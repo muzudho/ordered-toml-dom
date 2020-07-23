@@ -1,0 +1,8 @@
+# This file is a test.
+# このファイルはテスト用です。
+
+file_name = 'default' 
+file_ext = '.log.toml' # Only '.log.toml' or '.log'.
+retention_days = 7 
+level = 'Trace' # Only 'Trace', 'Debug', 'Info', 'Notice', 'Warn', 'Error', 'Fatal'.
+timeout_secs = 30
