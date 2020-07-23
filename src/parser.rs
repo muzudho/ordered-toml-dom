@@ -12,7 +12,7 @@ use std::io::{BufRead, BufReader};
 pub struct Document {}
 impl Document {
     pub fn from_file(path: &str) {
-        println!("WIP. {}", path);
+        println!("Read=|{}|", path);
         match File::open(path) {
             Ok(file) => {
                 for line in BufReader::new(file).lines() {
@@ -23,7 +23,7 @@ impl Document {
                             return;
                         }
                     };
-                    let line = LineSeek::from_line(&line);
+                    let _line = LineParser::from_line(&line);
                 }
             }
             Err(_why) => {
@@ -34,23 +34,59 @@ impl Document {
 }
 
 /// WIP.
-/// Line seeker.
-/// 行シーカー。
-pub struct LineSeek {}
-impl LineSeek {
+/// Line parser.
+/// 行パーサー。
+pub struct LineParser {
+    key: String,
+    right_value: String,
+}
+impl LineParser {
     pub fn from_line(line: &str) -> Self {
         println!("{}", line);
-        // 最初に出てくる文字まで飛ばします。
-        // Whitespace means tab (0x09 '\t') or space (0x20 ' ').
-        let ch_vec: Vec<char> = line.chars().collect();
-        let mut count = 0;
-        for ch in ch_vec {
-            match ch {
-                '\t' | ' ' => println!("[WhiteSpace]"),
-                _ => println!("[{}]", ch),
-            }
-            count += 1;
+        enum MachineState {
+            Start,
+            Key,
+            RightValue,
         }
+
+        let mut state = MachineState::Start;
+        let mut key = String::new();
+        let mut right_value = String::new();
+
+        let ch_vec: Vec<char> = line.chars().collect();
+        for ch in ch_vec {
+            match state {
+                MachineState::Start => {
+                    // 最初に出てくる文字まで飛ばします。
+                    // Whitespace means tab (0x09 '\t') or space (0x20 ' ').
+                    match ch {
+                        '\t' | ' ' => println!("[WhiteSpace]"),
+                        _ => {
+                            println!("[{}]", ch);
+                            key.push(ch);
+                            state = MachineState::Key;
+                        }
+                    }
+                }
+                MachineState::Key => {
+                    // イコールが出てくるまで読み取ります。
+                    // スペースもキーに含めます。
+                    match ch {
+                        '=' => {
+                            println!("key=|{}|", key);
+                            state = MachineState::RightValue;
+                        }
+                        _ => {
+                            key.push(ch);
+                        }
+                    }
+                }
+                MachineState::RightValue => {
+                    right_value.push(ch);
+                }
+            }
+        }
+        println!("right_value=|{}|", right_value);
 
         /*
         if let Ok(re_toml_key) = RE_TOML_KEY.lock() {
@@ -61,6 +97,80 @@ impl LineSeek {
         }
         */
 
-        LineSeek {}
+        LineParser {
+            key: key,
+            right_value: right_value,
+        }
+    }
+}
+
+/// Right value parser.
+/// 右値パーサー
+pub struct RightValueParser {}
+impl RightValueParser {
+    pub fn from_line(line: &str) {
+        println!("RightValueParser|line=|{}|", line);
+        enum MachineState {
+            Start,
+            InlineTableParser,
+        }
+        let mut state = MachineState::Start;
+
+        let ch_vec: Vec<char> = line.chars().collect();
+        for ch in ch_vec {
+            match state {
+                MachineState::Start => {
+                    // 最初に出てくる文字まで飛ばします。
+                    match ch {
+                        '\t' | ' ' => println!("[WhiteSpace]"),
+                        '{' => {
+                            println!("[{}]", ch);
+                            state = MachineState::InlineTableParser;
+                        }
+                        _ => {
+                            println!("[{}]", ch);
+                            // key.push(ch);
+                            // state = MachineState::Key;
+                        }
+                    }
+                }
+                MachineState::InlineTableParser => {}
+            }
+        }
+    }
+}
+
+enum InlineTableMachineState {
+    Start,
+}
+/// Inline table parser.
+/// インライン・テーブル・パーサー
+pub struct InlineTableParser {
+    state: InlineTableMachineState,
+}
+impl Default for InlineTableParser {
+    fn default() -> Self {
+        InlineTableParser {
+            state: InlineTableMachineState::Start,
+        }
+    }
+}
+impl InlineTableParser {
+    pub fn parse(&mut self, ch: char) {
+        println!("InlineTableParser|ch=|{}|", ch);
+
+        match self.state {
+            InlineTableMachineState::Start => {
+                // 最初に出てくる文字まで飛ばします。
+                match ch {
+                    '\t' | ' ' => println!("[WhiteSpace]"),
+                    _ => {
+                        println!("[{}]", ch);
+                        // key.push(ch);
+                        // state = MachineState::Key;
+                    }
+                }
+            }
+        }
     }
 }

@@ -7,5 +7,5 @@
 use toml_menu::parser::Document;
 
 fn main() {
-    let doc = Document::from_file("./casual-logger.toml");
+    let _doc = Document::from_file("./casual-logger.type.toml");
 }
