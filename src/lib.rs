@@ -4,8 +4,9 @@
 extern crate lazy_static;
 extern crate regex;
 
+pub mod lexical_parser;
 pub mod parser;
-pub mod tokenizer;
+pub mod scanner;
 
 use regex::Regex;
 use std::sync::Mutex;

@@ -1,30 +1,6 @@
 //! 単語単位に分けます。
 use crate::RE_KEY;
 use std::fmt;
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-
-pub struct Document {}
-impl Document {
-    pub fn from_file(path: &str) {
-        println!("Read=|{}|", path);
-        match File::open(path) {
-            Ok(file) => {
-                for line in BufReader::new(file).lines() {
-                    let line = match line {
-                        Ok(line) => line,
-                        Err(why) => panic!("{}", why),
-                    };
-                    println!("from_file/line=|{}|", line);
-                    let mut line_tokens = LineTokenizer::default();
-                    line_tokens.parse_line(&line);
-                    println!("from_file/line_tokens=|{:?}|", line_tokens);
-                }
-            }
-            Err(why) => panic!("{}", why),
-        }
-    }
-}
 
 #[derive(Debug)]
 enum LineMachineState {
@@ -34,17 +10,17 @@ enum LineMachineState {
 }
 
 /// WIP.
-/// Line tokenizer.
-/// 行トークンナイザー。
-pub struct LineTokenizer {
+/// Line parser.
+/// 行パーサー。
+pub struct LineParser {
     state: Option<LineMachineState>,
     tokens: Vec<Token>,
     buf_token_type: TokenType,
     buf: String,
 }
-impl Default for LineTokenizer {
+impl Default for LineParser {
     fn default() -> Self {
-        LineTokenizer {
+        LineParser {
             state: None,
             tokens: Vec::new(),
             buf_token_type: TokenType::WhiteSpace,
@@ -52,7 +28,7 @@ impl Default for LineTokenizer {
         }
     }
 }
-impl LineTokenizer {
+impl LineParser {
     pub fn parse_line(&mut self, line: &str) {
         println!("parse_line=|{}|", line);
 
@@ -160,7 +136,7 @@ impl LineTokenizer {
         println!("End of initial=|{}|", ch);
     }
 }
-impl fmt::Debug for LineTokenizer {
+impl fmt::Debug for LineParser {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for token in &self.tokens {

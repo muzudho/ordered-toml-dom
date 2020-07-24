@@ -4,8 +4,8 @@
 //!
 //! `cargo run --example main`
 
-use toml_menu::tokenizer::Document;
+use toml_menu::scanner::LineScanner;
 
 fn main() {
-    let _doc = Document::from_file("./casual-logger.type.toml");
+    let _doc = LineScanner::from_file("./casual-logger.type.toml");
 }
