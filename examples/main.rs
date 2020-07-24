@@ -4,7 +4,7 @@
 //!
 //! `cargo run --example main`
 
-use toml_menu::parser::Document;
+use toml_menu::tokenizer::Document;
 
 fn main() {
     let _doc = Document::from_file("./casual-logger.type.toml");

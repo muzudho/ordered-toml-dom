@@ -104,38 +104,43 @@ impl LineParser {
     }
 }
 
+enum RightValueMachineState {
+    Start,
+    InlineTableParser,
+}
+
 /// Right value parser.
 /// 右値パーサー
-pub struct RightValueParser {}
-impl RightValueParser {
-    pub fn from_line(line: &str) {
-        println!("RightValueParser|line=|{}|", line);
-        enum MachineState {
-            Start,
-            InlineTableParser,
+pub struct RightValueParser {
+    state: RightValueMachineState,
+}
+impl Default for RightValueParser {
+    fn default() -> Self {
+        RightValueParser {
+            state: RightValueMachineState::Start,
         }
-        let mut state = MachineState::Start;
-
-        let ch_vec: Vec<char> = line.chars().collect();
-        for ch in ch_vec {
-            match state {
-                MachineState::Start => {
-                    // 最初に出てくる文字まで飛ばします。
-                    match ch {
-                        '\t' | ' ' => println!("[WhiteSpace]"),
-                        '{' => {
-                            println!("[{}]", ch);
-                            state = MachineState::InlineTableParser;
-                        }
-                        _ => {
-                            println!("[{}]", ch);
-                            // key.push(ch);
-                            // state = MachineState::Key;
-                        }
+    }
+}
+impl RightValueParser {
+    pub fn parse(&mut self, ch: char) {
+        println!("RightValueParser|ch=|{}|", ch);
+        match self.state {
+            RightValueMachineState::Start => {
+                // 最初に出てくる文字まで飛ばします。
+                match ch {
+                    '\t' | ' ' => println!("[WhiteSpace]"),
+                    '{' => {
+                        println!("[{}]", ch);
+                        self.state = RightValueMachineState::InlineTableParser;
+                    }
+                    _ => {
+                        println!("[{}]", ch);
+                        // key.push(ch);
+                        // state = MachineState::Key;
                     }
                 }
-                MachineState::InlineTableParser => {}
             }
+            RightValueMachineState::InlineTableParser => {}
         }
     }
 }
