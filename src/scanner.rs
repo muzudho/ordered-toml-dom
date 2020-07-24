@@ -1,6 +1,6 @@
 use crate::lexical_parser::LineParser;
 use crate::syntax_parser::LineSyntaxScanner;
-use casual_logger::Log;
+use casual_logger::{Log, Table};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -21,7 +21,10 @@ impl LineScanner {
                     Log::info(&format!("from_file/line_tokens=|{:?}|", token_line));
                     let mut syntax_scanner = LineSyntaxScanner::default();
                     syntax_scanner.scan_line(&token_line.token_line);
-                    Log::info(&format!("Finish| {:?}", syntax_scanner))
+                    Log::info_t(
+                        "Finish.",
+                        Table::default().sub_t("syntax_scanner", &syntax_scanner.log()),
+                    )
                 }
             }
             Err(why) => panic!("{}", why),

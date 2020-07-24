@@ -1,7 +1,6 @@
 use crate::lexical_parser::Token;
 use crate::lexical_parser::{TokenLine, TokenType};
 use casual_logger::{Log, Table};
-use std::fmt;
 
 pub struct LineSyntaxScanner {
     line_syntax_parser: LineSyntaxParser,
@@ -30,10 +29,11 @@ impl LineSyntaxScanner {
             );
         }
     }
-}
-impl fmt::Debug for LineSyntaxScanner {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "contents=|{:?}|", self.line_syntax_parser)
+
+    pub fn log(&self) -> Table {
+        let mut t = Table::default();
+        t.sub_t("line", &self.line_syntax_parser.log());
+        t
     }
 }
 
@@ -100,24 +100,14 @@ impl LineSyntaxParser {
             }
         }
     }
-}
-impl fmt::Debug for LineSyntaxParser {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "state=|{:?}|
-{}",
-            self.state,
-            if let Some(key_value_syntax) = &self.key_value_syntax {
-                format!(
-                    "{:?}
-",
-                    key_value_syntax
-                )
-            } else {
-                "".to_string()
-            }
-        )
+    pub fn log(&self) -> Table {
+        let mut t = Table::default()
+            .str("state", &format!("{:?}", self.state))
+            .clone();
+        if let Some(key_value_syntax) = &self.key_value_syntax {
+            t.sub_t("key_value", &key_value_syntax.log());
+        }
+        t
     }
 }
 
@@ -189,28 +179,16 @@ impl KeyValueSyntaxParser {
             }
         }
     }
-}
-impl fmt::Debug for KeyValueSyntaxParser {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "state=|{:?}|
-key=|{}|
-right_value_buf=|{:?}|
-{}",
-            self.state,
-            self.key,
-            self.right_value_buf,
-            if let Some(inline_table_syntax_parser) = &self.inline_table_syntax_parser {
-                format!(
-                    "{:?}
-",
-                    inline_table_syntax_parser
-                )
-            } else {
-                "".to_string()
-            }
-        )
+    pub fn log(&self) -> Table {
+        let mut t = Table::default()
+            .str("state", &format!("{:?}", self.state))
+            .str("key", &self.key)
+            .str("right_value_buf", &format!("{:?}", self.right_value_buf))
+            .clone();
+        if let Some(inline_table_syntax_parser) = &self.inline_table_syntax_parser {
+            t.sub_t("inline_table", &inline_table_syntax_parser.log());
+        }
+        t
     }
 }
 
@@ -237,9 +215,9 @@ impl InlineTableSyntaxParser {
     pub fn parse(&mut self, token_line: &TokenLine, token: &Token) {
         self.contents.tokens.push(token.clone());
     }
-}
-impl fmt::Debug for InlineTableSyntaxParser {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "contents=|{:?}|", self.contents)
+    pub fn log(&self) -> Table {
+        Table::default()
+            .str("contents", &format!("{:?}", self.contents))
+            .clone()
     }
 }
