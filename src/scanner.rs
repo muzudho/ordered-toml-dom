@@ -1,5 +1,5 @@
 use crate::lexical_parser::LineParser;
-use crate::syntax_parser::SyntaxParser;
+use crate::syntax_parser::LineSyntaxParser;
 use casual_logger::Log;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -19,7 +19,7 @@ impl LineScanner {
                     let mut token_line = LineParser::default();
                     token_line.parse_line(&line);
                     Log::info(&format!("from_file/line_tokens=|{:?}|", token_line));
-                    let mut syntax_p = SyntaxParser::default();
+                    let mut syntax_p = LineSyntaxParser::default();
                     syntax_p.parse_line(&token_line.token_line);
                 }
             }

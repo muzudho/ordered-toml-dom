@@ -3,10 +3,13 @@
 //! TOMLパーサー。
 
 // use crate::toml::auto_correct::RE_TOML_KEY;
+/*
 use casual_logger::{Log, Table};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+*/
 
+/*
 /// WIP.
 /// TOML parser.
 /// TOMLパーサー。
@@ -33,7 +36,9 @@ impl Document {
         }
     }
 }
+*/
 
+/*
 /// WIP.
 /// Line parser.
 /// 行パーサー。
@@ -107,7 +112,9 @@ impl LineParser {
         }
     }
 }
+*/
 
+/*
 enum RightValueMachineState {
     Start,
     InlineTableParser,
@@ -181,3 +188,4 @@ impl InlineTableParser {
         }
     }
 }
+*/

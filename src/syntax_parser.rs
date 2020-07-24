@@ -1,3 +1,4 @@
+use crate::lexical_parser::Token;
 use crate::lexical_parser::{TokenLine, TokenType};
 use casual_logger::{Log, Table};
 
@@ -15,17 +16,20 @@ enum KeyPairSyntaxMachineState {
     AfterEquals,
 }
 
-pub struct SyntaxParser {}
-impl Default for SyntaxParser {
+pub struct LineSyntaxParser {
+    key_value_syntax: Option<KeyValueSyntaxParser>,
+}
+impl Default for LineSyntaxParser {
     fn default() -> Self {
-        SyntaxParser {}
+        LineSyntaxParser {
+            key_value_syntax: None,
+        }
     }
 }
-impl SyntaxParser {
+impl LineSyntaxParser {
     pub fn parse_line(&mut self, token_line: &TokenLine) {
         let mut state: MachineState = MachineState::First;
         let mut key_pair_state: KeyPairSyntaxMachineState = KeyPairSyntaxMachineState::AfterKey;
-        let mut right_value_buf: TokenLine = TokenLine::default();
 
         for token in &token_line.tokens {
             match state {
@@ -39,6 +43,7 @@ impl SyntaxParser {
                                 .str("key_pair_state", &format!("{:?}", key_pair_state))
                                 .str("token", &format!("{:?}", token)),
                         );
+                        self.key_value_syntax = Some(KeyValueSyntaxParser::new(&token.value));
                         state = MachineState::KeyPairSyntax;
                     }
                     _ => {
@@ -63,7 +68,18 @@ impl SyntaxParser {
                         }
                     }
                     KeyPairSyntaxMachineState::AfterEquals => {
-                        right_value_buf.tokens.push(token.clone());
+                        if let Some(key_value_syntax) = &mut self.key_value_syntax {
+                            key_value_syntax.parse(token);
+                        } else {
+                            panic!(Log::fatal_t(
+                                "",
+                                Table::default()
+                                    .str("token_line", &format!("{:?}", token_line))
+                                    .str("state", &format!("{:?}", state))
+                                    .str("key_pair_state", &format!("{:?}", key_pair_state))
+                                    .str("token", &format!("{:?}", token))
+                            ));
+                        }
                     }
                 },
                 MachineState::Unimplemented => {
@@ -82,12 +98,42 @@ impl SyntaxParser {
 
         match state {
             MachineState::KeyPairSyntax => {
-                Log::info_t(
-                    "SyntaxParser#parse_line",
-                    Table::default().str("right_value_buf", &format!("{:?}", right_value_buf)),
-                );
+                if let Some(key_value_syntax) = &self.key_value_syntax {
+                    Log::info_t(
+                        "LineSyntaxParser#parse_line/AfterEndOfLine",
+                        Table::default().str("key", &key_value_syntax.key).str(
+                            "right_value",
+                            &format!("{:?}", key_value_syntax.right_value_buf),
+                        ),
+                    );
+                } else {
+                    panic!(Log::fatal_t(
+                        "",
+                        Table::default()
+                            .str("token_line", &format!("{:?}", token_line))
+                            .str("state", &format!("{:?}", state))
+                            .str("key_pair_state", &format!("{:?}", key_pair_state))
+                    ));
+                }
             }
             _ => {}
         }
+    }
+}
+
+/// `key = value`.
+pub struct KeyValueSyntaxParser {
+    key: String,
+    right_value_buf: TokenLine,
+}
+impl KeyValueSyntaxParser {
+    pub fn new(key: &str) -> Self {
+        KeyValueSyntaxParser {
+            key: key.to_string(),
+            right_value_buf: TokenLine::default(),
+        }
+    }
+    pub fn parse(&mut self, token: &Token) {
+        self.right_value_buf.tokens.push(token.clone());
     }
 }
