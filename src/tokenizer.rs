@@ -76,8 +76,6 @@ impl LineTokenizer {
                         }
                     }
                     LineMachineState::Key => {
-                        // イコールが出てくるまで読み取ります。
-                        // スペースもキーに含めます。
                         let matched = match RE_KEY.lock() {
                             Ok(re_key) => re_key.is_match(&ch.to_string()),
                             Err(why) => {
@@ -104,6 +102,15 @@ impl LineTokenizer {
         println!("End of line.");
         self.flush();
     }
+    /// Flush.
+    fn flush(&mut self) {
+        if !self.buf.is_empty() {
+            self.tokens.push(Token::new(&self.buf, self.buf_token_type));
+            println!("Flush=|{}|", self.buf);
+            self.buf.clear();
+            self.state = None;
+        }
+    }
     /// 最初の文字
     fn initial(&mut self, ch: char) {
         self.buf.push(ch);
@@ -114,10 +121,25 @@ impl LineTokenizer {
                 println!("initial/{:?}=|{}|", self.buf_token_type, ch);
                 self.state = Some(LineMachineState::WhiteSpace);
             }
+            ',' => {
+                self.buf_token_type = TokenType::Comma;
+                println!("initial/{:?}=|{}|", self.buf_token_type, ch);
+            }
             '=' => {
                 self.buf_token_type = TokenType::Equals;
                 println!("initial/{:?}=|{}|", self.buf_token_type, ch);
-                self.state = None;
+            }
+            '{' => {
+                self.buf_token_type = TokenType::LeftCurlyBracket;
+                println!("initial/{:?}=|{}|", self.buf_token_type, ch);
+            }
+            '}' => {
+                self.buf_token_type = TokenType::RightCurlyBracket;
+                println!("initial/{:?}=|{}|", self.buf_token_type, ch);
+            }
+            '\'' => {
+                self.buf_token_type = TokenType::SingleQuotation;
+                println!("initial/{:?}=|{}|", self.buf_token_type, ch);
             }
             _ => {
                 let matched = match RE_KEY.lock() {
@@ -132,35 +154,36 @@ impl LineTokenizer {
                 } else {
                     self.buf_token_type = TokenType::Unimplemented;
                     println!("initial/{:?}=|{}|", self.buf_token_type, ch);
-                    self.state = None;
                 }
             }
         }
         println!("End of initial=|{}|", ch);
-    }
-    /// Flush.
-    fn flush(&mut self) {
-        if !self.buf.is_empty() {
-            self.tokens.push(Token::new(&self.buf, self.buf_token_type));
-            println!("Flush=|{}|", self.buf);
-            self.buf.clear();
-        }
     }
 }
 impl fmt::Debug for LineTokenizer {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for token in &self.tokens {
-            buf.push_str(&format!("{:?} ", token));
+            buf.push_str(&format!("{:?}", token));
         }
-        write!(f, "{}", buf.trim_end())
+        write!(f, "{}", buf)
     }
 }
 
 #[derive(Clone, Copy, Debug)]
 pub enum TokenType {
+    /// }
+    CloseCurlyBracket,
+    /// ,
+    Comma,
     Equals,
     Key,
+    /// {
+    LeftCurlyBracket,
+    /// }
+    RightCurlyBracket,
+    /// '
+    SingleQuotation,
     Unimplemented,
     /// Whitespace means tab (0x09 '\t') or space (0x20 ' ').
     WhiteSpace,
@@ -180,6 +203,6 @@ impl Token {
 }
 impl fmt::Debug for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "|{}|({:?})", self.value, self.type_)
+        write!(f, "|{}|{:?}", self.value, self.type_)
     }
 }
