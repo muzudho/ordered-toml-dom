@@ -21,6 +21,7 @@ impl LineScanner {
                     Log::info(&format!("from_file/line_tokens=|{:?}|", token_line));
                     let mut syntax_scanner = LineSyntaxScanner::default();
                     syntax_scanner.scan_line(&token_line.token_line);
+                    Log::info(&format!("Finish| {:?}", syntax_scanner))
                 }
             }
             Err(why) => panic!("{}", why),
