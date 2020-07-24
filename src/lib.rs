@@ -7,6 +7,7 @@ extern crate regex;
 pub mod lexical_parser;
 pub mod parser;
 pub mod scanner;
+pub mod syntax_parser;
 
 use regex::Regex;
 use std::sync::Mutex;

@@ -3,6 +3,7 @@
 //! TOMLパーサー。
 
 // use crate::toml::auto_correct::RE_TOML_KEY;
+use casual_logger::{Log, Table};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -12,7 +13,7 @@ use std::io::{BufRead, BufReader};
 pub struct Document {}
 impl Document {
     pub fn from_file(path: &str) {
-        println!("Read=|{}|", path);
+        Log::info_t("from_file", Table::default().str("path", path));
         match File::open(path) {
             Ok(file) => {
                 for line in BufReader::new(file).lines() {
@@ -42,7 +43,7 @@ pub struct LineParser {
 }
 impl LineParser {
     pub fn from_line(line: &str) -> Self {
-        println!("{}", line);
+        Log::info_t("from_line", Table::default().str("line", line));
         enum MachineState {
             Start,
             Key,
@@ -60,9 +61,9 @@ impl LineParser {
                     // 最初に出てくる文字まで飛ばします。
                     // Whitespace means tab (0x09 '\t') or space (0x20 ' ').
                     match ch {
-                        '\t' | ' ' => println!("[WhiteSpace]"),
+                        '\t' | ' ' => Log::info("[WhiteSpace]"),
                         _ => {
-                            println!("[{}]", ch);
+                            Log::info_t("from_line", Table::default().char("ch", ch));
                             key.push(ch);
                             state = MachineState::Key;
                         }
@@ -73,7 +74,7 @@ impl LineParser {
                     // スペースもキーに含めます。
                     match ch {
                         '=' => {
-                            println!("key=|{}|", key);
+                            Log::info_t("from_line", Table::default().str("key", &key));
                             state = MachineState::RightValue;
                         }
                         _ => {
@@ -86,7 +87,10 @@ impl LineParser {
                 }
             }
         }
-        println!("right_value=|{}|", right_value);
+        Log::info_t(
+            "from_line",
+            Table::default().str("right_value", &right_value),
+        );
 
         /*
         if let Ok(re_toml_key) = RE_TOML_KEY.lock() {
@@ -123,18 +127,17 @@ impl Default for RightValueParser {
 }
 impl RightValueParser {
     pub fn parse(&mut self, ch: char) {
-        println!("RightValueParser|ch=|{}|", ch);
+        Log::info_t("RightValueParser#parse", Table::default().char("ch", ch));
         match self.state {
             RightValueMachineState::Start => {
                 // 最初に出てくる文字まで飛ばします。
                 match ch {
-                    '\t' | ' ' => println!("[WhiteSpace]"),
+                    '\t' | ' ' => Log::info("[WhiteSpace]"),
+
                     '{' => {
-                        println!("[{}]", ch);
                         self.state = RightValueMachineState::InlineTableParser;
                     }
                     _ => {
-                        println!("[{}]", ch);
                         // key.push(ch);
                         // state = MachineState::Key;
                     }
@@ -162,15 +165,14 @@ impl Default for InlineTableParser {
 }
 impl InlineTableParser {
     pub fn parse(&mut self, ch: char) {
-        println!("InlineTableParser|ch=|{}|", ch);
+        Log::info_t("InlineTableParser#parse", Table::default().char("ch", ch));
 
         match self.state {
             InlineTableMachineState::Start => {
                 // 最初に出てくる文字まで飛ばします。
                 match ch {
-                    '\t' | ' ' => println!("[WhiteSpace]"),
+                    '\t' | ' ' => Log::info("[WhiteSpace]"),
                     _ => {
-                        println!("[{}]", ch);
                         // key.push(ch);
                         // state = MachineState::Key;
                     }
