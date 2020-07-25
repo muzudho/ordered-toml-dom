@@ -155,23 +155,23 @@ impl KeyValueParser {
                         }
                     }
                 } else {
-                    panic!(Log::fatal_t(
-                        "",
+                    return SyntaxParserResult::Err(
                         Table::default()
                             .str("parser", "KeyValueParser#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
-                    ));
+                            .clone(),
+                    );
                 }
             }
             MachineState::End => {
-                panic!(Log::fatal_t(
-                    "",
+                return SyntaxParserResult::Err(
                     Table::default()
                         .str("parser", "KeyValueParser#parse")
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token))
-                ));
+                        .clone(),
+                );
             }
         }
         SyntaxParserResult::Ok(false)

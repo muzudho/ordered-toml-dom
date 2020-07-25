@@ -71,7 +71,7 @@ impl ArrayParser {
                 TokenType::Comma => {
                     self.state = MachineState::AfterLeftSquareBracket;
                 }
-                TokenType::RightCurlyBracket => {
+                TokenType::RightSquareBracket => {
                     return SyntaxParserResult::Ok(true);
                 }
                 _ => panic!(Log::fatal_t(
