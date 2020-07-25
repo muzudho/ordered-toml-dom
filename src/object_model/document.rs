@@ -4,7 +4,11 @@ use std::fmt;
 pub struct DocumentModel {
     pub items: Vec<LineModel>,
 }
-impl DocumentModel {}
+impl Default for DocumentModel {
+    fn default() -> Self {
+        DocumentModel { items: Vec::new() }
+    }
+}
 impl fmt::Debug for DocumentModel {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();

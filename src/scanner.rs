@@ -1,4 +1,5 @@
 use crate::lexical_parser::LineLexicalParser;
+use crate::object_model::document::DocumentModel;
 use crate::syntax::SyntaxParserResult;
 use crate::syntax_parser::LineSyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
@@ -10,7 +11,7 @@ impl LineScanner {
     pub fn from_file(path: &str) {
         Log::info(&format!("Read=|{}|", path));
         let mut aot = ArrayOfTable::default().clone();
-        // let mut dom =
+        let mut document_model = DocumentModel::default();
         match File::open(path) {
             Ok(file) => {
                 for line in BufReader::new(file).lines() {
@@ -25,13 +26,9 @@ impl LineScanner {
                     let mut line_syntax_scanner = LineSyntaxScanner::default();
                     match line_syntax_scanner.scan_line(&token_line.token_line) {
                         SyntaxParserResult::Ok(_) => {
-                            let product = line_syntax_scanner.line_parser.product();
-                            Log::info_t(
-                                "Product",
-                                Table::default()
-                                    .str("parser", "LineScanner#from_file")
-                                    .str("product", &format!("{:?}", product)),
-                            );
+                            document_model
+                                .items
+                                .push(line_syntax_scanner.line_parser.product());
                         } // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             aot.table(
@@ -47,6 +44,12 @@ impl LineScanner {
             }
             Err(why) => panic!("{}", why),
         }
+        Log::info_t(
+            "Product.",
+            Table::default()
+                .str("parser", "LineScanner#from_file")
+                .str("product", &format!("{:?}", document_model)),
+        );
         Log::info_t(
             "Finish of LineScanner#from_file().",
             Table::default().sub_aot("file", &aot),
