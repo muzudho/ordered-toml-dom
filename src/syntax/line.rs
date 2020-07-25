@@ -27,9 +27,7 @@ impl LineParser {
     pub fn product(&self) -> LineModel {
         let mut product = LineModel::default();
         if let Some(p) = &self.comment_syntax {
-            product
-                .items
-                .push(LineItemModel::Comment(p.product.clone()));
+            product.items.push(LineItemModel::Comment(p.product()));
         }
         product
     }

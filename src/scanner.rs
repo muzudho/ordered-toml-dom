@@ -1,7 +1,7 @@
 use crate::lexical_parser::LineLexicalParser;
 use crate::object_model::document::DocumentModel;
 use crate::syntax::SyntaxParserResult;
-use crate::syntax_parser::LineSyntaxScanner;
+use crate::syntax_scanner::LineSyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use std::fs::File;
 use std::io::{BufRead, BufReader};

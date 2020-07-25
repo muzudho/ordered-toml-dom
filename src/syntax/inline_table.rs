@@ -2,10 +2,7 @@
 //! 構文パーサー。
 
 use crate::lexical_parser::{Token, TokenType};
-use crate::object_model::{
-    inline_table::{InlineTableItemModel, InlineTableModel},
-    key_value::KeyValueModel,
-};
+use crate::object_model::{inline_table::InlineTableModel, key_value::KeyValueModel, value::Value};
 use crate::syntax::key_value::KeyValueParser;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
@@ -26,6 +23,9 @@ impl Default for InlineTableParser {
     }
 }
 impl InlineTableParser {
+    pub fn product(&self) -> InlineTableModel {
+        self.product.clone()
+    }
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  
@@ -36,9 +36,9 @@ impl InlineTableParser {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Key => {
-                        self.product.items.push(InlineTableItemModel::KeyValue(
-                            KeyValueModel::new(&token.value),
-                        ));
+                        self.product
+                            .items
+                            .push(Value::KeyValue(KeyValueModel::new(&token.value)));
                         self.key_value_syntax_parser =
                             Some(Box::new(KeyValueParser::new(&token.value)));
                         self.state = MachineState::AfterKey;

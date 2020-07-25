@@ -1,14 +1,11 @@
-use crate::object_model::key_value::KeyValueModel;
+use crate::object_model::value::Value;
 
+#[derive(Clone)]
 pub struct InlineTableModel {
-    pub items: Vec<InlineTableItemModel>,
+    pub items: Vec<Value>,
 }
 impl Default for InlineTableModel {
     fn default() -> Self {
         InlineTableModel { items: Vec::new() }
     }
-}
-
-pub enum InlineTableItemModel {
-    KeyValue(KeyValueModel),
 }

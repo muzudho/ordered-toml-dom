@@ -1,6 +1,7 @@
 use crate::object_model::value::Value;
 use std::fmt;
 
+#[derive(Clone)]
 pub struct KeyValueModel {
     key: String,
     value: Option<Box<Value>>,

@@ -8,7 +8,7 @@ pub mod lexical_parser;
 pub mod object_model;
 pub mod scanner;
 mod syntax;
-pub mod syntax_parser;
+pub mod syntax_scanner;
 
 use regex::Regex;
 use std::sync::Mutex;

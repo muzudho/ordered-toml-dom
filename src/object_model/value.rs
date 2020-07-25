@@ -1,6 +1,7 @@
 use crate::object_model::key_value::KeyValueModel;
 use std::fmt;
 
+#[derive(Clone)]
 pub enum Value {
     String(String),
     KeyValue(KeyValueModel),
