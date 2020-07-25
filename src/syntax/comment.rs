@@ -1,7 +1,5 @@
 use crate::lexical_parser::Token;
-use crate::lexical_parser::{TokenLine, TokenType};
-use crate::syntax::inline_table::InlineTableSyntaxParser;
-use casual_logger::{Log, Table};
+use casual_logger::Table;
 
 /// `# comment`.
 pub struct CommentSyntaxParser {
@@ -13,7 +11,7 @@ impl CommentSyntaxParser {
             value: String::new(),
         }
     }
-    pub fn parse(&mut self, token_line: &TokenLine, token: &Token) {
+    pub fn parse(&mut self, token: &Token) {
         self.value.push_str(&token.value);
     }
     pub fn log(&self) -> Table {

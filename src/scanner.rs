@@ -22,7 +22,11 @@ impl LineScanner {
                     Log::info(&format!("from_file/line_tokens=|{:?}|", token_line));
                     let mut syntax_scanner = LineSyntaxScanner::default();
                     syntax_scanner.scan_line(&token_line.token_line);
-                    aot.table(&syntax_scanner.log());
+                    aot.table(
+                        Table::default()
+                            .str("token_line", &format!("{:?}", token_line))
+                            .sub_t("syntax_scanner", &syntax_scanner.log()),
+                    );
                 }
             }
             Err(why) => panic!("{}", why),

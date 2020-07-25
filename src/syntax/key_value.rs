@@ -27,7 +27,7 @@ impl KeyValueSyntaxParser {
             inline_table_syntax_parser: None,
         }
     }
-    pub fn parse(&mut self, token_line: &TokenLine, token: &Token) {
+    pub fn parse(&mut self, token: &Token) {
         match self.state {
             KeyValueSyntaxMachineState::AfterKey => {
                 match token.type_ {
@@ -39,7 +39,6 @@ impl KeyValueSyntaxParser {
                         "",
                         Table::default()
                             .str("state", &format!("{:?}", self.state))
-                            .str("token_line", &format!("{:?}", token_line))
                             .str("token", &format!("{:?}", token))
                     )),
                 }
@@ -58,13 +57,12 @@ impl KeyValueSyntaxParser {
             }
             KeyValueSyntaxMachineState::AfterLeftCurlyBracket => {
                 if let Some(p) = &mut self.inline_table_syntax_parser {
-                    p.parse(token_line, token);
+                    p.parse(token);
                 } else {
                     panic!(Log::fatal_t(
                         "",
                         Table::default()
                             .str("state", &format!("{:?}", self.state))
-                            .str("token_line", &format!("{:?}", token_line))
                             .str("token", &format!("{:?}", token))
                     ));
                 }

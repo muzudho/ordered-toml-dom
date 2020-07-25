@@ -1,5 +1,5 @@
 use crate::lexical_parser::Token;
-use crate::lexical_parser::{TokenLine, TokenType};
+use crate::lexical_parser::TokenType;
 use crate::syntax::comment::CommentSyntaxParser;
 use crate::syntax::key_value::KeyValueSyntaxParser;
 use casual_logger::{Log, Table};
@@ -29,20 +29,16 @@ impl Default for LineSyntaxParser {
     }
 }
 impl LineSyntaxParser {
-    pub fn parse(&mut self, token_line: &TokenLine, token: &Token) {
+    pub fn parse(&mut self, token: &Token) {
         match self.state {
             LineSyntaxParserMachineState::CommentSyntax => {
-                self.comment_syntax
-                    .as_mut()
-                    .unwrap()
-                    .parse(token_line, token);
+                self.comment_syntax.as_mut().unwrap().parse(token);
             }
             LineSyntaxParserMachineState::First => match token.type_ {
                 TokenType::Key => {
                     Log::info_t(
                         "LineSyntaxParser#parse",
                         Table::default()
-                            .str("token_line", &format!("{:?}", token_line))
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token)),
                     );
@@ -59,12 +55,11 @@ impl LineSyntaxParser {
             },
             LineSyntaxParserMachineState::KeyPairSyntax => {
                 if let Some(key_value_syntax) = &mut self.key_value_syntax {
-                    key_value_syntax.parse(token_line, token);
+                    key_value_syntax.parse(token);
                 } else {
                     panic!(Log::fatal_t(
                         "LineSyntaxParser#parse",
                         Table::default()
-                            .str("token_line", &format!("{:?}", token_line))
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     ));
@@ -74,7 +69,6 @@ impl LineSyntaxParser {
                 Log::info_t(
                     "LineSyntaxParser#parse",
                     Table::default()
-                        .str("token_line", &format!("{:?}", token_line))
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token)),
                 );

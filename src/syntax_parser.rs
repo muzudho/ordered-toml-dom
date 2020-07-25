@@ -15,7 +15,7 @@ impl Default for LineSyntaxScanner {
 impl LineSyntaxScanner {
     pub fn scan_line(&mut self, token_line: &TokenLine) {
         for token in &token_line.tokens {
-            self.line_syntax_parser.parse(token_line, token);
+            self.line_syntax_parser.parse(token);
         }
     }
 
