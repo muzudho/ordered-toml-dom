@@ -1,6 +1,7 @@
 use crate::object_model::key_value::KeyValueM;
 use std::fmt;
 
+#[derive(Clone)]
 pub struct LineM {
     pub items: Vec<LineItemModel>,
 }
@@ -19,6 +20,7 @@ impl fmt::Debug for LineM {
     }
 }
 
+#[derive(Clone)]
 pub enum LineItemModel {
     Comment(String),
     KeyValue(KeyValueM),

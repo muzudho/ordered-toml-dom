@@ -7,9 +7,12 @@ use casual_logger::Table;
 
 /// `'value'`.
 pub struct SingleQuotedStringP {
-    pub product: String,
+    product: String,
 }
 impl SingleQuotedStringP {
+    pub fn product(&self) -> String {
+        self.product.clone()
+    }
     pub fn new() -> Self {
         SingleQuotedStringP {
             product: String::new(),

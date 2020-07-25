@@ -29,7 +29,7 @@ impl fmt::Debug for KeyValueM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "{}={}",
+            "{}=|{}|",
             self.key,
             if let Some(v) = &self.value {
                 format!("{:?}", v).to_string()

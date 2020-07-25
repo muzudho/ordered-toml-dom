@@ -70,8 +70,10 @@ impl LineP {
             MachineState::KeyPairSyntax => {
                 if let Some(key_value_p) = &mut self.key_value_p {
                     match key_value_p.parse(token) {
-                        SyntaxParserResult::Ok(_) => {
-                            dom.items.push(self.product());
+                        SyntaxParserResult::Ok(end_of_syntax) => {
+                            if end_of_syntax {
+                                dom.push(&self.product());
+                            }
                         } // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(

@@ -146,6 +146,7 @@ impl KeyValueP {
                     match p.parse(token) {
                         SyntaxParserResult::Ok(end_of_syntax) => {
                             if end_of_syntax {
+                                self.product.value = Some(Box::new(ValueM::String(p.product())));
                                 self.single_quoted_string_p = None;
                                 self.state = MachineState::End;
                                 return SyntaxParserResult::Ok(true);
