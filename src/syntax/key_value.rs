@@ -5,6 +5,7 @@ use crate::lexical_parser::Token;
 use crate::lexical_parser::{TokenLine, TokenType};
 use crate::syntax::inline_table::InlineTableParser;
 use crate::syntax::single_quoted_string::SingleQuotedStringParser;
+use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
 /// `key = value`.
@@ -27,8 +28,9 @@ impl KeyValueParser {
     }
     /// # Returns
     ///
-    /// End of syntax.
-    pub fn parse(&mut self, token: &Token) -> bool {
+    /// * `SyntaxParserResult` - Result.  
+    ///                             結果。
+    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
             MachineState::AfterKey => {
                 match token.type_ {
@@ -36,12 +38,14 @@ impl KeyValueParser {
                     TokenType::Equals => {
                         self.state = MachineState::AfterEquals;
                     }
-                    _ => panic!(Log::fatal_t(
-                        "",
-                        Table::default()
-                            .str("state", &format!("{:?}", self.state))
-                            .str("token", &format!("{:?}", token))
-                    )),
+                    _ => {
+                        return SyntaxParserResult::Err(
+                            Table::default()
+                                .str("state", &format!("{:?}", self.state))
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
                 }
             }
             MachineState::AfterEquals => {
@@ -66,7 +70,7 @@ impl KeyValueParser {
                     if p.parse(token) {
                         self.inline_table_parser = None;
                         self.state = MachineState::End;
-                        return true;
+                        return SyntaxParserResult::Ok(true);
                     }
                 } else {
                     panic!(Log::fatal_t(
@@ -82,7 +86,7 @@ impl KeyValueParser {
                     if p.parse(token) {
                         self.single_quoted_string_parser = None;
                         self.state = MachineState::End;
-                        return true;
+                        return SyntaxParserResult::Ok(true);
                     }
                 } else {
                     panic!(Log::fatal_t(
@@ -102,7 +106,7 @@ impl KeyValueParser {
                 ));
             }
         }
-        false
+        SyntaxParserResult::Ok(false)
     }
     pub fn log(&self) -> Table {
         let mut t = Table::default()

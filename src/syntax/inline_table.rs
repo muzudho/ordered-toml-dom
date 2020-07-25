@@ -3,6 +3,7 @@
 
 use crate::lexical_parser::{Token, TokenLine, TokenType};
 use crate::syntax::key_value::KeyValueParser;
+use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
 /// `{ key = value, key = value }`.
@@ -40,12 +41,24 @@ impl InlineTableParser {
                 }
             }
             MachineState::AfterKey => {
-                if self.key_value_syntax_parser.as_mut().unwrap().parse(token) {
-                    self.key_value_syntax_parser = None;
-                    self.state = MachineState::AfterValue;
+                match self.key_value_syntax_parser.as_mut().unwrap().parse(token) {
+                    SyntaxParserResult::Ok(end_of_syntax) => {
+                        if end_of_syntax {
+                            self.key_value_syntax_parser = None;
+                            self.state = MachineState::AfterValue;
+                        }
+                    }
+                    SyntaxParserResult::Err(table) => panic!(Log::fatal_t(
+                        "InlineTableParser#parse/AfterValue",
+                        Table::default()
+                            .str("state", &format!("{:?}", self.state))
+                            .str("token", &format!("{:?}", token))
+                            .sub_t("key_value_error", &table)
+                    )),
                 }
             }
             MachineState::AfterValue => match token.type_ {
+                TokenType::WhiteSpace => {} // Ignore it.
                 TokenType::Comma => {
                     self.state = MachineState::AfterLeftCurlyBracket;
                 }
