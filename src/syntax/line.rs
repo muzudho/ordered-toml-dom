@@ -45,6 +45,7 @@ impl LineParser {
             }
             MachineState::First => match token.type_ {
                 TokenType::Key => {
+                    /*
                     Log::info_t(
                         "LineParser#parse",
                         Table::default()
@@ -52,6 +53,7 @@ impl LineParser {
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token)),
                     );
+                    */
                     self.key_value_syntax = Some(KeyValueParser::new(&token.value));
                     self.state = MachineState::KeyPairSyntax;
                 }

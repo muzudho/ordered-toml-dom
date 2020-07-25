@@ -31,30 +31,34 @@ impl Default for LineLexicalParser {
 }
 impl LineLexicalParser {
     pub fn parse_line(&mut self, line: &str) {
-        Log::info_t("parse_line", Table::default().str("line", line));
+        // Log::info_t("parse_line", Table::default().str("line", line));
 
         let ch_vec: Vec<char> = line.chars().collect();
         for ch in ch_vec {
-            Log::info_t("parse_line", Table::default().char("ch", ch));
+            // Log::info_t("parse_line", Table::default().char("ch", ch));
             if let Some(state) = &self.state {
+                /*
                 Log::info_t(
                     "parse_line",
                     Table::default()
                         .str("state", &format!("{:?}", state))
                         .char("ch", ch),
                 );
+                */
                 match state {
                     LineMachineState::WhiteSpace => {
                         // 最初に出てくる文字まで飛ばします。
                         match ch {
                             '\t' | ' ' => {
                                 self.buf.push(ch);
+                                /*
                                 Log::info_t(
                                     "",
                                     Table::default()
                                         .str("state", &format!("{:?}", state))
                                         .char("ch", ch),
                                 );
+                                */
                             }
                             _ => {
                                 self.flush();
@@ -70,12 +74,14 @@ impl LineLexicalParser {
                         if matched {
                             // A key.
                             self.buf.push(ch);
-                            Log::info_t(
-                                "",
-                                Table::default()
-                                    .str("state", &format!("{:?}", state))
-                                    .char("ch", ch),
-                            );
+                        /*
+                        Log::info_t(
+                            "",
+                            Table::default()
+                                .str("state", &format!("{:?}", state))
+                                .char("ch", ch),
+                        );
+                        */
                         } else {
                             self.flush();
                             self.initial(ch);
@@ -83,13 +89,13 @@ impl LineLexicalParser {
                     }
                 }
             } else {
-                Log::info_t("parse_line", Table::default().char("ch", ch));
+                // Log::info_t("parse_line", Table::default().char("ch", ch));
                 self.flush();
                 self.initial(ch);
             }
-            Log::info_t("End of parse_line", Table::default().char("ch", ch));
+            // Log::info_t("End of parse_line", Table::default().char("ch", ch));
         }
-        Log::info("End of line.");
+        // Log::info("End of line.");
         self.flush();
     }
     /// Flush.
@@ -98,7 +104,7 @@ impl LineLexicalParser {
             self.token_line
                 .tokens
                 .push(Token::new(&self.buf, self.buf_token_type));
-            Log::info_t("Flush", Table::default().str("buf", &self.buf));
+            // Log::info_t("Flush", Table::default().str("buf", &self.buf));
             self.buf.clear();
             self.state = None;
         }
@@ -106,89 +112,107 @@ impl LineLexicalParser {
     /// 最初の文字
     fn initial(&mut self, ch: char) {
         self.buf.push(ch);
-        Log::info_t("Begin of initial", Table::default().char("ch", ch));
+        // Log::info_t("Begin of initial", Table::default().char("ch", ch));
         match ch {
             '\t' | ' ' => {
                 self.buf_token_type = TokenType::WhiteSpace;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
                 self.state = Some(LineMachineState::WhiteSpace);
             }
             ',' => {
                 self.buf_token_type = TokenType::Comma;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             '=' => {
                 self.buf_token_type = TokenType::Equals;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             '{' => {
                 self.buf_token_type = TokenType::LeftCurlyBracket;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             '[' => {
                 self.buf_token_type = TokenType::LeftSquareBracket;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             '}' => {
                 self.buf_token_type = TokenType::RightCurlyBracket;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             ']' => {
                 self.buf_token_type = TokenType::RightSquareBracket;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             '#' => {
                 self.buf_token_type = TokenType::Sharp;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             '\'' => {
                 self.buf_token_type = TokenType::SingleQuotation;
+                /*
                 Log::info_t(
                     "initial",
                     Table::default()
                         .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                         .char("ch", ch),
                 );
+                */
             }
             _ => {
                 let matched = match RE_KEY.lock() {
@@ -198,25 +222,29 @@ impl LineLexicalParser {
                 if matched {
                     // A key.
                     self.buf_token_type = TokenType::Key;
+                    /*
                     Log::info_t(
                         "initial",
                         Table::default()
                             .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                             .char("ch", ch),
                     );
+                    */
                     self.state = Some(LineMachineState::Key);
                 } else {
                     self.buf_token_type = TokenType::Unimplemented;
+                    /*
                     Log::info_t(
                         "initial",
                         Table::default()
                             .str("buf_token_type", &format!("{:?}", self.buf_token_type))
                             .char("ch", ch),
                     );
+                    */
                 }
             }
         }
-        Log::info_t("End of initial", Table::default().char("ch", ch));
+        // Log::info_t("End of initial", Table::default().char("ch", ch));
     }
 }
 impl fmt::Debug for LineLexicalParser {
