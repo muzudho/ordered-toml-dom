@@ -2,7 +2,7 @@ use crate::object_model::key_value::KeyValueModel;
 use std::fmt;
 
 pub struct LineModel {
-    pub items: Vec<LineModelItem>,
+    pub items: Vec<LineItemModel>,
 }
 impl Default for LineModel {
     fn default() -> Self {
@@ -19,13 +19,15 @@ impl fmt::Debug for LineModel {
     }
 }
 
-pub enum LineModelItem {
+pub enum LineItemModel {
+    Comment(String),
     KeyValue(KeyValueModel),
 }
-impl fmt::Debug for LineModelItem {
+impl fmt::Debug for LineItemModel {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            LineModelItem::KeyValue(m) => write!(f, "{}", format!("{:?}", m)),
+            LineItemModel::Comment(s) => write!(f, "{}", format!("{}", s)),
+            LineItemModel::KeyValue(m) => write!(f, "{}", format!("{:?}", m)),
         }
     }
 }

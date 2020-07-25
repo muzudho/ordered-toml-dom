@@ -3,7 +3,7 @@
 
 use crate::lexical_parser::Token;
 use crate::lexical_parser::TokenType;
-use crate::object_model::line::LineModel;
+use crate::object_model::line::{LineItemModel, LineModel};
 use crate::syntax::comment::CommentParser;
 use crate::syntax::key_value::KeyValueParser;
 use crate::syntax::SyntaxParserResult;
@@ -11,7 +11,6 @@ use casual_logger::{Log, Table};
 
 pub struct LineParser {
     state: MachineState,
-    pub product: LineModel,
     comment_syntax: Option<CommentParser>,
     key_value_syntax: Option<KeyValueParser>,
 }
@@ -19,13 +18,22 @@ impl Default for LineParser {
     fn default() -> Self {
         LineParser {
             state: MachineState::First,
-            product: LineModel::default(),
             comment_syntax: None,
             key_value_syntax: None,
         }
     }
 }
 impl LineParser {
+    pub fn product(&self) -> LineModel {
+        let mut product = LineModel::default();
+        if let Some(p) = &self.comment_syntax {
+            product
+                .items
+                .push(LineItemModel::Comment(p.product.clone()));
+        }
+        product
+    }
+
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  

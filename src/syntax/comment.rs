@@ -6,18 +6,18 @@ use casual_logger::Table;
 
 /// `# comment`.
 pub struct CommentParser {
-    value: String,
+    pub product: String,
 }
 impl CommentParser {
     pub fn new() -> Self {
         CommentParser {
-            value: String::new(),
+            product: String::new(),
         }
     }
     pub fn parse(&mut self, token: &Token) {
-        self.value.push_str(&token.value);
+        self.product.push_str(&token.value);
     }
     pub fn log(&self) -> Table {
-        Table::default().str("value", &self.value).clone()
+        Table::default().str("product", &self.product).clone()
     }
 }

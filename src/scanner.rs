@@ -25,7 +25,7 @@ impl LineScanner {
                     let mut line_syntax_scanner = LineSyntaxScanner::default();
                     match line_syntax_scanner.scan_line(&token_line.token_line) {
                         SyntaxParserResult::Ok(_) => {
-                            let product = line_syntax_scanner.line_parser.product;
+                            let product = line_syntax_scanner.line_parser.product();
                             Log::info_t(
                                 "Product",
                                 Table::default()
