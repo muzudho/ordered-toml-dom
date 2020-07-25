@@ -5,6 +5,7 @@ use crate::lexical_parser::Token;
 use crate::lexical_parser::TokenType;
 use crate::syntax::comment::CommentParser;
 use crate::syntax::key_value::KeyValueParser;
+use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
 pub struct LineSyntaxParser {
@@ -22,7 +23,11 @@ impl Default for LineSyntaxParser {
     }
 }
 impl LineSyntaxParser {
-    pub fn parse(&mut self, token: &Token) {
+    /// # Returns
+    ///
+    /// * `SyntaxParserResult` - Result.  
+    ///                             結果。    
+    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
             MachineState::CommentSyntax => {
                 self.comment_syntax.as_mut().unwrap().parse(token);
@@ -32,6 +37,7 @@ impl LineSyntaxParser {
                     Log::info_t(
                         "LineSyntaxParser#parse",
                         Table::default()
+                            .str("parser", "LineSyntaxParser#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token)),
                     );
@@ -48,25 +54,41 @@ impl LineSyntaxParser {
             },
             MachineState::KeyPairSyntax => {
                 if let Some(key_value_syntax) = &mut self.key_value_syntax {
-                    key_value_syntax.parse(token);
+                    match key_value_syntax.parse(token) {
+                        SyntaxParserResult::Ok(_) => {} // Ignored it.
+                        SyntaxParserResult::Err(table) => {
+                            return SyntaxParserResult::Err(
+                                Table::default()
+                                    .str("parser", "LineSyntaxParser#parse")
+                                    .str("state", &format!("{:?}", self.state))
+                                    .str("token", &format!("{:?}", token))
+                                    .sub_t("error", &table)
+                                    .clone(),
+                            );
+                        }
+                    }
                 } else {
                     panic!(Log::fatal_t(
                         "LineSyntaxParser#parse",
                         Table::default()
+                            .str("parser", "LineSyntaxParser#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     ));
                 }
             }
             MachineState::Unimplemented => {
-                Log::info_t(
-                    "LineSyntaxParser#parse",
+                return SyntaxParserResult::Err(
                     Table::default()
+                        .str("parser", "LineSyntaxParser#parse")
                         .str("state", &format!("{:?}", self.state))
-                        .str("token", &format!("{:?}", token)),
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
                 );
             }
         }
+
+        SyntaxParserResult::Ok(false)
     }
     pub fn log(&self) -> Table {
         let mut t = Table::default()

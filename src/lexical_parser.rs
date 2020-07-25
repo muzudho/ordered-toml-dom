@@ -215,6 +215,13 @@ impl Default for TokenLine {
         TokenLine { tokens: Vec::new() }
     }
 }
+impl TokenLine {
+    pub fn new(tokens: &Vec<Token>) -> Self {
+        TokenLine {
+            tokens: tokens.to_vec(),
+        }
+    }
+}
 impl fmt::Debug for TokenLine {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();

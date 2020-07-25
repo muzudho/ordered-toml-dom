@@ -24,8 +24,9 @@ impl Default for InlineTableParser {
 impl InlineTableParser {
     /// # Returns
     ///
-    /// End of syntax.
-    pub fn parse(&mut self, token: &Token) -> bool {
+    /// * `SyntaxParserResult` - Result.  
+    ///                             結果。
+    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
             MachineState::AfterLeftCurlyBracket => {
                 match token.type_ {
@@ -48,13 +49,16 @@ impl InlineTableParser {
                             self.state = MachineState::AfterValue;
                         }
                     }
-                    SyntaxParserResult::Err(table) => panic!(Log::fatal_t(
-                        "InlineTableParser#parse/AfterValue",
-                        Table::default()
-                            .str("state", &format!("{:?}", self.state))
-                            .str("token", &format!("{:?}", token))
-                            .sub_t("key_value_error", &table)
-                    )),
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            Table::default()
+                                .str("parser", "InlineTableParser#parse")
+                                .str("state", &format!("{:?}", self.state))
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
                 }
             }
             MachineState::AfterValue => match token.type_ {
@@ -63,17 +67,18 @@ impl InlineTableParser {
                     self.state = MachineState::AfterLeftCurlyBracket;
                 }
                 TokenType::RightCurlyBracket => {
-                    return true;
+                    return SyntaxParserResult::Ok(true);
                 }
                 _ => panic!(Log::fatal_t(
                     "InlineTableParser#parse/AfterValue",
                     Table::default()
+                        .str("parser", "InlineTableParser#parse")
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token))
                 )),
             },
         }
-        false
+        SyntaxParserResult::Ok(false)
     }
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
