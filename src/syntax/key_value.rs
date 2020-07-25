@@ -1,39 +1,40 @@
+//! Syntax parser.
+//! 構文パーサー。
+
 use crate::lexical_parser::Token;
 use crate::lexical_parser::{TokenLine, TokenType};
-use crate::syntax::inline_table::InlineTableSyntaxParser;
+use crate::syntax::inline_table::InlineTableParser;
+use crate::syntax::single_quoted_string::SingleQuotedStringParser;
 use casual_logger::{Log, Table};
 
-/// `key = right_value`.
-#[derive(Debug)]
-enum KeyValueSyntaxMachineState {
-    AfterKey,
-    AfterEquals,
-    AfterLeftCurlyBracket,
-}
-
 /// `key = value`.
-pub struct KeyValueSyntaxParser {
-    state: KeyValueSyntaxMachineState,
+pub struct KeyValueParser {
+    state: MachineState,
     key: String,
-    right_value_buf: TokenLine,
-    inline_table_syntax_parser: Option<InlineTableSyntaxParser>,
+    rest: TokenLine,
+    inline_table_parser: Option<InlineTableParser>,
+    single_quoted_string_parser: Option<SingleQuotedStringParser>,
 }
-impl KeyValueSyntaxParser {
+impl KeyValueParser {
     pub fn new(key: &str) -> Self {
-        KeyValueSyntaxParser {
-            state: KeyValueSyntaxMachineState::AfterKey,
+        KeyValueParser {
+            state: MachineState::AfterKey,
             key: key.to_string(),
-            right_value_buf: TokenLine::default(),
-            inline_table_syntax_parser: None,
+            rest: TokenLine::default(),
+            inline_table_parser: None,
+            single_quoted_string_parser: None,
         }
     }
-    pub fn parse(&mut self, token: &Token) {
+    /// # Returns
+    ///
+    /// End of syntax.
+    pub fn parse(&mut self, token: &Token) -> bool {
         match self.state {
-            KeyValueSyntaxMachineState::AfterKey => {
+            MachineState::AfterKey => {
                 match token.type_ {
                     TokenType::WhiteSpace => {} //Ignored it.
                     TokenType::Equals => {
-                        self.state = KeyValueSyntaxMachineState::AfterEquals;
+                        self.state = MachineState::AfterEquals;
                     }
                     _ => panic!(Log::fatal_t(
                         "",
@@ -43,21 +44,30 @@ impl KeyValueSyntaxParser {
                     )),
                 }
             }
-            KeyValueSyntaxMachineState::AfterEquals => {
+            MachineState::AfterEquals => {
                 // key_value_syntax.parse(token_line, token);
                 match token.type_ {
+                    TokenType::WhiteSpace => {} //Ignored it.
                     TokenType::LeftCurlyBracket => {
-                        self.inline_table_syntax_parser = Some(InlineTableSyntaxParser::default());
-                        self.state = KeyValueSyntaxMachineState::AfterLeftCurlyBracket;
+                        self.inline_table_parser = Some(InlineTableParser::default());
+                        self.state = MachineState::AfterLeftCurlyBracket;
+                    }
+                    TokenType::SingleQuotation => {
+                        self.single_quoted_string_parser = Some(SingleQuotedStringParser::new());
+                        self.state = MachineState::SingleQuotedString;
                     }
                     _ => {
-                        self.right_value_buf.tokens.push(token.clone());
+                        self.rest.tokens.push(token.clone());
                     }
                 }
             }
-            KeyValueSyntaxMachineState::AfterLeftCurlyBracket => {
-                if let Some(p) = &mut self.inline_table_syntax_parser {
-                    p.parse(token);
+            MachineState::AfterLeftCurlyBracket => {
+                if let Some(p) = &mut self.inline_table_parser {
+                    if p.parse(token) {
+                        self.inline_table_parser = None;
+                        self.state = MachineState::End;
+                        return true;
+                    }
                 } else {
                     panic!(Log::fatal_t(
                         "",
@@ -67,17 +77,57 @@ impl KeyValueSyntaxParser {
                     ));
                 }
             }
+            MachineState::SingleQuotedString => {
+                if let Some(p) = &mut self.single_quoted_string_parser {
+                    if p.parse(token) {
+                        self.single_quoted_string_parser = None;
+                        self.state = MachineState::End;
+                        return true;
+                    }
+                } else {
+                    panic!(Log::fatal_t(
+                        "",
+                        Table::default()
+                            .str("state", &format!("{:?}", self.state))
+                            .str("token", &format!("{:?}", token))
+                    ));
+                }
+            }
+            MachineState::End => {
+                panic!(Log::fatal_t(
+                    "",
+                    Table::default()
+                        .str("state", &format!("{:?}", self.state))
+                        .str("token", &format!("{:?}", token))
+                ));
+            }
         }
+        false
     }
     pub fn log(&self) -> Table {
         let mut t = Table::default()
             .str("state", &format!("{:?}", self.state))
             .str("key", &self.key)
-            .str("right_value_buf", &format!("{:?}", self.right_value_buf))
             .clone();
-        if let Some(inline_table_syntax_parser) = &self.inline_table_syntax_parser {
-            t.sub_t("inline_table", &inline_table_syntax_parser.log());
+        if !self.rest.tokens.is_empty() {
+            t.str("rest", &format!("{:?}", self.rest));
+        }
+        if let Some(inline_table_parser) = &self.inline_table_parser {
+            t.sub_t("inline_table", &inline_table_parser.log());
+        }
+        if let Some(single_quoted_string_parser) = &self.single_quoted_string_parser {
+            t.sub_t("single_quoted_string", &single_quoted_string_parser.log());
         }
         t
     }
+}
+
+/// `key = right_value`.
+#[derive(Debug)]
+enum MachineState {
+    AfterKey,
+    AfterEquals,
+    AfterLeftCurlyBracket,
+    SingleQuotedString,
+    End,
 }

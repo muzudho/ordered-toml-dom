@@ -1,28 +1,21 @@
+//! Syntax parser.
+//! 構文パーサー。
+
 use crate::lexical_parser::Token;
 use crate::lexical_parser::TokenType;
-use crate::syntax::comment::CommentSyntaxParser;
-use crate::syntax::key_value::KeyValueSyntaxParser;
+use crate::syntax::comment::CommentParser;
+use crate::syntax::key_value::KeyValueParser;
 use casual_logger::{Log, Table};
 
-#[derive(Debug)]
-enum LineSyntaxParserMachineState {
-    /// `# comment`.
-    CommentSyntax,
-    First,
-    /// `key = right_value`.
-    KeyPairSyntax,
-    Unimplemented,
-}
-
 pub struct LineSyntaxParser {
-    state: LineSyntaxParserMachineState,
-    comment_syntax: Option<CommentSyntaxParser>,
-    key_value_syntax: Option<KeyValueSyntaxParser>,
+    state: MachineState,
+    comment_syntax: Option<CommentParser>,
+    key_value_syntax: Option<KeyValueParser>,
 }
 impl Default for LineSyntaxParser {
     fn default() -> Self {
         LineSyntaxParser {
-            state: LineSyntaxParserMachineState::First,
+            state: MachineState::First,
             comment_syntax: None,
             key_value_syntax: None,
         }
@@ -31,10 +24,10 @@ impl Default for LineSyntaxParser {
 impl LineSyntaxParser {
     pub fn parse(&mut self, token: &Token) {
         match self.state {
-            LineSyntaxParserMachineState::CommentSyntax => {
+            MachineState::CommentSyntax => {
                 self.comment_syntax.as_mut().unwrap().parse(token);
             }
-            LineSyntaxParserMachineState::First => match token.type_ {
+            MachineState::First => match token.type_ {
                 TokenType::Key => {
                     Log::info_t(
                         "LineSyntaxParser#parse",
@@ -42,18 +35,18 @@ impl LineSyntaxParser {
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token)),
                     );
-                    self.key_value_syntax = Some(KeyValueSyntaxParser::new(&token.value));
-                    self.state = LineSyntaxParserMachineState::KeyPairSyntax;
+                    self.key_value_syntax = Some(KeyValueParser::new(&token.value));
+                    self.state = MachineState::KeyPairSyntax;
                 }
                 TokenType::Sharp => {
-                    self.comment_syntax = Some(CommentSyntaxParser::new());
-                    self.state = LineSyntaxParserMachineState::CommentSyntax;
+                    self.comment_syntax = Some(CommentParser::new());
+                    self.state = MachineState::CommentSyntax;
                 }
                 _ => {
-                    self.state = LineSyntaxParserMachineState::Unimplemented;
+                    self.state = MachineState::Unimplemented;
                 }
             },
-            LineSyntaxParserMachineState::KeyPairSyntax => {
+            MachineState::KeyPairSyntax => {
                 if let Some(key_value_syntax) = &mut self.key_value_syntax {
                     key_value_syntax.parse(token);
                 } else {
@@ -65,7 +58,7 @@ impl LineSyntaxParser {
                     ));
                 }
             }
-            LineSyntaxParserMachineState::Unimplemented => {
+            MachineState::Unimplemented => {
                 Log::info_t(
                     "LineSyntaxParser#parse",
                     Table::default()
@@ -87,4 +80,14 @@ impl LineSyntaxParser {
         }
         t
     }
+}
+
+#[derive(Debug)]
+enum MachineState {
+    /// `# comment`.
+    CommentSyntax,
+    First,
+    /// `key = right_value`.
+    KeyPairSyntax,
+    Unimplemented,
 }

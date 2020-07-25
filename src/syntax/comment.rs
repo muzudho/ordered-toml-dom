@@ -1,13 +1,16 @@
+//! Syntax parser.
+//! 構文パーサー。
+
 use crate::lexical_parser::Token;
 use casual_logger::Table;
 
 /// `# comment`.
-pub struct CommentSyntaxParser {
+pub struct CommentParser {
     value: String,
 }
-impl CommentSyntaxParser {
+impl CommentParser {
     pub fn new() -> Self {
-        CommentSyntaxParser {
+        CommentParser {
             value: String::new(),
         }
     }

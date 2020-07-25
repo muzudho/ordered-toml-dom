@@ -1,58 +1,83 @@
+//! Syntax parser.
+//! 構文パーサー。
+
 use crate::lexical_parser::{Token, TokenLine, TokenType};
-use crate::syntax::key_value::KeyValueSyntaxParser;
-use casual_logger::Table;
+use crate::syntax::key_value::KeyValueParser;
+use casual_logger::{Log, Table};
 
 /// `{ key = value, key = value }`.
-#[derive(Debug)]
-enum InlineTableSyntaxMachineState {
-    AfterLeftCurlyBracket,
-    AfterKey,
+pub struct InlineTableParser {
+    state: MachineState,
+    rest: TokenLine,
+    key_value_syntax_parser: Option<Box<KeyValueParser>>,
 }
-
-/// `{ key = value, key = value }`.
-pub struct InlineTableSyntaxParser {
-    state: InlineTableSyntaxMachineState,
-    contents: TokenLine,
-    key_value_syntax_parser: Option<Box<KeyValueSyntaxParser>>,
-}
-impl Default for InlineTableSyntaxParser {
+impl Default for InlineTableParser {
     fn default() -> Self {
-        InlineTableSyntaxParser {
-            state: InlineTableSyntaxMachineState::AfterLeftCurlyBracket,
-            contents: TokenLine::default(),
+        InlineTableParser {
+            state: MachineState::AfterLeftCurlyBracket,
+            rest: TokenLine::default(),
             key_value_syntax_parser: None,
         }
     }
 }
-impl InlineTableSyntaxParser {
-    pub fn parse(&mut self, token: &Token) {
+impl InlineTableParser {
+    /// # Returns
+    ///
+    /// End of syntax.
+    pub fn parse(&mut self, token: &Token) -> bool {
         match self.state {
-            InlineTableSyntaxMachineState::AfterLeftCurlyBracket => {
+            MachineState::AfterLeftCurlyBracket => {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Key => {
                         self.key_value_syntax_parser =
-                            Some(Box::new(KeyValueSyntaxParser::new(&token.value)));
-                        self.state = InlineTableSyntaxMachineState::AfterKey;
+                            Some(Box::new(KeyValueParser::new(&token.value)));
+                        self.state = MachineState::AfterKey;
                     }
                     _ => {
-                        self.contents.tokens.push(token.clone());
+                        self.rest.tokens.push(token.clone());
                     }
                 }
             }
-            InlineTableSyntaxMachineState::AfterKey => {
-                self.contents.tokens.push(token.clone());
-                self.key_value_syntax_parser.as_mut().unwrap().parse(token);
+            MachineState::AfterKey => {
+                if self.key_value_syntax_parser.as_mut().unwrap().parse(token) {
+                    self.key_value_syntax_parser = None;
+                    self.state = MachineState::AfterValue;
+                }
             }
+            MachineState::AfterValue => match token.type_ {
+                TokenType::Comma => {
+                    self.state = MachineState::AfterLeftCurlyBracket;
+                }
+                TokenType::RightCurlyBracket => {
+                    return true;
+                }
+                _ => panic!(Log::fatal_t(
+                    "InlineTableParser#parse/AfterValue",
+                    Table::default()
+                        .str("state", &format!("{:?}", self.state))
+                        .str("token", &format!("{:?}", token))
+                )),
+            },
         }
+        false
     }
     pub fn log(&self) -> Table {
-        let mut t = Table::default()
-            .str("contents", &format!("{:?}", self.contents))
-            .clone();
+        let mut t = Table::default().clone();
+        if !self.rest.tokens.is_empty() {
+            t.str("rest", &format!("{:?}", self.rest));
+        }
         if let Some(key_value_syntax_parser) = &self.key_value_syntax_parser {
             t.sub_t("key_value", &key_value_syntax_parser.log());
         }
         t
     }
+}
+
+/// `{ key = value, key = value }`.
+#[derive(Debug)]
+enum MachineState {
+    AfterLeftCurlyBracket,
+    AfterKey,
+    AfterValue,
 }
