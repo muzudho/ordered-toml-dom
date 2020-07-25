@@ -1,6 +1,6 @@
 //! 単語単位に分けます。
 use crate::RE_KEY;
-use casual_logger::{Log, Table};
+use casual_logger::Log;
 use std::fmt;
 
 #[derive(Debug)]
