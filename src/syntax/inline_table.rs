@@ -2,28 +2,28 @@
 //! 構文パーサー。
 
 use crate::lexical_parser::{Token, TokenType};
-use crate::object_model::{inline_table::InlineTableModel, key_value::KeyValueModel, value::Value};
-use crate::syntax::key_value::KeyValueParser;
+use crate::object_model::{inline_table::InlineTableM, key_value::KeyValueM, value::ValueM};
+use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
 /// `{ key = value, key = value }`.
-pub struct InlineTableParser {
+pub struct InlineTableP {
     state: MachineState,
-    product: InlineTableModel,
-    key_value_syntax_parser: Option<Box<KeyValueParser>>,
+    product: InlineTableM,
+    key_value_syntax_parser: Option<Box<KeyValueP>>,
 }
-impl Default for InlineTableParser {
+impl Default for InlineTableP {
     fn default() -> Self {
-        InlineTableParser {
+        InlineTableP {
             state: MachineState::AfterLeftCurlyBracket,
-            product: InlineTableModel::default(),
+            product: InlineTableM::default(),
             key_value_syntax_parser: None,
         }
     }
 }
-impl InlineTableParser {
-    pub fn product(&self) -> InlineTableModel {
+impl InlineTableP {
+    pub fn product(&self) -> InlineTableM {
         self.product.clone()
     }
     /// # Returns
@@ -38,15 +38,14 @@ impl InlineTableParser {
                     TokenType::Key => {
                         self.product
                             .items
-                            .push(Value::KeyValue(KeyValueModel::new(&token.value)));
-                        self.key_value_syntax_parser =
-                            Some(Box::new(KeyValueParser::new(&token.value)));
+                            .push(ValueM::KeyValue(KeyValueM::new(&token.value)));
+                        self.key_value_syntax_parser = Some(Box::new(KeyValueP::new(&token.value)));
                         self.state = MachineState::AfterKey;
                     }
                     _ => panic!(Log::fatal_t(
-                        "InlineTableParser#parse/AfterValue",
+                        "InlineTableP#parse/AfterValue",
                         Table::default()
-                            .str("parser", "InlineTableParser#parse")
+                            .str("parser", "InlineTableP#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     )),
@@ -63,7 +62,7 @@ impl InlineTableParser {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             Table::default()
-                                .str("parser", "InlineTableParser#parse")
+                                .str("parser", "InlineTableP#parse")
                                 .str("state", &format!("{:?}", self.state))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -81,9 +80,9 @@ impl InlineTableParser {
                     return SyntaxParserResult::Ok(true);
                 }
                 _ => panic!(Log::fatal_t(
-                    "InlineTableParser#parse/AfterValue",
+                    "InlineTableP#parse/AfterValue",
                     Table::default()
-                        .str("parser", "InlineTableParser#parse")
+                        .str("parser", "InlineTableP#parse")
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token))
                 )),

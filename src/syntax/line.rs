@@ -3,29 +3,29 @@
 
 use crate::lexical_parser::Token;
 use crate::lexical_parser::TokenType;
-use crate::object_model::line::{LineItemModel, LineModel};
-use crate::syntax::comment::CommentParser;
-use crate::syntax::key_value::KeyValueParser;
+use crate::object_model::line::{LineItemModel, LineM};
+use crate::syntax::comment::CommentP;
+use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
-pub struct LineParser {
+pub struct LineP {
     state: MachineState,
-    comment_syntax: Option<CommentParser>,
-    key_value_syntax: Option<KeyValueParser>,
+    comment_syntax: Option<CommentP>,
+    key_value_syntax: Option<KeyValueP>,
 }
-impl Default for LineParser {
+impl Default for LineP {
     fn default() -> Self {
-        LineParser {
+        LineP {
             state: MachineState::First,
             comment_syntax: None,
             key_value_syntax: None,
         }
     }
 }
-impl LineParser {
-    pub fn product(&self) -> LineModel {
-        let mut product = LineModel::default();
+impl LineP {
+    pub fn product(&self) -> LineM {
+        let mut product = LineM::default();
         if let Some(p) = &self.comment_syntax {
             product.items.push(LineItemModel::Comment(p.product()));
         }
@@ -45,18 +45,18 @@ impl LineParser {
                 TokenType::Key => {
                     /*
                     Log::info_t(
-                        "LineParser#parse",
+                        "LineP#parse",
                         Table::default()
-                            .str("parser", "LineParser#parse")
+                            .str("parser", "LineP#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token)),
                     );
                     */
-                    self.key_value_syntax = Some(KeyValueParser::new(&token.value));
+                    self.key_value_syntax = Some(KeyValueP::new(&token.value));
                     self.state = MachineState::KeyPairSyntax;
                 }
                 TokenType::Sharp => {
-                    self.comment_syntax = Some(CommentParser::new());
+                    self.comment_syntax = Some(CommentP::new());
                     self.state = MachineState::CommentSyntax;
                 }
                 _ => {
@@ -70,7 +70,7 @@ impl LineParser {
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
                                 Table::default()
-                                    .str("parser", "LineParser#parse")
+                                    .str("parser", "LineP#parse")
                                     .str("state", &format!("{:?}", self.state))
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
@@ -80,9 +80,9 @@ impl LineParser {
                     }
                 } else {
                     panic!(Log::fatal_t(
-                        "LineParser#parse",
+                        "LineP#parse",
                         Table::default()
-                            .str("parser", "LineParser#parse")
+                            .str("parser", "LineP#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     ));
@@ -91,7 +91,7 @@ impl LineParser {
             MachineState::Unimplemented => {
                 return SyntaxParserResult::Err(
                     Table::default()
-                        .str("parser", "LineParser#parse")
+                        .str("parser", "LineP#parse")
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token))
                         .clone(),

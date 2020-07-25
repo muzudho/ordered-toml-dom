@@ -1,33 +1,32 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::lexical_parser::Token;
-use crate::lexical_parser::{TokenLine, TokenType};
-use crate::object_model::key_value::KeyValueModel;
-use crate::syntax::array::ArrayParser;
-use crate::syntax::inline_table::InlineTableParser;
-use crate::syntax::single_quoted_string::SingleQuotedStringParser;
+use crate::lexical_parser::{Token, TokenLine, TokenType};
+use crate::object_model::{key_value::KeyValueM, value::ValueM};
+use crate::syntax::array::ArrayP;
+use crate::syntax::inline_table::InlineTableP;
+use crate::syntax::single_quoted_string::SingleQuotedStringP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::Table;
 
 /// `key = value`.
-pub struct KeyValueParser {
+pub struct KeyValueP {
     state: MachineState,
-    product: KeyValueModel,
+    product: KeyValueM,
     rest: TokenLine,
-    inline_table_parser: Option<InlineTableParser>,
-    single_quoted_string_parser: Option<SingleQuotedStringParser>,
-    array_parser: Option<ArrayParser>,
+    inline_table_p: Option<InlineTableP>,
+    single_quoted_string_p: Option<SingleQuotedStringP>,
+    array_p: Option<ArrayP>,
 }
-impl KeyValueParser {
+impl KeyValueP {
     pub fn new(key: &str) -> Self {
-        KeyValueParser {
+        KeyValueP {
             state: MachineState::AfterKey,
-            product: KeyValueModel::new(key),
+            product: KeyValueM::new(key),
             rest: TokenLine::default(),
-            inline_table_parser: None,
-            single_quoted_string_parser: None,
-            array_parser: None,
+            inline_table_p: None,
+            single_quoted_string_p: None,
+            array_p: None,
         }
     }
     /// # Returns
@@ -45,7 +44,7 @@ impl KeyValueParser {
                     _ => {
                         return SyntaxParserResult::Err(
                             Table::default()
-                                .str("parser", "KeyValueParser#parse")
+                                .str("parser", "KeyValueP#parse")
                                 .str("state", &format!("{:?}", self.state))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -58,15 +57,15 @@ impl KeyValueParser {
                 match token.type_ {
                     TokenType::WhiteSpace => {} //Ignored it.
                     TokenType::LeftCurlyBracket => {
-                        self.inline_table_parser = Some(InlineTableParser::default());
+                        self.inline_table_p = Some(InlineTableP::default());
                         self.state = MachineState::AfterLeftCurlyBracket;
                     }
                     TokenType::LeftSquareBracket => {
-                        self.array_parser = Some(ArrayParser::default());
+                        self.array_p = Some(ArrayP::default());
                         self.state = MachineState::AfterLeftSquareBracket;
                     }
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_parser = Some(SingleQuotedStringParser::new());
+                        self.single_quoted_string_p = Some(SingleQuotedStringP::new());
                         self.state = MachineState::SingleQuotedString;
                     }
                     _ => {
@@ -75,18 +74,20 @@ impl KeyValueParser {
                 }
             }
             MachineState::AfterLeftCurlyBracket => {
-                if let Some(p) = &mut self.inline_table_parser {
+                if let Some(p) = &mut self.inline_table_p {
                     match p.parse(token) {
                         SyntaxParserResult::Ok(end_of_syntax) => {
                             if end_of_syntax {
-                                self.inline_table_parser = None;
+                                self.product.value =
+                                    Some(Box::new(ValueM::InlineTable(p.product())));
+                                self.inline_table_p = None;
                                 self.state = MachineState::End;
                             }
                         }
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
                                 Table::default()
-                                    .str("parser", "KeyValueParser#parse")
+                                    .str("parser", "KeyValueP#parse")
                                     .str("state", &format!("{:?}", self.state))
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
@@ -97,7 +98,7 @@ impl KeyValueParser {
                 } else {
                     return SyntaxParserResult::Err(
                         Table::default()
-                            .str("parser", "KeyValueParser#parse")
+                            .str("parser", "KeyValueP#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -105,18 +106,18 @@ impl KeyValueParser {
                 }
             }
             MachineState::AfterLeftSquareBracket => {
-                if let Some(p) = &mut self.array_parser {
+                if let Some(p) = &mut self.array_p {
                     match p.parse(token) {
                         SyntaxParserResult::Ok(end_of_syntax) => {
                             if end_of_syntax {
-                                self.array_parser = None;
+                                self.array_p = None;
                                 self.state = MachineState::End;
                             }
                         }
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
                                 Table::default()
-                                    .str("parser", "KeyValueParser#parse")
+                                    .str("parser", "KeyValueP#parse")
                                     .str("state", &format!("{:?}", self.state))
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
@@ -127,7 +128,7 @@ impl KeyValueParser {
                 } else {
                     return SyntaxParserResult::Err(
                         Table::default()
-                            .str("parser", "KeyValueParser#parse")
+                            .str("parser", "KeyValueP#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -135,11 +136,11 @@ impl KeyValueParser {
                 }
             }
             MachineState::SingleQuotedString => {
-                if let Some(p) = &mut self.single_quoted_string_parser {
+                if let Some(p) = &mut self.single_quoted_string_p {
                     match p.parse(token) {
                         SyntaxParserResult::Ok(end_of_syntax) => {
                             if end_of_syntax {
-                                self.single_quoted_string_parser = None;
+                                self.single_quoted_string_p = None;
                                 self.state = MachineState::End;
                                 return SyntaxParserResult::Ok(true);
                             }
@@ -147,7 +148,7 @@ impl KeyValueParser {
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
                                 Table::default()
-                                    .str("parser", "KeyValueParser#parse")
+                                    .str("parser", "KeyValueP#parse")
                                     .str("state", &format!("{:?}", self.state))
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
@@ -158,7 +159,7 @@ impl KeyValueParser {
                 } else {
                     return SyntaxParserResult::Err(
                         Table::default()
-                            .str("parser", "KeyValueParser#parse")
+                            .str("parser", "KeyValueP#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -168,7 +169,7 @@ impl KeyValueParser {
             MachineState::End => {
                 return SyntaxParserResult::Err(
                     Table::default()
-                        .str("parser", "KeyValueParser#parse")
+                        .str("parser", "KeyValueP#parse")
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -185,11 +186,11 @@ impl KeyValueParser {
         if !self.rest.tokens.is_empty() {
             t.str("rest", &format!("{:?}", self.rest));
         }
-        if let Some(inline_table_parser) = &self.inline_table_parser {
-            t.sub_t("inline_table", &inline_table_parser.log());
+        if let Some(inline_table_p) = &self.inline_table_p {
+            t.sub_t("inline_table", &inline_table_p.log());
         }
-        if let Some(single_quoted_string_parser) = &self.single_quoted_string_parser {
-            t.sub_t("single_quoted_string", &single_quoted_string_parser.log());
+        if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
+            t.sub_t("single_quoted_string", &single_quoted_string_p.log());
         }
         t
     }

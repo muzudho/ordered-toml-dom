@@ -1,9 +1,12 @@
-pub struct ArrayModel {
+//! Array model.  
+//! 配列モデル。  
+
+pub struct ArrayM {
     pub items: Vec<ArrayItem>,
 }
-impl Default for ArrayModel {
+impl Default for ArrayM {
     fn default() -> Self {
-        ArrayModel { items: Vec::new() }
+        ArrayM { items: Vec::new() }
     }
 }
 

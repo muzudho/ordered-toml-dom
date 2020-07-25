@@ -1,15 +1,15 @@
 use crate::lexical_parser::TokenLine;
-use crate::syntax::line::LineParser;
+use crate::syntax::line::LineP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::Table;
 
 pub struct LineSyntaxScanner {
-    pub line_parser: LineParser,
+    pub line_parser: LineP,
 }
 impl Default for LineSyntaxScanner {
     fn default() -> Self {
         LineSyntaxScanner {
-            line_parser: LineParser::default(),
+            line_parser: LineP::default(),
         }
     }
 }

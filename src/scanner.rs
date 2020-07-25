@@ -1,5 +1,5 @@
 use crate::lexical_parser::LineLexicalParser;
-use crate::object_model::document::DocumentModel;
+use crate::object_model::document::DocumentM;
 use crate::syntax::SyntaxParserResult;
 use crate::syntax_scanner::LineSyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
@@ -11,7 +11,7 @@ impl LineScanner {
     pub fn from_file(path: &str) {
         Log::info(&format!("Read=|{}|", path));
         let mut aot = ArrayOfTable::default().clone();
-        let mut document_model = DocumentModel::default();
+        let mut document_model = DocumentM::default();
         match File::open(path) {
             Ok(file) => {
                 for line in BufReader::new(file).lines() {

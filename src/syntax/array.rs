@@ -2,29 +2,29 @@
 //! 構文パーサー。
 
 use crate::lexical_parser::{Token, TokenLine, TokenType};
-use crate::object_model::array::{ArrayItem, ArrayModel};
-use crate::syntax::single_quoted_string::SingleQuotedStringParser;
+use crate::object_model::array::{ArrayItem, ArrayM};
+use crate::syntax::single_quoted_string::SingleQuotedStringP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
 /// `[ 'a', 'b', 'c' ]`.
-pub struct ArrayParser {
+pub struct ArrayP {
     state: MachineState,
-    product: ArrayModel,
+    product: ArrayM,
     rest: TokenLine,
-    single_quoted_string_parser: Option<Box<SingleQuotedStringParser>>,
+    single_quoted_string_parser: Option<Box<SingleQuotedStringP>>,
 }
-impl Default for ArrayParser {
+impl Default for ArrayP {
     fn default() -> Self {
-        ArrayParser {
+        ArrayP {
             state: MachineState::AfterLeftSquareBracket,
-            product: ArrayModel::default(),
+            product: ArrayM::default(),
             rest: TokenLine::default(),
             single_quoted_string_parser: None,
         }
     }
 }
-impl ArrayParser {
+impl ArrayP {
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  
@@ -36,7 +36,7 @@ impl ArrayParser {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_parser =
-                            Some(Box::new(SingleQuotedStringParser::new()));
+                            Some(Box::new(SingleQuotedStringP::new()));
                         self.state = MachineState::SingleQuotedString;
                     }
                     _ => {
@@ -59,7 +59,7 @@ impl ArrayParser {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             Table::default()
-                                .str("parser", "ArrayParser#parse")
+                                .str("parser", "ArrayP#parse")
                                 .str("state", &format!("{:?}", self.state))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -77,9 +77,9 @@ impl ArrayParser {
                     return SyntaxParserResult::Ok(true);
                 }
                 _ => panic!(Log::fatal_t(
-                    "ArrayParser#parse/AfterValue",
+                    "ArrayP#parse/AfterValue",
                     Table::default()
-                        .str("parser", "ArrayParser#parse")
+                        .str("parser", "ArrayP#parse")
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token))
                 )),

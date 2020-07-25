@@ -1,15 +1,15 @@
-use crate::object_model::key_value::KeyValueModel;
+use crate::object_model::key_value::KeyValueM;
 use std::fmt;
 
-pub struct LineModel {
+pub struct LineM {
     pub items: Vec<LineItemModel>,
 }
-impl Default for LineModel {
+impl Default for LineM {
     fn default() -> Self {
-        LineModel { items: Vec::new() }
+        LineM { items: Vec::new() }
     }
 }
-impl fmt::Debug for LineModel {
+impl fmt::Debug for LineM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for item in &self.items {
@@ -21,7 +21,7 @@ impl fmt::Debug for LineModel {
 
 pub enum LineItemModel {
     Comment(String),
-    KeyValue(KeyValueModel),
+    KeyValue(KeyValueM),
 }
 impl fmt::Debug for LineItemModel {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

@@ -1,16 +1,21 @@
-use crate::object_model::key_value::KeyValueModel;
+//! Value model.  
+//! 値モデル。  
+
+use crate::object_model::{inline_table::InlineTableM, key_value::KeyValueM};
 use std::fmt;
 
 #[derive(Clone)]
-pub enum Value {
+pub enum ValueM {
     String(String),
-    KeyValue(KeyValueModel),
+    KeyValue(KeyValueM),
+    InlineTable(InlineTableM),
 }
-impl fmt::Debug for Value {
+impl fmt::Debug for ValueM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Value::String(s) => write!(f, "{}", s),
-            Value::KeyValue(m) => write!(f, "{:?}", m),
+            ValueM::String(s) => write!(f, "{}", s),
+            ValueM::KeyValue(m) => write!(f, "{:?}", m),
+            ValueM::InlineTable(m) => write!(f, "{:?}", m),
         }
     }
 }

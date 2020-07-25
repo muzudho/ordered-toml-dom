@@ -5,12 +5,12 @@ use crate::lexical_parser::Token;
 use casual_logger::Table;
 
 /// `# comment`.
-pub struct CommentParser {
+pub struct CommentP {
     product: String,
 }
-impl CommentParser {
+impl CommentP {
     pub fn new() -> Self {
-        CommentParser {
+        CommentP {
             product: String::new(),
         }
     }

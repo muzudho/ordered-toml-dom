@@ -1,28 +1,31 @@
-use crate::object_model::value::Value;
+//! Key value model.  
+//! キー値モデル。  
+
+use crate::object_model::value::ValueM;
 use std::fmt;
 
 #[derive(Clone)]
-pub struct KeyValueModel {
+pub struct KeyValueM {
     key: String,
-    value: Option<Box<Value>>,
+    pub value: Option<Box<ValueM>>,
 }
-impl Default for KeyValueModel {
+impl Default for KeyValueM {
     fn default() -> Self {
-        KeyValueModel {
+        KeyValueM {
             key: String::new(),
             value: None,
         }
     }
 }
-impl KeyValueModel {
+impl KeyValueM {
     pub fn new(key: &str) -> Self {
-        KeyValueModel {
+        KeyValueM {
             key: key.to_string(),
             value: None,
         }
     }
 }
-impl fmt::Debug for KeyValueModel {
+impl fmt::Debug for KeyValueM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,

@@ -6,12 +6,12 @@ use crate::syntax::SyntaxParserResult;
 use casual_logger::Table;
 
 /// `'value'`.
-pub struct SingleQuotedStringParser {
+pub struct SingleQuotedStringP {
     pub product: String,
 }
-impl SingleQuotedStringParser {
+impl SingleQuotedStringP {
     pub fn new() -> Self {
-        SingleQuotedStringParser {
+        SingleQuotedStringP {
             product: String::new(),
         }
     }
