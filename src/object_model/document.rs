@@ -20,7 +20,6 @@ impl DocumentM {
 impl fmt::Debug for DocumentM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
-        buf.push_str(&format!("Len={}", self.items.len()));
         for item in &self.items {
             buf.push_str(&format!(
                 "{:?}

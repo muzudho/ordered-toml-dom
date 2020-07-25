@@ -1,3 +1,4 @@
+use crate::object_model::comment::CommentM;
 use crate::object_model::key_value::KeyValueM;
 use std::fmt;
 
@@ -22,13 +23,13 @@ impl fmt::Debug for LineM {
 
 #[derive(Clone)]
 pub enum LineItemModel {
-    Comment(String),
+    Comment(CommentM),
     KeyValue(KeyValueM),
 }
 impl fmt::Debug for LineItemModel {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            LineItemModel::Comment(s) => write!(f, "{}", format!("{}", s)),
+            LineItemModel::Comment(m) => write!(f, "{}", format!("{:?}", m)),
             LineItemModel::KeyValue(m) => write!(f, "{}", format!("{:?}", m)),
         }
     }

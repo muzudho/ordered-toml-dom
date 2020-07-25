@@ -12,6 +12,7 @@ use casual_logger::{Log, Table};
 
 pub struct LineP {
     state: MachineState,
+    product: LineM,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
 }
@@ -19,21 +20,23 @@ impl Default for LineP {
     fn default() -> Self {
         LineP {
             state: MachineState::First,
+            product: LineM::default(),
             comment_p: None,
             key_value_p: None,
         }
     }
 }
 impl LineP {
-    pub fn product(&self) -> LineM {
-        let mut product = LineM::default();
+    pub fn product(&mut self) -> LineM {
         if let Some(p) = &self.comment_p {
-            product.items.push(LineItemModel::Comment(p.product()));
+            self.product.items.push(LineItemModel::Comment(p.product()));
         }
         if let Some(p) = &self.key_value_p {
-            product.items.push(LineItemModel::KeyValue(p.product()));
+            self.product
+                .items
+                .push(LineItemModel::KeyValue(p.product()));
         }
-        product
+        self.product.clone()
     }
 
     /// # Returns
@@ -45,7 +48,14 @@ impl LineP {
             MachineState::CommentSyntax => match self.comment_p.as_mut().unwrap().parse(token) {
                 SyntaxParserResult::Ok(end_of_syntax) => {
                     if end_of_syntax {
-                        dom.push(&self.product());
+                        // ここにはこない。
+                        panic!(Log::fatal_t(
+                            "LineP#parse",
+                            Table::default()
+                                .str("parser", "LineP#parse")
+                                .str("state", &format!("{:?}", self.state))
+                                .str("token", &format!("{:?}", token))
+                        ));
                     }
                 }
                 SyntaxParserResult::Err(table) => {
@@ -55,6 +65,7 @@ impl LineP {
                             .str("parser", "LineP#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
+                            .sub_t("error", &table)
                     ));
                 }
             },
