@@ -43,8 +43,8 @@ impl LineScanner {
         Log::info_t(
             "Product.",
             Table::default()
-                .str("parser", "LineScanner#from_file")
-                .str("product", &format!("{:?}", dom)),
+                .str("parser", "scanners.rs/LineScanner#from_file")
+                .str("product_dom", &format!("{:?}", dom)),
         );
         Log::info_t(
             "Finish of LineScanner#from_file().",

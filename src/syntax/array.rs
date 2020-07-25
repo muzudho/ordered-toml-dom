@@ -25,6 +25,9 @@ impl Default for ArrayP {
     }
 }
 impl ArrayP {
+    pub fn product(&self) -> ArrayM {
+        self.product.clone()
+    }
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  

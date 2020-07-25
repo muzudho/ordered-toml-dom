@@ -3,6 +3,7 @@
 
 use crate::lexical_parser::Token;
 use crate::lexical_parser::TokenType;
+use crate::object_model::document::DocumentM;
 use crate::object_model::line::{LineItemModel, LineM};
 use crate::syntax::comment::CommentP;
 use crate::syntax::key_value::KeyValueP;
@@ -11,23 +12,26 @@ use casual_logger::{Log, Table};
 
 pub struct LineP {
     state: MachineState,
-    comment_syntax: Option<CommentP>,
-    key_value_syntax: Option<KeyValueP>,
+    comment_p: Option<CommentP>,
+    key_value_p: Option<KeyValueP>,
 }
 impl Default for LineP {
     fn default() -> Self {
         LineP {
             state: MachineState::First,
-            comment_syntax: None,
-            key_value_syntax: None,
+            comment_p: None,
+            key_value_p: None,
         }
     }
 }
 impl LineP {
     pub fn product(&self) -> LineM {
         let mut product = LineM::default();
-        if let Some(p) = &self.comment_syntax {
+        if let Some(p) = &self.comment_p {
             product.items.push(LineItemModel::Comment(p.product()));
+        }
+        if let Some(p) = &self.key_value_p {
+            product.items.push(LineItemModel::KeyValue(p.product()));
         }
         product
     }
@@ -35,11 +39,11 @@ impl LineP {
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  
-    ///                             結果。    
-    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
+    ///                             結果。
+    pub fn parse(&mut self, token: &Token, dom: &mut DocumentM) -> SyntaxParserResult {
         match self.state {
             MachineState::CommentSyntax => {
-                self.comment_syntax.as_mut().unwrap().parse(token);
+                self.comment_p.as_mut().unwrap().parse(token);
             }
             MachineState::First => match token.type_ {
                 TokenType::Key => {
@@ -52,11 +56,11 @@ impl LineP {
                             .str("token", &format!("{:?}", token)),
                     );
                     */
-                    self.key_value_syntax = Some(KeyValueP::new(&token.value));
+                    self.key_value_p = Some(KeyValueP::new(&token.value));
                     self.state = MachineState::KeyPairSyntax;
                 }
                 TokenType::Sharp => {
-                    self.comment_syntax = Some(CommentP::new());
+                    self.comment_p = Some(CommentP::new());
                     self.state = MachineState::CommentSyntax;
                 }
                 _ => {
@@ -64,9 +68,11 @@ impl LineP {
                 }
             },
             MachineState::KeyPairSyntax => {
-                if let Some(key_value_syntax) = &mut self.key_value_syntax {
-                    match key_value_syntax.parse(token) {
-                        SyntaxParserResult::Ok(_) => {} // Ignored it.
+                if let Some(key_value_p) = &mut self.key_value_p {
+                    match key_value_p.parse(token) {
+                        SyntaxParserResult::Ok(_) => {
+                            dom.items.push(self.product());
+                        } // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
                                 Table::default()
@@ -105,11 +111,11 @@ impl LineP {
         let mut t = Table::default()
             .str("state", &format!("{:?}", self.state))
             .clone();
-        if let Some(comment_syntax) = &self.comment_syntax {
-            t.sub_t("comment", &comment_syntax.log());
+        if let Some(comment_p) = &self.comment_p {
+            t.sub_t("comment", &comment_p.log());
         }
-        if let Some(key_value_syntax) = &self.key_value_syntax {
-            t.sub_t("key_value", &key_value_syntax.log());
+        if let Some(key_value_p) = &self.key_value_p {
+            t.sub_t("key_value", &key_value_p.log());
         }
         t
     }

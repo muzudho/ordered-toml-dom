@@ -29,6 +29,9 @@ impl KeyValueP {
             array_p: None,
         }
     }
+    pub fn product(&self) -> KeyValueM {
+        self.product.clone()
+    }
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  
@@ -82,6 +85,7 @@ impl KeyValueP {
                                     Some(Box::new(ValueM::InlineTable(p.product())));
                                 self.inline_table_p = None;
                                 self.state = MachineState::End;
+                                return SyntaxParserResult::Ok(true);
                             }
                         }
                         SyntaxParserResult::Err(table) => {
@@ -110,6 +114,7 @@ impl KeyValueP {
                     match p.parse(token) {
                         SyntaxParserResult::Ok(end_of_syntax) => {
                             if end_of_syntax {
+                                self.product.value = Some(Box::new(ValueM::Array(p.product())));
                                 self.array_p = None;
                                 self.state = MachineState::End;
                                 return SyntaxParserResult::Ok(true);
