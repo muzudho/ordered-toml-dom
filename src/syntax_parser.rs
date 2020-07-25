@@ -1,15 +1,15 @@
 use crate::lexical_parser::TokenLine;
-use crate::syntax::line::LineSyntaxParser;
+use crate::syntax::line::LineParser;
 use crate::syntax::SyntaxParserResult;
-use casual_logger::{Log, Table};
+use casual_logger::Table;
 
 pub struct LineSyntaxScanner {
-    line_syntax_parser: LineSyntaxParser,
+    pub line_parser: LineParser,
 }
 impl Default for LineSyntaxScanner {
     fn default() -> Self {
         LineSyntaxScanner {
-            line_syntax_parser: LineSyntaxParser::default(),
+            line_parser: LineParser::default(),
         }
     }
 }
@@ -20,7 +20,7 @@ impl LineSyntaxScanner {
     ///                             結果。
     pub fn scan_line(&mut self, token_line: &TokenLine) -> SyntaxParserResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
-            match self.line_syntax_parser.parse(token) {
+            match self.line_parser.parse(token) {
                 SyntaxParserResult::Ok(_) => {} // Ignored it.
                 SyntaxParserResult::Err(table) => {
                     return SyntaxParserResult::Err(
@@ -41,7 +41,7 @@ impl LineSyntaxScanner {
 
     pub fn log(&self) -> Table {
         let mut t = Table::default();
-        t.sub_t("line", &self.line_syntax_parser.log());
+        t.sub_t("line", &self.line_parser.log());
         t
     }
 }

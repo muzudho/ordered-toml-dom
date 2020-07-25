@@ -3,26 +3,29 @@
 
 use crate::lexical_parser::Token;
 use crate::lexical_parser::TokenType;
+use crate::object_model::line::LineModel;
 use crate::syntax::comment::CommentParser;
 use crate::syntax::key_value::KeyValueParser;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
-pub struct LineSyntaxParser {
+pub struct LineParser {
     state: MachineState,
+    pub product: LineModel,
     comment_syntax: Option<CommentParser>,
     key_value_syntax: Option<KeyValueParser>,
 }
-impl Default for LineSyntaxParser {
+impl Default for LineParser {
     fn default() -> Self {
-        LineSyntaxParser {
+        LineParser {
             state: MachineState::First,
+            product: LineModel::default(),
             comment_syntax: None,
             key_value_syntax: None,
         }
     }
 }
-impl LineSyntaxParser {
+impl LineParser {
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  
@@ -35,9 +38,9 @@ impl LineSyntaxParser {
             MachineState::First => match token.type_ {
                 TokenType::Key => {
                     Log::info_t(
-                        "LineSyntaxParser#parse",
+                        "LineParser#parse",
                         Table::default()
-                            .str("parser", "LineSyntaxParser#parse")
+                            .str("parser", "LineParser#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token)),
                     );
@@ -59,7 +62,7 @@ impl LineSyntaxParser {
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
                                 Table::default()
-                                    .str("parser", "LineSyntaxParser#parse")
+                                    .str("parser", "LineParser#parse")
                                     .str("state", &format!("{:?}", self.state))
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
@@ -69,9 +72,9 @@ impl LineSyntaxParser {
                     }
                 } else {
                     panic!(Log::fatal_t(
-                        "LineSyntaxParser#parse",
+                        "LineParser#parse",
                         Table::default()
-                            .str("parser", "LineSyntaxParser#parse")
+                            .str("parser", "LineParser#parse")
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     ));
@@ -80,7 +83,7 @@ impl LineSyntaxParser {
             MachineState::Unimplemented => {
                 return SyntaxParserResult::Err(
                     Table::default()
-                        .str("parser", "LineSyntaxParser#parse")
+                        .str("parser", "LineParser#parse")
                         .str("state", &format!("{:?}", self.state))
                         .str("token", &format!("{:?}", token))
                         .clone(),

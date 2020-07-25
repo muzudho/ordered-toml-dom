@@ -7,7 +7,7 @@ use crate::syntax::array::ArrayParser;
 use crate::syntax::inline_table::InlineTableParser;
 use crate::syntax::single_quoted_string::SingleQuotedStringParser;
 use crate::syntax::SyntaxParserResult;
-use casual_logger::{Log, Table};
+use casual_logger::Table;
 
 /// `key = value`.
 pub struct KeyValueParser {

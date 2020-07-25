@@ -5,6 +5,7 @@ extern crate lazy_static;
 extern crate regex;
 
 pub mod lexical_parser;
+pub mod object_model;
 pub mod scanner;
 mod syntax;
 pub mod syntax_parser;

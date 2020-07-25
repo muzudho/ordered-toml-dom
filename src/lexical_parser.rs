@@ -13,15 +13,15 @@ enum LineMachineState {
 /// WIP.
 /// Line parser.
 /// 行パーサー。
-pub struct LineParser {
+pub struct LineLexicalParser {
     state: Option<LineMachineState>,
     pub token_line: TokenLine,
     buf_token_type: TokenType,
     buf: String,
 }
-impl Default for LineParser {
+impl Default for LineLexicalParser {
     fn default() -> Self {
-        LineParser {
+        LineLexicalParser {
             state: None,
             token_line: TokenLine::default(),
             buf_token_type: TokenType::WhiteSpace,
@@ -29,7 +29,7 @@ impl Default for LineParser {
         }
     }
 }
-impl LineParser {
+impl LineLexicalParser {
     pub fn parse_line(&mut self, line: &str) {
         Log::info_t("parse_line", Table::default().str("line", line));
 
@@ -219,7 +219,7 @@ impl LineParser {
         Log::info_t("End of initial", Table::default().char("ch", ch));
     }
 }
-impl fmt::Debug for LineParser {
+impl fmt::Debug for LineLexicalParser {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self.token_line)
     }

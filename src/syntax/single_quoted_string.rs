@@ -7,7 +7,7 @@ use casual_logger::Table;
 
 /// `'value'`.
 pub struct SingleQuotedStringParser {
-    value: String,
+    pub value: String,
 }
 impl SingleQuotedStringParser {
     pub fn new() -> Self {

@@ -2,6 +2,7 @@
 //! 構文パーサー。
 
 use crate::lexical_parser::{Token, TokenLine, TokenType};
+use crate::object_model::array::{ArrayItem, ArrayModel};
 use crate::syntax::single_quoted_string::SingleQuotedStringParser;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
@@ -9,6 +10,7 @@ use casual_logger::{Log, Table};
 /// `[ 'a', 'b', 'c' ]`.
 pub struct ArrayParser {
     state: MachineState,
+    product: ArrayModel,
     rest: TokenLine,
     single_quoted_string_parser: Option<Box<SingleQuotedStringParser>>,
 }
@@ -16,6 +18,7 @@ impl Default for ArrayParser {
     fn default() -> Self {
         ArrayParser {
             state: MachineState::AfterLeftSquareBracket,
+            product: ArrayModel::default(),
             rest: TokenLine::default(),
             single_quoted_string_parser: None,
         }
@@ -42,14 +45,13 @@ impl ArrayParser {
                 }
             }
             MachineState::SingleQuotedString => {
-                match self
-                    .single_quoted_string_parser
-                    .as_mut()
-                    .unwrap()
-                    .parse(token)
-                {
+                let p = self.single_quoted_string_parser.as_mut().unwrap();
+                match p.parse(token) {
                     SyntaxParserResult::Ok(end_of_syntax) => {
                         if end_of_syntax {
+                            self.product
+                                .items
+                                .push(ArrayItem::String(p.value.to_string()));
                             self.single_quoted_string_parser = None;
                             self.state = MachineState::AfterSingleQuotedString;
                         }
