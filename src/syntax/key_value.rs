@@ -112,6 +112,7 @@ impl KeyValueP {
                             if end_of_syntax {
                                 self.array_p = None;
                                 self.state = MachineState::End;
+                                return SyntaxParserResult::Ok(true);
                             }
                         }
                         SyntaxParserResult::Err(table) => {

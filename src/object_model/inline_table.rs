@@ -19,6 +19,6 @@ impl fmt::Debug for InlineTableM {
         for item in &self.items {
             buf.push_str(&format!("{:?}", item))
         }
-        write!(f, "{}", buf)
+        write!(f, "{{ {} }}", buf)
     }
 }

@@ -1,4 +1,5 @@
 use crate::lexical_parser::TokenLine;
+use crate::object_model::document::DocumentM;
 use crate::syntax::line::LineP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::Table;
@@ -18,10 +19,12 @@ impl LineSyntaxScanner {
     ///
     /// * `SyntaxParserResult` - Result.  
     ///                             結果。
-    pub fn scan_line(&mut self, token_line: &TokenLine) -> SyntaxParserResult {
+    pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut DocumentM) -> SyntaxParserResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
             match self.line_parser.parse(token) {
-                SyntaxParserResult::Ok(_) => {} // Ignored it.
+                SyntaxParserResult::Ok(_) => {
+                    dom.items.push(self.line_parser.product());
+                }
                 SyntaxParserResult::Err(table) => {
                     return SyntaxParserResult::Err(
                         Table::default()

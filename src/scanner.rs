@@ -11,7 +11,7 @@ impl LineScanner {
     pub fn from_file(path: &str) {
         Log::info(&format!("Read=|{}|", path));
         let mut aot = ArrayOfTable::default().clone();
-        let mut document_model = DocumentM::default();
+        let mut dom = DocumentM::default();
         match File::open(path) {
             Ok(file) => {
                 for line in BufReader::new(file).lines() {
@@ -24,12 +24,8 @@ impl LineScanner {
                     token_line.parse_line(&line);
                     Log::info(&format!("from_file/line_tokens=|{:?}|", token_line));
                     let mut line_syntax_scanner = LineSyntaxScanner::default();
-                    match line_syntax_scanner.scan_line(&token_line.token_line) {
-                        SyntaxParserResult::Ok(_) => {
-                            document_model
-                                .items
-                                .push(line_syntax_scanner.line_parser.product());
-                        } // Ignored it.
+                    match line_syntax_scanner.scan_line(&token_line.token_line, &mut dom) {
+                        SyntaxParserResult::Ok(_) => {} // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             aot.table(
                                 Table::default()
@@ -48,7 +44,7 @@ impl LineScanner {
             "Product.",
             Table::default()
                 .str("parser", "LineScanner#from_file")
-                .str("product", &format!("{:?}", document_model)),
+                .str("product", &format!("{:?}", dom)),
         );
         Log::info_t(
             "Finish of LineScanner#from_file().",
