@@ -52,7 +52,9 @@ impl ArrayP {
                 match p.parse(token) {
                     SyntaxParserResult::Ok(end_of_syntax) => {
                         if end_of_syntax {
-                            self.product.items.push(ArrayItem::String(p.product()));
+                            self.product
+                                .items
+                                .push(ArrayItem::SingleQuotedString(p.product()));
                             self.single_quoted_string_parser = None;
                             self.state = MachineState::AfterSingleQuotedString;
                         }

@@ -1,5 +1,6 @@
 //! Array model.  
 //! 配列モデル。  
+use crate::object_model::single_quoted_string::SingleQuotedStringM;
 use std::fmt;
 
 #[derive(Clone)]
@@ -23,12 +24,12 @@ impl fmt::Debug for ArrayM {
 
 #[derive(Clone)]
 pub enum ArrayItem {
-    String(String),
+    SingleQuotedString(SingleQuotedStringM),
 }
 impl fmt::Debug for ArrayItem {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ArrayItem::String(s) => write!(f, "{}", s),
+            ArrayItem::SingleQuotedString(m) => write!(f, "{:?}", m),
         }
     }
 }

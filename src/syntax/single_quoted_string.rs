@@ -2,20 +2,21 @@
 //! 構文パーサー。
 
 use crate::lexical_parser::{Token, TokenType};
+use crate::object_model::single_quoted_string::SingleQuotedStringM;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::Table;
 
 /// `'value'`.
 pub struct SingleQuotedStringP {
-    product: String,
+    product: SingleQuotedStringM,
 }
 impl SingleQuotedStringP {
-    pub fn product(&self) -> String {
+    pub fn product(&self) -> SingleQuotedStringM {
         self.product.clone()
     }
     pub fn new() -> Self {
         SingleQuotedStringP {
-            product: String::new(),
+            product: SingleQuotedStringM::default(),
         }
     }
     /// # Returns
@@ -30,12 +31,12 @@ impl SingleQuotedStringP {
                 return SyntaxParserResult::Ok(true);
             }
             _ => {
-                self.product.push_str(&token.value);
+                self.product.push_token(&token);
             }
         }
         SyntaxParserResult::Ok(false)
     }
     pub fn log(&self) -> Table {
-        Table::default().str("value", &self.product).clone()
+        Table::default().str("value", &self.product.value).clone()
     }
 }
