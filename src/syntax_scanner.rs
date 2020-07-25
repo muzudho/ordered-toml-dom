@@ -37,6 +37,24 @@ impl LineSyntaxScanner {
                 }
             }
         }
+
+        // TODO 行末が終端子のケース。
+        match self.line_parser.eol() {
+            SyntaxParserResult::Ok(end_of_syntax) => {
+                if end_of_syntax {
+                    dom.push(&self.line_parser.product())
+                }
+            }
+            SyntaxParserResult::Err(table) => {
+                return SyntaxParserResult::Err(
+                    Table::default()
+                        .str("token_line", &format!("{:?}", token_line))
+                        .sub_t("error", &table)
+                        .clone(),
+                );
+            }
+        }
+
         SyntaxParserResult::Ok(false)
     }
 

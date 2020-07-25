@@ -32,6 +32,9 @@ impl KeyValueP {
     pub fn product(&self) -> KeyValueM {
         self.product.clone()
     }
+    pub fn eol(&self) -> SyntaxParserResult {
+        SyntaxParserResult::Ok(false)
+    }
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  

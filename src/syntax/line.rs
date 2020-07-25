@@ -42,9 +42,22 @@ impl LineP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token, dom: &mut DocumentM) -> SyntaxParserResult {
         match self.state {
-            MachineState::CommentSyntax => {
-                self.comment_p.as_mut().unwrap().parse(token);
-            }
+            MachineState::CommentSyntax => match self.comment_p.as_mut().unwrap().parse(token) {
+                SyntaxParserResult::Ok(end_of_syntax) => {
+                    if end_of_syntax {
+                        dom.push(&self.product());
+                    }
+                }
+                SyntaxParserResult::Err(table) => {
+                    panic!(Log::fatal_t(
+                        "LineP#parse",
+                        Table::default()
+                            .str("parser", "LineP#parse")
+                            .str("state", &format!("{:?}", self.state))
+                            .str("token", &format!("{:?}", token))
+                    ));
+                }
+            },
             MachineState::First => match token.type_ {
                 TokenType::Key => {
                     /*
@@ -108,6 +121,15 @@ impl LineP {
         }
 
         SyntaxParserResult::Ok(false)
+    }
+    pub fn eol(&self) -> SyntaxParserResult {
+        if let Some(p) = &self.comment_p {
+            p.eol()
+        } else if let Some(p) = &self.key_value_p {
+            p.eol()
+        } else {
+            SyntaxParserResult::Ok(false)
+        }
     }
     pub fn log(&self) -> Table {
         let mut t = Table::default()
