@@ -3,6 +3,7 @@
 
 use crate::lexical_parser::Token;
 use crate::lexical_parser::{TokenLine, TokenType};
+use crate::syntax::array::ArrayParser;
 use crate::syntax::inline_table::InlineTableParser;
 use crate::syntax::single_quoted_string::SingleQuotedStringParser;
 use crate::syntax::SyntaxParserResult;
@@ -15,6 +16,7 @@ pub struct KeyValueParser {
     rest: TokenLine,
     inline_table_parser: Option<InlineTableParser>,
     single_quoted_string_parser: Option<SingleQuotedStringParser>,
+    array_parser: Option<ArrayParser>,
 }
 impl KeyValueParser {
     pub fn new(key: &str) -> Self {
@@ -24,6 +26,7 @@ impl KeyValueParser {
             rest: TokenLine::default(),
             inline_table_parser: None,
             single_quoted_string_parser: None,
+            array_parser: None,
         }
     }
     /// # Returns
@@ -56,6 +59,10 @@ impl KeyValueParser {
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_parser = Some(InlineTableParser::default());
                         self.state = MachineState::AfterLeftCurlyBracket;
+                    }
+                    TokenType::LeftSquareBracket => {
+                        self.array_parser = Some(ArrayParser::default());
+                        self.state = MachineState::AfterLeftSquareBracket;
                     }
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_parser = Some(SingleQuotedStringParser::new());
@@ -96,12 +103,56 @@ impl KeyValueParser {
                     );
                 }
             }
+            MachineState::AfterLeftSquareBracket => {
+                if let Some(p) = &mut self.array_parser {
+                    match p.parse(token) {
+                        SyntaxParserResult::Ok(end_of_syntax) => {
+                            if end_of_syntax {
+                                self.array_parser = None;
+                                self.state = MachineState::End;
+                            }
+                        }
+                        SyntaxParserResult::Err(table) => {
+                            return SyntaxParserResult::Err(
+                                Table::default()
+                                    .str("parser", "KeyValueParser#parse")
+                                    .str("state", &format!("{:?}", self.state))
+                                    .str("token", &format!("{:?}", token))
+                                    .sub_t("error", &table)
+                                    .clone(),
+                            )
+                        }
+                    }
+                } else {
+                    return SyntaxParserResult::Err(
+                        Table::default()
+                            .str("parser", "KeyValueParser#parse")
+                            .str("state", &format!("{:?}", self.state))
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    );
+                }
+            }
             MachineState::SingleQuotedString => {
                 if let Some(p) = &mut self.single_quoted_string_parser {
-                    if p.parse(token) {
-                        self.single_quoted_string_parser = None;
-                        self.state = MachineState::End;
-                        return SyntaxParserResult::Ok(true);
+                    match p.parse(token) {
+                        SyntaxParserResult::Ok(end_of_syntax) => {
+                            if end_of_syntax {
+                                self.single_quoted_string_parser = None;
+                                self.state = MachineState::End;
+                                return SyntaxParserResult::Ok(true);
+                            }
+                        }
+                        SyntaxParserResult::Err(table) => {
+                            return SyntaxParserResult::Err(
+                                Table::default()
+                                    .str("parser", "KeyValueParser#parse")
+                                    .str("state", &format!("{:?}", self.state))
+                                    .str("token", &format!("{:?}", token))
+                                    .sub_t("error", &table)
+                                    .clone(),
+                            )
+                        }
                     }
                 } else {
                     panic!(Log::fatal_t(
@@ -149,6 +200,7 @@ enum MachineState {
     AfterKey,
     AfterEquals,
     AfterLeftCurlyBracket,
+    AfterLeftSquareBracket,
     SingleQuotedString,
     End,
 }

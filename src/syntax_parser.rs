@@ -14,24 +14,29 @@ impl Default for LineSyntaxScanner {
     }
 }
 impl LineSyntaxScanner {
-    pub fn scan_line(&mut self, token_line: &TokenLine) {
+    /// # Returns
+    ///
+    /// * `SyntaxParserResult` - Result.  
+    ///                             結果。
+    pub fn scan_line(&mut self, token_line: &TokenLine) -> SyntaxParserResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
             match self.line_syntax_parser.parse(token) {
                 SyntaxParserResult::Ok(_) => {} // Ignored it.
                 SyntaxParserResult::Err(table) => {
-                    panic!(Log::fatal_t(
-                        "LineSyntaxScanner#scan_line",
+                    return SyntaxParserResult::Err(
                         Table::default()
                             .str("token_line", &format!("{:?}", token_line))
                             .str(
                                 "rest",
-                                &format!("{:?}", TokenLine::new(&token_line.tokens[i..].to_vec()))
+                                &format!("{:?}", TokenLine::new(&token_line.tokens[i..].to_vec())),
                             )
                             .sub_t("error", &table)
-                    ));
+                            .clone(),
+                    );
                 }
             }
         }
+        SyntaxParserResult::Ok(false)
     }
 
     pub fn log(&self) -> Table {

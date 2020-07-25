@@ -1,4 +1,5 @@
 use crate::lexical_parser::LineParser;
+use crate::syntax::SyntaxParserResult;
 use crate::syntax_parser::LineSyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use std::fs::File;
@@ -21,12 +22,18 @@ impl LineScanner {
                     token_line.parse_line(&line);
                     Log::info(&format!("from_file/line_tokens=|{:?}|", token_line));
                     let mut syntax_scanner = LineSyntaxScanner::default();
-                    syntax_scanner.scan_line(&token_line.token_line);
-                    aot.table(
-                        Table::default()
-                            .str("token_line", &format!("{:?}", token_line))
-                            .sub_t("syntax_scanner", &syntax_scanner.log()),
-                    );
+                    match syntax_scanner.scan_line(&token_line.token_line) {
+                        SyntaxParserResult::Ok(_) => {} // Ignored it.
+                        SyntaxParserResult::Err(table) => {
+                            aot.table(
+                                Table::default()
+                                    .str("line", &format!("{}", line))
+                                    .str("token_line", &format!("{:?}", token_line))
+                                    .sub_t("error", &table)
+                                    .sub_t("syntax_scanner", &syntax_scanner.log()),
+                            );
+                        }
+                    }
                 }
             }
             Err(why) => panic!("{}", why),

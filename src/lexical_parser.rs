@@ -145,8 +145,26 @@ impl LineParser {
                         .char("ch", ch),
                 );
             }
+            '[' => {
+                self.buf_token_type = TokenType::LeftSquareBracket;
+                Log::info_t(
+                    "initial",
+                    Table::default()
+                        .str("buf_token_type", &format!("{:?}", self.buf_token_type))
+                        .char("ch", ch),
+                );
+            }
             '}' => {
                 self.buf_token_type = TokenType::RightCurlyBracket;
+                Log::info_t(
+                    "initial",
+                    Table::default()
+                        .str("buf_token_type", &format!("{:?}", self.buf_token_type))
+                        .char("ch", ch),
+                );
+            }
+            ']' => {
+                self.buf_token_type = TokenType::RightSquareBracket;
                 Log::info_t(
                     "initial",
                     Table::default()
@@ -242,8 +260,12 @@ pub enum TokenType {
     Key,
     /// {
     LeftCurlyBracket,
+    /// [
+    LeftSquareBracket,
     /// }
     RightCurlyBracket,
+    /// ]
+    RightSquareBracket,
     /// #
     Sharp,
     /// '
