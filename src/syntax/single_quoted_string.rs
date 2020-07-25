@@ -7,12 +7,12 @@ use casual_logger::Table;
 
 /// `'value'`.
 pub struct SingleQuotedStringParser {
-    pub value: String,
+    pub product: String,
 }
 impl SingleQuotedStringParser {
     pub fn new() -> Self {
         SingleQuotedStringParser {
-            value: String::new(),
+            product: String::new(),
         }
     }
     /// # Returns
@@ -27,12 +27,12 @@ impl SingleQuotedStringParser {
                 return SyntaxParserResult::Ok(true);
             }
             _ => {
-                self.value.push_str(&token.value);
+                self.product.push_str(&token.value);
             }
         }
         SyntaxParserResult::Ok(false)
     }
     pub fn log(&self) -> Table {
-        Table::default().str("value", &self.value).clone()
+        Table::default().str("value", &self.product).clone()
     }
 }

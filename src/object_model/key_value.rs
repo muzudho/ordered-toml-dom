@@ -12,6 +12,14 @@ impl Default for KeyValueModel {
         }
     }
 }
+impl KeyValueModel {
+    pub fn new(key: &str) -> Self {
+        KeyValueModel {
+            key: key.to_string(),
+            value: String::new(),
+        }
+    }
+}
 impl fmt::Debug for KeyValueModel {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}={}", self.key, self.value)

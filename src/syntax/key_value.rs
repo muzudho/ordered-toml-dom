@@ -3,6 +3,7 @@
 
 use crate::lexical_parser::Token;
 use crate::lexical_parser::{TokenLine, TokenType};
+use crate::object_model::key_value::KeyValueModel;
 use crate::syntax::array::ArrayParser;
 use crate::syntax::inline_table::InlineTableParser;
 use crate::syntax::single_quoted_string::SingleQuotedStringParser;
@@ -12,7 +13,7 @@ use casual_logger::Table;
 /// `key = value`.
 pub struct KeyValueParser {
     state: MachineState,
-    key: String,
+    product: KeyValueModel,
     rest: TokenLine,
     inline_table_parser: Option<InlineTableParser>,
     single_quoted_string_parser: Option<SingleQuotedStringParser>,
@@ -22,7 +23,7 @@ impl KeyValueParser {
     pub fn new(key: &str) -> Self {
         KeyValueParser {
             state: MachineState::AfterKey,
-            key: key.to_string(),
+            product: KeyValueModel::new(key),
             rest: TokenLine::default(),
             inline_table_parser: None,
             single_quoted_string_parser: None,
@@ -179,7 +180,7 @@ impl KeyValueParser {
     pub fn log(&self) -> Table {
         let mut t = Table::default()
             .str("state", &format!("{:?}", self.state))
-            .str("key", &self.key)
+            .str("key", &format!("{:?}", &self.product))
             .clone();
         if !self.rest.tokens.is_empty() {
             t.str("rest", &format!("{:?}", self.rest));

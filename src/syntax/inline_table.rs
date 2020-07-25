@@ -1,7 +1,11 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::lexical_parser::{Token, TokenLine, TokenType};
+use crate::lexical_parser::{Token, TokenType};
+use crate::object_model::{
+    inline_table::{InlineTableItemModel, InlineTableModel},
+    key_value::KeyValueModel,
+};
 use crate::syntax::key_value::KeyValueParser;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
@@ -9,14 +13,14 @@ use casual_logger::{Log, Table};
 /// `{ key = value, key = value }`.
 pub struct InlineTableParser {
     state: MachineState,
-    rest: TokenLine,
+    product: InlineTableModel,
     key_value_syntax_parser: Option<Box<KeyValueParser>>,
 }
 impl Default for InlineTableParser {
     fn default() -> Self {
         InlineTableParser {
             state: MachineState::AfterLeftCurlyBracket,
-            rest: TokenLine::default(),
+            product: InlineTableModel::default(),
             key_value_syntax_parser: None,
         }
     }
@@ -32,13 +36,20 @@ impl InlineTableParser {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Key => {
+                        self.product.items.push(InlineTableItemModel::KeyValue(
+                            KeyValueModel::new(&token.value),
+                        ));
                         self.key_value_syntax_parser =
                             Some(Box::new(KeyValueParser::new(&token.value)));
                         self.state = MachineState::AfterKey;
                     }
-                    _ => {
-                        self.rest.tokens.push(token.clone());
-                    }
+                    _ => panic!(Log::fatal_t(
+                        "InlineTableParser#parse/AfterValue",
+                        Table::default()
+                            .str("parser", "InlineTableParser#parse")
+                            .str("state", &format!("{:?}", self.state))
+                            .str("token", &format!("{:?}", token))
+                    )),
                 }
             }
             MachineState::AfterKey => {
@@ -82,9 +93,6 @@ impl InlineTableParser {
     }
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
-        if !self.rest.tokens.is_empty() {
-            t.str("rest", &format!("{:?}", self.rest));
-        }
         if let Some(key_value_syntax_parser) = &self.key_value_syntax_parser {
             t.sub_t("key_value", &key_value_syntax_parser.log());
         }

@@ -51,7 +51,7 @@ impl ArrayParser {
                         if end_of_syntax {
                             self.product
                                 .items
-                                .push(ArrayItem::String(p.value.to_string()));
+                                .push(ArrayItem::String(p.product.to_string()));
                             self.single_quoted_string_parser = None;
                             self.state = MachineState::AfterSingleQuotedString;
                         }
