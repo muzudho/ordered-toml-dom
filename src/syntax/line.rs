@@ -1,7 +1,6 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::object_model::document::DocumentM;
 use crate::object_model::line::LineM;
 use crate::syntax::comment::CommentP;
 use crate::syntax::key_value::KeyValueP;
@@ -27,12 +26,6 @@ impl Default for LineP {
 }
 impl LineP {
     pub fn product(&mut self) -> &LineM {
-        if let Some(p) = &self.comment_p {
-            self.product.push_comment(&p.product());
-        }
-        if let Some(p) = &self.key_value_p {
-            self.product.push_key_value(&p.product());
-        }
         &self.product
     }
 
@@ -46,6 +39,8 @@ impl LineP {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
+                        self.product.push_comment(&p.product());
+                        self.comment_p = None;
                         self.state = MachineState::End;
                         return SyntaxParserResult::End;
                     }
@@ -77,6 +72,7 @@ impl LineP {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
+                        self.product.push_key_value(&p.product());
                         self.key_value_p = None;
                         self.state = MachineState::End;
                         return SyntaxParserResult::End;
