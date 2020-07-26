@@ -5,7 +5,7 @@
 //! `cargo run --example main`
 
 use casual_logger::{Log, Table};
-use toml_menu::Toml;
+use toml_menu::{model::ElementM, Toml};
 
 fn main() {
     println!("Start.");
@@ -16,10 +16,20 @@ fn main() {
         Table::default().uint("count", doc.elements.len() as u128),
     );
     for elem in doc.elements {
-        Log::info_t(
-            "Scan a element.",
-            Table::default().str("elem", &format!("{:?}", elem)),
-        );
+        match elem {
+            ElementM::Comment(m) => {
+                Log::info_t(
+                    "Scan a element.",
+                    Table::default().str("Comment", &format!("{:?}", m)),
+                );
+            }
+            ElementM::KeyValue(m) => {
+                Log::info_t(
+                    "Scan a element.",
+                    Table::default().str("KeyValue", &format!("{:?}", m)),
+                );
+            }
+        }
     }
     Log::flush();
     println!("Finished.");

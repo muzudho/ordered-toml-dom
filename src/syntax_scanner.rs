@@ -1,4 +1,4 @@
-use crate::model::document::DocumentM;
+use crate::model::DocumentM;
 use crate::syntax::line::LineP;
 use crate::syntax::SyntaxParserResult;
 use crate::token::TokenLine;

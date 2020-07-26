@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::single_quoted_string::SingleQuotedStringM;
+use crate::model::SingleQuotedStringM;
 use crate::syntax::SyntaxParserResult;
 use crate::token::{Token, TokenType};
 use casual_logger::Table;

@@ -1,12 +1,9 @@
 //! Document model.  
 //! ドキュメント・モデル。  
 
-use crate::model::element::ElementM;
+use crate::model::{DocumentM, ElementM};
 use std::fmt;
 
-pub struct DocumentM {
-    pub elements: Vec<ElementM>,
-}
 impl Default for DocumentM {
     fn default() -> Self {
         DocumentM {

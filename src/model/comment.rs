@@ -1,10 +1,7 @@
+use crate::model::CommentM;
 use crate::token::Token;
 use std::fmt;
 
-#[derive(Clone)]
-pub struct CommentM {
-    value: String,
-}
 impl Default for CommentM {
     fn default() -> Self {
         CommentM {

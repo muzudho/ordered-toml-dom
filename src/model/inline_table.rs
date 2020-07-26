@@ -1,14 +1,9 @@
 //! Inline model.  
 //! インライン・モデル。  
 
-use crate::model::key_value::KeyValueM;
-use crate::model::value::ValueM;
+use crate::model::{InlineTableM, KeyValueM, ValueM};
 use std::fmt;
 
-#[derive(Clone)]
-pub struct InlineTableM {
-    items: Vec<ValueM>,
-}
 impl Default for InlineTableM {
     fn default() -> Self {
         InlineTableM { items: Vec::new() }

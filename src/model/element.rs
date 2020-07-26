@@ -1,15 +1,9 @@
 //! Element model.  
 //! 要素モデル。  
 
-use crate::model::comment::CommentM;
-use crate::model::key_value::KeyValueM;
+use crate::model::{CommentM, ElementM, KeyValueM};
 use std::fmt;
 
-#[derive(Clone)]
-pub enum ElementM {
-    Comment(CommentM),
-    KeyValue(KeyValueM),
-}
 impl ElementM {
     pub fn from_comment(m: &CommentM) -> Self {
         ElementM::Comment(m.clone())

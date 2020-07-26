@@ -1,25 +1,10 @@
 //! Key value model.  
 //! キー値モデル。  
 
-use crate::model::value::ValueM;
+use crate::model::{KeyValueM, ValueM};
 use crate::token::Token;
 use std::fmt;
 
-#[derive(Clone)]
-pub struct KeyValueM {
-    key: String,
-    value: Box<ValueM>,
-}
-/*
-impl Default for KeyValueM {
-    fn default() -> Self {
-        KeyValueM {
-            key: String::new(),
-            value: None,
-        }
-    }
-}
-*/
 impl KeyValueM {
     pub fn new(token: &Token, m: &ValueM) -> Self {
         KeyValueM {

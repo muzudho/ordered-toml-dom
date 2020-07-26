@@ -1,14 +1,8 @@
 //! Array model.  
 //! 配列モデル。  
-use crate::model::literal_string::LiteralStringM;
-use crate::model::single_quoted_string::SingleQuotedStringM;
-use crate::model::value::ValueM;
+use crate::model::{ArrayM, LiteralStringM, SingleQuotedStringM, ValueM};
 use std::fmt;
 
-#[derive(Clone)]
-pub struct ArrayM {
-    items: Vec<ValueM>,
-}
 impl Default for ArrayM {
     fn default() -> Self {
         ArrayM { items: Vec::new() }

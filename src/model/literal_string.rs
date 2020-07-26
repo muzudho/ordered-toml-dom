@@ -1,10 +1,7 @@
+use crate::model::LiteralStringM;
 use crate::token::Token;
 use std::fmt;
 
-#[derive(Clone)]
-pub struct LiteralStringM {
-    value: String,
-}
 impl Default for LiteralStringM {
     fn default() -> Self {
         LiteralStringM {

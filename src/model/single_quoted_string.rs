@@ -1,10 +1,7 @@
+use crate::model::SingleQuotedStringM;
 use crate::token::Token;
 use std::fmt;
 
-#[derive(Clone)]
-pub struct SingleQuotedStringM {
-    pub value: String,
-}
 impl Default for SingleQuotedStringM {
     fn default() -> Self {
         SingleQuotedStringM {

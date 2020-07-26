@@ -11,7 +11,7 @@ pub mod syntax_scanner;
 mod token;
 
 use crate::lexical_parser::LineLexicalParser;
-use crate::model::document::DocumentM;
+use crate::model::DocumentM;
 use crate::syntax::SyntaxParserResult;
 use crate::syntax_scanner::LineSyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};

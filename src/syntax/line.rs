@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::element::ElementM;
+use crate::model::ElementM;
 use crate::syntax::comment::CommentP;
 use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
