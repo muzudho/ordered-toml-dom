@@ -5,7 +5,10 @@
 //! `cargo run --example main`
 
 use casual_logger::{Log, Table};
-use toml_menu::{model::ElementM, Toml};
+use toml_menu::{
+    model::{ElementM, ValueM},
+    Toml,
+};
 
 fn main() {
     println!("Start.");
@@ -28,6 +31,13 @@ fn main() {
                     "Scan a element.",
                     Table::default().str("KeyValue", &format!("{:?}", m)),
                 );
+                match *m.value {
+                    ValueM::Array(m) => Log::info(&format!("{:?}", m)),
+                    ValueM::InlineTable(m) => Log::info(&format!("{:?}", m)),
+                    ValueM::KeyValue(m) => Log::info(&format!("{:?}", m)),
+                    ValueM::LiteralString(m) => Log::info(&format!("{:?}", m)),
+                    ValueM::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
+                }
             }
         }
     }

@@ -36,8 +36,8 @@ pub struct InlineTableM {
 
 #[derive(Clone)]
 pub struct KeyValueM {
-    key: String,
-    value: Box<ValueM>,
+    pub key: String,
+    pub value: Box<ValueM>,
 }
 
 #[derive(Clone)]
