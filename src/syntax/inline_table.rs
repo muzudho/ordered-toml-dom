@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::object_model::{inline_table::InlineTableM, key_value::KeyValueM};
+use crate::model::{inline_table::InlineTableM, key_value::KeyValueM};
 use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
 use crate::token::{Token, TokenType};

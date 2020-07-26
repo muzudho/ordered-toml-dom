@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::object_model::{array::ArrayM, literal_string::LiteralStringM};
+use crate::model::{array::ArrayM, literal_string::LiteralStringM};
 use crate::syntax::single_quoted_string::SingleQuotedStringP;
 use crate::syntax::SyntaxParserResult;
 use crate::token::{Token, TokenType};

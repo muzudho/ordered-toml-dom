@@ -1,8 +1,8 @@
 //! Inline model.  
 //! インライン・モデル。  
 
-use crate::object_model::key_value::KeyValueM;
-use crate::object_model::value::ValueM;
+use crate::model::key_value::KeyValueM;
+use crate::model::value::ValueM;
 use std::fmt;
 
 #[derive(Clone)]

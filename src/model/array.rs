@@ -1,8 +1,8 @@
 //! Array model.  
 //! 配列モデル。  
-use crate::object_model::literal_string::LiteralStringM;
-use crate::object_model::single_quoted_string::SingleQuotedStringM;
-use crate::object_model::value::ValueM;
+use crate::model::literal_string::LiteralStringM;
+use crate::model::single_quoted_string::SingleQuotedStringM;
+use crate::model::value::ValueM;
 use std::fmt;
 
 #[derive(Clone)]

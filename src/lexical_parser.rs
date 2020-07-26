@@ -1,7 +1,7 @@
 //! 単語単位に分けます。
 use crate::token::{Token, TokenLine, TokenType};
 use crate::RE_KEY;
-use casual_logger::{Log, Table};
+use casual_logger::Log;
 use std::fmt;
 
 #[derive(Debug)]

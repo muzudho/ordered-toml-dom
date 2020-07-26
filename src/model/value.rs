@@ -1,9 +1,9 @@
 //! Value model.  
 //! 値モデル。  
 
-use crate::object_model::literal_string::LiteralStringM;
-use crate::object_model::single_quoted_string::SingleQuotedStringM;
-use crate::object_model::{array::ArrayM, inline_table::InlineTableM, key_value::KeyValueM};
+use crate::model::literal_string::LiteralStringM;
+use crate::model::single_quoted_string::SingleQuotedStringM;
+use crate::model::{array::ArrayM, inline_table::InlineTableM, key_value::KeyValueM};
 use std::fmt;
 
 #[derive(Clone)]

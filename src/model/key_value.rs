@@ -1,7 +1,7 @@
 //! Key value model.  
 //! キー値モデル。  
 
-use crate::object_model::value::ValueM;
+use crate::model::value::ValueM;
 use crate::token::Token;
 use std::fmt;
 

@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::object_model::line::LineM;
+use crate::model::element::ElementM;
 use crate::syntax::comment::CommentP;
 use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
@@ -10,7 +10,7 @@ use casual_logger::Table;
 
 pub struct LineP {
     state: MachineState,
-    buffer: Option<LineM>,
+    buffer: Option<ElementM>,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
 }
@@ -18,14 +18,14 @@ impl Default for LineP {
     fn default() -> Self {
         LineP {
             state: MachineState::First,
-            buffer: Some(LineM::default()),
+            buffer: Some(ElementM::default()),
             comment_p: None,
             key_value_p: None,
         }
     }
 }
 impl LineP {
-    pub fn flush(&mut self) -> Option<LineM> {
+    pub fn flush(&mut self) -> Option<ElementM> {
         let m = self.buffer.clone();
         self.buffer = None;
         m

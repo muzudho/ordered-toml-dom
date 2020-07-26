@@ -1,17 +1,20 @@
-use crate::object_model::comment::CommentM;
-use crate::object_model::key_value::KeyValueM;
+//! Element model.  
+//! 要素モデル。  
+
+use crate::model::comment::CommentM;
+use crate::model::key_value::KeyValueM;
 use std::fmt;
 
 #[derive(Clone)]
-pub struct LineM {
+pub struct ElementM {
     items: Vec<LineItemModel>,
 }
-impl Default for LineM {
+impl Default for ElementM {
     fn default() -> Self {
-        LineM { items: Vec::new() }
+        ElementM { items: Vec::new() }
     }
 }
-impl LineM {
+impl ElementM {
     pub fn push_comment(&mut self, m: &CommentM) {
         self.items.push(LineItemModel::Comment(m.clone()));
     }
@@ -19,7 +22,7 @@ impl LineM {
         self.items.push(LineItemModel::KeyValue(m.clone()));
     }
 }
-impl fmt::Debug for LineM {
+impl fmt::Debug for ElementM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for item in &self.items {
