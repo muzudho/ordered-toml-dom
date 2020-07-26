@@ -21,8 +21,10 @@ impl LineSyntaxScanner {
     ///                             結果。
     pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut DocumentM) -> SyntaxParserResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
-            match self.line_parser.parse(token, dom) {
-                SyntaxParserResult::End | SyntaxParserResult::Ongoing => {}
+            match self.line_parser.parse(token) {
+                SyntaxParserResult::End => {
+                    dom.push_line(&self.line_parser.product());
+                }
                 SyntaxParserResult::Err(table) => {
                     return SyntaxParserResult::Err(
                         Table::default()
@@ -36,6 +38,7 @@ impl LineSyntaxScanner {
                             .clone(),
                     );
                 }
+                SyntaxParserResult::Ongoing => {}
             }
         }
 

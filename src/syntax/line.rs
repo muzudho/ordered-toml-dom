@@ -40,13 +40,12 @@ impl LineP {
     ///
     /// * `SyntaxParserResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token, dom: &mut DocumentM) -> SyntaxParserResult {
+    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
             MachineState::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        dom.push_line(&self.product());
                         self.state = MachineState::End;
                         return SyntaxParserResult::End;
                     }
@@ -78,9 +77,9 @@ impl LineP {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        dom.push_line(&self.product());
                         self.key_value_p = None;
                         self.state = MachineState::End;
+                        return SyntaxParserResult::End;
                     } // Ignored it.
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
