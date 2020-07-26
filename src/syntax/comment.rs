@@ -2,14 +2,10 @@
 //! 構文パーサー。
 
 use crate::model::CommentM;
-use crate::syntax::SyntaxParserResult;
+use crate::syntax::{CommentP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
-/// `# comment`.
-pub struct CommentP {
-    buffer: Option<CommentM>,
-}
 impl CommentP {
     pub fn new() -> Self {
         CommentP { buffer: None }

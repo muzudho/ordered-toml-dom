@@ -2,22 +2,14 @@
 //! 構文パーサー。
 
 use crate::model::ElementM;
-use crate::syntax::comment::CommentP;
-use crate::syntax::key_value::KeyValueP;
-use crate::syntax::SyntaxParserResult;
+use crate::syntax::{machine_state::LineState, CommentP, KeyValueP, LineP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
-pub struct LineP {
-    state: MachineState,
-    buffer: Option<ElementM>,
-    comment_p: Option<CommentP>,
-    key_value_p: Option<KeyValueP>,
-}
 impl Default for LineP {
     fn default() -> Self {
         LineP {
-            state: MachineState::First,
+            state: LineState::First,
             buffer: None,
             comment_p: None,
             key_value_p: None,
@@ -37,14 +29,14 @@ impl LineP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
-            MachineState::CommentSyntax => {
+            LineState::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(ElementM::from_comment(&child_m));
                             self.comment_p = None;
-                            self.state = MachineState::AfterComment;
+                            self.state = LineState::AfterComment;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -65,27 +57,27 @@ impl LineP {
                     SyntaxParserResult::Ongoing => {}
                 }
             }
-            MachineState::First => match token.type_ {
+            LineState::First => match token.type_ {
                 TokenType::Key => {
                     self.key_value_p = Some(KeyValueP::new(&token));
-                    self.state = MachineState::KeyPairSyntax;
+                    self.state = LineState::KeyPairSyntax;
                 }
                 TokenType::Sharp => {
                     self.comment_p = Some(CommentP::new());
-                    self.state = MachineState::CommentSyntax;
+                    self.state = LineState::CommentSyntax;
                 }
                 _ => {
-                    self.state = MachineState::Unimplemented;
+                    self.state = LineState::Unimplemented;
                 }
             },
-            MachineState::KeyPairSyntax => {
+            LineState::KeyPairSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(ElementM::from_key_value(&child_m));
                             self.key_value_p = None;
-                            self.state = MachineState::AfterKeyValue;
+                            self.state = LineState::AfterKeyValue;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -106,21 +98,21 @@ impl LineP {
                     SyntaxParserResult::Ongoing => {}
                 }
             }
-            MachineState::Unimplemented => {
+            LineState::Unimplemented => {
                 return SyntaxParserResult::Err(
                     self.err_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
             }
-            MachineState::AfterComment => {
+            LineState::AfterComment => {
                 return SyntaxParserResult::Err(
                     self.err_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
             }
-            MachineState::AfterKeyValue => match token.type_ {
+            LineState::AfterKeyValue => match token.type_ {
                 TokenType::EndOfLine => return SyntaxParserResult::End,
                 _ => {
                     return SyntaxParserResult::Err(
@@ -147,16 +139,4 @@ impl LineP {
         }
         t
     }
-}
-
-#[derive(Debug)]
-enum MachineState {
-    AfterComment,
-    AfterKeyValue,
-    /// `# comment`.
-    CommentSyntax,
-    First,
-    /// `key = right_value`.
-    KeyPairSyntax,
-    Unimplemented,
 }

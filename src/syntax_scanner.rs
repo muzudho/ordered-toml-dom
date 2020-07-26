@@ -1,6 +1,5 @@
 use crate::model::DocumentM;
-use crate::syntax::line::LineP;
-use crate::syntax::SyntaxParserResult;
+use crate::syntax::{LineP, SyntaxParserResult};
 use crate::token::TokenLine;
 use casual_logger::Table;
 

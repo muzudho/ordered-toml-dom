@@ -2,26 +2,17 @@
 //! 構文パーサー。
 
 use crate::model::{KeyValueM, LiteralStringM, ValueM};
-use crate::syntax::array::ArrayP;
-use crate::syntax::inline_table::InlineTableP;
-use crate::syntax::single_quoted_string::SingleQuotedStringP;
-use crate::syntax::SyntaxParserResult;
+use crate::syntax::{
+    machine_state::KeyValueState, ArrayP, InlineTableP, KeyValueP, SingleQuotedStringP,
+    SyntaxParserResult,
+};
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
 
-/// `key = value`.
-pub struct KeyValueP {
-    state: MachineState,
-    temp_key: Token,
-    buffer: Option<KeyValueM>,
-    inline_table_p: Option<InlineTableP>,
-    single_quoted_string_p: Option<SingleQuotedStringP>,
-    array_p: Option<ArrayP>,
-}
 impl KeyValueP {
     pub fn new(key: &Token) -> Self {
         KeyValueP {
-            state: MachineState::AfterKey,
+            state: KeyValueState::AfterKey,
             temp_key: key.clone(),
             buffer: None,
             inline_table_p: None,
@@ -40,7 +31,7 @@ impl KeyValueP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
-            MachineState::AfterKey => {
+            KeyValueState::AfterKey => {
                 match token.type_ {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
@@ -49,7 +40,7 @@ impl KeyValueP {
                         );
                     } //Ignored it.
                     TokenType::Equals => {
-                        self.state = MachineState::AfterEquals;
+                        self.state = KeyValueState::AfterEquals;
                         Log::trace_t(
                             "KeyValueP#parse/AfterKey/=",
                             Table::default().str("token", &format!("{:?}", token)),
@@ -64,7 +55,7 @@ impl KeyValueP {
                     }
                 }
             }
-            MachineState::AfterEquals => {
+            KeyValueState::AfterEquals => {
                 match token.type_ {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
@@ -78,7 +69,7 @@ impl KeyValueP {
                             &self.temp_key,
                             &ValueM::LiteralString(LiteralStringM::new(&token)),
                         ));
-                        self.state = MachineState::End;
+                        self.state = KeyValueState::End;
                         Log::trace_t(
                             "KeyValueP#parse/After=/Key",
                             Table::default().str("token", &format!("{:?}", token)),
@@ -87,7 +78,7 @@ impl KeyValueP {
                     }
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());
-                        self.state = MachineState::AfterLeftCurlyBracket;
+                        self.state = KeyValueState::AfterLeftCurlyBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/{",
                             Table::default().str("token", &format!("{:?}", token)),
@@ -95,7 +86,7 @@ impl KeyValueP {
                     }
                     TokenType::LeftSquareBracket => {
                         self.array_p = Some(ArrayP::default());
-                        self.state = MachineState::AfterLeftSquareBracket;
+                        self.state = KeyValueState::AfterLeftSquareBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/[",
                             Table::default().str("token", &format!("{:?}", token)),
@@ -103,7 +94,7 @@ impl KeyValueP {
                     }
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_p = Some(SingleQuotedStringP::new());
-                        self.state = MachineState::SingleQuotedString;
+                        self.state = KeyValueState::SingleQuotedString;
                         Log::trace_t(
                             "KeyValueP#parse/After=/'",
                             Table::default().str("token", &format!("{:?}", token)),
@@ -118,7 +109,7 @@ impl KeyValueP {
                     }
                 }
             }
-            MachineState::AfterLeftCurlyBracket => {
+            KeyValueState::AfterLeftCurlyBracket => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/After{",
                     Table::default().str("token", &format!("{:?}", token)),
@@ -132,7 +123,7 @@ impl KeyValueP {
                                 &ValueM::InlineTable(child_m),
                             ));
                             self.inline_table_p = None;
-                            self.state = MachineState::End;
+                            self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -153,7 +144,7 @@ impl KeyValueP {
                     SyntaxParserResult::Ongoing => {}
                 }
             }
-            MachineState::AfterLeftSquareBracket => {
+            KeyValueState::AfterLeftSquareBracket => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/After[",
                     Table::default().str("token", &format!("{:?}", token)),
@@ -165,7 +156,7 @@ impl KeyValueP {
                             self.buffer =
                                 Some(KeyValueM::new(&self.temp_key, &ValueM::Array(child_m)));
                             self.array_p = None;
-                            self.state = MachineState::End;
+                            self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -186,7 +177,7 @@ impl KeyValueP {
                     SyntaxParserResult::Ongoing => {}
                 }
             }
-            MachineState::SingleQuotedString => {
+            KeyValueState::SingleQuotedString => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/'value'",
                     Table::default().str("token", &format!("{:?}", token)),
@@ -200,7 +191,7 @@ impl KeyValueP {
                                 &ValueM::SingleQuotedString(child_m),
                             ));
                             self.single_quoted_string_p = None;
-                            self.state = MachineState::End;
+                            self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -221,7 +212,7 @@ impl KeyValueP {
                     SyntaxParserResult::Ongoing => {}
                 }
             }
-            MachineState::End => {
+            KeyValueState::End => {
                 return SyntaxParserResult::Err(
                     self.err_table()
                         .str("token", &format!("{:?}", token))
@@ -245,15 +236,4 @@ impl KeyValueP {
         }
         t
     }
-}
-
-/// `key = right_value`.
-#[derive(Debug)]
-enum MachineState {
-    AfterKey,
-    AfterEquals,
-    AfterLeftCurlyBracket,
-    AfterLeftSquareBracket,
-    SingleQuotedString,
-    End,
 }

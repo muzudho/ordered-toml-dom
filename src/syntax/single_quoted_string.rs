@@ -2,15 +2,10 @@
 //! 構文パーサー。
 
 use crate::model::SingleQuotedStringM;
-use crate::syntax::SyntaxParserResult;
+use crate::syntax::{SingleQuotedStringP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
-/// `'value'`.
-#[derive(Clone)]
-pub struct SingleQuotedStringP {
-    buffer: Option<SingleQuotedStringM>,
-}
 impl SingleQuotedStringP {
     pub fn flush(&mut self) -> Option<SingleQuotedStringM> {
         let m = self.buffer.clone();
