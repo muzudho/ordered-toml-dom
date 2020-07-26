@@ -60,8 +60,8 @@ impl KeyValueP {
                     TokenType::WhiteSpace => {} //Ignored it.
                     TokenType::Key => {
                         // TODO true, false
-                        self.product.value =
-                            Some(Box::new(ValueM::LiteralString(LiteralStringM::new(&token))));
+                        self.product
+                            .set_value(&ValueM::LiteralString(LiteralStringM::new(&token)));
                         self.state = MachineState::End;
                         return SyntaxParserResult::Ok(true);
                     }
@@ -91,7 +91,7 @@ impl KeyValueP {
                 match p.parse(token) {
                     SyntaxParserResult::Ok(end_of_syntax) => {
                         if end_of_syntax {
-                            self.product.value = Some(Box::new(ValueM::InlineTable(p.product())));
+                            self.product.set_value(&ValueM::InlineTable(p.product()));
                             self.inline_table_p = None;
                             self.state = MachineState::End;
                             return SyntaxParserResult::Ok(true);
@@ -112,7 +112,7 @@ impl KeyValueP {
                 match p.parse(token) {
                     SyntaxParserResult::Ok(end_of_syntax) => {
                         if end_of_syntax {
-                            self.product.value = Some(Box::new(ValueM::Array(p.product())));
+                            self.product.set_value(&ValueM::Array(p.product()));
                             self.array_p = None;
                             self.state = MachineState::End;
                             return SyntaxParserResult::Ok(true);
@@ -133,8 +133,8 @@ impl KeyValueP {
                 match p.parse(token) {
                     SyntaxParserResult::Ok(end_of_syntax) => {
                         if end_of_syntax {
-                            self.product.value =
-                                Some(Box::new(ValueM::SingleQuotedString(p.product())));
+                            self.product
+                                .set_value(&ValueM::SingleQuotedString(p.product()));
                             self.single_quoted_string_p = None;
                             self.state = MachineState::End;
                             return SyntaxParserResult::Ok(true);

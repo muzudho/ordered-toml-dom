@@ -3,7 +3,8 @@
 
 enable = true
 apple = 'pie'
-array = [1, 2, 3]
+one_box = [1]
+three_list = [1, 2, 3]
 file_name = { type = 'string', regex = true, default = 'default', value = '^[a-zA-Z0-9_-]+$' }
 file_ext = { type = 'select', default = '.log.toml', value = ['.log.toml', '.log'] }
 retention_days = { type = 'i16', default = 7, min = -100000000, max = 100000000 }

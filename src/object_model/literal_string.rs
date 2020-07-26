@@ -3,7 +3,7 @@ use std::fmt;
 
 #[derive(Clone)]
 pub struct LiteralStringM {
-    pub value: String,
+    value: String,
 }
 impl Default for LiteralStringM {
     fn default() -> Self {

@@ -8,7 +8,7 @@ use std::fmt;
 #[derive(Clone)]
 pub struct KeyValueM {
     key: String,
-    pub value: Option<Box<ValueM>>,
+    value: Option<Box<ValueM>>,
 }
 impl Default for KeyValueM {
     fn default() -> Self {
@@ -24,6 +24,9 @@ impl KeyValueM {
             key: token.value.to_string(),
             value: None,
         }
+    }
+    pub fn set_value(&mut self, m: &ValueM) {
+        self.value = Some(Box::new(m.clone()));
     }
 }
 impl fmt::Debug for KeyValueM {

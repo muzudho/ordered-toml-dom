@@ -5,7 +5,7 @@ use crate::lexical_parser::{Token, TokenType};
 use crate::object_model::{array::ArrayM, literal_string::LiteralStringM};
 use crate::syntax::single_quoted_string::SingleQuotedStringP;
 use crate::syntax::SyntaxParserResult;
-use casual_logger::Table;
+use casual_logger::{Log, Table};
 
 /// `[ 'a', 'b', 'c' ]`.
 pub struct ArrayP {
@@ -33,15 +33,34 @@ impl ArrayP {
     pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
             MachineState::AfterLeftSquareBracket => {
+                /*
+                Log::trace_t(
+                    "ArrayP#parse/After[",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                */
                 match token.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpace => {
+                        Log::trace_t(
+                            "ArrayP#parse/After[/WhiteSpace",
+                            Table::default().str("token", &format!("{:?}", token)),
+                        );
+                    } // Ignore it.
                     TokenType::Key => {
+                        Log::trace_t(
+                            "ArrayP#parse/After[/Key",
+                            Table::default().str("token", &format!("{:?}", token)),
+                        );
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。
                         self.product()
                             .push_literal_string(&LiteralStringM::new(token));
                         self.state = MachineState::AfterItem;
                     }
                     TokenType::SingleQuotation => {
+                        Log::trace_t(
+                            "ArrayP#parse/After[/'",
+                            Table::default().str("token", &format!("{:?}", token)),
+                        );
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
                         self.state = MachineState::SingleQuotedString;
                     }
@@ -55,6 +74,10 @@ impl ArrayP {
                 }
             }
             MachineState::SingleQuotedString => {
+                Log::trace_t(
+                    "ArrayP#parse/'value'",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::Ok(end_of_syntax) => {
@@ -74,37 +97,62 @@ impl ArrayP {
                     }
                 }
             }
-            MachineState::AfterItem => match token.type_ {
-                TokenType::Comma => {
-                    self.state = MachineState::AfterLeftSquareBracket;
+            MachineState::AfterItem => {
+                Log::trace_t(
+                    "ArrayP#parse/After*",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                match token.type_ {
+                    TokenType::Comma => {
+                        self.state = MachineState::AfterLeftSquareBracket;
+                    }
+                    TokenType::RightSquareBracket => {
+                        self.state = MachineState::End;
+                        return SyntaxParserResult::Ok(true);
+                    }
+                    _ => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
                 }
-                TokenType::RightSquareBracket => {
-                    return SyntaxParserResult::Ok(true);
+            }
+            MachineState::AfterSingleQuotedString => {
+                Log::trace_t(
+                    "ArrayP#parse/After'value'",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                match token.type_ {
+                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::Comma => {
+                        self.state = MachineState::AfterLeftSquareBracket;
+                    }
+                    TokenType::RightSquareBracket => {
+                        self.state = MachineState::End;
+                        return SyntaxParserResult::Ok(true);
+                    }
+                    _ => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
                 }
-                _ => {
-                    return SyntaxParserResult::Err(
-                        self.err_table()
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    )
-                }
-            },
-            MachineState::AfterSingleQuotedString => match token.type_ {
-                TokenType::WhiteSpace => {} // Ignore it.
-                TokenType::Comma => {
-                    self.state = MachineState::AfterLeftSquareBracket;
-                }
-                TokenType::RightSquareBracket => {
-                    return SyntaxParserResult::Ok(true);
-                }
-                _ => {
-                    return SyntaxParserResult::Err(
-                        self.err_table()
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    )
-                }
-            },
+            }
+            MachineState::End => {
+                Log::trace_t(
+                    "ArrayP#parse/End",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
         }
         SyntaxParserResult::Ok(false)
     }
@@ -125,8 +173,9 @@ impl ArrayP {
 enum MachineState {
     /// [ か , の次。
     AfterLeftSquareBracket,
-    SingleQuotedString,
     AfterSingleQuotedString,
     /// , か ] を待ちます。
     AfterItem,
+    End,
+    SingleQuotedString,
 }
