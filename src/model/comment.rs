@@ -3,7 +3,7 @@ use std::fmt;
 
 #[derive(Clone)]
 pub struct CommentM {
-    pub value: String,
+    value: String,
 }
 impl Default for CommentM {
     fn default() -> Self {

@@ -8,8 +8,9 @@ use std::fmt;
 #[derive(Clone)]
 pub struct KeyValueM {
     key: String,
-    value: Option<Box<ValueM>>,
+    value: Box<ValueM>,
 }
+/*
 impl Default for KeyValueM {
     fn default() -> Self {
         KeyValueM {
@@ -18,28 +19,17 @@ impl Default for KeyValueM {
         }
     }
 }
+*/
 impl KeyValueM {
-    pub fn new(token: &Token) -> Self {
+    pub fn new(token: &Token, m: &ValueM) -> Self {
         KeyValueM {
             key: token.value.to_string(),
-            value: None,
+            value: Box::new(m.clone()),
         }
-    }
-    pub fn set_value(&mut self, m: &ValueM) {
-        self.value = Some(Box::new(m.clone()));
     }
 }
 impl fmt::Debug for KeyValueM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}={}",
-            self.key,
-            if let Some(v) = &self.value {
-                format!("{:?}", v).to_string()
-            } else {
-                "".to_string()
-            }
-        )
+        write!(f, "{}={:?}", self.key, self.value)
     }
 }
