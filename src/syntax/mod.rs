@@ -3,13 +3,16 @@
 
 pub mod array;
 pub mod comment;
+pub mod double_quoted_string;
 pub mod inline_table;
 pub mod key_value;
 pub mod line;
 pub mod machine_state;
 pub mod single_quoted_string;
 
-use crate::model::{Array, Comment, Element, InlineTable, KeyValue, SingleQuotedString};
+use crate::model::{
+    Array, Comment, DoubleQuotedString, Element, InlineTable, KeyValue, SingleQuotedString,
+};
 use crate::syntax::machine_state::{ArrayState, InlineTableState, KeyValueState, LineState};
 use crate::token::Token;
 use casual_logger::Table;
@@ -37,6 +40,12 @@ pub struct CommentP {
     buffer: Option<Comment>,
 }
 
+/// `"value"`.
+#[derive(Clone)]
+pub struct DoubleQuotedStringP {
+    buffer: Option<DoubleQuotedString>,
+}
+
 /// `{ key = value, key = value }`.
 pub struct InlineTableP {
     state: InlineTableState,
@@ -46,12 +55,13 @@ pub struct InlineTableP {
 
 /// `key = value`.
 pub struct KeyValueP {
-    state: KeyValueState,
-    temp_key: Token,
+    array_p: Option<ArrayP>,
     buffer: Option<KeyValue>,
+    double_quoted_string_p: Option<DoubleQuotedStringP>,
     inline_table_p: Option<InlineTableP>,
     single_quoted_string_p: Option<SingleQuotedStringP>,
-    array_p: Option<ArrayP>,
+    state: KeyValueState,
+    temp_key: Token,
 }
 
 pub struct LineP {

@@ -10,7 +10,7 @@ mod syntax;
 pub mod syntax_scanner;
 mod token;
 
-use crate::lexical_parser::LineLexicalParser;
+use crate::lexical_parser::LexicalParser;
 use crate::model::Document;
 use crate::syntax::SyntaxParserResult;
 use crate::syntax_scanner::LineSyntaxScanner;
@@ -41,7 +41,7 @@ impl Toml {
                         Err(why) => panic!(Log::fatal(&format!("{}", why))),
                     };
                     Log::info(&format!("from_file/line=|{}|", line));
-                    let mut token_line = LineLexicalParser::default();
+                    let mut token_line = LexicalParser::default();
                     token_line.parse_line(&line);
                     Log::info_t(
                         "from_file/line_tokens",

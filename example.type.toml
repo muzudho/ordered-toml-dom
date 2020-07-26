@@ -3,6 +3,7 @@
 
 punch = true
 kick = false
+jump = "High"
 apple = 'pie'
 one_box = [1]
 three_list = [1, 2, 3]

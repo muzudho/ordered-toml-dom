@@ -1,6 +1,6 @@
 //! Array model.  
 //! 配列モデル。  
-use crate::model::{Array, LiteralString, SingleQuotedString, Value};
+use crate::model::{Array, ItemValue, LiteralString, SingleQuotedString};
 use std::fmt;
 
 impl Default for Array {
@@ -10,10 +10,10 @@ impl Default for Array {
 }
 impl Array {
     pub fn push_literal_string(&mut self, m: &LiteralString) {
-        self.items.push(Value::LiteralString(m.clone()));
+        self.items.push(ItemValue::LiteralString(m.clone()));
     }
     pub fn push_single_quote_string(&mut self, m: &SingleQuotedString) {
-        self.items.push(Value::SingleQuotedString(m.clone()));
+        self.items.push(ItemValue::SingleQuotedString(m.clone()));
     }
 }
 impl fmt::Debug for Array {

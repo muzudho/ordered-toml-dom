@@ -25,6 +25,7 @@ pub enum KeyValueState {
     AfterEquals,
     AfterLeftCurlyBracket,
     AfterLeftSquareBracket,
+    DoubleQuotedString,
     SingleQuotedString,
     End,
 }
@@ -37,6 +38,6 @@ pub enum LineState {
     CommentSyntax,
     First,
     /// `key = right_value`.
-    KeyPairSyntax,
+    KeyValueSyntax,
     Unimplemented,
 }

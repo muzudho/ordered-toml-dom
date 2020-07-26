@@ -60,7 +60,7 @@ impl LineP {
             LineState::First => match token.type_ {
                 TokenType::Key => {
                     self.key_value_p = Some(KeyValueP::new(&token));
-                    self.state = LineState::KeyPairSyntax;
+                    self.state = LineState::KeyValueSyntax;
                 }
                 TokenType::Sharp => {
                     self.comment_p = Some(CommentP::new());
@@ -70,7 +70,7 @@ impl LineP {
                     self.state = LineState::Unimplemented;
                 }
             },
-            LineState::KeyPairSyntax => {
+            LineState::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {

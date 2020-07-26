@@ -1,15 +1,15 @@
 //! Key value model.  
 //! キー値モデル。  
 
-use crate::model::{KeyValue, Value};
+use crate::model::{ItemValue, KeyValue};
 use crate::token::Token;
 use std::fmt;
 
 impl KeyValue {
-    pub fn new(token: &Token, m: &Value) -> Self {
+    pub fn new(token: &Token, value: &ItemValue) -> Self {
         KeyValue {
             key: token.value.to_string(),
-            value: Box::new(m.clone()),
+            value: Box::new(value.clone()),
         }
     }
 }

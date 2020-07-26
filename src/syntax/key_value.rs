@@ -1,10 +1,10 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::{KeyValue, LiteralString, Value};
+use crate::model::{ItemValue, KeyValue, LiteralString};
 use crate::syntax::{
-    machine_state::KeyValueState, ArrayP, InlineTableP, KeyValueP, SingleQuotedStringP,
-    SyntaxParserResult,
+    machine_state::KeyValueState, ArrayP, DoubleQuotedStringP, InlineTableP, KeyValueP,
+    SingleQuotedStringP, SyntaxParserResult,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
@@ -12,12 +12,13 @@ use casual_logger::{Log, Table};
 impl KeyValueP {
     pub fn new(key: &Token) -> Self {
         KeyValueP {
-            state: KeyValueState::AfterKey,
-            temp_key: key.clone(),
+            array_p: None,
             buffer: None,
+            double_quoted_string_p: None,
             inline_table_p: None,
             single_quoted_string_p: None,
-            array_p: None,
+            state: KeyValueState::AfterKey,
+            temp_key: key.clone(),
         }
     }
     pub fn flush(&mut self) -> Option<KeyValue> {
@@ -57,17 +58,19 @@ impl KeyValueP {
             }
             KeyValueState::AfterEquals => {
                 match token.type_ {
-                    TokenType::WhiteSpace => {
+                    TokenType::DoubleQuotation => {
+                        self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
+                        self.state = KeyValueState::DoubleQuotedString;
                         Log::trace_t(
-                            "KeyValueP#parse/After=/WhiteSpace",
+                            "KeyValueP#parse/After=/\"",
                             Table::default().str("token", &format!("{:?}", token)),
                         );
-                    } //Ignored it.
+                    }
                     TokenType::Key => {
                         // TODO true, false
                         self.buffer = Some(KeyValue::new(
                             &self.temp_key,
-                            &Value::LiteralString(LiteralString::new(&token)),
+                            &ItemValue::LiteralString(LiteralString::new(&token)),
                         ));
                         self.state = KeyValueState::End;
                         Log::trace_t(
@@ -100,6 +103,12 @@ impl KeyValueP {
                             Table::default().str("token", &format!("{:?}", token)),
                         );
                     }
+                    TokenType::WhiteSpace => {
+                        Log::trace_t(
+                            "KeyValueP#parse/After=/WhiteSpace",
+                            Table::default().str("token", &format!("{:?}", token)),
+                        );
+                    } //Ignored it.
                     _ => {
                         return SyntaxParserResult::Err(
                             self.err_table()
@@ -118,8 +127,10 @@ impl KeyValueP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer =
-                                Some(KeyValue::new(&self.temp_key, &Value::InlineTable(child_m)));
+                            self.buffer = Some(KeyValue::new(
+                                &self.temp_key,
+                                &ItemValue::InlineTable(child_m),
+                            ));
                             self.inline_table_p = None;
                             self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
@@ -152,8 +163,43 @@ impl KeyValueP {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer =
-                                Some(KeyValue::new(&self.temp_key, &Value::Array(child_m)));
+                                Some(KeyValue::new(&self.temp_key, &ItemValue::Array(child_m)));
                             self.array_p = None;
+                            self.state = KeyValueState::End;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
+                    SyntaxParserResult::Ongoing => {}
+                }
+            }
+            KeyValueState::DoubleQuotedString => {
+                Log::trace_t(
+                    "KeyValueP#parse/After=/\"value\"",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                let p = self.double_quoted_string_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            self.buffer = Some(KeyValue::new(
+                                &self.temp_key,
+                                &ItemValue::DoubleQuotedString(child_m),
+                            ));
+                            self.double_quoted_string_p = None;
                             self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
                         } else {
@@ -186,7 +232,7 @@ impl KeyValueP {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
-                                &Value::SingleQuotedString(child_m),
+                                &ItemValue::SingleQuotedString(child_m),
                             ));
                             self.single_quoted_string_p = None;
                             self.state = KeyValueState::End;
@@ -226,6 +272,9 @@ impl KeyValueP {
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
+        if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
+            t.sub_t("double_quoted_string", &double_quoted_string_p.err_table());
+        }
         if let Some(inline_table_p) = &self.inline_table_p {
             t.sub_t("inline_table", &inline_table_p.err_table());
         }

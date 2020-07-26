@@ -27,30 +27,34 @@ impl fmt::Debug for TokenLine {
 
 #[derive(Clone, Copy, Debug)]
 pub enum TokenType {
-    /// }
+    /// }  
     CloseCurlyBracket,
-    /// ,
+    /// ,  
     Comma,
-    /// .
+    /// .  
     Dot,
+    /// "  
+    DoubleQuotation,
     EndOfLine,
     Equals,
     Key,
-    /// 全角文字などいろいろ。
+    /// Multi-byte character or more.  
+    /// 全角文字などいろいろ。  
     Otherwise,
-    /// {
+    /// {  
     LeftCurlyBracket,
-    /// [
+    /// [  
     LeftSquareBracket,
-    /// }
+    /// }  
     RightCurlyBracket,
-    /// ]
+    /// ]  
     RightSquareBracket,
-    /// #
+    /// #  
     Sharp,
-    /// '
+    /// '  
     SingleQuotation,
-    /// Whitespace means tab (0x09 '\t') or space (0x20 ' ').
+    /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
+    /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
     WhiteSpace,
 }
 

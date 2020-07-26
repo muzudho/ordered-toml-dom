@@ -1,7 +1,7 @@
 //! Inline model.  
 //! インライン・モデル。  
 
-use crate::model::{InlineTable, KeyValue, Value};
+use crate::model::{InlineTable, ItemValue, KeyValue};
 use std::fmt;
 
 impl Default for InlineTable {
@@ -11,7 +11,7 @@ impl Default for InlineTable {
 }
 impl InlineTable {
     pub fn push_key_value(&mut self, m: &KeyValue) {
-        self.items.push(Value::KeyValue(m.clone()));
+        self.items.push(ItemValue::KeyValue(m.clone()));
     }
 }
 impl fmt::Debug for InlineTable {
