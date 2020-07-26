@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::InlineTableM;
+use crate::model::InlineTable;
 use crate::syntax::{machine_state::InlineTableState, InlineTableP, KeyValueP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
@@ -10,13 +10,13 @@ impl Default for InlineTableP {
     fn default() -> Self {
         InlineTableP {
             state: InlineTableState::AfterLeftCurlyBracket,
-            buffer: Some(InlineTableM::default()),
+            buffer: Some(InlineTable::default()),
             key_value_p: None,
         }
     }
 }
 impl InlineTableP {
-    pub fn flush(&mut self) -> Option<InlineTableM> {
+    pub fn flush(&mut self) -> Option<InlineTable> {
         let m = self.buffer.clone();
         self.buffer = None;
         m

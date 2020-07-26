@@ -9,52 +9,52 @@ pub mod single_quoted_string;
 pub mod value;
 
 #[derive(Clone)]
-pub struct ArrayM {
-    items: Vec<ValueM>,
+pub struct Array {
+    items: Vec<Value>,
 }
 
 #[derive(Clone)]
-pub struct CommentM {
+pub struct Comment {
     value: String,
 }
 
 #[derive(Clone)]
-pub struct DocumentM {
-    pub elements: Vec<ElementM>,
+pub struct Document {
+    pub elements: Vec<Element>,
 }
 
 #[derive(Clone)]
-pub enum ElementM {
-    Comment(CommentM),
-    KeyValue(KeyValueM),
+pub enum Element {
+    Comment(Comment),
+    KeyValue(KeyValue),
 }
 
 #[derive(Clone)]
-pub struct InlineTableM {
-    items: Vec<ValueM>,
+pub struct InlineTable {
+    items: Vec<Value>,
 }
 
 #[derive(Clone)]
-pub struct KeyValueM {
+pub struct KeyValue {
     pub key: String,
-    pub value: Box<ValueM>,
+    pub value: Box<Value>,
 }
 
 #[derive(Clone)]
-pub struct LiteralStringM {
+pub struct LiteralString {
     value: String,
 }
 
 #[derive(Clone)]
-pub struct SingleQuotedStringM {
+pub struct SingleQuotedString {
     pub value: String,
 }
 
 #[derive(Clone)]
-pub enum ValueM {
-    Array(ArrayM),
-    InlineTable(InlineTableM),
-    KeyValue(KeyValueM),
-    LiteralString(LiteralStringM),
-    SingleQuotedString(SingleQuotedStringM),
+pub enum Value {
+    Array(Array),
+    InlineTable(InlineTable),
+    KeyValue(KeyValue),
+    LiteralString(LiteralString),
+    SingleQuotedString(SingleQuotedString),
 }

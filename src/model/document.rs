@@ -1,22 +1,22 @@
 //! Document model.  
 //! ドキュメント・モデル。  
 
-use crate::model::{DocumentM, ElementM};
+use crate::model::{Document, Element};
 use std::fmt;
 
-impl Default for DocumentM {
+impl Default for Document {
     fn default() -> Self {
-        DocumentM {
+        Document {
             elements: Vec::new(),
         }
     }
 }
-impl DocumentM {
-    pub fn push_line(&mut self, m: &ElementM) {
+impl Document {
+    pub fn push_line(&mut self, m: &Element) {
         self.elements.push(m.clone());
     }
 }
-impl fmt::Debug for DocumentM {
+impl fmt::Debug for Document {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for item in &self.elements {

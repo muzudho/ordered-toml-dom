@@ -1,20 +1,20 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::SingleQuotedStringM;
+use crate::model::SingleQuotedString;
 use crate::syntax::{SingleQuotedStringP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
 impl SingleQuotedStringP {
-    pub fn flush(&mut self) -> Option<SingleQuotedStringM> {
+    pub fn flush(&mut self) -> Option<SingleQuotedString> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
         SingleQuotedStringP {
-            buffer: Some(SingleQuotedStringM::default()),
+            buffer: Some(SingleQuotedString::default()),
         }
     }
     /// # Returns

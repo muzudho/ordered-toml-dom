@@ -11,7 +11,7 @@ pub mod syntax_scanner;
 mod token;
 
 use crate::lexical_parser::LineLexicalParser;
-use crate::model::DocumentM;
+use crate::model::Document;
 use crate::syntax::SyntaxParserResult;
 use crate::syntax_scanner::LineSyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
@@ -29,10 +29,10 @@ pub struct Toml {}
 impl Toml {
     /// Line scan.
     /// 行走査。
-    pub fn from_file(path: &str) -> DocumentM {
+    pub fn from_file(path: &str) -> Document {
         Log::info(&format!("Read=|{}|", path));
         let mut aot = ArrayOfTable::default().clone();
-        let mut doc = DocumentM::default();
+        let mut doc = Document::default();
         match File::open(path) {
             Ok(file) => {
                 for line in BufReader::new(file).lines() {

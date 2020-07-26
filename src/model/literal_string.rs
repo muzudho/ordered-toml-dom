@@ -1,17 +1,17 @@
-use crate::model::LiteralStringM;
+use crate::model::LiteralString;
 use crate::token::Token;
 use std::fmt;
 
-impl Default for LiteralStringM {
+impl Default for LiteralString {
     fn default() -> Self {
-        LiteralStringM {
+        LiteralString {
             value: String::new(),
         }
     }
 }
-impl LiteralStringM {
+impl LiteralString {
     pub fn new(token: &Token) -> Self {
-        LiteralStringM {
+        LiteralString {
             value: token.value.to_string(),
         }
     }
@@ -19,7 +19,7 @@ impl LiteralStringM {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for LiteralStringM {
+impl fmt::Debug for LiteralString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.value)
     }

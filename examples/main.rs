@@ -6,7 +6,7 @@
 
 use casual_logger::{Log, Table};
 use toml_menu::{
-    model::{ElementM, ValueM},
+    model::{Element, Value},
     Toml,
 };
 
@@ -20,23 +20,23 @@ fn main() {
     );
     for elem in doc.elements {
         match elem {
-            ElementM::Comment(m) => {
+            Element::Comment(m) => {
                 Log::info_t(
                     "Scan a element.",
                     Table::default().str("Comment", &format!("{:?}", m)),
                 );
             }
-            ElementM::KeyValue(m) => {
+            Element::KeyValue(m) => {
                 Log::info_t(
                     "Scan a element.",
                     Table::default().str("KeyValue", &format!("{:?}", m)),
                 );
                 match *m.value {
-                    ValueM::Array(m) => Log::info(&format!("{:?}", m)),
-                    ValueM::InlineTable(m) => Log::info(&format!("{:?}", m)),
-                    ValueM::KeyValue(m) => Log::info(&format!("{:?}", m)),
-                    ValueM::LiteralString(m) => Log::info(&format!("{:?}", m)),
-                    ValueM::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
+                    Value::Array(m) => Log::info(&format!("{:?}", m)),
+                    Value::InlineTable(m) => Log::info(&format!("{:?}", m)),
+                    Value::KeyValue(m) => Log::info(&format!("{:?}", m)),
+                    Value::LiteralString(m) => Log::info(&format!("{:?}", m)),
+                    Value::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
                 }
             }
         }

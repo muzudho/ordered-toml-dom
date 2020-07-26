@@ -9,7 +9,7 @@ pub mod line;
 pub mod machine_state;
 pub mod single_quoted_string;
 
-use crate::model::{ArrayM, CommentM, ElementM, InlineTableM, KeyValueM, SingleQuotedStringM};
+use crate::model::{Array, Comment, Element, InlineTable, KeyValue, SingleQuotedString};
 use crate::syntax::machine_state::{ArrayState, InlineTableState, KeyValueState, LineState};
 use crate::token::Token;
 use casual_logger::Table;
@@ -28,19 +28,19 @@ pub enum SyntaxParserResult {
 #[derive(Clone)]
 pub struct ArrayP {
     state: ArrayState,
-    buffer: Option<ArrayM>,
+    buffer: Option<Array>,
     single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
 }
 
 /// `# comment`.
 pub struct CommentP {
-    buffer: Option<CommentM>,
+    buffer: Option<Comment>,
 }
 
 /// `{ key = value, key = value }`.
 pub struct InlineTableP {
     state: InlineTableState,
-    buffer: Option<InlineTableM>,
+    buffer: Option<InlineTable>,
     key_value_p: Option<Box<KeyValueP>>,
 }
 
@@ -48,7 +48,7 @@ pub struct InlineTableP {
 pub struct KeyValueP {
     state: KeyValueState,
     temp_key: Token,
-    buffer: Option<KeyValueM>,
+    buffer: Option<KeyValue>,
     inline_table_p: Option<InlineTableP>,
     single_quoted_string_p: Option<SingleQuotedStringP>,
     array_p: Option<ArrayP>,
@@ -56,7 +56,7 @@ pub struct KeyValueP {
 
 pub struct LineP {
     state: LineState,
-    buffer: Option<ElementM>,
+    buffer: Option<Element>,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
 }
@@ -64,5 +64,5 @@ pub struct LineP {
 /// `'value'`.
 #[derive(Clone)]
 pub struct SingleQuotedStringP {
-    buffer: Option<SingleQuotedStringM>,
+    buffer: Option<SingleQuotedString>,
 }

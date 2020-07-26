@@ -1,20 +1,20 @@
-use crate::model::CommentM;
+use crate::model::Comment;
 use crate::token::Token;
 use std::fmt;
 
-impl Default for CommentM {
+impl Default for Comment {
     fn default() -> Self {
-        CommentM {
+        Comment {
             value: String::new(),
         }
     }
 }
-impl CommentM {
+impl Comment {
     pub fn push_token(&mut self, token: &Token) {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for CommentM {
+impl fmt::Debug for Comment {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "#{}", self.value)
     }

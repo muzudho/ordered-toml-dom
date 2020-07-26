@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::CommentM;
+use crate::model::Comment;
 use crate::syntax::{CommentP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
@@ -10,7 +10,7 @@ impl CommentP {
     pub fn new() -> Self {
         CommentP { buffer: None }
     }
-    pub fn flush(&mut self) -> Option<CommentM> {
+    pub fn flush(&mut self) -> Option<Comment> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
@@ -24,7 +24,7 @@ impl CommentP {
             TokenType::EndOfLine => return SyntaxParserResult::End,
             _ => {
                 if let None = self.buffer {
-                    self.buffer = Some(CommentM::default());
+                    self.buffer = Some(Comment::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(token);

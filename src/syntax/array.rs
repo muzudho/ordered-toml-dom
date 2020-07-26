@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::{ArrayM, LiteralStringM};
+use crate::model::{Array, LiteralString};
 use crate::syntax::{machine_state::ArrayState, ArrayP, SingleQuotedStringP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
@@ -16,7 +16,7 @@ impl Default for ArrayP {
     }
 }
 impl ArrayP {
-    pub fn flush(&mut self) -> Option<ArrayM> {
+    pub fn flush(&mut self) -> Option<Array> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
@@ -38,10 +38,10 @@ impl ArrayP {
                     TokenType::Key => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
-                            self.buffer = Some(ArrayM::default());
+                            self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralStringM::new(token));
+                        m.push_literal_string(&LiteralString::new(token));
                         self.state = ArrayState::AfterItem;
                         Log::trace_t(
                             "ArrayP#parse/After[/Key",
@@ -77,7 +77,7 @@ impl ArrayP {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
-                                self.buffer = Some(ArrayM::default());
+                                self.buffer = Some(Array::default());
                             }
                             let m = self.buffer.as_mut().unwrap();
                             m.push_single_quote_string(&child_m);

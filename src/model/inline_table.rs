@@ -1,20 +1,20 @@
 //! Inline model.  
 //! インライン・モデル。  
 
-use crate::model::{InlineTableM, KeyValueM, ValueM};
+use crate::model::{InlineTable, KeyValue, Value};
 use std::fmt;
 
-impl Default for InlineTableM {
+impl Default for InlineTable {
     fn default() -> Self {
-        InlineTableM { items: Vec::new() }
+        InlineTable { items: Vec::new() }
     }
 }
-impl InlineTableM {
-    pub fn push_key_value(&mut self, m: &KeyValueM) {
-        self.items.push(ValueM::KeyValue(m.clone()));
+impl InlineTable {
+    pub fn push_key_value(&mut self, m: &KeyValue) {
+        self.items.push(Value::KeyValue(m.clone()));
     }
 }
-impl fmt::Debug for InlineTableM {
+impl fmt::Debug for InlineTable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for item in &self.items {

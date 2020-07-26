@@ -1,22 +1,22 @@
 //! Element model.  
 //! 要素モデル。  
 
-use crate::model::{CommentM, ElementM, KeyValueM};
+use crate::model::{Comment, Element, KeyValue};
 use std::fmt;
 
-impl ElementM {
-    pub fn from_comment(m: &CommentM) -> Self {
-        ElementM::Comment(m.clone())
+impl Element {
+    pub fn from_comment(m: &Comment) -> Self {
+        Element::Comment(m.clone())
     }
-    pub fn from_key_value(m: &KeyValueM) -> Self {
-        ElementM::KeyValue(m.clone())
+    pub fn from_key_value(m: &KeyValue) -> Self {
+        Element::KeyValue(m.clone())
     }
 }
-impl fmt::Debug for ElementM {
+impl fmt::Debug for Element {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ElementM::Comment(m) => write!(f, "{}", format!("{:?}", m)),
-            ElementM::KeyValue(m) => write!(f, "{}", format!("{:?}", m)),
+            Element::Comment(m) => write!(f, "{}", format!("{:?}", m)),
+            Element::KeyValue(m) => write!(f, "{}", format!("{:?}", m)),
         }
     }
 }

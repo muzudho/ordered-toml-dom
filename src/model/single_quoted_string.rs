@@ -1,20 +1,20 @@
-use crate::model::SingleQuotedStringM;
+use crate::model::SingleQuotedString;
 use crate::token::Token;
 use std::fmt;
 
-impl Default for SingleQuotedStringM {
+impl Default for SingleQuotedString {
     fn default() -> Self {
-        SingleQuotedStringM {
+        SingleQuotedString {
             value: String::new(),
         }
     }
 }
-impl SingleQuotedStringM {
+impl SingleQuotedString {
     pub fn push_token(&mut self, token: &Token) {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for SingleQuotedStringM {
+impl fmt::Debug for SingleQuotedString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "'{}'", self.value)
     }

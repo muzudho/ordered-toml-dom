@@ -1,22 +1,22 @@
 //! Array model.  
 //! 配列モデル。  
-use crate::model::{ArrayM, LiteralStringM, SingleQuotedStringM, ValueM};
+use crate::model::{Array, LiteralString, SingleQuotedString, Value};
 use std::fmt;
 
-impl Default for ArrayM {
+impl Default for Array {
     fn default() -> Self {
-        ArrayM { items: Vec::new() }
+        Array { items: Vec::new() }
     }
 }
-impl ArrayM {
-    pub fn push_literal_string(&mut self, m: &LiteralStringM) {
-        self.items.push(ValueM::LiteralString(m.clone()));
+impl Array {
+    pub fn push_literal_string(&mut self, m: &LiteralString) {
+        self.items.push(Value::LiteralString(m.clone()));
     }
-    pub fn push_single_quote_string(&mut self, m: &SingleQuotedStringM) {
-        self.items.push(ValueM::SingleQuotedString(m.clone()));
+    pub fn push_single_quote_string(&mut self, m: &SingleQuotedString) {
+        self.items.push(Value::SingleQuotedString(m.clone()));
     }
 }
-impl fmt::Debug for ArrayM {
+impl fmt::Debug for Array {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for item in &self.items {

@@ -1,4 +1,4 @@
-use crate::model::DocumentM;
+use crate::model::Document;
 use crate::syntax::{LineP, SyntaxParserResult};
 use crate::token::TokenLine;
 use casual_logger::Table;
@@ -18,7 +18,7 @@ impl LineSyntaxScanner {
     ///
     /// * `SyntaxParserResult` - Result.  
     ///                             結果。
-    pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut DocumentM) -> SyntaxParserResult {
+    pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut Document) -> SyntaxParserResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
             match self.line_parser.parse(token) {
                 SyntaxParserResult::End => {

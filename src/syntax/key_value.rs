@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::{KeyValueM, LiteralStringM, ValueM};
+use crate::model::{KeyValue, LiteralString, Value};
 use crate::syntax::{
     machine_state::KeyValueState, ArrayP, InlineTableP, KeyValueP, SingleQuotedStringP,
     SyntaxParserResult,
@@ -20,7 +20,7 @@ impl KeyValueP {
             array_p: None,
         }
     }
-    pub fn flush(&mut self) -> Option<KeyValueM> {
+    pub fn flush(&mut self) -> Option<KeyValue> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
@@ -65,9 +65,9 @@ impl KeyValueP {
                     } //Ignored it.
                     TokenType::Key => {
                         // TODO true, false
-                        self.buffer = Some(KeyValueM::new(
+                        self.buffer = Some(KeyValue::new(
                             &self.temp_key,
-                            &ValueM::LiteralString(LiteralStringM::new(&token)),
+                            &Value::LiteralString(LiteralString::new(&token)),
                         ));
                         self.state = KeyValueState::End;
                         Log::trace_t(
@@ -118,10 +118,8 @@ impl KeyValueP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(KeyValueM::new(
-                                &self.temp_key,
-                                &ValueM::InlineTable(child_m),
-                            ));
+                            self.buffer =
+                                Some(KeyValue::new(&self.temp_key, &Value::InlineTable(child_m)));
                             self.inline_table_p = None;
                             self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
@@ -154,7 +152,7 @@ impl KeyValueP {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer =
-                                Some(KeyValueM::new(&self.temp_key, &ValueM::Array(child_m)));
+                                Some(KeyValue::new(&self.temp_key, &Value::Array(child_m)));
                             self.array_p = None;
                             self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
@@ -186,9 +184,9 @@ impl KeyValueP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(KeyValueM::new(
+                            self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
-                                &ValueM::SingleQuotedString(child_m),
+                                &Value::SingleQuotedString(child_m),
                             ));
                             self.single_quoted_string_p = None;
                             self.state = KeyValueState::End;
