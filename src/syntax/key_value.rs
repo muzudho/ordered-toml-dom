@@ -87,89 +87,67 @@ impl KeyValueP {
                 }
             }
             MachineState::AfterLeftCurlyBracket => {
-                if let Some(p) = &mut self.inline_table_p {
-                    match p.parse(token) {
-                        SyntaxParserResult::Ok(end_of_syntax) => {
-                            if end_of_syntax {
-                                self.product.value =
-                                    Some(Box::new(ValueM::InlineTable(p.product())));
-                                self.inline_table_p = None;
-                                self.state = MachineState::End;
-                                return SyntaxParserResult::Ok(true);
-                            }
-                        }
-                        SyntaxParserResult::Err(table) => {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .sub_t("error", &table)
-                                    .clone(),
-                            )
+                let p = self.inline_table_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::Ok(end_of_syntax) => {
+                        if end_of_syntax {
+                            self.product.value = Some(Box::new(ValueM::InlineTable(p.product())));
+                            self.inline_table_p = None;
+                            self.state = MachineState::End;
+                            return SyntaxParserResult::Ok(true);
                         }
                     }
-                } else {
-                    return SyntaxParserResult::Err(
-                        self.err_table()
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    );
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
                 }
             }
             MachineState::AfterLeftSquareBracket => {
-                if let Some(p) = &mut self.array_p {
-                    match p.parse(token) {
-                        SyntaxParserResult::Ok(end_of_syntax) => {
-                            if end_of_syntax {
-                                self.product.value = Some(Box::new(ValueM::Array(p.product())));
-                                self.array_p = None;
-                                self.state = MachineState::End;
-                                return SyntaxParserResult::Ok(true);
-                            }
-                        }
-                        SyntaxParserResult::Err(table) => {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .sub_t("error", &table)
-                                    .clone(),
-                            )
+                let p = self.array_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::Ok(end_of_syntax) => {
+                        if end_of_syntax {
+                            self.product.value = Some(Box::new(ValueM::Array(p.product())));
+                            self.array_p = None;
+                            self.state = MachineState::End;
+                            return SyntaxParserResult::Ok(true);
                         }
                     }
-                } else {
-                    return SyntaxParserResult::Err(
-                        self.err_table()
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    );
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
                 }
             }
             MachineState::SingleQuotedString => {
-                if let Some(p) = &mut self.single_quoted_string_p {
-                    match p.parse(token) {
-                        SyntaxParserResult::Ok(end_of_syntax) => {
-                            if end_of_syntax {
-                                self.product.value =
-                                    Some(Box::new(ValueM::SingleQuotedString(p.product())));
-                                self.single_quoted_string_p = None;
-                                self.state = MachineState::End;
-                                return SyntaxParserResult::Ok(true);
-                            }
-                        }
-                        SyntaxParserResult::Err(table) => {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .sub_t("error", &table)
-                                    .clone(),
-                            )
+                let p = self.single_quoted_string_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::Ok(end_of_syntax) => {
+                        if end_of_syntax {
+                            self.product.value =
+                                Some(Box::new(ValueM::SingleQuotedString(p.product())));
+                            self.single_quoted_string_p = None;
+                            self.state = MachineState::End;
+                            return SyntaxParserResult::Ok(true);
                         }
                     }
-                } else {
-                    return SyntaxParserResult::Err(
-                        self.err_table()
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    );
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
                 }
             }
             MachineState::End => {
@@ -189,10 +167,10 @@ impl KeyValueP {
             .str("product", &format!("{:?}", &self.product))
             .clone();
         if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t("inline_table", &inline_table_p.log());
+            t.sub_t("inline_table", &inline_table_p.err_table());
         }
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string", &single_quoted_string_p.log());
+            t.sub_t("single_quoted_string", &single_quoted_string_p.err_table());
         }
         t
     }

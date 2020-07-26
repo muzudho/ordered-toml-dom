@@ -114,7 +114,7 @@ impl ArrayP {
             .str("state", &format!("{:?}", self.state));
 
         if let Some(p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string", &p.log());
+            t.sub_t("single_quoted_string", &p.err_table());
         }
         t
     }

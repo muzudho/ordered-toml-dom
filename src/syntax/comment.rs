@@ -30,7 +30,7 @@ impl CommentP {
     pub fn eol(&self) -> SyntaxParserResult {
         SyntaxParserResult::Ok(true)
     }
-    pub fn log(&self) -> Table {
+    pub fn err_table(&self) -> Table {
         Table::default().str("product", &self.product.value).clone()
     }
 }

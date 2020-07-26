@@ -61,7 +61,7 @@ impl LineSyntaxScanner {
 
     pub fn log(&self) -> Table {
         let mut t = Table::default();
-        t.sub_t("line", &self.line_parser.log());
+        t.sub_t("line", &self.line_parser.err_table());
         t
     }
 }

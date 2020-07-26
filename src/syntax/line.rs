@@ -8,7 +8,7 @@ use crate::object_model::line::LineM;
 use crate::syntax::comment::CommentP;
 use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
-use casual_logger::{Log, Table};
+use casual_logger::Table;
 
 pub struct LineP {
     state: MachineState,
@@ -43,41 +43,31 @@ impl LineP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token, dom: &mut DocumentM) -> SyntaxParserResult {
         match self.state {
-            MachineState::CommentSyntax => match self.comment_p.as_mut().unwrap().parse(token) {
-                SyntaxParserResult::Ok(end_of_syntax) => {
-                    if end_of_syntax {
-                        // ここにはこない。
-                        panic!(Log::fatal_t(
-                            "LineP#parse",
-                            Table::default()
-                                .str("parser", "LineP#parse")
-                                .str("state", &format!("{:?}", self.state))
+            MachineState::CommentSyntax => {
+                let p = self.comment_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::Ok(end_of_syntax) => {
+                        if end_of_syntax {
+                            // ここにはこない。
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
                                 .str("token", &format!("{:?}", token))
-                        ));
+                                .sub_t("error", &table)
+                                .clone(),
+                        );
                     }
                 }
-                SyntaxParserResult::Err(table) => {
-                    panic!(Log::fatal_t(
-                        "LineP#parse",
-                        Table::default()
-                            .str("parser", "LineP#parse")
-                            .str("state", &format!("{:?}", self.state))
-                            .str("token", &format!("{:?}", token))
-                            .sub_t("error", &table)
-                    ));
-                }
-            },
+            }
             MachineState::First => match token.type_ {
                 TokenType::Key => {
-                    /*
-                    Log::info_t(
-                        "LineP#parse",
-                        Table::default()
-                            .str("parser", "LineP#parse")
-                            .str("state", &format!("{:?}", self.state))
-                            .str("token", &format!("{:?}", token)),
-                    );
-                    */
                     self.key_value_p = Some(KeyValueP::new(&token));
                     self.state = MachineState::KeyPairSyntax;
                 }
@@ -90,50 +80,35 @@ impl LineP {
                 }
             },
             MachineState::KeyPairSyntax => {
-                if let Some(key_value_p) = &mut self.key_value_p {
-                    match key_value_p.parse(token) {
-                        SyntaxParserResult::Ok(end_of_syntax) => {
-                            if end_of_syntax {
-                                dom.push_line(&self.product());
-                                self.key_value_p = None;
-                                self.state = MachineState::End;
-                            }
-                        } // Ignored it.
-                        SyntaxParserResult::Err(table) => {
-                            return SyntaxParserResult::Err(
-                                Table::default()
-                                    .str("parser", "LineP#parse")
-                                    .str("state", &format!("{:?}", self.state))
-                                    .str("token", &format!("{:?}", token))
-                                    .sub_t("error", &table)
-                                    .clone(),
-                            );
+                let p = self.key_value_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::Ok(end_of_syntax) => {
+                        if end_of_syntax {
+                            dom.push_line(&self.product());
+                            self.key_value_p = None;
+                            self.state = MachineState::End;
                         }
+                    } // Ignored it.
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        );
                     }
-                } else {
-                    panic!(Log::fatal_t(
-                        "LineP#parse",
-                        Table::default()
-                            .str("parser", "LineP#parse")
-                            .str("state", &format!("{:?}", self.state))
-                            .str("token", &format!("{:?}", token))
-                    ));
                 }
             }
             MachineState::Unimplemented => {
                 return SyntaxParserResult::Err(
-                    Table::default()
-                        .str("parser", "LineP#parse")
-                        .str("state", &format!("{:?}", self.state))
+                    self.err_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
             }
             MachineState::End => {
                 return SyntaxParserResult::Err(
-                    Table::default()
-                        .str("parser", "LineP#parse")
-                        .str("state", &format!("{:?}", self.state))
+                    self.err_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -151,12 +126,13 @@ impl LineP {
             SyntaxParserResult::Ok(false)
         }
     }
-    pub fn log(&self) -> Table {
+    pub fn err_table(&self) -> Table {
         let mut t = Table::default()
+            .str("parser", "LineP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {
-            t.sub_t("comment", &comment_p.log());
+            t.sub_t("comment", &comment_p.err_table());
         }
         if let Some(key_value_p) = &self.key_value_p {
             t.sub_t("key_value", &key_value_p.err_table());

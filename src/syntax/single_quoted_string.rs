@@ -36,7 +36,7 @@ impl SingleQuotedStringP {
         }
         SyntaxParserResult::Ok(false)
     }
-    pub fn log(&self) -> Table {
+    pub fn err_table(&self) -> Table {
         Table::default().str("value", &self.product.value).clone()
     }
 }
