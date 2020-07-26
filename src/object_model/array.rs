@@ -1,15 +1,25 @@
 //! Array model.  
 //! 配列モデル。  
+use crate::object_model::literal_string::LiteralStringM;
+use crate::object_model::single_quoted_string::SingleQuotedStringM;
 use crate::object_model::value::ValueM;
 use std::fmt;
 
 #[derive(Clone)]
 pub struct ArrayM {
-    pub items: Vec<ValueM>,
+    items: Vec<ValueM>,
 }
 impl Default for ArrayM {
     fn default() -> Self {
         ArrayM { items: Vec::new() }
+    }
+}
+impl ArrayM {
+    pub fn push_literal_string(&mut self, m: &LiteralStringM) {
+        self.items.push(ValueM::LiteralString(m.clone()));
+    }
+    pub fn push_single_quote_string(&mut self, m: &SingleQuotedStringM) {
+        self.items.push(ValueM::SingleQuotedString(m.clone()));
     }
 }
 impl fmt::Debug for ArrayM {

@@ -4,7 +4,7 @@
 use crate::lexical_parser::Token;
 use crate::lexical_parser::TokenType;
 use crate::object_model::document::DocumentM;
-use crate::object_model::line::{LineItemModel, LineM};
+use crate::object_model::line::LineM;
 use crate::syntax::comment::CommentP;
 use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
@@ -94,7 +94,7 @@ impl LineP {
                     match key_value_p.parse(token) {
                         SyntaxParserResult::Ok(end_of_syntax) => {
                             if end_of_syntax {
-                                dom.push(&self.product());
+                                dom.push_line(&self.product());
                                 self.key_value_p = None;
                                 self.state = MachineState::End;
                             }

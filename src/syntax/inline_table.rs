@@ -2,7 +2,7 @@
 //! 構文パーサー。
 
 use crate::lexical_parser::{Token, TokenType};
-use crate::object_model::{inline_table::InlineTableM, key_value::KeyValueM, value::ValueM};
+use crate::object_model::{inline_table::InlineTableM, key_value::KeyValueM};
 use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
@@ -36,9 +36,7 @@ impl InlineTableP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Key => {
-                        self.product
-                            .items
-                            .push(ValueM::KeyValue(KeyValueM::new(&token)));
+                        self.product.push_key_value(&KeyValueM::new(&token));
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
                         self.state = MachineState::AfterKey;
                     }

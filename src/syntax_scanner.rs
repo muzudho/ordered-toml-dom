@@ -43,7 +43,7 @@ impl LineSyntaxScanner {
         match self.line_parser.eol() {
             SyntaxParserResult::Ok(end_of_syntax) => {
                 if end_of_syntax {
-                    dom.push(&self.line_parser.product())
+                    dom.push_line(&self.line_parser.product())
                 }
             }
             SyntaxParserResult::Err(table) => {

@@ -13,8 +13,8 @@ impl Default for DocumentM {
     }
 }
 impl DocumentM {
-    pub fn push(&mut self, item: &LineM) {
-        self.items.push(item.clone());
+    pub fn push_line(&mut self, m: &LineM) {
+        self.items.push(m.clone());
     }
 }
 impl fmt::Debug for DocumentM {
