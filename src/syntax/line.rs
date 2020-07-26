@@ -39,10 +39,18 @@ impl LineP {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        self.product.push_comment(&p.product());
-                        self.comment_p = None;
-                        self.state = MachineState::End;
-                        return SyntaxParserResult::End;
+                        if let Some(m) = p.flush() {
+                            self.product.push_comment(&m);
+                            self.comment_p = None;
+                            self.state = MachineState::End;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(

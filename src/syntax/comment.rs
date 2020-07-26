@@ -8,16 +8,16 @@ use casual_logger::Table;
 
 /// `# comment`.
 pub struct CommentP {
-    product: CommentM,
+    buffer: Option<CommentM>,
 }
 impl CommentP {
     pub fn new() -> Self {
-        CommentP {
-            product: CommentM::default(),
-        }
+        CommentP { buffer: None }
     }
-    pub fn product(&self) -> &CommentM {
-        &self.product
+    pub fn flush(&mut self) -> Option<CommentM> {
+        let m = self.buffer.clone();
+        self.buffer = None;
+        m
     }
     /// # Returns
     ///
@@ -27,15 +27,20 @@ impl CommentP {
         match token.type_ {
             TokenType::EndOfLine => return SyntaxParserResult::End,
             _ => {
-                self.product.push_token(token);
+                if let None = self.buffer {
+                    self.buffer = Some(CommentM::default());
+                }
+                let m = self.buffer.as_mut().unwrap();
+                m.push_token(token);
             }
         }
         SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
-        Table::default()
-            .str("Parse", "CommentP")
-            .str("product", &self.product.value)
-            .clone()
+        let mut t = Table::default().str("Parse", "CommentP").clone();
+        if let Some(m) = &self.buffer {
+            t.str("buffer", &format!("{:?}", m));
+        }
+        t
     }
 }
