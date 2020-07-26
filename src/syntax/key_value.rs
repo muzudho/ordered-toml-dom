@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::{ItemValue, KeyValue, LiteralString};
+use crate::model::{ItemValue, KeyValue, LiteralString, RightValue};
 use crate::syntax::{
     machine_state::KeyValueState, ArrayP, DoubleQuotedStringP, InlineTableP, KeyValueP,
     SingleQuotedStringP, SyntaxParserResult,
@@ -70,7 +70,7 @@ impl KeyValueP {
                         // TODO true, false
                         self.buffer = Some(KeyValue::new(
                             &self.temp_key,
-                            &ItemValue::LiteralString(LiteralString::new(&token)),
+                            &RightValue::LiteralString(LiteralString::new(&token)),
                         ));
                         self.state = KeyValueState::End;
                         Log::trace_t(
@@ -129,7 +129,7 @@ impl KeyValueP {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
-                                &ItemValue::InlineTable(child_m),
+                                &RightValue::InlineTable(child_m),
                             ));
                             self.inline_table_p = None;
                             self.state = KeyValueState::End;
@@ -163,7 +163,7 @@ impl KeyValueP {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer =
-                                Some(KeyValue::new(&self.temp_key, &ItemValue::Array(child_m)));
+                                Some(KeyValue::new(&self.temp_key, &RightValue::Array(child_m)));
                             self.array_p = None;
                             self.state = KeyValueState::End;
                             return SyntaxParserResult::End;
@@ -197,7 +197,7 @@ impl KeyValueP {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
-                                &ItemValue::DoubleQuotedString(child_m),
+                                &RightValue::DoubleQuotedString(child_m),
                             ));
                             self.double_quoted_string_p = None;
                             self.state = KeyValueState::End;
@@ -232,7 +232,7 @@ impl KeyValueP {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
-                                &ItemValue::SingleQuotedString(child_m),
+                                &RightValue::SingleQuotedString(child_m),
                             ));
                             self.single_quoted_string_p = None;
                             self.state = KeyValueState::End;

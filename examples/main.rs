@@ -6,7 +6,7 @@
 
 use casual_logger::{Log, Table};
 use toml_menu::{
-    model::{Element, ItemValue},
+    model::{Element, RightValue},
     Toml,
 };
 
@@ -32,12 +32,11 @@ fn main() {
                     Table::default().str("KeyValue", &format!("{:?}", m)),
                 );
                 match *m.value {
-                    ItemValue::Array(m) => Log::info(&format!("{:?}", m)),
-                    ItemValue::DoubleQuotedString(m) => Log::info(&format!("{:?}", m)),
-                    ItemValue::InlineTable(m) => Log::info(&format!("{:?}", m)),
-                    ItemValue::KeyValue(m) => Log::info(&format!("{:?}", m)),
-                    ItemValue::LiteralString(m) => Log::info(&format!("{:?}", m)),
-                    ItemValue::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
+                    RightValue::Array(m) => Log::info(&format!("{:?}", m)),
+                    RightValue::DoubleQuotedString(m) => Log::info(&format!("{:?}", m)),
+                    RightValue::InlineTable(m) => Log::info(&format!("{:?}", m)),
+                    RightValue::LiteralString(m) => Log::info(&format!("{:?}", m)),
+                    RightValue::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
                 }
             }
         }

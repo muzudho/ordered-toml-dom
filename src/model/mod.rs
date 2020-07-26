@@ -7,6 +7,7 @@ pub mod inline_table;
 pub mod item_value;
 pub mod key_value;
 pub mod literal_string;
+pub mod right_value;
 pub mod single_quoted_string;
 
 #[derive(Clone)]
@@ -43,12 +44,22 @@ pub struct InlineTable {
 #[derive(Clone)]
 pub struct KeyValue {
     pub key: String,
-    pub value: Box<ItemValue>,
+    pub value: Box<RightValue>,
 }
 
 #[derive(Clone)]
 pub struct LiteralString {
     value: String,
+}
+
+#[derive(Clone)]
+pub enum RightValue {
+    Array(Array),
+    DoubleQuotedString(DoubleQuotedString),
+    InlineTable(InlineTable),
+    // No KeyValue.
+    LiteralString(LiteralString),
+    SingleQuotedString(SingleQuotedString),
 }
 
 #[derive(Clone)]
