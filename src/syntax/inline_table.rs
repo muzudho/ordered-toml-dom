@@ -17,7 +17,7 @@ impl Default for InlineTableP {
     fn default() -> Self {
         InlineTableP {
             state: MachineState::AfterLeftCurlyBracket,
-            buffer: None,
+            buffer: Some(InlineTableM::default()),
             key_value_p: None,
         }
     }
@@ -38,41 +38,46 @@ impl InlineTableP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Key => {
-                        if let None = self.buffer {
-                            self.buffer = Some(InlineTableM::default());
-                        }
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_key_value(&KeyValueM::new(&token));
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
-                        self.state = MachineState::AfterKey;
+                        self.state = MachineState::KeyValue;
                     }
                     _ => panic!(Log::fatal_t(
                         "InlineTableP#parse/AfterValue",
-                        Table::default()
-                            .str("parser", "InlineTableP#parse")
+                        self.err_table()
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     )),
                 }
             }
-            MachineState::AfterKey => match self.key_value_p.as_mut().unwrap().parse(token) {
-                SyntaxParserResult::End => {
-                    self.key_value_p = None;
-                    self.state = MachineState::AfterValue;
+            MachineState::KeyValue => {
+                let p = self.key_value_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_key_value(&child_m);
+                            self.key_value_p = None;
+                            self.state = MachineState::AfterKeyValue;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
+                    SyntaxParserResult::Ongoing => {}
                 }
-                SyntaxParserResult::Err(table) => {
-                    return SyntaxParserResult::Err(
-                        Table::default()
-                            .str("parser", "InlineTableP#parse")
-                            .str("state", &format!("{:?}", self.state))
-                            .str("token", &format!("{:?}", token))
-                            .sub_t("error", &table)
-                            .clone(),
-                    )
-                }
-                SyntaxParserResult::Ongoing => {}
-            },
-            MachineState::AfterValue => match token.type_ {
+            }
+            MachineState::AfterKeyValue => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
                 TokenType::Comma => {
                     self.state = MachineState::AfterLeftCurlyBracket;
@@ -82,17 +87,17 @@ impl InlineTableP {
                 }
                 _ => panic!(Log::fatal_t(
                     "InlineTableP#parse/AfterValue",
-                    Table::default()
-                        .str("parser", "InlineTableP#parse")
-                        .str("state", &format!("{:?}", self.state))
-                        .str("token", &format!("{:?}", token))
+                    self.err_table().str("token", &format!("{:?}", token))
                 )),
             },
         }
         SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
-        let mut t = Table::default().clone();
+        let mut t = Table::default()
+            .str("parser", "InlineTableP#parse")
+            .str("state", &format!("{:?}", self.state))
+            .clone();
         if let Some(key_value_p) = &self.key_value_p {
             t.sub_t("key_value", &key_value_p.err_table());
         }
@@ -104,6 +109,6 @@ impl InlineTableP {
 #[derive(Debug)]
 enum MachineState {
     AfterLeftCurlyBracket,
-    AfterKey,
-    AfterValue,
+    KeyValue,
+    AfterKeyValue,
 }
