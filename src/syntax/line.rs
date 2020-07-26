@@ -80,10 +80,18 @@ impl LineP {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        self.product.push_key_value(&p.product());
-                        self.key_value_p = None;
-                        self.state = MachineState::End;
-                        return SyntaxParserResult::End;
+                        if let Some(m) = p.flush() {
+                            self.product.push_key_value(&m);
+                            self.key_value_p = None;
+                            self.state = MachineState::End;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
                     } // Ignored it.
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(

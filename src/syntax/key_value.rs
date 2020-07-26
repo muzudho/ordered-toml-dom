@@ -12,7 +12,7 @@ use casual_logger::{Log, Table};
 /// `key = value`.
 pub struct KeyValueP {
     state: MachineState,
-    product: KeyValueM,
+    buffer: Option<KeyValueM>,
     inline_table_p: Option<InlineTableP>,
     single_quoted_string_p: Option<SingleQuotedStringP>,
     array_p: Option<ArrayP>,
@@ -21,14 +21,16 @@ impl KeyValueP {
     pub fn new(key: &Token) -> Self {
         KeyValueP {
             state: MachineState::AfterKey,
-            product: KeyValueM::new(key),
+            buffer: Some(KeyValueM::new(key)),
             inline_table_p: None,
             single_quoted_string_p: None,
             array_p: None,
         }
     }
-    pub fn product(&self) -> &KeyValueM {
-        &self.product
+    pub fn flush(&mut self) -> Option<KeyValueM> {
+        let m = self.buffer.clone();
+        self.buffer = None;
+        m
     }
     /// # Returns
     ///
@@ -70,8 +72,8 @@ impl KeyValueP {
                     } //Ignored it.
                     TokenType::Key => {
                         // TODO true, false
-                        self.product
-                            .set_value(&ValueM::LiteralString(LiteralStringM::new(&token)));
+                        let m = self.buffer.as_mut().unwrap();
+                        m.set_value(&ValueM::LiteralString(LiteralStringM::new(&token)));
                         self.state = MachineState::End;
                         Log::trace_t(
                             "KeyValueP#parse/After=/Key",
@@ -120,8 +122,9 @@ impl KeyValueP {
                 let p = self.inline_table_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        if let Some(m) = p.flush() {
-                            self.product.set_value(&ValueM::InlineTable(m));
+                        if let Some(child_m) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.set_value(&ValueM::InlineTable(child_m));
                             self.inline_table_p = None;
                             self.state = MachineState::End;
                             return SyntaxParserResult::End;
@@ -152,8 +155,9 @@ impl KeyValueP {
                 let p = self.array_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        if let Some(m) = p.flush() {
-                            self.product.set_value(&ValueM::Array(m));
+                        if let Some(child_m) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.set_value(&ValueM::Array(child_m));
                             self.array_p = None;
                             self.state = MachineState::End;
                             return SyntaxParserResult::End;
@@ -184,8 +188,8 @@ impl KeyValueP {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        self.product
-                            .set_value(&ValueM::SingleQuotedString(p.product().clone()));
+                        let m = self.buffer.as_mut().unwrap();
+                        m.set_value(&ValueM::SingleQuotedString(p.product().clone()));
                         self.single_quoted_string_p = None;
                         self.state = MachineState::End;
                         return SyntaxParserResult::End;
@@ -215,7 +219,7 @@ impl KeyValueP {
         let mut t = Table::default()
             .str("parser", "KeyValueP#parse")
             .str("state", &format!("{:?}", self.state))
-            .str("product", &format!("{:?}", &self.product))
+            .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
         if let Some(inline_table_p) = &self.inline_table_p {
             t.sub_t("inline_table", &inline_table_p.err_table());
