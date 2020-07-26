@@ -18,7 +18,7 @@ impl Default for LineP {
     fn default() -> Self {
         LineP {
             state: MachineState::First,
-            buffer: Some(ElementM::default()),
+            buffer: None,
             comment_p: None,
             key_value_p: None,
         }
@@ -42,8 +42,7 @@ impl LineP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_comment(&child_m);
+                            self.buffer = Some(ElementM::from_comment(&child_m));
                             self.comment_p = None;
                             self.state = MachineState::AfterComment;
                             return SyntaxParserResult::End;
@@ -84,8 +83,7 @@ impl LineP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_key_value(&child_m);
+                            self.buffer = Some(ElementM::from_key_value(&child_m));
                             self.key_value_p = None;
                             self.state = MachineState::AfterKeyValue;
                             return SyntaxParserResult::End;
