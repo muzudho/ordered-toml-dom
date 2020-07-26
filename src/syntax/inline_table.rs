@@ -89,7 +89,7 @@ impl InlineTableP {
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log());
+            t.sub_t("key_value", &key_value_p.err_table());
         }
         t
     }

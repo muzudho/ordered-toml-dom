@@ -159,7 +159,7 @@ impl LineP {
             t.sub_t("comment", &comment_p.log());
         }
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log());
+            t.sub_t("key_value", &key_value_p.err_table());
         }
         t
     }

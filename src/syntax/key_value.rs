@@ -47,9 +47,7 @@ impl KeyValueP {
                     }
                     _ => {
                         return SyntaxParserResult::Err(
-                            Table::default()
-                                .str("parser", "KeyValueP#parse")
-                                .str("state", &format!("{:?}", self.state))
+                            self.err_table()
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -81,9 +79,7 @@ impl KeyValueP {
                     }
                     _ => {
                         return SyntaxParserResult::Err(
-                            Table::default()
-                                .str("parser", "KeyValueP#parse")
-                                .str("state", &format!("{:?}", self.state))
+                            self.err_table()
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -104,9 +100,7 @@ impl KeyValueP {
                         }
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
-                                Table::default()
-                                    .str("parser", "KeyValueP#parse")
-                                    .str("state", &format!("{:?}", self.state))
+                                self.err_table()
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
                                     .clone(),
@@ -115,9 +109,7 @@ impl KeyValueP {
                     }
                 } else {
                     return SyntaxParserResult::Err(
-                        Table::default()
-                            .str("parser", "KeyValueP#parse")
-                            .str("state", &format!("{:?}", self.state))
+                        self.err_table()
                             .str("token", &format!("{:?}", token))
                             .clone(),
                     );
@@ -136,9 +128,7 @@ impl KeyValueP {
                         }
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
-                                Table::default()
-                                    .str("parser", "KeyValueP#parse")
-                                    .str("state", &format!("{:?}", self.state))
+                                self.err_table()
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
                                     .clone(),
@@ -147,9 +137,7 @@ impl KeyValueP {
                     }
                 } else {
                     return SyntaxParserResult::Err(
-                        Table::default()
-                            .str("parser", "KeyValueP#parse")
-                            .str("state", &format!("{:?}", self.state))
+                        self.err_table()
                             .str("token", &format!("{:?}", token))
                             .clone(),
                     );
@@ -169,9 +157,7 @@ impl KeyValueP {
                         }
                         SyntaxParserResult::Err(table) => {
                             return SyntaxParserResult::Err(
-                                Table::default()
-                                    .str("parser", "KeyValueP#parse")
-                                    .str("state", &format!("{:?}", self.state))
+                                self.err_table()
                                     .str("token", &format!("{:?}", token))
                                     .sub_t("error", &table)
                                     .clone(),
@@ -180,9 +166,7 @@ impl KeyValueP {
                     }
                 } else {
                     return SyntaxParserResult::Err(
-                        Table::default()
-                            .str("parser", "KeyValueP#parse")
-                            .str("state", &format!("{:?}", self.state))
+                        self.err_table()
                             .str("token", &format!("{:?}", token))
                             .clone(),
                     );
@@ -190,9 +174,7 @@ impl KeyValueP {
             }
             MachineState::End => {
                 return SyntaxParserResult::Err(
-                    Table::default()
-                        .str("parser", "KeyValueP#parse")
-                        .str("state", &format!("{:?}", self.state))
+                    self.err_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -200,10 +182,11 @@ impl KeyValueP {
         }
         SyntaxParserResult::Ok(false)
     }
-    pub fn log(&self) -> Table {
+    pub fn err_table(&self) -> Table {
         let mut t = Table::default()
+            .str("parser", "KeyValueP#parse")
             .str("state", &format!("{:?}", self.state))
-            .str("key", &format!("{:?}", &self.product))
+            .str("product", &format!("{:?}", &self.product))
             .clone();
         if let Some(inline_table_p) = &self.inline_table_p {
             t.sub_t("inline_table", &inline_table_p.log());

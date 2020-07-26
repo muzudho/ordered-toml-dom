@@ -45,7 +45,13 @@ impl ArrayP {
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
                         self.state = MachineState::SingleQuotedString;
                     }
-                    _ => return SyntaxParserResult::Err(self.err_table(Some(token)).clone()),
+                    _ => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
                 }
             }
             MachineState::SingleQuotedString => {
@@ -60,7 +66,10 @@ impl ArrayP {
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table(Some(token)).sub_t("error", &table).clone(),
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
                         )
                     }
                 }
@@ -72,7 +81,13 @@ impl ArrayP {
                 TokenType::RightSquareBracket => {
                     return SyntaxParserResult::Ok(true);
                 }
-                _ => return SyntaxParserResult::Err(self.err_table(Some(token)).clone()),
+                _ => {
+                    return SyntaxParserResult::Err(
+                        self.err_table()
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    )
+                }
             },
             MachineState::AfterSingleQuotedString => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
@@ -82,19 +97,21 @@ impl ArrayP {
                 TokenType::RightSquareBracket => {
                     return SyntaxParserResult::Ok(true);
                 }
-                _ => return SyntaxParserResult::Err(self.err_table(Some(token)).clone()),
+                _ => {
+                    return SyntaxParserResult::Err(
+                        self.err_table()
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    )
+                }
             },
         }
         SyntaxParserResult::Ok(false)
     }
-    pub fn err_table(&self, token: Option<&Token>) -> Table {
+    pub fn err_table(&self) -> Table {
         let mut t = Table::default().clone();
         t.str("parser", "ArrayP#parse")
             .str("state", &format!("{:?}", self.state));
-
-        if let Some(token) = token {
-            t.str("token", &format!("{:?}", token));
-        }
 
         if let Some(p) = &self.single_quoted_string_p {
             t.sub_t("single_quoted_string", &p.log());
