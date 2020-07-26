@@ -26,6 +26,7 @@ impl LineSyntaxScanner {
                 SyntaxParserResult::Err(table) => {
                     return SyntaxParserResult::Err(
                         Table::default()
+                            .str("parser", "syntax_scanner.rs/LineSyntaxScanner#scan_line")
                             .str("token_line", &format!("{:?}", token_line))
                             .str(
                                 "rest",

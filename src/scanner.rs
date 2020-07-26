@@ -22,7 +22,12 @@ impl LineScanner {
                     Log::info(&format!("from_file/line=|{}|", line));
                     let mut token_line = LineLexicalParser::default();
                     token_line.parse_line(&line);
-                    Log::info(&format!("from_file/line_tokens=|{:?}|", token_line));
+                    Log::info_t(
+                        "from_file/line_tokens",
+                        Table::default()
+                            .str("line", &line)
+                            .str("token_line", &format!("=|{:?}|", token_line)),
+                    );
                     let mut line_syntax_scanner = LineSyntaxScanner::default();
                     match line_syntax_scanner.scan_line(&token_line.token_line, &mut dom) {
                         SyntaxParserResult::Ok(_) => {} // Ignored it.

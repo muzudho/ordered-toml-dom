@@ -29,12 +29,10 @@ impl Default for LineP {
 impl LineP {
     pub fn product(&mut self) -> LineM {
         if let Some(p) = &self.comment_p {
-            self.product.items.push(LineItemModel::Comment(p.product()));
+            self.product.push_comment(&p.product());
         }
         if let Some(p) = &self.key_value_p {
-            self.product
-                .items
-                .push(LineItemModel::KeyValue(p.product()));
+            self.product.push_key_value(&p.product());
         }
         self.product.clone()
     }
@@ -97,6 +95,8 @@ impl LineP {
                         SyntaxParserResult::Ok(end_of_syntax) => {
                             if end_of_syntax {
                                 dom.push(&self.product());
+                                self.key_value_p = None;
+                                self.state = MachineState::End;
                             }
                         } // Ignored it.
                         SyntaxParserResult::Err(table) => {
@@ -121,6 +121,15 @@ impl LineP {
                 }
             }
             MachineState::Unimplemented => {
+                return SyntaxParserResult::Err(
+                    Table::default()
+                        .str("parser", "LineP#parse")
+                        .str("state", &format!("{:?}", self.state))
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
+            MachineState::End => {
                 return SyntaxParserResult::Err(
                     Table::default()
                         .str("parser", "LineP#parse")
@@ -160,6 +169,7 @@ impl LineP {
 enum MachineState {
     /// `# comment`.
     CommentSyntax,
+    End,
     First,
     /// `key = right_value`.
     KeyPairSyntax,

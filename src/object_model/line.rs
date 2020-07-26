@@ -4,11 +4,19 @@ use std::fmt;
 
 #[derive(Clone)]
 pub struct LineM {
-    pub items: Vec<LineItemModel>,
+    items: Vec<LineItemModel>,
 }
 impl Default for LineM {
     fn default() -> Self {
         LineM { items: Vec::new() }
+    }
+}
+impl LineM {
+    pub fn push_comment(&mut self, m: &CommentM) {
+        self.items.push(LineItemModel::Comment(m.clone()));
+    }
+    pub fn push_key_value(&mut self, m: &KeyValueM) {
+        self.items.push(LineItemModel::KeyValue(m.clone()));
     }
 }
 impl fmt::Debug for LineM {

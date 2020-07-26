@@ -1,8 +1,8 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::lexical_parser::{Token, TokenLine, TokenType};
-use crate::object_model::{array::ArrayM, value::ValueM};
+use crate::lexical_parser::{Token, TokenType};
+use crate::object_model::{array::ArrayM, literal_string::LiteralStringM, value::ValueM};
 use crate::syntax::single_quoted_string::SingleQuotedStringP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
@@ -11,7 +11,6 @@ use casual_logger::{Log, Table};
 pub struct ArrayP {
     state: MachineState,
     product: ArrayM,
-    rest: TokenLine,
     single_quoted_string_parser: Option<Box<SingleQuotedStringP>>,
 }
 impl Default for ArrayP {
@@ -19,7 +18,6 @@ impl Default for ArrayP {
         ArrayP {
             state: MachineState::AfterLeftSquareBracket,
             product: ArrayM::default(),
-            rest: TokenLine::default(),
             single_quoted_string_parser: None,
         }
     }
@@ -37,13 +35,26 @@ impl ArrayP {
             MachineState::AfterLeftSquareBracket => {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::Key => {
+                        // TODO 数字なら正しいが、リテラル文字列だと間違い。
+                        self.product()
+                            .items
+                            .push(ValueM::LiteralString(LiteralStringM::new(token)));
+                        self.state = MachineState::AfterItem;
+                    }
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_parser =
                             Some(Box::new(SingleQuotedStringP::new()));
                         self.state = MachineState::SingleQuotedString;
                     }
                     _ => {
-                        self.rest.tokens.push(token.clone());
+                        return SyntaxParserResult::Err(
+                            Table::default()
+                                .str("parser", "ArrayP#parse")
+                                .str("state", &format!("{:?}", self.state))
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
                     }
                 }
             }
@@ -71,6 +82,23 @@ impl ArrayP {
                     }
                 }
             }
+            MachineState::AfterItem => match token.type_ {
+                TokenType::Comma => {
+                    self.state = MachineState::AfterLeftSquareBracket;
+                }
+                TokenType::RightSquareBracket => {
+                    return SyntaxParserResult::Ok(true);
+                }
+                _ => {
+                    return SyntaxParserResult::Err(
+                        Table::default()
+                            .str("parser", "ArrayP#parse")
+                            .str("state", &format!("{:?}", self.state))
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    )
+                }
+            },
             MachineState::AfterSingleQuotedString => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
                 TokenType::Comma => {
@@ -92,9 +120,6 @@ impl ArrayP {
     }
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
-        if !self.rest.tokens.is_empty() {
-            t.str("rest", &format!("{:?}", self.rest));
-        }
         if let Some(p) = &self.single_quoted_string_parser {
             t.sub_t("single_quoted_string", &p.log());
         }
@@ -105,7 +130,10 @@ impl ArrayP {
 /// `[ 'a', 'b', 'c' ]`.
 #[derive(Debug)]
 enum MachineState {
+    /// [ か , の次。
     AfterLeftSquareBracket,
     SingleQuotedString,
     AfterSingleQuotedString,
+    /// , か ] を待ちます。
+    AfterItem,
 }
