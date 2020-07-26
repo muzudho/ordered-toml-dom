@@ -10,21 +10,23 @@ use casual_logger::{Log, Table};
 /// `{ key = value, key = value }`.
 pub struct InlineTableP {
     state: MachineState,
-    product: InlineTableM,
+    buffer: Option<InlineTableM>,
     key_value_p: Option<Box<KeyValueP>>,
 }
 impl Default for InlineTableP {
     fn default() -> Self {
         InlineTableP {
             state: MachineState::AfterLeftCurlyBracket,
-            product: InlineTableM::default(),
+            buffer: None,
             key_value_p: None,
         }
     }
 }
 impl InlineTableP {
-    pub fn product(&self) -> &InlineTableM {
-        &self.product
+    pub fn flush(&mut self) -> Option<InlineTableM> {
+        let m = self.buffer.clone();
+        self.buffer = None;
+        m
     }
     /// # Returns
     ///
@@ -36,7 +38,11 @@ impl InlineTableP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Key => {
-                        self.product.push_key_value(&KeyValueM::new(&token));
+                        if let None = self.buffer {
+                            self.buffer = Some(InlineTableM::default());
+                        }
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_key_value(&KeyValueM::new(&token));
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
                         self.state = MachineState::AfterKey;
                     }
