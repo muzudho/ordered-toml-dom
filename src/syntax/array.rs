@@ -2,7 +2,7 @@
 //! 構文パーサー。
 
 use crate::lexical_parser::{Token, TokenLine, TokenType};
-use crate::object_model::array::{ArrayItem, ArrayM};
+use crate::object_model::{array::ArrayM, value::ValueM};
 use crate::syntax::single_quoted_string::SingleQuotedStringP;
 use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
@@ -54,7 +54,7 @@ impl ArrayP {
                         if end_of_syntax {
                             self.product
                                 .items
-                                .push(ArrayItem::SingleQuotedString(p.product()));
+                                .push(ValueM::SingleQuotedString(p.product()));
                             self.single_quoted_string_parser = None;
                             self.state = MachineState::AfterSingleQuotedString;
                         }

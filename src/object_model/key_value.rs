@@ -1,6 +1,7 @@
 //! Key value model.  
 //! キー値モデル。  
 
+use crate::lexical_parser::Token;
 use crate::object_model::value::ValueM;
 use std::fmt;
 
@@ -18,9 +19,9 @@ impl Default for KeyValueM {
     }
 }
 impl KeyValueM {
-    pub fn new(key: &str) -> Self {
+    pub fn new(token: &Token) -> Self {
         KeyValueM {
-            key: key.to_string(),
+            key: token.value.to_string(),
             value: None,
         }
     }
@@ -29,7 +30,7 @@ impl fmt::Debug for KeyValueM {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "{}=|{}|",
+            "{}={}",
             self.key,
             if let Some(v) = &self.value {
                 format!("{:?}", v).to_string()

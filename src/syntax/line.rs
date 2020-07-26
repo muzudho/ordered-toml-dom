@@ -80,7 +80,7 @@ impl LineP {
                             .str("token", &format!("{:?}", token)),
                     );
                     */
-                    self.key_value_p = Some(KeyValueP::new(&token.value));
+                    self.key_value_p = Some(KeyValueP::new(&token));
                     self.state = MachineState::KeyPairSyntax;
                 }
                 TokenType::Sharp => {

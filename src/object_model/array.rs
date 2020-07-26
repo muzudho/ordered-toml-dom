@@ -1,11 +1,11 @@
 //! Array model.  
 //! 配列モデル。  
-use crate::object_model::single_quoted_string::SingleQuotedStringM;
+use crate::object_model::value::ValueM;
 use std::fmt;
 
 #[derive(Clone)]
 pub struct ArrayM {
-    pub items: Vec<ArrayItem>,
+    pub items: Vec<ValueM>,
 }
 impl Default for ArrayM {
     fn default() -> Self {
@@ -19,17 +19,5 @@ impl fmt::Debug for ArrayM {
             buf.push_str(&format!("{:?},", item))
         }
         write!(f, "{{ {} }}", buf)
-    }
-}
-
-#[derive(Clone)]
-pub enum ArrayItem {
-    SingleQuotedString(SingleQuotedStringM),
-}
-impl fmt::Debug for ArrayItem {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            ArrayItem::SingleQuotedString(m) => write!(f, "{:?}", m),
-        }
     }
 }
