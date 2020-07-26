@@ -30,9 +30,10 @@ pub enum SyntaxParserResult {
 /// `[ 'a', 'b', 'c' ]`.
 #[derive(Clone)]
 pub struct ArrayP {
-    state: ArrayState,
     buffer: Option<Array>,
+    double_quoted_string_p: Option<Box<DoubleQuotedStringP>>,
     single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
+    state: ArrayState,
 }
 
 /// `# comment`.

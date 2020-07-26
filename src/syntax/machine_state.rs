@@ -2,10 +2,12 @@
 #[derive(Clone, Debug)]
 pub enum ArrayState {
     /// [ か , の次。
+    AfterDoubleQuotedString,
     AfterLeftSquareBracket,
     AfterSingleQuotedString,
     /// , か ] を待ちます。
     AfterItem,
+    DoubleQuotedString,
     End,
     SingleQuotedString,
 }

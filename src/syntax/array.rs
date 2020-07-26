@@ -2,16 +2,19 @@
 //! 構文パーサー。
 
 use crate::model::{Array, LiteralString};
-use crate::syntax::{machine_state::ArrayState, ArrayP, SingleQuotedStringP, SyntaxParserResult};
+use crate::syntax::{
+    machine_state::ArrayState, ArrayP, DoubleQuotedStringP, SingleQuotedStringP, SyntaxParserResult,
+};
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
 
 impl Default for ArrayP {
     fn default() -> Self {
         ArrayP {
-            state: ArrayState::AfterLeftSquareBracket,
             buffer: None,
+            double_quoted_string_p: None,
             single_quoted_string_p: None,
+            state: ArrayState::AfterLeftSquareBracket,
         }
     }
 }
@@ -27,14 +30,39 @@ impl ArrayP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
+            ArrayState::AfterDoubleQuotedString => {
+                Log::trace_t(
+                    "ArrayP#parse/After\"value\"",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                match token.type_ {
+                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::Comma => {
+                        self.state = ArrayState::AfterLeftSquareBracket;
+                    }
+                    TokenType::RightSquareBracket => {
+                        self.state = ArrayState::End;
+                        return SyntaxParserResult::End;
+                    }
+                    _ => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
+                }
+            }
             ArrayState::AfterLeftSquareBracket => {
                 match token.type_ {
-                    TokenType::WhiteSpace => {
+                    TokenType::DoubleQuotation => {
                         Log::trace_t(
-                            "ArrayP#parse/After[/WhiteSpace",
+                            "ArrayP#parse/After[/\"",
                             Table::default().str("token", &format!("{:?}", token)),
                         );
-                    } // Ignore it.
+                        self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
+                        self.state = ArrayState::DoubleQuotedString;
+                    }
                     TokenType::Key => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
@@ -58,6 +86,12 @@ impl ArrayP {
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
                         self.state = ArrayState::SingleQuotedString;
                     }
+                    TokenType::WhiteSpace => {
+                        Log::trace_t(
+                            "ArrayP#parse/After[/WhiteSpace",
+                            Table::default().str("token", &format!("{:?}", token)),
+                        );
+                    } // Ignore it.
                     _ => {
                         return SyntaxParserResult::Err(
                             self.err_table()
@@ -65,41 +99,6 @@ impl ArrayP {
                                 .clone(),
                         )
                     }
-                }
-            }
-            ArrayState::SingleQuotedString => {
-                Log::trace_t(
-                    "ArrayP#parse/'value'",
-                    Table::default().str("token", &format!("{:?}", token)),
-                );
-                let p = self.single_quoted_string_p.as_mut().unwrap();
-                match p.parse(token) {
-                    SyntaxParserResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            if let None = self.buffer {
-                                self.buffer = Some(Array::default());
-                            }
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_single_quote_string(&child_m);
-                            self.single_quoted_string_p = None;
-                            self.state = ArrayState::AfterSingleQuotedString;
-                        } else {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
-                    }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
-                            self.err_table()
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
-                                .clone(),
-                        )
-                    }
-                    SyntaxParserResult::Ongoing => {}
                 }
             }
             ArrayState::AfterItem => {
@@ -147,6 +146,41 @@ impl ArrayP {
                     }
                 }
             }
+            ArrayState::DoubleQuotedString => {
+                Log::trace_t(
+                    "ArrayP#parse/\"value\"",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                let p = self.double_quoted_string_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            if let None = self.buffer {
+                                self.buffer = Some(Array::default());
+                            }
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_double_quote_string(&child_m);
+                            self.double_quoted_string_p = None;
+                            self.state = ArrayState::AfterDoubleQuotedString;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
+                    SyntaxParserResult::Ongoing => {}
+                }
+            }
             ArrayState::End => {
                 Log::trace_t(
                     "ArrayP#parse/End",
@@ -158,6 +192,41 @@ impl ArrayP {
                         .clone(),
                 );
             }
+            ArrayState::SingleQuotedString => {
+                Log::trace_t(
+                    "ArrayP#parse/'value'",
+                    Table::default().str("token", &format!("{:?}", token)),
+                );
+                let p = self.single_quoted_string_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            if let None = self.buffer {
+                                self.buffer = Some(Array::default());
+                            }
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_single_quote_string(&child_m);
+                            self.single_quoted_string_p = None;
+                            self.state = ArrayState::AfterSingleQuotedString;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
+                    SyntaxParserResult::Ongoing => {}
+                }
+            }
         }
         SyntaxParserResult::Ongoing
     }
@@ -166,9 +235,13 @@ impl ArrayP {
         t.str("parser", "ArrayP#parse")
             .str("state", &format!("{:?}", self.state));
 
+        if let Some(p) = &self.double_quoted_string_p {
+            t.sub_t("double_quoted_string", &p.err_table());
+        }
         if let Some(p) = &self.single_quoted_string_p {
             t.sub_t("single_quoted_string", &p.err_table());
         }
+
         t
     }
 }

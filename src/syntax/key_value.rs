@@ -1,7 +1,7 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::model::{ItemValue, KeyValue, LiteralString, RightValue};
+use crate::model::{KeyValue, LiteralString, RightValue};
 use crate::syntax::{
     machine_state::KeyValueState, ArrayP, DoubleQuotedStringP, InlineTableP, KeyValueP,
     SingleQuotedStringP, SyntaxParserResult,

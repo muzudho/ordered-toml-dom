@@ -23,7 +23,7 @@ impl DoubleQuotedStringP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match token.type_ {
-            TokenType::SingleQuotation => {
+            TokenType::DoubleQuotation => {
                 // End of syntax.
                 // 構文の終わり。
                 return SyntaxParserResult::End;
