@@ -44,25 +44,19 @@ impl ArrayP {
                         );
                     } // Ignore it.
                     TokenType::Key => {
-                        // TODO 数字なら正しいが、リテラル文字列だと間違い。
+                        // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
-                            let mut m = ArrayM::default();
-                            m.push_literal_string(&LiteralStringM::new(token));
-                            self.buffer = Some(m);
-                            self.state = MachineState::AfterItem;
-                            Log::trace_t(
-                                "ArrayP#parse/After[/Key",
-                                Table::default()
-                                    .str("token", &format!("{:?}", token))
-                                    .str("buffer", &format!("{:?}", self.buffer)),
-                            );
-                        } else {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            self.buffer = Some(ArrayM::default());
                         }
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_literal_string(&LiteralStringM::new(token));
+                        self.state = MachineState::AfterItem;
+                        Log::trace_t(
+                            "ArrayP#parse/After[/Key",
+                            Table::default()
+                                .str("token", &format!("{:?}", token))
+                                .str("buffer", &format!("{:?}", self.buffer)),
+                        );
                     }
                     TokenType::SingleQuotation => {
                         Log::trace_t(
@@ -90,18 +84,12 @@ impl ArrayP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let None = self.buffer {
-                            let mut m = ArrayM::default();
-                            m.push_single_quote_string(&p.product());
-                            self.buffer = Some(m);
-                            self.single_quoted_string_p = None;
-                            self.state = MachineState::AfterSingleQuotedString;
-                        } else {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            self.buffer = Some(ArrayM::default());
                         }
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_single_quote_string(&p.product());
+                        self.single_quoted_string_p = None;
+                        self.state = MachineState::AfterSingleQuotedString;
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
