@@ -12,6 +12,21 @@ impl Default for Document {
     }
 }
 impl Document {
+    pub fn child(&self, name: &str) -> Option<&Element> {
+        for elem in &self.elements {
+            match elem {
+                Element::Comment(_) => {}
+                Element::KeyValue(m) => {
+                    println!("m.key={}", m.key);
+                    if m.key == name {
+                        println!("HIT m.key={}", m.key);
+                        return Some(elem);
+                    }
+                }
+            }
+        }
+        None
+    }
     pub fn push_line(&mut self, m: &Element) {
         self.elements.push(m.clone());
     }
