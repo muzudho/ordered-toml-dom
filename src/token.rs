@@ -31,6 +31,7 @@ pub enum TokenType {
     CloseCurlyBracket,
     /// ,
     Comma,
+    EndOfLine,
     Equals,
     Key,
     /// {

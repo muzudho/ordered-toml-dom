@@ -72,6 +72,11 @@ impl LineLexicalParser {
         }
         // Log::info("End of line.");
         self.flush();
+        self.product.tokens.push(Token::new(
+            "
+",
+            TokenType::EndOfLine,
+        ));
     }
     /// Flush.
     fn flush(&mut self) {

@@ -45,15 +45,10 @@ impl LineP {
             MachineState::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::Ok(end_of_syntax) => {
-                        if end_of_syntax {
-                            // ここにはこない。
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
+                    SyntaxParserResult::End => {
+                        dom.push_line(&self.product());
+                        self.state = MachineState::End;
+                        return SyntaxParserResult::End;
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
@@ -63,6 +58,7 @@ impl LineP {
                                 .clone(),
                         );
                     }
+                    SyntaxParserResult::Ongoing => {}
                 }
             }
             MachineState::First => match token.type_ {
@@ -81,12 +77,10 @@ impl LineP {
             MachineState::KeyPairSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::Ok(end_of_syntax) => {
-                        if end_of_syntax {
-                            dom.push_line(&self.product());
-                            self.key_value_p = None;
-                            self.state = MachineState::End;
-                        }
+                    SyntaxParserResult::End => {
+                        dom.push_line(&self.product());
+                        self.key_value_p = None;
+                        self.state = MachineState::End;
                     } // Ignored it.
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
@@ -96,6 +90,7 @@ impl LineP {
                                 .clone(),
                         );
                     }
+                    SyntaxParserResult::Ongoing => {}
                 }
             }
             MachineState::Unimplemented => {
@@ -105,25 +100,19 @@ impl LineP {
                         .clone(),
                 );
             }
-            MachineState::End => {
-                return SyntaxParserResult::Err(
-                    self.err_table()
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
-            }
+            MachineState::End => match token.type_ {
+                TokenType::EndOfLine => return SyntaxParserResult::End,
+                _ => {
+                    return SyntaxParserResult::Err(
+                        self.err_table()
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    );
+                }
+            },
         }
 
-        SyntaxParserResult::Ok(false)
-    }
-    pub fn eol(&self) -> SyntaxParserResult {
-        if let Some(p) = &self.comment_p {
-            p.eol()
-        } else if let Some(p) = &self.key_value_p {
-            p.eol()
-        } else {
-            SyntaxParserResult::Ok(false)
-        }
+        SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
         let mut t = Table::default()

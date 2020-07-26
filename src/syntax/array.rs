@@ -77,12 +77,10 @@ impl ArrayP {
                 );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::Ok(end_of_syntax) => {
-                        if end_of_syntax {
-                            self.product.push_single_quote_string(&p.product());
-                            self.single_quoted_string_p = None;
-                            self.state = MachineState::AfterSingleQuotedString;
-                        }
+                    SyntaxParserResult::End => {
+                        self.product.push_single_quote_string(&p.product());
+                        self.single_quoted_string_p = None;
+                        self.state = MachineState::AfterSingleQuotedString;
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
@@ -92,6 +90,7 @@ impl ArrayP {
                                 .clone(),
                         )
                     }
+                    SyntaxParserResult::Ongoing => {}
                 }
             }
             MachineState::AfterItem => {
@@ -105,7 +104,7 @@ impl ArrayP {
                     }
                     TokenType::RightSquareBracket => {
                         self.state = MachineState::End;
-                        return SyntaxParserResult::Ok(true);
+                        return SyntaxParserResult::End;
                     }
                     _ => {
                         return SyntaxParserResult::Err(
@@ -128,7 +127,7 @@ impl ArrayP {
                     }
                     TokenType::RightSquareBracket => {
                         self.state = MachineState::End;
-                        return SyntaxParserResult::Ok(true);
+                        return SyntaxParserResult::End;
                     }
                     _ => {
                         return SyntaxParserResult::Err(
@@ -151,7 +150,7 @@ impl ArrayP {
                 );
             }
         }
-        SyntaxParserResult::Ok(false)
+        SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
         let mut t = Table::default().clone();

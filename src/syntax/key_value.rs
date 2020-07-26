@@ -30,9 +30,6 @@ impl KeyValueP {
     pub fn product(&self) -> &KeyValueM {
         &self.product
     }
-    pub fn eol(&self) -> SyntaxParserResult {
-        SyntaxParserResult::Ok(false)
-    }
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  
@@ -80,7 +77,7 @@ impl KeyValueP {
                             "KeyValueP#parse/After=/Key",
                             Table::default().str("token", &format!("{:?}", token)),
                         );
-                        return SyntaxParserResult::Ok(true);
+                        return SyntaxParserResult::End;
                     }
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());
@@ -122,14 +119,12 @@ impl KeyValueP {
                 );
                 let p = self.inline_table_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::Ok(end_of_syntax) => {
-                        if end_of_syntax {
-                            self.product
-                                .set_value(&ValueM::InlineTable(p.product().clone()));
-                            self.inline_table_p = None;
-                            self.state = MachineState::End;
-                            return SyntaxParserResult::Ok(true);
-                        }
+                    SyntaxParserResult::End => {
+                        self.product
+                            .set_value(&ValueM::InlineTable(p.product().clone()));
+                        self.inline_table_p = None;
+                        self.state = MachineState::End;
+                        return SyntaxParserResult::End;
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
@@ -139,6 +134,7 @@ impl KeyValueP {
                                 .clone(),
                         )
                     }
+                    SyntaxParserResult::Ongoing => {}
                 }
             }
             MachineState::AfterLeftSquareBracket => {
@@ -148,13 +144,11 @@ impl KeyValueP {
                 );
                 let p = self.array_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::Ok(end_of_syntax) => {
-                        if end_of_syntax {
-                            self.product.set_value(&ValueM::Array(p.product().clone()));
-                            self.array_p = None;
-                            self.state = MachineState::End;
-                            return SyntaxParserResult::Ok(true);
-                        }
+                    SyntaxParserResult::End => {
+                        self.product.set_value(&ValueM::Array(p.product().clone()));
+                        self.array_p = None;
+                        self.state = MachineState::End;
+                        return SyntaxParserResult::End;
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
@@ -164,6 +158,7 @@ impl KeyValueP {
                                 .clone(),
                         )
                     }
+                    SyntaxParserResult::Ongoing => {}
                 }
             }
             MachineState::SingleQuotedString => {
@@ -173,14 +168,12 @@ impl KeyValueP {
                 );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::Ok(end_of_syntax) => {
-                        if end_of_syntax {
-                            self.product
-                                .set_value(&ValueM::SingleQuotedString(p.product().clone()));
-                            self.single_quoted_string_p = None;
-                            self.state = MachineState::End;
-                            return SyntaxParserResult::Ok(true);
-                        }
+                    SyntaxParserResult::End => {
+                        self.product
+                            .set_value(&ValueM::SingleQuotedString(p.product().clone()));
+                        self.single_quoted_string_p = None;
+                        self.state = MachineState::End;
+                        return SyntaxParserResult::End;
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
@@ -190,6 +183,7 @@ impl KeyValueP {
                                 .clone(),
                         )
                     }
+                    SyntaxParserResult::Ongoing => {}
                 }
             }
             MachineState::End => {
@@ -200,7 +194,7 @@ impl KeyValueP {
                 );
             }
         }
-        SyntaxParserResult::Ok(false)
+        SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
         let mut t = Table::default()

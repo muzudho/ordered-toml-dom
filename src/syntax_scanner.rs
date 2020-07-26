@@ -22,7 +22,7 @@ impl LineSyntaxScanner {
     pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut DocumentM) -> SyntaxParserResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
             match self.line_parser.parse(token, dom) {
-                SyntaxParserResult::Ok(_) => {}
+                SyntaxParserResult::End | SyntaxParserResult::Ongoing => {}
                 SyntaxParserResult::Err(table) => {
                     return SyntaxParserResult::Err(
                         Table::default()
@@ -39,24 +39,7 @@ impl LineSyntaxScanner {
             }
         }
 
-        // TODO 行末が終端子のケース。
-        match self.line_parser.eol() {
-            SyntaxParserResult::Ok(end_of_syntax) => {
-                if end_of_syntax {
-                    dom.push_line(&self.line_parser.product())
-                }
-            }
-            SyntaxParserResult::Err(table) => {
-                return SyntaxParserResult::Err(
-                    Table::default()
-                        .str("token_line", &format!("{:?}", token_line))
-                        .sub_t("error", &table)
-                        .clone(),
-                );
-            }
-        }
-
-        SyntaxParserResult::Ok(false)
+        SyntaxParserResult::Ongoing
     }
 
     pub fn log(&self) -> Table {

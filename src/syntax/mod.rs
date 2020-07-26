@@ -13,8 +13,9 @@ use casual_logger::Table;
 /// Result of syntax parser.  
 /// 構文パーサーの結果。  
 pub enum SyntaxParserResult {
-    /// * `bool` - End of syntax.
-    Ok(bool),
+    /// End of syntax.
+    End,
+    Ongoing,
     /// Error.
     Err(Table),
 }

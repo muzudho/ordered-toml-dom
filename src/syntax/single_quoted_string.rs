@@ -29,13 +29,13 @@ impl SingleQuotedStringP {
             TokenType::SingleQuotation => {
                 // End of syntax.
                 // 構文の終わり。
-                return SyntaxParserResult::Ok(true);
+                return SyntaxParserResult::End;
             }
             _ => {
                 self.product.push_token(&token);
             }
         }
-        SyntaxParserResult::Ok(false)
+        SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
         Table::default().str("value", &self.product.value).clone()

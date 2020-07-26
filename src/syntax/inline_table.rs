@@ -50,11 +50,9 @@ impl InlineTableP {
                 }
             }
             MachineState::AfterKey => match self.key_value_p.as_mut().unwrap().parse(token) {
-                SyntaxParserResult::Ok(end_of_syntax) => {
-                    if end_of_syntax {
-                        self.key_value_p = None;
-                        self.state = MachineState::AfterValue;
-                    }
+                SyntaxParserResult::End => {
+                    self.key_value_p = None;
+                    self.state = MachineState::AfterValue;
                 }
                 SyntaxParserResult::Err(table) => {
                     return SyntaxParserResult::Err(
@@ -66,6 +64,7 @@ impl InlineTableP {
                             .clone(),
                     )
                 }
+                SyntaxParserResult::Ongoing => {}
             },
             MachineState::AfterValue => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
@@ -73,7 +72,7 @@ impl InlineTableP {
                     self.state = MachineState::AfterLeftCurlyBracket;
                 }
                 TokenType::RightCurlyBracket => {
-                    return SyntaxParserResult::Ok(true);
+                    return SyntaxParserResult::End;
                 }
                 _ => panic!(Log::fatal_t(
                     "InlineTableP#parse/AfterValue",
@@ -84,7 +83,7 @@ impl InlineTableP {
                 )),
             },
         }
-        SyntaxParserResult::Ok(false)
+        SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
         let mut t = Table::default().clone();

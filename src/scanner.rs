@@ -30,13 +30,21 @@ impl LineScanner {
                     );
                     let mut line_syntax_scanner = LineSyntaxScanner::default();
                     match line_syntax_scanner.scan_line(&token_line.product(), &mut dom) {
-                        SyntaxParserResult::Ok(_) => {} // Ignored it.
+                        SyntaxParserResult::End => {} // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             aot.table(
                                 Table::default()
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", token_line))
                                     .sub_t("error", &table)
+                                    .sub_t("line_scanner", &line_syntax_scanner.log()),
+                            );
+                        }
+                        SyntaxParserResult::Ongoing => {
+                            aot.table(
+                                Table::default()
+                                    .str("line", &format!("{}", line))
+                                    .str("token_line", &format!("{:?}", token_line))
                                     .sub_t("line_scanner", &line_syntax_scanner.log()),
                             );
                         }
