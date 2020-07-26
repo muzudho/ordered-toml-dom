@@ -1,3 +1,6 @@
+//! Single quoted string model.  
+//! 単一引用符文字列モデル。  
+
 use crate::model::SingleQuotedString;
 use crate::token::Token;
 use std::fmt;

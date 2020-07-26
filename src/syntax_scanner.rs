@@ -1,8 +1,13 @@
+//! Syntax scanner.  
+//! 構文走査器。  
+
 use crate::model::Document;
 use crate::syntax::{LineP, SyntaxParserResult};
 use crate::token::TokenLine;
 use casual_logger::Table;
 
+/// Syntax scanner.  
+/// 構文走査器。  
 pub struct LineSyntaxScanner {
     pub line_parser: LineP,
 }

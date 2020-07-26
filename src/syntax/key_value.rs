@@ -1,5 +1,5 @@
-//! Syntax parser.
-//! 構文パーサー。
+//! Key value syntax parser.  
+//! キー値構文パーサー。  
 
 use crate::model::{KeyValue, LiteralString, RightValue};
 use crate::syntax::{

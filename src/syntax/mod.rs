@@ -27,7 +27,10 @@ pub enum SyntaxParserResult {
     Err(Table),
 }
 
-/// `[ 'a', 'b', 'c' ]`.
+/// Array parser.  
+/// 配列パーサー。  
+///
+/// Example: `[ 'a', 'b', 'c' ]`.  
 #[derive(Clone)]
 pub struct ArrayP {
     buffer: Option<Array>,
@@ -36,25 +39,37 @@ pub struct ArrayP {
     state: ArrayState,
 }
 
-/// `# comment`.
+/// Comment parser.  
+/// コメント・パーサー。  
+///
+/// Example: `# comment`.  
 pub struct CommentP {
     buffer: Option<Comment>,
 }
 
-/// `"value"`.
+/// Double quoted string syntax parser.  
+/// 二重引用符文字列構文パーサー。  
+///
+/// Example: `"value"`.  
 #[derive(Clone)]
 pub struct DoubleQuotedStringP {
     buffer: Option<DoubleQuotedString>,
 }
 
-/// `{ key = value, key = value }`.
+/// Inline table syntax parser.  
+/// インライン・テーブル構文パーサー。  
+///
+/// Example: `{ key = value, key = value }`.  
 pub struct InlineTableP {
     state: InlineTableState,
     buffer: Option<InlineTable>,
     key_value_p: Option<Box<KeyValueP>>,
 }
 
-/// `key = value`.
+/// Key value syntax parser.  
+/// キー値構文パーサー。  
+///
+/// `key = value`.  
 pub struct KeyValueP {
     array_p: Option<ArrayP>,
     buffer: Option<KeyValue>,
@@ -65,6 +80,8 @@ pub struct KeyValueP {
     temp_key: Token,
 }
 
+/// Line syntax parser.  
+/// 行構文パーサー。  
 pub struct LineP {
     state: LineState,
     buffer: Option<Element>,
@@ -72,7 +89,10 @@ pub struct LineP {
     key_value_p: Option<KeyValueP>,
 }
 
-/// `'value'`.
+/// Single quoted string syntax parser.  
+/// 単一引用符文字列構文パーサー。  
+///
+/// Example: `'value'`.  
 #[derive(Clone)]
 pub struct SingleQuotedStringP {
     buffer: Option<SingleQuotedString>,

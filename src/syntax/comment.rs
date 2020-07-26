@@ -1,5 +1,5 @@
-//! Syntax parser.
-//! 構文パーサー。
+//! Comment syntax parser.  
+//! コメント構文パーサー。  
 
 use crate::model::Comment;
 use crate::syntax::{CommentP, SyntaxParserResult};

@@ -1,3 +1,6 @@
+//! Literal string model.  
+//! リテラル文字列モデル。  
+
 use crate::model::LiteralString;
 use crate::token::Token;
 use std::fmt;

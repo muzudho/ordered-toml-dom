@@ -1,5 +1,10 @@
+//! Token.  
+//! 字句。  
+
 use std::fmt;
 
+/// A row of tokens.  
+/// 一列のトークン。  
 pub struct TokenLine {
     pub tokens: Vec<Token>,
 }
@@ -25,6 +30,8 @@ impl fmt::Debug for TokenLine {
     }
 }
 
+/// Token type.  
+/// トークンの種類。  
 #[derive(Clone, Copy, Debug)]
 pub enum TokenType {
     /// }  
@@ -58,6 +65,8 @@ pub enum TokenType {
     WhiteSpace,
 }
 
+/// Token.  
+/// 字句。  
 #[derive(Clone)]
 pub struct Token {
     pub value: String,

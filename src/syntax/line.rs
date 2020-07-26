@@ -1,5 +1,5 @@
-//! Syntax parser.
-//! 構文パーサー。
+//! Line syntax parser.  
+//! 行構文パーサー。  
 
 use crate::model::Element;
 use crate::syntax::{machine_state::LineState, CommentP, KeyValueP, LineP, SyntaxParserResult};

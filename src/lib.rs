@@ -1,3 +1,6 @@
+//! TOML parser.  
+//! トムル解析器。  
+//!
 //! `cargo run --example main`
 
 #[macro_use]
@@ -22,9 +25,12 @@ use std::sync::Mutex;
 
 lazy_static! {
     /// Without dot.
+    /// ドットは含みません。
     pub static ref RE_KEY: Mutex<Regex> = Mutex::new(Regex::new(r"[A-Za-z0-9_-]$").unwrap());
 }
 
+/// TOML.  
+/// トムル。  
 pub struct Toml {}
 impl Toml {
     /// Line scan.

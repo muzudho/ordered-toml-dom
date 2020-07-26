@@ -1,5 +1,5 @@
-//! Syntax parser.
-//! 構文パーサー。
+//! Single quoted string syntax parser.  
+//! 単一引用符文字列構文パーサー。  
 
 use crate::model::SingleQuotedString;
 use crate::syntax::{SingleQuotedStringP, SyntaxParserResult};

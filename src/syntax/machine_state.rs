@@ -1,4 +1,10 @@
-/// `[ 'a', 'b', 'c' ]`.
+//! Machine state.  
+//! 状態遷移。  
+
+/// Array syntax machine state.  
+/// 配列構文状態遷移。  
+///
+/// Example: `[ 'a', 'b', 'c' ]`.  
 #[derive(Clone, Debug)]
 pub enum ArrayState {
     /// [ か , の次。
@@ -12,7 +18,10 @@ pub enum ArrayState {
     SingleQuotedString,
 }
 
-/// `{ key = value, key = value }`.
+/// Inline table syntax machine state.  
+/// インライン・テーブル構文状態遷移。  
+///
+/// Example: `{ key = value, key = value }`.  
 #[derive(Debug)]
 pub enum InlineTableState {
     AfterLeftCurlyBracket,
@@ -20,7 +29,10 @@ pub enum InlineTableState {
     AfterKeyValue,
 }
 
-/// `key = right_value`.
+/// Key value syntax machine state.  
+/// キー値構文状態遷移。  
+///
+/// Example: `key = right_value`.  
 #[derive(Debug)]
 pub enum KeyValueState {
     AfterKey,
@@ -32,6 +44,8 @@ pub enum KeyValueState {
     End,
 }
 
+/// Line syntax machine state.  
+/// 行構文状態遷移。  
 #[derive(Debug)]
 pub enum LineState {
     AfterComment,

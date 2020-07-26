@@ -1,5 +1,5 @@
-//! Syntax parser.
-//! 構文パーサー。
+//! Array syntax parser.  
+//! 配列構文パーサー。  
 
 use crate::model::{Array, LiteralString};
 use crate::syntax::{

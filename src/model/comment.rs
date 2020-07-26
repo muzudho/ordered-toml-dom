@@ -1,3 +1,6 @@
+//! Comment model.  
+//! コメント・モデル。  
+
 use crate::model::Comment;
 use crate::token::Token;
 use std::fmt;

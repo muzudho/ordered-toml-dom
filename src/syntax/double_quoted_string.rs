@@ -1,5 +1,5 @@
-//! Syntax parser.
-//! 構文パーサー。
+//! Double quoted string syntax parser.  
+//! 二重引用符文字列構文パーサー。  
 
 use crate::model::DoubleQuotedString;
 use crate::syntax::{DoubleQuotedStringP, SyntaxParserResult};
