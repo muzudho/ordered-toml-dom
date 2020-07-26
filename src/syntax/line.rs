@@ -45,7 +45,7 @@ impl LineP {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_comment(&child_m);
                             self.comment_p = None;
-                            self.state = MachineState::End;
+                            self.state = MachineState::AfterComment;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -87,7 +87,7 @@ impl LineP {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_key_value(&child_m);
                             self.key_value_p = None;
-                            self.state = MachineState::End;
+                            self.state = MachineState::AfterKeyValue;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -115,7 +115,14 @@ impl LineP {
                         .clone(),
                 );
             }
-            MachineState::End => match token.type_ {
+            MachineState::AfterComment => {
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
+            MachineState::AfterKeyValue => match token.type_ {
                 TokenType::EndOfLine => return SyntaxParserResult::End,
                 _ => {
                     return SyntaxParserResult::Err(
@@ -146,9 +153,10 @@ impl LineP {
 
 #[derive(Debug)]
 enum MachineState {
+    AfterComment,
+    AfterKeyValue,
     /// `# comment`.
     CommentSyntax,
-    End,
     First,
     /// `key = right_value`.
     KeyPairSyntax,

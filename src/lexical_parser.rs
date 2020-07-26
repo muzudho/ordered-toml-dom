@@ -1,7 +1,7 @@
 //! 単語単位に分けます。
 use crate::token::{Token, TokenLine, TokenType};
 use crate::RE_KEY;
-use casual_logger::Log;
+use casual_logger::{Log, Table};
 use std::fmt;
 
 #[derive(Debug)]
@@ -117,6 +117,9 @@ impl LineLexicalParser {
                 );
                 */
             }
+            '.' => {
+                self.buf_token_type = TokenType::Dot;
+            }
             '=' => {
                 self.buf_token_type = TokenType::Equals;
                 /*
@@ -212,15 +215,15 @@ impl LineLexicalParser {
                     */
                     self.state = Some(LineMachineState::Key);
                 } else {
-                    self.buf_token_type = TokenType::Unimplemented;
                     /*
-                    Log::info_t(
-                        "initial",
+                    panic!(Log::fatal_t(
+                        "Unimplemented char.",
                         Table::default()
                             .str("buf_token_type", &format!("{:?}", self.buf_token_type))
-                            .char("ch", ch),
-                    );
+                            .char("ch", ch)
+                    ))
                     */
+                    self.buf_token_type = TokenType::Otherwise;
                 }
             }
         }

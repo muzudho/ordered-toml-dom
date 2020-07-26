@@ -31,9 +31,13 @@ pub enum TokenType {
     CloseCurlyBracket,
     /// ,
     Comma,
+    /// .
+    Dot,
     EndOfLine,
     Equals,
     Key,
+    /// 全角文字などいろいろ。
+    Otherwise,
     /// {
     LeftCurlyBracket,
     /// [
@@ -46,7 +50,6 @@ pub enum TokenType {
     Sharp,
     /// '
     SingleQuotation,
-    Unimplemented,
     /// Whitespace means tab (0x09 '\t') or space (0x20 ' ').
     WhiteSpace,
 }

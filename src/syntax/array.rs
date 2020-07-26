@@ -83,13 +83,21 @@ impl ArrayP {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        if let None = self.buffer {
-                            self.buffer = Some(ArrayM::default());
+                        if let Some(child_m) = p.flush() {
+                            if let None = self.buffer {
+                                self.buffer = Some(ArrayM::default());
+                            }
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_single_quote_string(&child_m);
+                            self.single_quoted_string_p = None;
+                            self.state = MachineState::AfterSingleQuotedString;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
                         }
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_single_quote_string(&p.product());
-                        self.single_quoted_string_p = None;
-                        self.state = MachineState::AfterSingleQuotedString;
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(

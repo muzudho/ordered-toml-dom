@@ -9,15 +9,17 @@ use casual_logger::Table;
 /// `'value'`.
 #[derive(Clone)]
 pub struct SingleQuotedStringP {
-    product: SingleQuotedStringM,
+    buffer: Option<SingleQuotedStringM>,
 }
 impl SingleQuotedStringP {
-    pub fn product(&self) -> &SingleQuotedStringM {
-        &self.product
+    pub fn flush(&mut self) -> Option<SingleQuotedStringM> {
+        let m = self.buffer.clone();
+        self.buffer = None;
+        m
     }
     pub fn new() -> Self {
         SingleQuotedStringP {
-            product: SingleQuotedStringM::default(),
+            buffer: Some(SingleQuotedStringM::default()),
         }
     }
     /// # Returns
@@ -32,12 +34,17 @@ impl SingleQuotedStringP {
                 return SyntaxParserResult::End;
             }
             _ => {
-                self.product.push_token(&token);
+                let m = self.buffer.as_mut().unwrap();
+                m.push_token(&token);
             }
         }
         SyntaxParserResult::Ongoing
     }
     pub fn err_table(&self) -> Table {
-        Table::default().str("value", &self.product.value).clone()
+        let mut t = Table::default().clone();
+        if let Some(m) = &self.buffer {
+            t.str("value", &format!("{:?}", m));
+        }
+        t
     }
 }

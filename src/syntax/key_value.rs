@@ -188,11 +188,19 @@ impl KeyValueP {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        let m = self.buffer.as_mut().unwrap();
-                        m.set_value(&ValueM::SingleQuotedString(p.product().clone()));
-                        self.single_quoted_string_p = None;
-                        self.state = MachineState::End;
-                        return SyntaxParserResult::End;
+                        if let Some(child_m) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.set_value(&ValueM::SingleQuotedString(child_m));
+                            self.single_quoted_string_p = None;
+                            self.state = MachineState::End;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
