@@ -33,12 +33,6 @@ impl ArrayP {
     pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
             MachineState::AfterLeftSquareBracket => {
-                /*
-                Log::trace_t(
-                    "ArrayP#parse/After[",
-                    Table::default().str("token", &format!("{:?}", token)),
-                );
-                */
                 match token.type_ {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
@@ -47,14 +41,16 @@ impl ArrayP {
                         );
                     } // Ignore it.
                     TokenType::Key => {
-                        Log::trace_t(
-                            "ArrayP#parse/After[/Key",
-                            Table::default().str("token", &format!("{:?}", token)),
-                        );
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。
-                        self.product()
+                        self.product
                             .push_literal_string(&LiteralStringM::new(token));
                         self.state = MachineState::AfterItem;
+                        Log::trace_t(
+                            "ArrayP#parse/After[/Key",
+                            Table::default()
+                                .str("token", &format!("{:?}", token))
+                                .str("product", &format!("{:?}", self.product())),
+                        );
                     }
                     TokenType::SingleQuotation => {
                         Log::trace_t(
