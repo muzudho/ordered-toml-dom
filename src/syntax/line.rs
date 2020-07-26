@@ -10,7 +10,7 @@ use casual_logger::Table;
 
 pub struct LineP {
     state: MachineState,
-    product: LineM,
+    buffer: Option<LineM>,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
 }
@@ -18,15 +18,17 @@ impl Default for LineP {
     fn default() -> Self {
         LineP {
             state: MachineState::First,
-            product: LineM::default(),
+            buffer: Some(LineM::default()),
             comment_p: None,
             key_value_p: None,
         }
     }
 }
 impl LineP {
-    pub fn product(&mut self) -> &LineM {
-        &self.product
+    pub fn flush(&mut self) -> Option<LineM> {
+        let m = self.buffer.clone();
+        self.buffer = None;
+        m
     }
 
     /// # Returns
@@ -39,8 +41,9 @@ impl LineP {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        if let Some(m) = p.flush() {
-                            self.product.push_comment(&m);
+                        if let Some(child_m) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_comment(&child_m);
                             self.comment_p = None;
                             self.state = MachineState::End;
                             return SyntaxParserResult::End;
@@ -80,8 +83,9 @@ impl LineP {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        if let Some(m) = p.flush() {
-                            self.product.push_key_value(&m);
+                        if let Some(child_m) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_key_value(&child_m);
                             self.key_value_p = None;
                             self.state = MachineState::End;
                             return SyntaxParserResult::End;

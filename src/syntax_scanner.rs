@@ -23,17 +23,27 @@ impl LineSyntaxScanner {
         for (i, token) in token_line.tokens.iter().enumerate() {
             match self.line_parser.parse(token) {
                 SyntaxParserResult::End => {
-                    dom.push_line(&self.line_parser.product());
+                    if let Some(child_p) = self.line_parser.flush() {
+                        dom.push_line(&child_p);
+                    } else {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token_line", &format!("{:?}", token_line))
+                                .str(
+                                    "rest",
+                                    &format!(
+                                        "{:?}",
+                                        TokenLine::new(&token_line.tokens[i..].to_vec())
+                                    ),
+                                )
+                                .clone(),
+                        );
+                    }
                 }
                 SyntaxParserResult::Err(table) => {
                     return SyntaxParserResult::Err(
-                        Table::default()
-                            .str("parser", "syntax_scanner.rs/LineSyntaxScanner#scan_line")
+                        self.err_table()
                             .str("token_line", &format!("{:?}", token_line))
-                            .str(
-                                "rest",
-                                &format!("{:?}", TokenLine::new(&token_line.tokens[i..].to_vec())),
-                            )
                             .sub_t("error", &table)
                             .clone(),
                     );
@@ -45,9 +55,10 @@ impl LineSyntaxScanner {
         SyntaxParserResult::Ongoing
     }
 
-    pub fn log(&self) -> Table {
+    pub fn err_table(&self) -> Table {
         let mut t = Table::default();
-        t.sub_t("line", &self.line_parser.err_table());
+        t.str("parser", "syntax_scanner.rs/LineSyntaxScanner#scan_line")
+            .sub_t("line", &self.line_parser.err_table());
         t
     }
 }

@@ -37,7 +37,7 @@ impl LineScanner {
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", token_line))
                                     .sub_t("error", &table)
-                                    .sub_t("line_scanner", &line_syntax_scanner.log()),
+                                    .sub_t("line_scanner", &line_syntax_scanner.err_table()),
                             );
                         }
                         SyntaxParserResult::Ongoing => {
@@ -45,7 +45,7 @@ impl LineScanner {
                                 Table::default()
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", token_line))
-                                    .sub_t("line_scanner", &line_syntax_scanner.log()),
+                                    .sub_t("line_scanner", &line_syntax_scanner.err_table()),
                             );
                         }
                     }
