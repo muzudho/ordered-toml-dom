@@ -1,0 +1,8 @@
+# This file is a test.
+# このファイルはテスト用です。
+
+int = 1 
+sq = 'a' 
+sqc = 'A' # Comment 1.
+dq = "b" 
+dqc = "B" # Comment 2.

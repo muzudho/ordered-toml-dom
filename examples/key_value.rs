@@ -1,7 +1,7 @@
-//! Test.
-//! テスト。
+//! Test key value.
+//! キー値テスト。
 //!
-//! `cargo run --example main`
+//! `cargo run --example key_value`
 
 use casual_logger::{Log, Table};
 use toml_menu::{
@@ -11,8 +11,9 @@ use toml_menu::{
 
 fn main() {
     println!("Start.");
+    Log::set_file_name("key-value");
     Log::remove_old_logs();
-    let doc = Toml::from_file("./resource/example.type.toml");
+    let doc = Toml::from_file("./resource/key-value.toml");
     Log::info_t(
         "Count elements.",
         Table::default().uint("count", doc.elements.len() as u128),
