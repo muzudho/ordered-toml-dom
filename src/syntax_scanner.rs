@@ -1,7 +1,7 @@
-use crate::lexical_parser::TokenLine;
 use crate::object_model::document::DocumentM;
 use crate::syntax::line::LineP;
 use crate::syntax::SyntaxParserResult;
+use crate::token::TokenLine;
 use casual_logger::Table;
 
 pub struct LineSyntaxScanner {

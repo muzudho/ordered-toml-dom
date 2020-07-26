@@ -1,9 +1,9 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::lexical_parser::Token;
 use crate::object_model::comment::CommentM;
 use crate::syntax::SyntaxParserResult;
+use crate::token::Token;
 use casual_logger::Table;
 
 /// `# comment`.

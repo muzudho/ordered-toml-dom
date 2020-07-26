@@ -9,6 +9,7 @@ pub mod object_model;
 pub mod scanner;
 mod syntax;
 pub mod syntax_scanner;
+mod token;
 
 use regex::Regex;
 use std::sync::Mutex;

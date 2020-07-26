@@ -1,13 +1,12 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::lexical_parser::Token;
-use crate::lexical_parser::TokenType;
 use crate::object_model::document::DocumentM;
 use crate::object_model::line::LineM;
 use crate::syntax::comment::CommentP;
 use crate::syntax::key_value::KeyValueP;
 use crate::syntax::SyntaxParserResult;
+use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
 pub struct LineP {

@@ -1,4 +1,4 @@
-use crate::lexical_parser::Token;
+use crate::token::Token;
 use std::fmt;
 
 #[derive(Clone)]

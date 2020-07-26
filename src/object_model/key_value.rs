@@ -1,8 +1,8 @@
 //! Key value model.  
 //! キー値モデル。  
 
-use crate::lexical_parser::Token;
 use crate::object_model::value::ValueM;
+use crate::token::Token;
 use std::fmt;
 
 #[derive(Clone)]

@@ -1,12 +1,12 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::lexical_parser::{Token, TokenType};
 use crate::object_model::{key_value::KeyValueM, literal_string::LiteralStringM, value::ValueM};
 use crate::syntax::array::ArrayP;
 use crate::syntax::inline_table::InlineTableP;
 use crate::syntax::single_quoted_string::SingleQuotedStringP;
 use crate::syntax::SyntaxParserResult;
+use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
 
 /// `key = value`.

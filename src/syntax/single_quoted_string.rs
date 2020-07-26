@@ -1,9 +1,9 @@
 //! Syntax parser.
 //! 構文パーサー。
 
-use crate::lexical_parser::{Token, TokenType};
 use crate::object_model::single_quoted_string::SingleQuotedStringM;
 use crate::syntax::SyntaxParserResult;
+use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
 /// `'value'`.
