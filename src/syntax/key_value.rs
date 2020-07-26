@@ -145,10 +145,18 @@ impl KeyValueP {
                 let p = self.array_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        self.product.set_value(&ValueM::Array(p.product().clone()));
-                        self.array_p = None;
-                        self.state = MachineState::End;
-                        return SyntaxParserResult::End;
+                        if let Some(m) = p.flush() {
+                            self.product.set_value(&ValueM::Array(m));
+                            self.array_p = None;
+                            self.state = MachineState::End;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(

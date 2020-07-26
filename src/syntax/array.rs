@@ -11,21 +11,23 @@ use casual_logger::{Log, Table};
 #[derive(Clone)]
 pub struct ArrayP {
     state: MachineState,
-    product: ArrayM,
+    buffer: Option<ArrayM>,
     single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
 }
 impl Default for ArrayP {
     fn default() -> Self {
         ArrayP {
             state: MachineState::AfterLeftSquareBracket,
-            product: ArrayM::default(),
+            buffer: None,
             single_quoted_string_p: None,
         }
     }
 }
 impl ArrayP {
-    pub fn product(&self) -> &ArrayM {
-        &self.product
+    pub fn flush(&mut self) -> Option<ArrayM> {
+        let m = self.buffer.clone();
+        self.buffer = None;
+        m
     }
     /// # Returns
     ///
@@ -43,15 +45,24 @@ impl ArrayP {
                     } // Ignore it.
                     TokenType::Key => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。
-                        self.product
-                            .push_literal_string(&LiteralStringM::new(token));
-                        self.state = MachineState::AfterItem;
-                        Log::trace_t(
-                            "ArrayP#parse/After[/Key",
-                            Table::default()
-                                .str("token", &format!("{:?}", token))
-                                .str("product", &format!("{:?}", self.product())),
-                        );
+                        if let None = self.buffer {
+                            let mut m = ArrayM::default();
+                            m.push_literal_string(&LiteralStringM::new(token));
+                            self.buffer = Some(m);
+                            self.state = MachineState::AfterItem;
+                            Log::trace_t(
+                                "ArrayP#parse/After[/Key",
+                                Table::default()
+                                    .str("token", &format!("{:?}", token))
+                                    .str("buffer", &format!("{:?}", self.buffer)),
+                            );
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
                     }
                     TokenType::SingleQuotation => {
                         Log::trace_t(
@@ -78,9 +89,19 @@ impl ArrayP {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
-                        self.product.push_single_quote_string(&p.product());
-                        self.single_quoted_string_p = None;
-                        self.state = MachineState::AfterSingleQuotedString;
+                        if let None = self.buffer {
+                            let mut m = ArrayM::default();
+                            m.push_single_quote_string(&p.product());
+                            self.buffer = Some(m);
+                            self.single_quoted_string_p = None;
+                            self.state = MachineState::AfterSingleQuotedString;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
