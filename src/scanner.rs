@@ -29,7 +29,7 @@ impl LineScanner {
                             .str("token_line", &format!("=|{:?}|", token_line)),
                     );
                     let mut line_syntax_scanner = LineSyntaxScanner::default();
-                    match line_syntax_scanner.scan_line(&token_line.token_line, &mut dom) {
+                    match line_syntax_scanner.scan_line(&token_line.product(), &mut dom) {
                         SyntaxParserResult::Ok(_) => {} // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             aot.table(

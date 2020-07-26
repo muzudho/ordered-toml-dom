@@ -16,8 +16,8 @@ impl CommentP {
             product: CommentM::default(),
         }
     }
-    pub fn product(&self) -> CommentM {
-        self.product.clone()
+    pub fn product(&self) -> &CommentM {
+        &self.product
     }
     /// # Returns
     ///

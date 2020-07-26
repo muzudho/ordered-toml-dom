@@ -7,12 +7,13 @@ use crate::syntax::SyntaxParserResult;
 use casual_logger::Table;
 
 /// `'value'`.
+#[derive(Clone)]
 pub struct SingleQuotedStringP {
     product: SingleQuotedStringM,
 }
 impl SingleQuotedStringP {
-    pub fn product(&self) -> SingleQuotedStringM {
-        self.product.clone()
+    pub fn product(&self) -> &SingleQuotedStringM {
+        &self.product
     }
     pub fn new() -> Self {
         SingleQuotedStringP {

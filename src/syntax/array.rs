@@ -8,6 +8,7 @@ use crate::syntax::SyntaxParserResult;
 use casual_logger::{Log, Table};
 
 /// `[ 'a', 'b', 'c' ]`.
+#[derive(Clone)]
 pub struct ArrayP {
     state: MachineState,
     product: ArrayM,
@@ -23,8 +24,8 @@ impl Default for ArrayP {
     }
 }
 impl ArrayP {
-    pub fn product(&self) -> ArrayM {
-        self.product.clone()
+    pub fn product(&self) -> &ArrayM {
+        &self.product
     }
     /// # Returns
     ///
@@ -165,7 +166,7 @@ impl ArrayP {
 }
 
 /// `[ 'a', 'b', 'c' ]`.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum MachineState {
     /// [ か , の次。
     AfterLeftSquareBracket,

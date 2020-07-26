@@ -15,7 +15,7 @@ enum LineMachineState {
 /// 行パーサー。
 pub struct LineLexicalParser {
     state: Option<LineMachineState>,
-    pub token_line: TokenLine,
+    product: TokenLine,
     buf_token_type: TokenType,
     buf: String,
 }
@@ -23,13 +23,16 @@ impl Default for LineLexicalParser {
     fn default() -> Self {
         LineLexicalParser {
             state: None,
-            token_line: TokenLine::default(),
+            product: TokenLine::default(),
             buf_token_type: TokenType::WhiteSpace,
             buf: String::new(),
         }
     }
 }
 impl LineLexicalParser {
+    pub fn product(&self) -> &TokenLine {
+        &self.product
+    }
     pub fn parse_line(&mut self, line: &str) {
         // Log::info_t("parse_line", Table::default().str("line", line));
 
@@ -101,7 +104,7 @@ impl LineLexicalParser {
     /// Flush.
     fn flush(&mut self) {
         if !self.buf.is_empty() {
-            self.token_line
+            self.product
                 .tokens
                 .push(Token::new(&self.buf, self.buf_token_type));
             // Log::info_t("Flush", Table::default().str("buf", &self.buf));
@@ -249,7 +252,7 @@ impl LineLexicalParser {
 }
 impl fmt::Debug for LineLexicalParser {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self.token_line)
+        write!(f, "{:?}", self.product)
     }
 }
 

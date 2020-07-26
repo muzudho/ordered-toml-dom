@@ -23,8 +23,8 @@ impl Default for InlineTableP {
     }
 }
 impl InlineTableP {
-    pub fn product(&self) -> InlineTableM {
-        self.product.clone()
+    pub fn product(&self) -> &InlineTableM {
+        &self.product
     }
     /// # Returns
     ///

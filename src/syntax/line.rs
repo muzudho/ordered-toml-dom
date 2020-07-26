@@ -27,14 +27,14 @@ impl Default for LineP {
     }
 }
 impl LineP {
-    pub fn product(&mut self) -> LineM {
+    pub fn product(&mut self) -> &LineM {
         if let Some(p) = &self.comment_p {
             self.product.push_comment(&p.product());
         }
         if let Some(p) = &self.key_value_p {
             self.product.push_key_value(&p.product());
         }
-        self.product.clone()
+        &self.product
     }
 
     /// # Returns
