@@ -2,11 +2,11 @@
 //! 構文パーサー。  
 
 pub mod array;
+pub mod broad_line;
 pub mod comment;
 pub mod double_quoted_string;
 pub mod inline_table;
 pub mod key_value;
-pub mod line;
 pub mod machine_state;
 pub mod single_quoted_string;
 
@@ -39,10 +39,20 @@ pub struct ArrayP {
     state: ArrayState,
 }
 
+/// Broad-line syntax parser.  
+/// `縦幅のある行` パーサー。  
+pub struct BroadLineP {
+    buffer: Option<BroadLine>,
+    comment_p: Option<CommentP>,
+    key_value_p: Option<KeyValueP>,
+    state: LineState,
+}
+
 /// Comment parser.  
 /// コメント・パーサー。  
 ///
 /// Example: `# comment`.  
+#[derive(Clone)]
 pub struct CommentP {
     buffer: Option<Comment>,
 }
@@ -78,15 +88,6 @@ pub struct KeyValueP {
     single_quoted_string_p: Option<SingleQuotedStringP>,
     state: KeyValueState,
     temp_key: Token,
-}
-
-/// Line syntax parser.  
-/// 行構文パーサー。  
-pub struct LineP {
-    state: LineState,
-    buffer: Option<BroadLine>,
-    comment_p: Option<CommentP>,
-    key_value_p: Option<KeyValueP>,
 }
 
 /// Single quoted string syntax parser.  

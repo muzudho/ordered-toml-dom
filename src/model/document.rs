@@ -16,6 +16,7 @@ impl Document {
         for elem in &self.broad_lines {
             match elem {
                 BroadLine::Comment(_) => {}
+                BroadLine::EmptyLine => {}
                 BroadLine::KeyValue(m) => {
                     println!("m.key={}", m.key);
                     if m.key == name {
@@ -27,7 +28,7 @@ impl Document {
         }
         None
     }
-    pub fn push_line(&mut self, m: &BroadLine) {
+    pub fn push_broad_line(&mut self, m: &BroadLine) {
         self.broad_lines.push(m.clone());
     }
 }

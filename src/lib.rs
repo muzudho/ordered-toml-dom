@@ -16,7 +16,7 @@ mod token;
 use crate::lexical_parser::LexicalParser;
 use crate::model::Document;
 use crate::syntax::SyntaxParserResult;
-use crate::syntax_scanner::LineSyntaxScanner;
+use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
 use std::fs::File;
@@ -47,22 +47,24 @@ impl Toml {
                         Err(why) => panic!(Log::fatal(&format!("{}", why))),
                     };
                     Log::info(&format!("from_file/line=|{}|", line));
-                    let mut token_line = LexicalParser::default();
-                    token_line.parse_line(&line);
-                    Log::info_t(
-                        "from_file/line_tokens",
+                    let mut lexical_p = LexicalParser::default();
+                    lexical_p.parse_line(&line);
+                    /*
+                    Log::trace_t(
+                        "Toml::from_file/line_tokens",
                         Table::default()
                             .str("line", &line)
-                            .str("token_line", &format!("=|{:?}|", token_line)),
+                            .str("token_line", &format!("=|{:?}|", lexical_p)),
                     );
-                    let mut line_syntax_scanner = LineSyntaxScanner::default();
-                    match line_syntax_scanner.scan_line(&token_line.product(), &mut doc) {
+                    */
+                    let mut line_syntax_scanner = SyntaxScanner::default();
+                    match line_syntax_scanner.scan_line(&lexical_p.product(), &mut doc) {
                         SyntaxParserResult::End => {} // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             aot.table(
                                 Table::default()
                                     .str("line", &format!("{}", line))
-                                    .str("token_line", &format!("{:?}", token_line))
+                                    .str("token_line", &format!("{:?}", lexical_p))
                                     .sub_t("error", &table)
                                     .sub_t("line_scanner", &line_syntax_scanner.err_table()),
                             );
@@ -71,7 +73,7 @@ impl Toml {
                             aot.table(
                                 Table::default()
                                     .str("line", &format!("{}", line))
-                                    .str("token_line", &format!("{:?}", token_line))
+                                    .str("token_line", &format!("{:?}", lexical_p))
                                     .sub_t("line_scanner", &line_syntax_scanner.err_table()),
                             );
                         }

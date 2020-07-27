@@ -1,22 +1,24 @@
-//! Line syntax parser.  
-//! 行構文パーサー。  
+//! Broad-line syntax parser.  
+//! `縦幅のある行` 構文パーサー。  
 
 use crate::model::BroadLine;
-use crate::syntax::{machine_state::LineState, CommentP, KeyValueP, LineP, SyntaxParserResult};
+use crate::syntax::{
+    machine_state::LineState, BroadLineP, CommentP, KeyValueP, SyntaxParserResult,
+};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
-impl Default for LineP {
+impl Default for BroadLineP {
     fn default() -> Self {
-        LineP {
-            state: LineState::First,
+        BroadLineP {
             buffer: None,
             comment_p: None,
             key_value_p: None,
+            state: LineState::First,
         }
     }
 }
-impl LineP {
+impl BroadLineP {
     pub fn flush(&mut self) -> Option<BroadLine> {
         let m = self.buffer.clone();
         self.buffer = None;
@@ -58,6 +60,17 @@ impl LineP {
                 }
             }
             LineState::First => match token.type_ {
+                TokenType::EndOfLine => {
+                    if let Some(_) = &self.comment_p {
+                        return SyntaxParserResult::End;
+                    }
+                    if let Some(_) = &self.key_value_p {
+                        return SyntaxParserResult::End;
+                    }
+                    self.buffer = Some(BroadLine::EmptyLine);
+                    self.state = LineState::Finished;
+                    return SyntaxParserResult::End;
+                }
                 TokenType::Key => {
                     self.key_value_p = Some(KeyValueP::new(&token));
                     self.state = LineState::KeyValueSyntax;
@@ -66,10 +79,18 @@ impl LineP {
                     self.comment_p = Some(CommentP::new());
                     self.state = LineState::CommentSyntax;
                 }
+                TokenType::WhiteSpace => {} // Ignored it.
                 _ => {
                     self.state = LineState::Unimplemented;
                 }
             },
+            LineState::Finished => {
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
             LineState::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
@@ -128,7 +149,7 @@ impl LineP {
     }
     pub fn err_table(&self) -> Table {
         let mut t = Table::default()
-            .str("parser", "LineP#parse")
+            .str("parser", "BroadLineP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {

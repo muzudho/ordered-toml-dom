@@ -18,6 +18,21 @@ pub enum ArrayState {
     SingleQuotedString,
 }
 
+/// Line syntax machine state.  
+/// 行構文状態遷移。  
+#[derive(Debug)]
+pub enum LineState {
+    AfterComment,
+    AfterKeyValue,
+    /// `# comment`.
+    CommentSyntax,
+    Finished,
+    First,
+    /// `key = right_value`.
+    KeyValueSyntax,
+    Unimplemented,
+}
+
 /// Inline table syntax machine state.  
 /// インライン・テーブル構文状態遷移。  
 ///
@@ -42,18 +57,4 @@ pub enum KeyValueState {
     DoubleQuotedString,
     SingleQuotedString,
     End,
-}
-
-/// Line syntax machine state.  
-/// 行構文状態遷移。  
-#[derive(Debug)]
-pub enum LineState {
-    AfterComment,
-    AfterKeyValue,
-    /// `# comment`.
-    CommentSyntax,
-    First,
-    /// `key = right_value`.
-    KeyValueSyntax,
-    Unimplemented,
 }

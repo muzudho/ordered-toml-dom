@@ -16,6 +16,7 @@ impl fmt::Debug for BroadLine {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             BroadLine::Comment(m) => write!(f, "{}", format!("{:?}", m)),
+            BroadLine::EmptyLine => write!(f, ""),
             BroadLine::KeyValue(m) => write!(f, "{}", format!("{:?}", m)),
         }
     }

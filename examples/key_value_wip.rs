@@ -22,13 +22,16 @@ fn main() {
         match elem {
             BroadLine::Comment(m) => {
                 Log::info_t(
-                    "Scan a element.",
+                    "Scan a Broad-line.",
                     Table::default().str("Comment", &format!("{:?}", m)),
                 );
             }
+            BroadLine::EmptyLine => {
+                Log::info_t("Scan a Broad-line.", Table::default().str("EmptyLine", ""));
+            }
             BroadLine::KeyValue(m) => {
                 Log::info_t(
-                    "Scan a element.",
+                    "Scan a Broad-line.",
                     Table::default().str("KeyValue", &format!("{:?}", m)),
                 );
                 match *m.value {

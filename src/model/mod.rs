@@ -17,6 +17,17 @@ pub struct Array {
     items: Vec<ItemValue>,
 }
 
+/// Either a Empty-line, Comment, Key Value, Table or a Array-of-table.  
+/// 空行、コメント、キー値、テーブル、テーブルの配列のいずれかです。  
+#[derive(Clone)]
+pub enum BroadLine {
+    Comment(Comment),
+    EmptyLine,
+    KeyValue(KeyValue),
+    // TODO Table
+    // TODO ArrayOfTable
+}
+
 /// It has one string.  
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
@@ -38,17 +49,6 @@ pub struct Document {
 #[derive(Clone)]
 pub struct DoubleQuotedString {
     pub value: String,
-}
-
-/// Either a comment or a key value.  
-/// コメント、キー値のいずれかです。  
-#[derive(Clone)]
-pub enum BroadLine {
-    Comment(Comment),
-    KeyValue(KeyValue),
-    // TODO Empty
-    // TODO Table
-    // TODO ArrayOfTable
 }
 
 /// It has multiple item values.  

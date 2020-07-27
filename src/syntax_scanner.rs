@@ -2,33 +2,33 @@
 //! 構文走査器。  
 
 use crate::model::Document;
-use crate::syntax::{LineP, SyntaxParserResult};
+use crate::syntax::{BroadLineP, SyntaxParserResult};
 use crate::token::TokenLine;
 use casual_logger::Table;
 
 /// Syntax scanner.  
 /// 構文走査器。  
-pub struct LineSyntaxScanner {
-    pub line_parser: LineP,
+pub struct SyntaxScanner {
+    pub broad_line_p: BroadLineP,
 }
-impl Default for LineSyntaxScanner {
+impl Default for SyntaxScanner {
     fn default() -> Self {
-        LineSyntaxScanner {
-            line_parser: LineP::default(),
+        SyntaxScanner {
+            broad_line_p: BroadLineP::default(),
         }
     }
 }
-impl LineSyntaxScanner {
+impl SyntaxScanner {
     /// # Returns
     ///
     /// * `SyntaxParserResult` - Result.  
     ///                             結果。
     pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut Document) -> SyntaxParserResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
-            match self.line_parser.parse(token) {
+            match self.broad_line_p.parse(token) {
                 SyntaxParserResult::End => {
-                    if let Some(child_p) = self.line_parser.flush() {
-                        dom.push_line(&child_p);
+                    if let Some(child_m) = self.broad_line_p.flush() {
+                        dom.push_broad_line(&child_m);
                     } else {
                         return SyntaxParserResult::Err(
                             self.err_table()
@@ -61,8 +61,8 @@ impl LineSyntaxScanner {
 
     pub fn err_table(&self) -> Table {
         let mut t = Table::default();
-        t.str("parser", "syntax_scanner.rs/LineSyntaxScanner#scan_line")
-            .sub_t("line", &self.line_parser.err_table());
+        t.str("parser", "syntax_scanner.rs/SyntaxScanner#scan_line")
+            .sub_t("line", &self.broad_line_p.err_table());
         t
     }
 }
