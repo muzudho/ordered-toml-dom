@@ -3,7 +3,8 @@
 
 use crate::model::BroadLine;
 use crate::syntax::{
-    machine_state::BroadLineState, BroadLineP, CommentP, KeyValueP, SyntaxParserResult,
+    machine_state::BroadLineState, ArrayOfTableP, BroadLineP, CommentP, KeyValueP,
+    SyntaxParserResult, TableP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
@@ -59,8 +60,15 @@ impl BroadLineP {
                 }
             },
             BroadLineState::AfterLeftSquareBracket => match token.type_ {
-                TokenType::LeftSquareBracket => {}
-                _ => {}
+                TokenType::LeftSquareBracket => {
+                    self.array_of_table_p = Some(ArrayOfTableP::new());
+                    self.state = BroadLineState::ArrayOfTable;
+                }
+                _ => {
+                    self.table_p = Some(TableP::new());
+                    self.state = BroadLineState::Table;
+                    return self.parse_table(token);
+                }
             },
             BroadLineState::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
@@ -190,32 +198,7 @@ impl BroadLineP {
                 }
             }
             BroadLineState::Table => {
-                let p = self.table_p.as_mut().unwrap();
-                match p.parse(token) {
-                    SyntaxParserResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(BroadLine::from_table(&child_m));
-                            self.table_p = None;
-                            self.state = BroadLineState::AfterTable;
-                            return SyntaxParserResult::End;
-                        } else {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
-                    } // Ignored it.
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
-                            self.err_table()
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
-                                .clone(),
-                        );
-                    }
-                    SyntaxParserResult::Ongoing => {}
-                }
+                return self.parse_table(token);
             }
             BroadLineState::Unimplemented => {
                 return SyntaxParserResult::Err(
@@ -227,6 +210,34 @@ impl BroadLineP {
         }
 
         SyntaxParserResult::Ongoing
+    }
+    fn parse_table(&mut self, token: &Token) -> SyntaxParserResult {
+        let p = self.table_p.as_mut().unwrap();
+        match p.parse(token) {
+            SyntaxParserResult::End => {
+                if let Some(child_m) = p.flush() {
+                    self.buffer = Some(BroadLine::from_table(&child_m));
+                    self.table_p = None;
+                    self.state = BroadLineState::AfterTable;
+                    return SyntaxParserResult::End;
+                } else {
+                    return SyntaxParserResult::Err(
+                        self.err_table()
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    );
+                }
+            } // Ignored it.
+            SyntaxParserResult::Err(table) => {
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .sub_t("error", &table)
+                        .clone(),
+                );
+            }
+            SyntaxParserResult::Ongoing => SyntaxParserResult::Ongoing,
+        }
     }
     pub fn err_table(&self) -> Table {
         let mut t = Table::default()
