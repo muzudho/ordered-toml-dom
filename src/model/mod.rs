@@ -1,8 +1,8 @@
 pub mod array;
+pub mod broad_line;
 pub mod comment;
 pub mod document;
 pub mod double_quoted_string;
-pub mod element;
 pub mod inline_table;
 pub mod item_value;
 pub mod key_value;
@@ -30,7 +30,7 @@ pub struct Comment {
 pub struct Document {
     /// Line with height.
     /// 縦幅を持つ行。
-    pub broad_lines: Vec<Element>,
+    pub broad_lines: Vec<BroadLine>,
 }
 
 /// It has one string.  
@@ -43,9 +43,12 @@ pub struct DoubleQuotedString {
 /// Either a comment or a key value.  
 /// コメント、キー値のいずれかです。  
 #[derive(Clone)]
-pub enum Element {
+pub enum BroadLine {
     Comment(Comment),
     KeyValue(KeyValue),
+    // TODO Empty
+    // TODO Table
+    // TODO ArrayOfTable
 }
 
 /// It has multiple item values.  

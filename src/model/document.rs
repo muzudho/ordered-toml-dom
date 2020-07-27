@@ -1,7 +1,7 @@
 //! Document model.  
 //! ドキュメント・モデル。  
 
-use crate::model::{Document, Element};
+use crate::model::{BroadLine, Document};
 use std::fmt;
 
 impl Default for Document {
@@ -12,11 +12,11 @@ impl Default for Document {
     }
 }
 impl Document {
-    pub fn child(&self, name: &str) -> Option<&Element> {
+    pub fn child(&self, name: &str) -> Option<&BroadLine> {
         for elem in &self.broad_lines {
             match elem {
-                Element::Comment(_) => {}
-                Element::KeyValue(m) => {
+                BroadLine::Comment(_) => {}
+                BroadLine::KeyValue(m) => {
                     println!("m.key={}", m.key);
                     if m.key == name {
                         println!("HIT m.key={}", m.key);
@@ -27,7 +27,7 @@ impl Document {
         }
         None
     }
-    pub fn push_line(&mut self, m: &Element) {
+    pub fn push_line(&mut self, m: &BroadLine) {
         self.broad_lines.push(m.clone());
     }
 }

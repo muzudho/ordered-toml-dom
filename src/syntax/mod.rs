@@ -11,7 +11,7 @@ pub mod machine_state;
 pub mod single_quoted_string;
 
 use crate::model::{
-    Array, Comment, DoubleQuotedString, Element, InlineTable, KeyValue, SingleQuotedString,
+    Array, BroadLine, Comment, DoubleQuotedString, InlineTable, KeyValue, SingleQuotedString,
 };
 use crate::syntax::machine_state::{ArrayState, InlineTableState, KeyValueState, LineState};
 use crate::token::Token;
@@ -84,7 +84,7 @@ pub struct KeyValueP {
 /// 行構文パーサー。  
 pub struct LineP {
     state: LineState,
-    buffer: Option<Element>,
+    buffer: Option<BroadLine>,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
 }

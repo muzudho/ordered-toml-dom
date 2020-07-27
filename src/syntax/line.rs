@@ -1,7 +1,7 @@
 //! Line syntax parser.  
 //! 行構文パーサー。  
 
-use crate::model::Element;
+use crate::model::BroadLine;
 use crate::syntax::{machine_state::LineState, CommentP, KeyValueP, LineP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
@@ -17,7 +17,7 @@ impl Default for LineP {
     }
 }
 impl LineP {
-    pub fn flush(&mut self) -> Option<Element> {
+    pub fn flush(&mut self) -> Option<BroadLine> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
@@ -34,7 +34,7 @@ impl LineP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(Element::from_comment(&child_m));
+                            self.buffer = Some(BroadLine::from_comment(&child_m));
                             self.comment_p = None;
                             self.state = LineState::AfterComment;
                             return SyntaxParserResult::End;
@@ -75,7 +75,7 @@ impl LineP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(Element::from_key_value(&child_m));
+                            self.buffer = Some(BroadLine::from_key_value(&child_m));
                             self.key_value_p = None;
                             self.state = LineState::AfterKeyValue;
                             return SyntaxParserResult::End;

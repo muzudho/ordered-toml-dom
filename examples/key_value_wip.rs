@@ -5,7 +5,7 @@
 
 use casual_logger::{Log, Table};
 use toml_menu::{
-    model::{Element, RightValue},
+    model::{BroadLine, RightValue},
     Toml,
 };
 
@@ -20,13 +20,13 @@ fn main() {
     );
     for elem in doc.broad_lines {
         match elem {
-            Element::Comment(m) => {
+            BroadLine::Comment(m) => {
                 Log::info_t(
                     "Scan a element.",
                     Table::default().str("Comment", &format!("{:?}", m)),
                 );
             }
-            Element::KeyValue(m) => {
+            BroadLine::KeyValue(m) => {
                 Log::info_t(
                     "Scan a element.",
                     Table::default().str("KeyValue", &format!("{:?}", m)),
