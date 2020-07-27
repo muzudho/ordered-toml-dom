@@ -15,9 +15,9 @@ fn main() {
     let doc = Toml::from_file("./resource/example.type.toml");
     Log::info_t(
         "Count elements.",
-        Table::default().uint("count", doc.elements.len() as u128),
+        Table::default().uint("BroadLineCount", doc.broad_lines.len() as u128),
     );
-    for elem in doc.elements {
+    for elem in doc.broad_lines {
         match elem {
             Element::Comment(m) => {
                 Log::info_t(

@@ -1,0 +1,31 @@
+apple = 'pie'
+
+[banana]
+apple = 'juice'
+
+[[cherry]]
+color = 'red'
+
+[[cherry]]
+color = 'green'
+
+[[cherry]]
+color = 'blue'
+
+[pinapple]
+drink = 1
+
+[pinapple.banana]
+drink = 2
+
+[pinapple.banana.cherry]
+drink = 3
+
+[[pinapple.banana.cherry.grape]]
+drink = 4
+
+[[pinapple.banana.cherry.grape]]
+drink = 5
+
+[[pinapple.banana.cherry.grape]]
+drink = 6

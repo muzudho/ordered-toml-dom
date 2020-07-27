@@ -24,11 +24,13 @@ pub struct Comment {
     value: String,
 }
 
-/// It has multiple elements.  
-/// 複数の要素を持ちます。  
+/// It has multiple `broad_line`.  
+/// 複数の `縦幅を持つ行` を持ちます。  
 #[derive(Clone)]
 pub struct Document {
-    pub elements: Vec<Element>,
+    /// Line with height.
+    /// 縦幅を持つ行。
+    pub broad_lines: Vec<Element>,
 }
 
 /// It has one string.  
