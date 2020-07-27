@@ -2,6 +2,7 @@
 //! 構文パーサー。  
 
 pub mod array;
+pub mod array_of_table;
 pub mod broad_line;
 pub mod comment;
 pub mod double_quoted_string;
@@ -9,13 +10,15 @@ pub mod inline_table;
 pub mod key_value;
 pub mod machine_state;
 pub mod single_quoted_string;
+pub mod table;
 
 use crate::model::{
-    Array, BroadLine, Comment, DoubleQuotedString, InlineTable, KeyValue, SingleQuotedString,
+    Array, ArrayOfTable, BroadLine, Comment, DoubleQuotedString, InlineTable, KeyValue,
+    SingleQuotedString, Table as TableM,
 };
-use crate::syntax::machine_state::{ArrayState, InlineTableState, KeyValueState, LineState};
+use crate::syntax::machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState};
 use crate::token::Token;
-use casual_logger::Table;
+use casual_logger::Table as LogTable;
 
 /// Result of syntax parser.  
 /// 構文パーサーの結果。  
@@ -24,7 +27,16 @@ pub enum SyntaxParserResult {
     End,
     Ongoing,
     /// Error.
-    Err(Table),
+    Err(LogTable),
+}
+
+/// Array of table syntax parser.  
+/// テーブル配列構文パーサー。  
+///
+/// Example: `"value"`.  
+#[derive(Clone)]
+pub struct ArrayOfTableP {
+    buffer: Option<ArrayOfTable>,
 }
 
 /// Array parser.  
@@ -42,10 +54,12 @@ pub struct ArrayP {
 /// Broad-line syntax parser.  
 /// `縦幅のある行` パーサー。  
 pub struct BroadLineP {
+    array_of_table_p: Option<ArrayOfTableP>,
     buffer: Option<BroadLine>,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
-    state: LineState,
+    state: BroadLineState,
+    table_p: Option<TableP>,
 }
 
 /// Comment parser.  
@@ -97,4 +111,13 @@ pub struct KeyValueP {
 #[derive(Clone)]
 pub struct SingleQuotedStringP {
     buffer: Option<SingleQuotedString>,
+}
+
+/// Table syntax parser.  
+/// テーブル構文パーサー。  
+///
+/// Example: `"value"`.  
+#[derive(Clone)]
+pub struct TableP {
+    buffer: Option<TableM>,
 }

@@ -1,4 +1,5 @@
 pub mod array;
+pub mod array_of_table;
 pub mod broad_line;
 pub mod comment;
 pub mod document;
@@ -9,6 +10,7 @@ pub mod key_value;
 pub mod literal_string;
 pub mod right_value;
 pub mod single_quoted_string;
+pub mod table;
 
 /// It has multiple item values.  
 /// 複数の項目値を持ちます。  
@@ -17,15 +19,21 @@ pub struct Array {
     items: Vec<ItemValue>,
 }
 
+/// WIP.  
+#[derive(Clone)]
+pub struct ArrayOfTable {
+    pub value: String,
+}
+
 /// Either a Empty-line, Comment, Key Value, Table or a Array-of-table.  
 /// 空行、コメント、キー値、テーブル、テーブルの配列のいずれかです。  
 #[derive(Clone)]
 pub enum BroadLine {
+    ArrayOfTable(ArrayOfTable),
     Comment(Comment),
     EmptyLine,
     KeyValue(KeyValue),
-    // TODO Table
-    // TODO ArrayOfTable
+    Table(Table),
 }
 
 /// It has one string.  
@@ -56,6 +64,18 @@ pub struct DoubleQuotedString {
 #[derive(Clone)]
 pub struct InlineTable {
     items: Vec<ItemValue>,
+}
+
+/// Array, inline table item.  
+/// 配列、インライン・テーブルの項目です。  
+#[derive(Clone)]
+pub enum ItemValue {
+    Array(Array),
+    DoubleQuotedString(DoubleQuotedString),
+    InlineTable(InlineTable),
+    KeyValue(KeyValue),
+    LiteralString(LiteralString),
+    SingleQuotedString(SingleQuotedString),
 }
 
 /// It has a key and a value.  
@@ -92,14 +112,8 @@ pub struct SingleQuotedString {
     pub value: String,
 }
 
-/// Array, inline table item.  
-/// 配列、インライン・テーブルの項目です。  
+/// WIP.  
 #[derive(Clone)]
-pub enum ItemValue {
-    Array(Array),
-    DoubleQuotedString(DoubleQuotedString),
-    InlineTable(InlineTable),
-    KeyValue(KeyValue),
-    LiteralString(LiteralString),
-    SingleQuotedString(SingleQuotedString),
+pub struct Table {
+    pub value: String,
 }

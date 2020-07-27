@@ -20,6 +20,12 @@ fn main() {
     );
     for elem in doc.broad_lines {
         match elem {
+            BroadLine::ArrayOfTable(m) => {
+                Log::info_t(
+                    "Scan a Broad-line.",
+                    Table::default().str("ArrayOfTable", &format!("{:?}", m)),
+                );
+            }
             BroadLine::Comment(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
@@ -41,6 +47,12 @@ fn main() {
                     RightValue::LiteralString(m) => Log::info(&format!("{:?}", m)),
                     RightValue::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
                 }
+            }
+            BroadLine::Table(m) => {
+                Log::info_t(
+                    "Scan a Broad-line.",
+                    Table::default().str("Table", &format!("{:?}", m)),
+                );
             }
         }
     }

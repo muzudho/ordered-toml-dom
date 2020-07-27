@@ -15,6 +15,9 @@ impl Document {
     pub fn child(&self, name: &str) -> Option<&BroadLine> {
         for elem in &self.broad_lines {
             match elem {
+                BroadLine::ArrayOfTable(_) => {
+                    // TODO
+                }
                 BroadLine::Comment(_) => {}
                 BroadLine::EmptyLine => {}
                 BroadLine::KeyValue(m) => {
@@ -23,6 +26,9 @@ impl Document {
                         println!("HIT m.key={}", m.key);
                         return Some(elem);
                     }
+                }
+                BroadLine::Table(_) => {
+                    // TODO
                 }
             }
         }

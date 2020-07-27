@@ -3,7 +3,7 @@
 
 use crate::model::BroadLine;
 use crate::syntax::{
-    machine_state::LineState, BroadLineP, CommentP, KeyValueP, SyntaxParserResult,
+    machine_state::BroadLineState, BroadLineP, CommentP, KeyValueP, SyntaxParserResult,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
@@ -11,10 +11,12 @@ use casual_logger::Table;
 impl Default for BroadLineP {
     fn default() -> Self {
         BroadLineP {
+            array_of_table_p: None,
             buffer: None,
             comment_p: None,
             key_value_p: None,
-            state: LineState::First,
+            state: BroadLineState::First,
+            table_p: None,
         }
     }
 }
@@ -31,74 +33,51 @@ impl BroadLineP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
         match self.state {
-            LineState::CommentSyntax => {
-                let p = self.comment_p.as_mut().unwrap();
-                match p.parse(token) {
-                    SyntaxParserResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(BroadLine::from_comment(&child_m));
-                            self.comment_p = None;
-                            self.state = LineState::AfterComment;
-                            return SyntaxParserResult::End;
-                        } else {
-                            return SyntaxParserResult::Err(
-                                self.err_table()
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
-                    }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
-                            self.err_table()
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
-                                .clone(),
-                        );
-                    }
-                    SyntaxParserResult::Ongoing => {}
-                }
-            }
-            LineState::First => match token.type_ {
-                TokenType::EndOfLine => {
-                    if let Some(_) = &self.comment_p {
-                        return SyntaxParserResult::End;
-                    }
-                    if let Some(_) = &self.key_value_p {
-                        return SyntaxParserResult::End;
-                    }
-                    self.buffer = Some(BroadLine::EmptyLine);
-                    self.state = LineState::Finished;
-                    return SyntaxParserResult::End;
-                }
-                TokenType::Key => {
-                    self.key_value_p = Some(KeyValueP::new(&token));
-                    self.state = LineState::KeyValueSyntax;
-                }
-                TokenType::Sharp => {
-                    self.comment_p = Some(CommentP::new());
-                    self.state = LineState::CommentSyntax;
-                }
-                TokenType::WhiteSpace => {} // Ignored it.
-                _ => {
-                    self.state = LineState::Unimplemented;
-                }
-            },
-            LineState::Finished => {
+            BroadLineState::AfterArrayOfTable => {
+                // TODO 後ろにコメントがあるかも。
                 return SyntaxParserResult::Err(
                     self.err_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
             }
-            LineState::KeyValueSyntax => {
-                let p = self.key_value_p.as_mut().unwrap();
+            BroadLineState::AfterComment => {
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
+            BroadLineState::AfterKeyValue => match token.type_ {
+                TokenType::EndOfLine => return SyntaxParserResult::End,
+                _ => {
+                    return SyntaxParserResult::Err(
+                        self.err_table()
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    );
+                }
+            },
+            BroadLineState::AfterLeftSquareBracket => match token.type_ {
+                TokenType::LeftSquareBracket => {}
+                _ => {}
+            },
+            BroadLineState::AfterTable => {
+                // TODO 後ろにコメントがあるかも。
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
+            BroadLineState::ArrayOfTable => {
+                let p = self.array_of_table_p.as_mut().unwrap();
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(BroadLine::from_key_value(&child_m));
-                            self.key_value_p = None;
-                            self.state = LineState::AfterKeyValue;
+                            self.buffer = Some(BroadLine::from_array_of_table(&child_m));
+                            self.array_of_table_p = None;
+                            self.state = BroadLineState::AfterArrayOfTable;
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
@@ -119,30 +98,132 @@ impl BroadLineP {
                     SyntaxParserResult::Ongoing => {}
                 }
             }
-            LineState::Unimplemented => {
-                return SyntaxParserResult::Err(
-                    self.err_table()
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+            BroadLineState::CommentSyntax => {
+                let p = self.comment_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            self.buffer = Some(BroadLine::from_comment(&child_m));
+                            self.comment_p = None;
+                            self.state = BroadLineState::AfterComment;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        );
+                    }
+                    SyntaxParserResult::Ongoing => {}
+                }
             }
-            LineState::AfterComment => {
-                return SyntaxParserResult::Err(
-                    self.err_table()
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
-            }
-            LineState::AfterKeyValue => match token.type_ {
-                TokenType::EndOfLine => return SyntaxParserResult::End,
+            BroadLineState::First => match token.type_ {
+                TokenType::EndOfLine => {
+                    if let Some(_) = &self.comment_p {
+                        return SyntaxParserResult::End;
+                    }
+                    if let Some(_) = &self.key_value_p {
+                        return SyntaxParserResult::End;
+                    }
+                    self.buffer = Some(BroadLine::EmptyLine);
+                    self.state = BroadLineState::Finished;
+                    return SyntaxParserResult::End;
+                }
+                TokenType::LeftSquareBracket => {
+                    self.state = BroadLineState::AfterLeftSquareBracket;
+                }
+                TokenType::Key => {
+                    self.key_value_p = Some(KeyValueP::new(&token));
+                    self.state = BroadLineState::KeyValueSyntax;
+                }
+                TokenType::Sharp => {
+                    self.comment_p = Some(CommentP::new());
+                    self.state = BroadLineState::CommentSyntax;
+                }
+                TokenType::WhiteSpace => {} // Ignored it.
                 _ => {
-                    return SyntaxParserResult::Err(
-                        self.err_table()
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    );
+                    self.state = BroadLineState::Unimplemented;
                 }
             },
+            BroadLineState::Finished => {
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
+            BroadLineState::KeyValueSyntax => {
+                let p = self.key_value_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            self.buffer = Some(BroadLine::from_key_value(&child_m));
+                            self.key_value_p = None;
+                            self.state = BroadLineState::AfterKeyValue;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    } // Ignored it.
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        );
+                    }
+                    SyntaxParserResult::Ongoing => {}
+                }
+            }
+            BroadLineState::Table => {
+                let p = self.table_p.as_mut().unwrap();
+                match p.parse(token) {
+                    SyntaxParserResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            self.buffer = Some(BroadLine::from_table(&child_m));
+                            self.table_p = None;
+                            self.state = BroadLineState::AfterTable;
+                            return SyntaxParserResult::End;
+                        } else {
+                            return SyntaxParserResult::Err(
+                                self.err_table()
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    } // Ignored it.
+                    SyntaxParserResult::Err(table) => {
+                        return SyntaxParserResult::Err(
+                            self.err_table()
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        );
+                    }
+                    SyntaxParserResult::Ongoing => {}
+                }
+            }
+            BroadLineState::Unimplemented => {
+                return SyntaxParserResult::Err(
+                    self.err_table()
+                        .str("token", &format!("{:?}", token))
+                        .clone(),
+                );
+            }
         }
 
         SyntaxParserResult::Ongoing

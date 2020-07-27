@@ -21,15 +21,22 @@ pub enum ArrayState {
 /// Line syntax machine state.  
 /// 行構文状態遷移。  
 #[derive(Debug)]
-pub enum LineState {
+pub enum BroadLineState {
+    AfterArrayOfTable,
     AfterComment,
     AfterKeyValue,
+    AfterLeftSquareBracket,
+    AfterTable,
+    /// `[[name]]`
+    ArrayOfTable,
     /// `# comment`.
     CommentSyntax,
     Finished,
     First,
     /// `key = right_value`.
     KeyValueSyntax,
+    /// `[name]`
+    Table,
     Unimplemented,
 }
 
