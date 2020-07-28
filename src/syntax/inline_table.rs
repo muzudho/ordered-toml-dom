@@ -36,7 +36,7 @@ impl InlineTableP {
                     }
                     _ => panic!(Log::fatal_t(
                         "InlineTableP#parse/AfterValue",
-                        self.err_table()
+                        self.log_table()
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     )),
@@ -53,7 +53,7 @@ impl InlineTableP {
                             self.state = InlineTableState::AfterKeyValue;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -61,7 +61,7 @@ impl InlineTableP {
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -80,19 +80,19 @@ impl InlineTableP {
                 }
                 _ => panic!(Log::fatal_t(
                     "InlineTableP#parse/AfterValue",
-                    self.err_table().str("token", &format!("{:?}", token))
+                    self.log_table().str("token", &format!("{:?}", token))
                 )),
             },
         }
         SyntaxParserResult::Ongoing
     }
-    pub fn err_table(&self) -> Table {
+    pub fn log_table(&self) -> Table {
         let mut t = Table::default()
             .str("parser", "InlineTableP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.err_table());
+            t.sub_t("key_value", &key_value_p.log_table());
         }
         t
     }

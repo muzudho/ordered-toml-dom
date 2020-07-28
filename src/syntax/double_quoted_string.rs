@@ -35,7 +35,7 @@ impl DoubleQuotedStringP {
         }
         SyntaxParserResult::Ongoing
     }
-    pub fn err_table(&self) -> Table {
+    pub fn log_table(&self) -> Table {
         let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));

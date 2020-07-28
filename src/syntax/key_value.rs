@@ -37,19 +37,19 @@ impl KeyValueP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "KeyValueP#parse/AfterKey/WhiteSpace",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                     } //Ignored it.
                     TokenType::Equals => {
                         self.state = KeyValueState::AfterEquals;
                         Log::trace_t(
                             "KeyValueP#parse/AfterKey/=",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                     }
                     _ => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -63,7 +63,7 @@ impl KeyValueP {
                         self.state = KeyValueState::DoubleQuotedString;
                         Log::trace_t(
                             "KeyValueP#parse/After=/\"",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                     }
                     TokenType::Key => {
@@ -75,7 +75,7 @@ impl KeyValueP {
                         self.state = KeyValueState::End;
                         Log::trace_t(
                             "KeyValueP#parse/After=/Key",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                         return SyntaxParserResult::End;
                     }
@@ -84,7 +84,7 @@ impl KeyValueP {
                         self.state = KeyValueState::AfterLeftCurlyBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/{",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                     }
                     TokenType::LeftSquareBracket => {
@@ -92,7 +92,7 @@ impl KeyValueP {
                         self.state = KeyValueState::AfterLeftSquareBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/[",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                     }
                     TokenType::SingleQuotation => {
@@ -100,18 +100,18 @@ impl KeyValueP {
                         self.state = KeyValueState::SingleQuotedString;
                         Log::trace_t(
                             "KeyValueP#parse/After=/'",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                     }
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "KeyValueP#parse/After=/WhiteSpace",
-                            Table::default().str("token", &format!("{:?}", token)),
+                            self.log_table().str("token", &format!("{:?}", token)),
                         );
                     } //Ignored it.
                     _ => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -136,7 +136,7 @@ impl KeyValueP {
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -144,7 +144,7 @@ impl KeyValueP {
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -169,7 +169,7 @@ impl KeyValueP {
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -177,7 +177,7 @@ impl KeyValueP {
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -204,7 +204,7 @@ impl KeyValueP {
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -212,7 +212,7 @@ impl KeyValueP {
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -239,7 +239,7 @@ impl KeyValueP {
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -247,7 +247,7 @@ impl KeyValueP {
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -258,7 +258,7 @@ impl KeyValueP {
             }
             KeyValueState::End => {
                 return SyntaxParserResult::Err(
-                    self.err_table()
+                    self.log_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -266,20 +266,20 @@ impl KeyValueP {
         }
         SyntaxParserResult::Ongoing
     }
-    pub fn err_table(&self) -> Table {
+    pub fn log_table(&self) -> Table {
         let mut t = Table::default()
             .str("parser", "KeyValueP#parse")
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
         if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
-            t.sub_t("double_quoted_string", &double_quoted_string_p.err_table());
+            t.sub_t("double_quoted_string", &double_quoted_string_p.log_table());
         }
         if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t("inline_table", &inline_table_p.err_table());
+            t.sub_t("inline_table", &inline_table_p.log_table());
         }
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string", &single_quoted_string_p.err_table());
+            t.sub_t("single_quoted_string", &single_quoted_string_p.log_table());
         }
         t
     }

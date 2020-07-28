@@ -35,7 +35,7 @@ impl ArrayOfTableP {
         }
         SyntaxParserResult::Ongoing
     }
-    pub fn err_table(&self) -> LogTable {
+    pub fn log_table(&self) -> LogTable {
         let mut t = LogTable::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));

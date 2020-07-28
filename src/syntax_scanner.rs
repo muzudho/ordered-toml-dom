@@ -58,7 +58,7 @@ impl SyntaxScanner {
     pub fn err_table(&self) -> Table {
         let mut t = Table::default();
         t.str("parser", "syntax_scanner.rs/SyntaxScanner#scan_line")
-            .sub_t("line", &self.broad_line_p.err_table());
+            .sub_t("line", &self.broad_line_p.log_table());
         t
     }
 }

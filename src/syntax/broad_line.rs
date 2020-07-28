@@ -37,14 +37,14 @@ impl BroadLineP {
             BroadLineState::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
                 return SyntaxParserResult::Err(
-                    self.err_table()
+                    self.log_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
             }
             BroadLineState::AfterComment => {
                 return SyntaxParserResult::Err(
-                    self.err_table()
+                    self.log_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -53,7 +53,7 @@ impl BroadLineP {
                 TokenType::EndOfLine => return SyntaxParserResult::End,
                 _ => {
                     return SyntaxParserResult::Err(
-                        self.err_table()
+                        self.log_table()
                             .str("token", &format!("{:?}", token))
                             .clone(),
                     );
@@ -73,7 +73,7 @@ impl BroadLineP {
             BroadLineState::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
                 return SyntaxParserResult::Err(
-                    self.err_table()
+                    self.log_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -89,7 +89,7 @@ impl BroadLineP {
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -97,7 +97,7 @@ impl BroadLineP {
                     } // Ignored it.
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -117,7 +117,7 @@ impl BroadLineP {
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -125,7 +125,7 @@ impl BroadLineP {
                     }
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -164,7 +164,7 @@ impl BroadLineP {
             },
             BroadLineState::Finished => {
                 return SyntaxParserResult::Err(
-                    self.err_table()
+                    self.log_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -180,7 +180,7 @@ impl BroadLineP {
                             return SyntaxParserResult::End;
                         } else {
                             return SyntaxParserResult::Err(
-                                self.err_table()
+                                self.log_table()
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -188,7 +188,7 @@ impl BroadLineP {
                     } // Ignored it.
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
-                            self.err_table()
+                            self.log_table()
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -202,7 +202,7 @@ impl BroadLineP {
             }
             BroadLineState::Unimplemented => {
                 return SyntaxParserResult::Err(
-                    self.err_table()
+                    self.log_table()
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -222,7 +222,7 @@ impl BroadLineP {
                     return SyntaxParserResult::End;
                 } else {
                     return SyntaxParserResult::Err(
-                        self.err_table()
+                        self.log_table()
                             .str("token", &format!("{:?}", token))
                             .clone(),
                     );
@@ -230,7 +230,7 @@ impl BroadLineP {
             } // Ignored it.
             SyntaxParserResult::Err(table) => {
                 return SyntaxParserResult::Err(
-                    self.err_table()
+                    self.log_table()
                         .str("token", &format!("{:?}", token))
                         .sub_t("error", &table)
                         .clone(),
@@ -239,16 +239,16 @@ impl BroadLineP {
             SyntaxParserResult::Ongoing => SyntaxParserResult::Ongoing,
         }
     }
-    pub fn err_table(&self) -> Table {
+    pub fn log_table(&self) -> Table {
         let mut t = Table::default()
             .str("parser", "BroadLineP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {
-            t.sub_t("comment", &comment_p.err_table());
+            t.sub_t("comment", &comment_p.log_table());
         }
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.err_table());
+            t.sub_t("key_value", &key_value_p.log_table());
         }
         t
     }
