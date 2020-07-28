@@ -9,19 +9,11 @@ pub struct TokenLine {
     pub row_number: usize,
     pub tokens: Vec<Token>,
 }
-/*
-impl Default for TokenLine {
-    fn default() -> Self {
-        TokenLine { tokens: Vec::new() }
-    }
-}
-*/
 impl TokenLine {
     pub fn new(row_number: usize) -> Self {
-        // , tokens: &Vec<Token>
         TokenLine {
             row_number: row_number,
-            tokens: Vec::new(), // tokens.to_vec(),
+            tokens: Vec::new(),
         }
     }
 }
@@ -74,12 +66,14 @@ pub enum TokenType {
 /// 字句。  
 #[derive(Clone)]
 pub struct Token {
+    pub column_number: usize,
     pub value: String,
     pub type_: TokenType,
 }
 impl Token {
-    pub fn new(value: &str, type_: TokenType) -> Self {
+    pub fn new(column_number: usize, value: &str, type_: TokenType) -> Self {
         Token {
+            column_number: column_number,
             value: value.to_string(),
             type_: type_,
         }

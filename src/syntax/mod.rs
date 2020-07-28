@@ -19,6 +19,15 @@ use crate::model::{
 use crate::syntax::machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState};
 use crate::token::Token;
 use casual_logger::Table as LogTable;
+use std::convert::TryInto;
+
+fn usize_to_i128(num: usize) -> i128 {
+    if let Ok(n) = num.try_into() {
+        n
+    } else {
+        -1
+    }
+}
 
 /// Result of syntax parser.  
 /// 構文パーサーの結果。  

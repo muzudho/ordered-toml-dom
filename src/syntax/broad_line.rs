@@ -2,6 +2,7 @@
 //! `縦幅のある行` 構文パーサー。  
 
 use crate::model::BroadLine;
+use crate::syntax::usize_to_i128;
 use crate::syntax::{
     machine_state::BroadLineState, ArrayOfTableP, BroadLineP, CommentP, KeyValueP,
     SyntaxParserResult, TableP,
@@ -38,6 +39,7 @@ impl BroadLineP {
                 // TODO 後ろにコメントがあるかも。
                 return SyntaxParserResult::Err(
                     self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -45,6 +47,7 @@ impl BroadLineP {
             BroadLineState::AfterComment => {
                 return SyntaxParserResult::Err(
                     self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -54,6 +57,7 @@ impl BroadLineP {
                 _ => {
                     return SyntaxParserResult::Err(
                         self.log_table()
+                            .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
                     );
@@ -74,6 +78,7 @@ impl BroadLineP {
                 // TODO 後ろにコメントがあるかも。
                 return SyntaxParserResult::Err(
                     self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -90,6 +95,7 @@ impl BroadLineP {
                         } else {
                             return SyntaxParserResult::Err(
                                 self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -98,6 +104,7 @@ impl BroadLineP {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -118,6 +125,7 @@ impl BroadLineP {
                         } else {
                             return SyntaxParserResult::Err(
                                 self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -126,6 +134,7 @@ impl BroadLineP {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -165,6 +174,7 @@ impl BroadLineP {
             BroadLineState::Finished => {
                 return SyntaxParserResult::Err(
                     self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -181,6 +191,7 @@ impl BroadLineP {
                         } else {
                             return SyntaxParserResult::Err(
                                 self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -189,6 +200,7 @@ impl BroadLineP {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -203,6 +215,7 @@ impl BroadLineP {
             BroadLineState::Unimplemented => {
                 return SyntaxParserResult::Err(
                     self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -223,6 +236,7 @@ impl BroadLineP {
                 } else {
                     return SyntaxParserResult::Err(
                         self.log_table()
+                            .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
                     );
@@ -231,6 +245,7 @@ impl BroadLineP {
             SyntaxParserResult::Err(table) => {
                 return SyntaxParserResult::Err(
                     self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .sub_t("error", &table)
                         .clone(),

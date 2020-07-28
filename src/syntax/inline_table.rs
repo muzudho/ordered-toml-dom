@@ -2,6 +2,7 @@
 //! インライン・テーブル構文パーサー。  
 
 use crate::model::InlineTable;
+use crate::syntax::usize_to_i128;
 use crate::syntax::{machine_state::InlineTableState, InlineTableP, KeyValueP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
@@ -37,6 +38,7 @@ impl InlineTableP {
                     _ => panic!(Log::fatal_t(
                         "InlineTableP#parse/AfterValue",
                         self.log_table()
+                            .int("column_number", usize_to_i128(token.column_number))
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
                     )),
@@ -54,6 +56,7 @@ impl InlineTableP {
                         } else {
                             return SyntaxParserResult::Err(
                                 self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -62,6 +65,7 @@ impl InlineTableP {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -80,7 +84,9 @@ impl InlineTableP {
                 }
                 _ => panic!(Log::fatal_t(
                     "InlineTableP#parse/AfterValue",
-                    self.log_table().str("token", &format!("{:?}", token))
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token))
                 )),
             },
         }

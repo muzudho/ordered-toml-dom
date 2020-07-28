@@ -2,6 +2,7 @@
 //! 配列構文パーサー。  
 
 use crate::model::{Array, LiteralString};
+use crate::syntax::usize_to_i128;
 use crate::syntax::{
     machine_state::ArrayState, ArrayP, DoubleQuotedStringP, SingleQuotedStringP, SyntaxParserResult,
 };
@@ -33,7 +34,9 @@ impl ArrayP {
             ArrayState::AfterDoubleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/After\"value\"",
-                    self.log_table().str("token", &format!("{:?}", token)),
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
                 );
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
@@ -47,6 +50,7 @@ impl ArrayP {
                     _ => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -58,7 +62,9 @@ impl ArrayP {
                     TokenType::DoubleQuotation => {
                         Log::trace_t(
                             "ArrayP#parse/After[/\"",
-                            self.log_table().str("token", &format!("{:?}", token)),
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token)),
                         );
                         self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
                         self.state = ArrayState::DoubleQuotedString;
@@ -74,6 +80,7 @@ impl ArrayP {
                         Log::trace_t(
                             "ArrayP#parse/After[/Key",
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .str("buffer", &format!("{:?}", self.buffer)),
                         );
@@ -81,7 +88,9 @@ impl ArrayP {
                     TokenType::SingleQuotation => {
                         Log::trace_t(
                             "ArrayP#parse/After[/'",
-                            self.log_table().str("token", &format!("{:?}", token)),
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token)),
                         );
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
                         self.state = ArrayState::SingleQuotedString;
@@ -89,12 +98,15 @@ impl ArrayP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "ArrayP#parse/After[/WhiteSpace",
-                            self.log_table().str("token", &format!("{:?}", token)),
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token)),
                         );
                     } // Ignore it.
                     _ => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -104,7 +116,9 @@ impl ArrayP {
             ArrayState::AfterItem => {
                 Log::trace_t(
                     "ArrayP#parse/After*",
-                    self.log_table().str("token", &format!("{:?}", token)),
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
                 );
                 match token.type_ {
                     TokenType::Comma => {
@@ -117,6 +131,7 @@ impl ArrayP {
                     _ => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -126,7 +141,9 @@ impl ArrayP {
             ArrayState::AfterSingleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/After'value'",
-                    self.log_table().str("token", &format!("{:?}", token)),
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
                 );
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
@@ -140,6 +157,7 @@ impl ArrayP {
                     _ => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
                         )
@@ -149,7 +167,9 @@ impl ArrayP {
             ArrayState::DoubleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/\"value\"",
-                    self.log_table().str("token", &format!("{:?}", token)),
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
                 );
                 let p = self.double_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
@@ -165,6 +185,7 @@ impl ArrayP {
                         } else {
                             return SyntaxParserResult::Err(
                                 self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -173,6 +194,7 @@ impl ArrayP {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),
@@ -184,10 +206,13 @@ impl ArrayP {
             ArrayState::End => {
                 Log::trace_t(
                     "ArrayP#parse/End",
-                    self.log_table().str("token", &format!("{:?}", token)),
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
                 );
                 return SyntaxParserResult::Err(
                     self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
                 );
@@ -195,7 +220,9 @@ impl ArrayP {
             ArrayState::SingleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/'value'",
-                    self.log_table().str("token", &format!("{:?}", token)),
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
                 );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
@@ -211,6 +238,7 @@ impl ArrayP {
                         } else {
                             return SyntaxParserResult::Err(
                                 self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
                             );
@@ -219,6 +247,7 @@ impl ArrayP {
                     SyntaxParserResult::Err(table) => {
                         return SyntaxParserResult::Err(
                             self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
                                 .clone(),

@@ -21,18 +21,6 @@ pub struct LexicalParser {
     buf_token_type: TokenType,
     buf: String,
 }
-/*
-impl Default for LexicalParser {
-    fn default() -> Self {
-        LexicalParser {
-            state: None,
-            product: TokenLine::default(),
-            buf_token_type: TokenType::WhiteSpace,
-            buf: String::new(),
-        }
-    }
-}
-*/
 impl LexicalParser {
     pub fn new(row_number: usize) -> Self {
         LexicalParser {
@@ -47,18 +35,21 @@ impl LexicalParser {
     }
     pub fn parse_line(&mut self, line: &str) {
         let ch_vec: Vec<char> = line.chars().collect();
-        for ch in ch_vec {
+        let mut initial_column_number = 0;
+        for (i, ch) in ch_vec.iter().enumerate() {
+            let column_number = i + 1;
             if let Some(state) = &self.state {
                 match state {
                     LineMachineState::WhiteSpace => {
                         // 最初に出てくる文字まで飛ばします。
                         match ch {
                             '\t' | ' ' => {
-                                self.buf.push(ch);
+                                self.buf.push(*ch);
                             }
                             _ => {
-                                self.flush();
-                                self.initial(ch);
+                                self.flush(initial_column_number);
+                                self.initial(*ch);
+                                initial_column_number = column_number;
                             }
                         }
                     }
@@ -69,32 +60,35 @@ impl LexicalParser {
                         };
                         if matched {
                             // A key.
-                            self.buf.push(ch);
+                            self.buf.push(*ch);
                         } else {
-                            self.flush();
-                            self.initial(ch);
+                            self.flush(initial_column_number);
+                            self.initial(*ch);
+                            initial_column_number = column_number;
                         }
                     }
                 }
             } else {
-                self.flush();
-                self.initial(ch);
+                self.flush(initial_column_number);
+                self.initial(*ch);
+                initial_column_number = column_number;
             }
         }
         // Log::info("End of line.");
-        self.flush();
+        self.flush(initial_column_number);
         self.product.tokens.push(Token::new(
+            ch_vec.len(),
             "
 ",
             TokenType::EndOfLine,
         ));
     }
     /// Flush.
-    fn flush(&mut self) {
+    fn flush(&mut self, column_number: usize) {
         if !self.buf.is_empty() {
             self.product
                 .tokens
-                .push(Token::new(&self.buf, self.buf_token_type));
+                .push(Token::new(column_number, &self.buf, self.buf_token_type));
             // Log::info_t("Flush", Table::default().str("buf", &self.buf));
             self.buf.clear();
             self.state = None;
