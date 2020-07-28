@@ -21,6 +21,7 @@ pub struct LexicalParser {
     buf_token_type: TokenType,
     buf: String,
 }
+/*
 impl Default for LexicalParser {
     fn default() -> Self {
         LexicalParser {
@@ -31,7 +32,16 @@ impl Default for LexicalParser {
         }
     }
 }
+*/
 impl LexicalParser {
+    pub fn new(row_number: usize) -> Self {
+        LexicalParser {
+            state: None,
+            product: TokenLine::new(row_number),
+            buf_token_type: TokenType::WhiteSpace,
+            buf: String::new(),
+        }
+    }
     pub fn product(&self) -> &TokenLine {
         &self.product
     }

@@ -19,6 +19,7 @@ use crate::syntax::SyntaxParserResult;
 use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
+use std::convert::TryInto;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::sync::Mutex;
@@ -41,18 +42,19 @@ impl Toml {
         let mut doc = Document::default();
         match File::open(path) {
             Ok(file) => {
-                for line in BufReader::new(file).lines() {
+                for (i, line) in BufReader::new(file).lines().enumerate() {
+                    let row_number = i + 1;
                     let line = match line {
                         Ok(line) => line,
                         Err(why) => panic!(Log::fatal(&format!("{}", why))),
                     };
-                    Log::info(&format!("from_file/line=|{}|", line));
-                    let mut lexical_p = LexicalParser::default();
+                    Log::trace(&format!("from_file/line=|{}|", line));
+                    let mut lexical_p = LexicalParser::new(row_number);
                     lexical_p.parse_line(&line);
                     /*
                     Log::trace_t(
                         "Toml::from_file/line_tokens",
-                        Table::default()
+                        Toml::err_table()
                             .str("line", &line)
                             .str("token_line", &format!("=|{:?}|", lexical_p)),
                     );
@@ -62,7 +64,15 @@ impl Toml {
                         SyntaxParserResult::End => {} // Ignored it.
                         SyntaxParserResult::Err(table) => {
                             aot.table(
-                                Table::default()
+                                Toml::err_table()
+                                    .int(
+                                        "row_number",
+                                        if let Ok(n) = row_number.try_into() {
+                                            n
+                                        } else {
+                                            -1
+                                        },
+                                    )
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
                                     .sub_t("error", &table)
@@ -71,7 +81,15 @@ impl Toml {
                         }
                         SyntaxParserResult::Ongoing => {
                             aot.table(
-                                Table::default()
+                                Toml::err_table()
+                                    .int(
+                                        "row_number",
+                                        if let Ok(n) = row_number.try_into() {
+                                            n
+                                        } else {
+                                            -1
+                                        },
+                                    )
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
                                     .sub_t("line_scanner", &line_syntax_scanner.err_table()),
@@ -84,15 +102,19 @@ impl Toml {
         }
         Log::info_t(
             "Product.",
-            Table::default()
-                .str("parser", "scanners.rs/Toml#from_file")
-                .str("product_dom", &format!("{:?}", doc)),
+            Toml::err_table().str("product_dom", &format!("{:?}", doc)),
         );
         Log::info_t(
             "Finish of Toml#from_file().",
-            Table::default().sub_aot("file", &aot),
+            Toml::err_table().sub_aot("file", &aot),
         );
 
         doc
+    }
+    pub fn err_table() -> Table {
+        let t = Table::default()
+            .str("Parse", "lib.rs/Toml#from_file")
+            .clone();
+        t
     }
 }

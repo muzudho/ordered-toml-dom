@@ -31,6 +31,8 @@ impl LogExt for Log {
 fn main() {
     Log::println("Start.");
     Log::set_file_name("cover");
+    Log::set_level(Level::Debug);
+    Log::set_retention_days(-1);
     Log::remove_old_logs();
     let doc = Toml::from_file("./resource/cover.toml");
     Log::println_t(

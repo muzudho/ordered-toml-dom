@@ -30,16 +30,12 @@ impl SyntaxScanner {
                     if let Some(child_m) = self.broad_line_p.flush() {
                         dom.push_broad_line(&child_m);
                     } else {
+                        let mut err_token_line = TokenLine::new(token_line.row_number);
+                        err_token_line.tokens = token_line.tokens[i..].to_vec();
                         return SyntaxParserResult::Err(
                             self.err_table()
                                 .str("token_line", &format!("{:?}", token_line))
-                                .str(
-                                    "rest",
-                                    &format!(
-                                        "{:?}",
-                                        TokenLine::new(&token_line.tokens[i..].to_vec())
-                                    ),
-                                )
+                                .str("rest", &format!("{:?}", err_token_line))
                                 .clone(),
                         );
                     }

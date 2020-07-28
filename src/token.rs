@@ -6,17 +6,22 @@ use std::fmt;
 /// A row of tokens.  
 /// 一列のトークン。  
 pub struct TokenLine {
+    pub row_number: usize,
     pub tokens: Vec<Token>,
 }
+/*
 impl Default for TokenLine {
     fn default() -> Self {
         TokenLine { tokens: Vec::new() }
     }
 }
+*/
 impl TokenLine {
-    pub fn new(tokens: &Vec<Token>) -> Self {
+    pub fn new(row_number: usize) -> Self {
+        // , tokens: &Vec<Token>
         TokenLine {
-            tokens: tokens.to_vec(),
+            row_number: row_number,
+            tokens: Vec::new(), // tokens.to_vec(),
         }
     }
 }
