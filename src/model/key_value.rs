@@ -1,7 +1,7 @@
 //! Key value model.  
 //! キー値モデル。  
 
-use crate::model::{KeyValue, RightValue};
+use crate::model::{layer20::RightValue, KeyValue};
 use crate::token::Token;
 use std::fmt;
 

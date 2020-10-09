@@ -1,8 +1,8 @@
 //! Array model.  
 //! 配列モデル。  
 use crate::model::{
-    layer1::{LiteralString, SingleQuotedString},
-    Array, DoubleQuotedString, ItemValue,
+    layer10::{DoubleQuotedString, LiteralString, SingleQuotedString},
+    layer20::{Array, ItemValue},
 };
 use std::fmt;
 

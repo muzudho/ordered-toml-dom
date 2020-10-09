@@ -13,8 +13,9 @@ pub mod single_quoted_string;
 pub mod table;
 
 use crate::model::{
-    layer1::{Comment, DoubleQuotedString, SingleQuotedString},
-    Array, ArrayOfTable, BroadLine, InlineTable, KeyValue, Table as TableM,
+    layer10::{Comment, DoubleQuotedString, SingleQuotedString},
+    layer20::{Array, InlineTable, KeyValue},
+    ArrayOfTable, BroadLine, Table as TableM,
 };
 use crate::syntax::machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState};
 use crate::token::Token;

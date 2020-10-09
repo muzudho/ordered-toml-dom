@@ -1,7 +1,7 @@
 //! Inline model.  
 //! インライン・モデル。  
 
-use crate::model::{InlineTable, ItemValue, KeyValue};
+use crate::model::layer20::{InlineTable, ItemValue, KeyValue};
 use std::fmt;
 
 impl Default for InlineTable {

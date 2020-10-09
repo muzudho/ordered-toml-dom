@@ -1,7 +1,7 @@
 //! Inline table syntax parser.  
 //! インライン・テーブル構文パーサー。  
 
-use crate::model::InlineTable;
+use crate::model::layer20::InlineTable;
 use crate::syntax::usize_to_i128;
 use crate::syntax::{machine_state::InlineTableState, InlineTableP, KeyValueP, SyntaxParserResult};
 use crate::token::{Token, TokenType};

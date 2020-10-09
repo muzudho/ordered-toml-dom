@@ -1,7 +1,7 @@
 //! Array syntax parser.  
 //! 配列構文パーサー。  
 
-use crate::model::{layer1::LiteralString, Array};
+use crate::model::{layer10::LiteralString, layer20::Array};
 use crate::syntax::usize_to_i128;
 use crate::syntax::{
     machine_state::ArrayState, ArrayP, DoubleQuotedStringP, SingleQuotedStringP, SyntaxParserResult,

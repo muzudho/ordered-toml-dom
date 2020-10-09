@@ -5,7 +5,7 @@
 
 use casual_logger::{Log, Table};
 use toml_menu::{
-    model::{BroadLine, RightValue},
+    model::{layer20::RightValue, BroadLine},
     Toml,
 };
 

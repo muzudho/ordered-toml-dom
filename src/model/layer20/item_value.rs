@@ -1,7 +1,7 @@
 //! Item value model.  
 //! アイテム値モデル。  
 
-use crate::model::ItemValue;
+use crate::model::layer20::ItemValue;
 use std::fmt;
 
 impl fmt::Debug for ItemValue {

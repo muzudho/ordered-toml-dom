@@ -1,7 +1,7 @@
 //! Double quoted string model.  
 //! 二重引用符文字列モデル。  
 
-use crate::model::DoubleQuotedString;
+use crate::model::layer10::DoubleQuotedString;
 use crate::token::Token;
 use std::fmt;
 
