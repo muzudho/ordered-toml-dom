@@ -4,7 +4,6 @@
 pub mod array;
 pub mod array_of_table;
 pub mod broad_line;
-pub mod double_quoted_string;
 pub mod inline_table;
 pub mod key_value;
 pub mod layer10;
@@ -13,12 +12,12 @@ pub mod single_quoted_string;
 pub mod table;
 
 use crate::model::{
-    layer10::{DoubleQuotedString, SingleQuotedString},
+    layer10::SingleQuotedString,
     layer20::{Array, InlineTable, KeyValue},
     layer30::{ArrayOfTable, BroadLine, Table as TableM},
 };
 use crate::syntax::{
-    layer10::CommentP,
+    layer10::{CommentP, DoubleQuotedStringP},
     machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState},
 };
 use crate::token::Token;
@@ -73,15 +72,6 @@ pub struct BroadLineP {
     key_value_p: Option<KeyValueP>,
     state: BroadLineState,
     table_p: Option<TableP>,
-}
-
-/// Double quoted string syntax parser.  
-/// 二重引用符文字列構文パーサー。  
-///
-/// Example: `"value"`.  
-#[derive(Clone)]
-pub struct DoubleQuotedStringP {
-    buffer: Option<DoubleQuotedString>,
 }
 
 /// Inline table syntax parser.  
