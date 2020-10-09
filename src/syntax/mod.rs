@@ -4,20 +4,23 @@
 pub mod array;
 pub mod array_of_table;
 pub mod broad_line;
-pub mod comment;
 pub mod double_quoted_string;
 pub mod inline_table;
 pub mod key_value;
+pub mod layer10;
 pub mod machine_state;
 pub mod single_quoted_string;
 pub mod table;
 
 use crate::model::{
-    layer10::{Comment, DoubleQuotedString, SingleQuotedString},
+    layer10::{DoubleQuotedString, SingleQuotedString},
     layer20::{Array, InlineTable, KeyValue},
     layer30::{ArrayOfTable, BroadLine, Table as TableM},
 };
-use crate::syntax::machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState};
+use crate::syntax::{
+    layer10::CommentP,
+    machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState},
+};
 use crate::token::Token;
 use casual_logger::Table as LogTable;
 use std::convert::TryInto;
@@ -70,15 +73,6 @@ pub struct BroadLineP {
     key_value_p: Option<KeyValueP>,
     state: BroadLineState,
     table_p: Option<TableP>,
-}
-
-/// Comment parser.  
-/// コメント・パーサー。  
-///
-/// Example: `# comment`.  
-#[derive(Clone)]
-pub struct CommentP {
-    buffer: Option<Comment>,
 }
 
 /// Double quoted string syntax parser.  
