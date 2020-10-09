@@ -8,16 +8,14 @@ pub mod inline_table;
 pub mod key_value;
 pub mod layer10;
 pub mod machine_state;
-pub mod single_quoted_string;
 pub mod table;
 
 use crate::model::{
-    layer10::SingleQuotedString,
     layer20::{Array, InlineTable, KeyValue},
     layer30::{ArrayOfTable, BroadLine, Table as TableM},
 };
 use crate::syntax::{
-    layer10::{CommentP, DoubleQuotedStringP},
+    layer10::{CommentP, DoubleQuotedStringP, SingleQuotedStringP},
     machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState},
 };
 use crate::token::Token;
@@ -96,15 +94,6 @@ pub struct KeyValueP {
     single_quoted_string_p: Option<SingleQuotedStringP>,
     state: KeyValueState,
     temp_key: Token,
-}
-
-/// Single quoted string syntax parser.  
-/// 単一引用符文字列構文パーサー。  
-///
-/// Example: `'value'`.  
-#[derive(Clone)]
-pub struct SingleQuotedStringP {
-    buffer: Option<SingleQuotedString>,
 }
 
 /// Table syntax parser.  

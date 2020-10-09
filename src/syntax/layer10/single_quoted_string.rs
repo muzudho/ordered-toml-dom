@@ -2,7 +2,7 @@
 //! 単一引用符文字列構文パーサー。  
 
 use crate::model::layer10::SingleQuotedString;
-use crate::syntax::{SingleQuotedStringP, SyntaxParserResult};
+use crate::syntax::{layer10::SingleQuotedStringP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 

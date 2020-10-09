@@ -7,8 +7,9 @@ use crate::model::{
 };
 use crate::syntax::usize_to_i128;
 use crate::syntax::{
-    layer10::DoubleQuotedStringP, machine_state::KeyValueState, ArrayP, InlineTableP, KeyValueP,
-    SingleQuotedStringP, SyntaxParserResult,
+    layer10::{DoubleQuotedStringP, SingleQuotedStringP},
+    machine_state::KeyValueState,
+    ArrayP, InlineTableP, KeyValueP, SyntaxParserResult,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
