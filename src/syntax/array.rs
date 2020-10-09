@@ -1,5 +1,11 @@
 //! Array syntax parser.  
 //! 配列構文パーサー。  
+//!
+//! # Examples
+//!
+//! ```
+//! // [ 1, 2, 3 ]
+//! ```
 
 use crate::model::{layer10::LiteralString, layer20::Array};
 use crate::syntax::usize_to_i128;

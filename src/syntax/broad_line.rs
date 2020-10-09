@@ -64,6 +64,7 @@ impl BroadLineP {
                 }
             },
             BroadLineState::AfterLeftSquareBracket => match token.type_ {
+                // `[`
                 TokenType::LeftSquareBracket => {
                     self.array_of_table_p = Some(ArrayOfTableP::new());
                     self.state = BroadLineState::ArrayOfTable;
@@ -155,6 +156,7 @@ impl BroadLineP {
                     self.state = BroadLineState::Finished;
                     return SyntaxParserResult::End;
                 }
+                // `[`
                 TokenType::LeftSquareBracket => {
                     self.state = BroadLineState::AfterLeftSquareBracket;
                 }
@@ -162,6 +164,7 @@ impl BroadLineP {
                     self.key_value_p = Some(KeyValueP::new(&token));
                     self.state = BroadLineState::KeyValueSyntax;
                 }
+                // `#`
                 TokenType::Sharp => {
                     self.comment_p = Some(CommentP::new());
                     self.state = BroadLineState::CommentSyntax;

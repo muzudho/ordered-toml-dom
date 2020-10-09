@@ -76,9 +76,11 @@ impl InlineTableP {
             }
             InlineTableState::AfterKeyValue => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
+                // `,`
                 TokenType::Comma => {
                     self.state = InlineTableState::AfterLeftCurlyBracket;
                 }
+                // `}`
                 TokenType::RightCurlyBracket => {
                     return SyntaxParserResult::End;
                 }
