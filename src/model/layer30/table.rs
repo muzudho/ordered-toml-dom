@@ -1,7 +1,7 @@
 //! Table model.  
 //! テーブル・モデル。  
 
-use crate::model::Table;
+use crate::model::layer30::Table;
 use crate::token::Token;
 use std::fmt;
 

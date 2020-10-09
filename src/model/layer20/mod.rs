@@ -1,6 +1,8 @@
 pub mod array;
 pub mod inline_table;
 pub mod item_value;
+pub mod key_value;
+pub mod right_value;
 
 use crate::model::layer10::{DoubleQuotedString, LiteralString, SingleQuotedString};
 

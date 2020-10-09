@@ -1,7 +1,7 @@
 //! Array of ArrayOfTable syntax parser.  
 //! テーブルの配列構文パーサー。  
 
-use crate::model::ArrayOfTable as ArrayOfTableM;
+use crate::model::layer30::ArrayOfTable as ArrayOfTableM;
 use crate::syntax::{ArrayOfTableP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table as LogTable;

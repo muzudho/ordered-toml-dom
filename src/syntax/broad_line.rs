@@ -1,7 +1,7 @@
 //! Broad-line syntax parser.  
 //! `縦幅のある行` 構文パーサー。  
 
-use crate::model::BroadLine;
+use crate::model::layer30::BroadLine;
 use crate::syntax::usize_to_i128;
 use crate::syntax::{
     machine_state::BroadLineState, ArrayOfTableP, BroadLineP, CommentP, KeyValueP,

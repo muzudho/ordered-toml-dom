@@ -15,7 +15,7 @@ pub mod table;
 use crate::model::{
     layer10::{Comment, DoubleQuotedString, SingleQuotedString},
     layer20::{Array, InlineTable, KeyValue},
-    ArrayOfTable, BroadLine, Table as TableM,
+    layer30::{ArrayOfTable, BroadLine, Table as TableM},
 };
 use crate::syntax::machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState};
 use crate::token::Token;
