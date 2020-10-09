@@ -1,7 +1,7 @@
 //! Comment syntax parser.  
 //! コメント構文パーサー。  
 
-use crate::model::Comment;
+use crate::model::layer1::Comment;
 use crate::syntax::{CommentP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;

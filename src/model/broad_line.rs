@@ -1,7 +1,7 @@
 //! BroadLine model.  
 //! 縦幅のある行 モデル。  
 
-use crate::model::{ArrayOfTable, BroadLine, Comment, KeyValue, Table};
+use crate::model::{layer1::Comment, ArrayOfTable, BroadLine, KeyValue, Table};
 use std::fmt;
 
 impl BroadLine {

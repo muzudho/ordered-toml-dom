@@ -1,7 +1,7 @@
 //! Key value syntax parser.  
 //! キー値構文パーサー。  
 
-use crate::model::{KeyValue, LiteralString, RightValue};
+use crate::model::{layer1::LiteralString, KeyValue, RightValue};
 use crate::syntax::usize_to_i128;
 use crate::syntax::{
     machine_state::KeyValueState, ArrayP, DoubleQuotedStringP, InlineTableP, KeyValueP,

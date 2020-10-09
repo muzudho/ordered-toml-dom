@@ -1,6 +1,9 @@
 //! Array model.  
 //! 配列モデル。  
-use crate::model::{Array, DoubleQuotedString, ItemValue, LiteralString, SingleQuotedString};
+use crate::model::{
+    layer1::{LiteralString, SingleQuotedString},
+    Array, DoubleQuotedString, ItemValue,
+};
 use std::fmt;
 
 impl Default for Array {

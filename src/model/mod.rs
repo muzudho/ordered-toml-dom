@@ -1,16 +1,15 @@
 pub mod array;
 pub mod array_of_table;
 pub mod broad_line;
-pub mod comment;
 pub mod document;
-pub mod double_quoted_string;
 pub mod inline_table;
 pub mod item_value;
 pub mod key_value;
-pub mod literal_string;
+pub mod layer1;
 pub mod right_value;
-pub mod single_quoted_string;
 pub mod table;
+
+use crate::model::layer1::{Comment, DoubleQuotedString, LiteralString, SingleQuotedString};
 
 /// It has multiple item values.  
 /// 複数の項目値を持ちます。  
@@ -36,13 +35,6 @@ pub enum BroadLine {
     Table(Table),
 }
 
-/// It has one string.  
-/// １つの文字列を持ちます。  
-#[derive(Clone)]
-pub struct Comment {
-    value: String,
-}
-
 /// It has multiple `broad_line`.  
 /// 複数の `縦幅を持つ行` を持ちます。  
 #[derive(Clone)]
@@ -50,13 +42,6 @@ pub struct Document {
     /// Line with height.
     /// 縦幅を持つ行。
     pub broad_lines: Vec<BroadLine>,
-}
-
-/// It has one string.  
-/// １つの文字列を持ちます。  
-#[derive(Clone)]
-pub struct DoubleQuotedString {
-    pub value: String,
 }
 
 /// It has multiple item values.  
@@ -86,13 +71,6 @@ pub struct KeyValue {
     pub value: Box<RightValue>,
 }
 
-/// It has one string.  
-/// １つの文字列を持ちます。  
-#[derive(Clone)]
-pub struct LiteralString {
-    value: String,
-}
-
 /// The right side of the key value model.  
 /// キー値モデルの右辺です。  
 #[derive(Clone)]
@@ -103,13 +81,6 @@ pub enum RightValue {
     // No KeyValue.
     LiteralString(LiteralString),
     SingleQuotedString(SingleQuotedString),
-}
-
-/// It has one string.  
-/// １つの文字列を持ちます。  
-#[derive(Clone)]
-pub struct SingleQuotedString {
-    pub value: String,
 }
 
 /// WIP.  
