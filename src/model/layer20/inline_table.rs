@@ -1,5 +1,11 @@
-//! Inline model.  
-//! インライン・モデル。  
+//! Inline table model.  
+//! インライン・テーブル・モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // { name="a", pass="b", age=3 }
+//! ```
 
 use crate::model::layer20::{InlineTable, ItemValue, KeyValue};
 use std::fmt;

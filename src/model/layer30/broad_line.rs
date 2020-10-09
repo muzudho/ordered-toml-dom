@@ -3,8 +3,8 @@
 
 use crate::model::{
     layer10::Comment,
-    layer30::{ArrayOfTable, Table},
-    BroadLine, KeyValue,
+    layer20::KeyValue,
+    layer30::{ArrayOfTable, BroadLine, Table},
 };
 use std::fmt;
 

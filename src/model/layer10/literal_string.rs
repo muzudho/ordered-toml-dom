@@ -1,5 +1,11 @@
 //! Literal string model.  
 //! リテラル文字列モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // work_number
+//! ```
 
 use crate::model::layer10::LiteralString;
 use crate::token::Token;

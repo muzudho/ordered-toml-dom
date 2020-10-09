@@ -1,5 +1,11 @@
 //! Single quoted string model.  
 //! 単一引用符文字列モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // 'ハロー'
+//! ```
 
 use crate::model::layer10::SingleQuotedString;
 use crate::token::Token;

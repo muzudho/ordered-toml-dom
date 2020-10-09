@@ -24,9 +24,15 @@ pub struct InlineTable {
 /// 配列、インライン・テーブルの項目です。  
 #[derive(Clone)]
 pub enum ItemValue {
+    /// Recursive.
+    /// 再帰的。
     Array(Array),
     DoubleQuotedString(DoubleQuotedString),
+    /// Recursive.
+    /// 再帰的。
     InlineTable(InlineTable),
+    /// Recursive.
+    /// 再帰的。
     KeyValue(KeyValue),
     LiteralString(LiteralString),
     SingleQuotedString(SingleQuotedString),
@@ -37,6 +43,8 @@ pub enum ItemValue {
 #[derive(Clone)]
 pub struct KeyValue {
     pub key: String,
+    /// Recursive.
+    /// 再帰的。
     pub value: Box<RightValue>,
 }
 
@@ -44,8 +52,12 @@ pub struct KeyValue {
 /// キー値モデルの右辺です。  
 #[derive(Clone)]
 pub enum RightValue {
+    /// Recursive.
+    /// 再帰的。
     Array(Array),
     DoubleQuotedString(DoubleQuotedString),
+    /// Recursive.
+    /// 再帰的。
     InlineTable(InlineTable),
     // No KeyValue.
     LiteralString(LiteralString),

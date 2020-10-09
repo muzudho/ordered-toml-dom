@@ -1,5 +1,11 @@
 //! Double quoted string model.  
 //! 二重引用符文字列モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // "ハロー"
+//! ```
 
 use crate::model::layer10::DoubleQuotedString;
 use crate::token::Token;

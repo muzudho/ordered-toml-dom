@@ -1,5 +1,11 @@
 //! Comment model.  
 //! コメント・モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // # Toml's comment（トムルのコメント）
+//! ```
 
 use crate::model::layer10::Comment;
 use crate::token::Token;

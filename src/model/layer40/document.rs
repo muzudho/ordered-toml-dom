@@ -1,7 +1,7 @@
 //! Document model.  
 //! ドキュメント・モデル。  
 
-use crate::model::{BroadLine, Document};
+use crate::model::{layer30::BroadLine, layer40::Document};
 use std::fmt;
 
 impl Default for Document {

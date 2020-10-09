@@ -1,5 +1,12 @@
 //! Array model.  
 //! 配列モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // [ 1, 2, 3 ]
+//! ```
+
 use crate::model::{
     layer10::{DoubleQuotedString, LiteralString, SingleQuotedString},
     layer20::{Array, ItemValue},
