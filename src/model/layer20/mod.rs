@@ -13,11 +13,11 @@ pub struct Array {
     items: Vec<ItemValue>,
 }
 
-/// It has multiple item values.  
-/// 複数の項目値を持ちます。  
+/// It has multiple key-values.  
+/// 複数の キー・バリュー を持ちます。  
 #[derive(Clone)]
 pub struct InlineTable {
-    items: Vec<ItemValue>,
+    items: Vec<KeyValue>,
 }
 
 /// Array, inline table item.  
