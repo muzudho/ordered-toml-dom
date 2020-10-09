@@ -9,4 +9,4 @@ edition = "2018"
 [dependencies]
 lazy_static = "1.4.0"
 regex = "1"
-casual_logger = "0.6.3"
+casual_logger = "0.6.5"
