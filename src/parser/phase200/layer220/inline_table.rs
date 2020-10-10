@@ -16,7 +16,7 @@ use casual_logger::{Log, Table};
 ///
 /// Example: `{ key = value, key = value }`.  
 #[derive(Debug)]
-pub enum InlineTableState {
+pub enum State {
     AfterLeftCurlyBracket,
     KeyValue,
     AfterKeyValue,
@@ -25,7 +25,7 @@ pub enum InlineTableState {
 impl Default for InlineTableP {
     fn default() -> Self {
         InlineTableP {
-            state: InlineTableState::AfterLeftCurlyBracket,
+            state: State::AfterLeftCurlyBracket,
             buffer: Some(InlineTable::default()),
             key_value_p: None,
         }
@@ -43,12 +43,12 @@ impl InlineTableP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
-            InlineTableState::AfterLeftCurlyBracket => {
+            State::AfterLeftCurlyBracket => {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Key => {
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
-                        self.state = InlineTableState::KeyValue;
+                        self.state = State::KeyValue;
                     }
                     _ => panic!(Log::fatal_t(
                         "InlineTableP#parse/AfterValue",
@@ -59,7 +59,7 @@ impl InlineTableP {
                     )),
                 }
             }
-            InlineTableState::KeyValue => {
+            State::KeyValue => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -67,7 +67,7 @@ impl InlineTableP {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_key_value(&child_m);
                             self.key_value_p = None;
-                            self.state = InlineTableState::AfterKeyValue;
+                            self.state = State::AfterKeyValue;
                         } else {
                             return PResult::Err(
                                 self.log_table()
@@ -89,11 +89,11 @@ impl InlineTableP {
                     PResult::Ongoing => {}
                 }
             }
-            InlineTableState::AfterKeyValue => match token.type_ {
+            State::AfterKeyValue => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
                 // `,`
                 TokenType::Comma => {
-                    self.state = InlineTableState::AfterLeftCurlyBracket;
+                    self.state = State::AfterLeftCurlyBracket;
                 }
                 // `}`
                 TokenType::RightCurlyBracket => {

@@ -4,7 +4,7 @@ use crate::model::layer230::DocumentElement;
 use crate::parser::phase200::{
     layer210::{ArrayOfTableP, CommentP, TableP},
     layer220::KeyValueP,
-    layer230::document_element::DocumentElementState,
+    layer230::document_element::State as DocumentElementState,
 };
 
 /// Broad-line syntax parser.  

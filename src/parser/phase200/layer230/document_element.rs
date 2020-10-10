@@ -15,7 +15,7 @@ use casual_logger::Table;
 /// Line syntax machine state.  
 /// 行構文状態遷移。  
 #[derive(Debug)]
-pub enum DocumentElementState {
+pub enum State {
     AfterArrayOfTable,
     AfterComment,
     AfterKeyValue,
@@ -41,7 +41,7 @@ impl Default for DocumentElementP {
             buffer: None,
             comment_p: None,
             key_value_p: None,
-            state: DocumentElementState::First,
+            state: State::First,
             table_p: None,
         }
     }
@@ -59,7 +59,7 @@ impl DocumentElementP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
-            DocumentElementState::AfterArrayOfTable => {
+            State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
                     self.log_table()
@@ -68,7 +68,7 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            DocumentElementState::AfterComment => {
+            State::AfterComment => {
                 return PResult::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
@@ -76,7 +76,7 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            DocumentElementState::AfterKeyValue => match token.type_ {
+            State::AfterKeyValue => match token.type_ {
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
                     return PResult::Err(
@@ -87,19 +87,19 @@ impl DocumentElementP {
                     );
                 }
             },
-            DocumentElementState::AfterLeftSquareBracket => match token.type_ {
+            State::AfterLeftSquareBracket => match token.type_ {
                 // `[`
                 TokenType::LeftSquareBracket => {
                     self.array_of_table_p = Some(ArrayOfTableP::new());
-                    self.state = DocumentElementState::ArrayOfTable;
+                    self.state = State::ArrayOfTable;
                 }
                 _ => {
                     self.table_p = Some(TableP::new());
-                    self.state = DocumentElementState::Table;
+                    self.state = State::Table;
                     return self.parse_table(token);
                 }
             },
-            DocumentElementState::AfterTable => {
+            State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
                     self.log_table()
@@ -108,14 +108,14 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            DocumentElementState::ArrayOfTable => {
+            State::ArrayOfTable => {
                 let p = self.array_of_table_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_array_of_table(&m));
                             self.array_of_table_p = None;
-                            self.state = DocumentElementState::AfterArrayOfTable;
+                            self.state = State::AfterArrayOfTable;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -138,14 +138,14 @@ impl DocumentElementP {
                     PResult::Ongoing => {}
                 }
             }
-            DocumentElementState::CommentSyntax => {
+            State::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_comment(&m));
                             self.comment_p = None;
-                            self.state = DocumentElementState::AfterComment;
+                            self.state = State::AfterComment;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -168,7 +168,7 @@ impl DocumentElementP {
                     PResult::Ongoing => {}
                 }
             }
-            DocumentElementState::First => match token.type_ {
+            State::First => match token.type_ {
                 TokenType::EndOfLine => {
                     if let Some(_) = &self.comment_p {
                         return PResult::End;
@@ -177,28 +177,28 @@ impl DocumentElementP {
                         return PResult::End;
                     }
                     self.buffer = Some(DocumentElement::EmptyLine);
-                    self.state = DocumentElementState::Finished;
+                    self.state = State::Finished;
                     return PResult::End;
                 }
                 // `[`
                 TokenType::LeftSquareBracket => {
-                    self.state = DocumentElementState::AfterLeftSquareBracket;
+                    self.state = State::AfterLeftSquareBracket;
                 }
                 TokenType::Key => {
                     self.key_value_p = Some(KeyValueP::new(&token));
-                    self.state = DocumentElementState::KeyValueSyntax;
+                    self.state = State::KeyValueSyntax;
                 }
                 // `#`
                 TokenType::Sharp => {
                     self.comment_p = Some(CommentP::new());
-                    self.state = DocumentElementState::CommentSyntax;
+                    self.state = State::CommentSyntax;
                 }
                 TokenType::WhiteSpace => {} // Ignored it.
                 _ => {
-                    self.state = DocumentElementState::Unimplemented;
+                    self.state = State::Unimplemented;
                 }
             },
-            DocumentElementState::Finished => {
+            State::Finished => {
                 return PResult::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
@@ -206,14 +206,14 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            DocumentElementState::KeyValueSyntax => {
+            State::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_key_value(&m));
                             self.key_value_p = None;
-                            self.state = DocumentElementState::AfterKeyValue;
+                            self.state = State::AfterKeyValue;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -236,10 +236,10 @@ impl DocumentElementP {
                     PResult::Ongoing => {}
                 }
             }
-            DocumentElementState::Table => {
+            State::Table => {
                 return self.parse_table(token);
             }
-            DocumentElementState::Unimplemented => {
+            State::Unimplemented => {
                 return PResult::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
@@ -258,7 +258,7 @@ impl DocumentElementP {
                 if let Some(m) = p.flush() {
                     self.buffer = Some(DocumentElement::from_table(&m));
                     self.table_p = None;
-                    self.state = DocumentElementState::AfterTable;
+                    self.state = State::AfterTable;
                     return PResult::End;
                 } else {
                     return PResult::Err(

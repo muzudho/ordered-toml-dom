@@ -8,7 +8,10 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     layer210::{DoubleQuotedStringP, SingleQuotedStringP},
-    layer220::{array::ArrayState, inline_table::InlineTableState, key_value::KeyValueState},
+    layer220::{
+        array::State as ArrayState, inline_table::State as InlineTableState,
+        key_value::State as KeyValueState,
+    },
 };
 use std::convert::TryInto;
 

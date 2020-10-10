@@ -17,7 +17,7 @@ use casual_logger::{Log, Table};
 ///
 /// Example: `key = right_value`.  
 #[derive(Debug)]
-pub enum KeyValueState {
+pub enum State {
     AfterKey,
     AfterEquals,
     AfterLeftCurlyBracket,
@@ -35,7 +35,7 @@ impl KeyValueP {
             double_quoted_string_p: None,
             inline_table_p: None,
             single_quoted_string_p: None,
-            state: KeyValueState::AfterKey,
+            state: State::AfterKey,
             temp_key: key.clone(),
         }
     }
@@ -50,7 +50,7 @@ impl KeyValueP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
-            KeyValueState::AfterKey => {
+            State::AfterKey => {
                 match token.type_ {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
@@ -61,7 +61,7 @@ impl KeyValueP {
                         );
                     } //Ignored it.
                     TokenType::Equals => {
-                        self.state = KeyValueState::AfterEquals;
+                        self.state = State::AfterEquals;
                         Log::trace_t(
                             "KeyValueP#parse/AfterKey/=",
                             self.log_table()
@@ -79,11 +79,11 @@ impl KeyValueP {
                     }
                 }
             }
-            KeyValueState::AfterEquals => {
+            State::AfterEquals => {
                 match token.type_ {
                     TokenType::DoubleQuotation => {
                         self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
-                        self.state = KeyValueState::DoubleQuotedString;
+                        self.state = State::DoubleQuotedString;
                         Log::trace_t(
                             "KeyValueP#parse/After=/\"",
                             self.log_table()
@@ -97,7 +97,7 @@ impl KeyValueP {
                             &self.temp_key,
                             &RightValue::LiteralString(LiteralString::new(&token)),
                         ));
-                        self.state = KeyValueState::End;
+                        self.state = State::End;
                         Log::trace_t(
                             "KeyValueP#parse/After=/Key",
                             self.log_table()
@@ -108,7 +108,7 @@ impl KeyValueP {
                     }
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());
-                        self.state = KeyValueState::AfterLeftCurlyBracket;
+                        self.state = State::AfterLeftCurlyBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/{",
                             self.log_table()
@@ -118,7 +118,7 @@ impl KeyValueP {
                     }
                     TokenType::LeftSquareBracket => {
                         self.array_p = Some(ArrayP::default());
-                        self.state = KeyValueState::AfterLeftSquareBracket;
+                        self.state = State::AfterLeftSquareBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/[",
                             self.log_table()
@@ -128,7 +128,7 @@ impl KeyValueP {
                     }
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_p = Some(SingleQuotedStringP::new());
-                        self.state = KeyValueState::SingleQuotedString;
+                        self.state = State::SingleQuotedString;
                         Log::trace_t(
                             "KeyValueP#parse/After=/'",
                             self.log_table()
@@ -154,7 +154,7 @@ impl KeyValueP {
                     }
                 }
             }
-            KeyValueState::AfterLeftCurlyBracket => {
+            State::AfterLeftCurlyBracket => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/After{",
                     self.log_table()
@@ -170,7 +170,7 @@ impl KeyValueP {
                                 &RightValue::InlineTable(child_m),
                             ));
                             self.inline_table_p = None;
-                            self.state = KeyValueState::End;
+                            self.state = State::End;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -193,7 +193,7 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
-            KeyValueState::AfterLeftSquareBracket => {
+            State::AfterLeftSquareBracket => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/After[",
                     self.log_table()
@@ -207,7 +207,7 @@ impl KeyValueP {
                             self.buffer =
                                 Some(KeyValue::new(&self.temp_key, &RightValue::Array(child_m)));
                             self.array_p = None;
-                            self.state = KeyValueState::End;
+                            self.state = State::End;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -230,7 +230,7 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
-            KeyValueState::DoubleQuotedString => {
+            State::DoubleQuotedString => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/\"value\"",
                     Table::default().str("token", &format!("{:?}", token)),
@@ -244,7 +244,7 @@ impl KeyValueP {
                                 &RightValue::DoubleQuotedString(child_m),
                             ));
                             self.double_quoted_string_p = None;
-                            self.state = KeyValueState::End;
+                            self.state = State::End;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -267,7 +267,7 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
-            KeyValueState::SingleQuotedString => {
+            State::SingleQuotedString => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/'value'",
                     self.log_table()
@@ -283,7 +283,7 @@ impl KeyValueP {
                                 &RightValue::SingleQuotedString(child_m),
                             ));
                             self.single_quoted_string_p = None;
-                            self.state = KeyValueState::End;
+                            self.state = State::End;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -306,7 +306,7 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
-            KeyValueState::End => {
+            State::End => {
                 return PResult::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))

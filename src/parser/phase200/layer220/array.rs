@@ -23,7 +23,7 @@ use casual_logger::{Log, Table};
 ///
 /// Example: `[ 'a', 'b', 'c' ]`.  
 #[derive(Clone, Debug)]
-pub enum ArrayState {
+pub enum State {
     /// [ か , の次。
     AfterDoubleQuotedString,
     AfterLeftSquareBracket,
@@ -41,7 +41,7 @@ impl Default for ArrayP {
             buffer: None,
             double_quoted_string_p: None,
             single_quoted_string_p: None,
-            state: ArrayState::AfterLeftSquareBracket,
+            state: State::AfterLeftSquareBracket,
         }
     }
 }
@@ -57,7 +57,7 @@ impl ArrayP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
-            ArrayState::AfterDoubleQuotedString => {
+            State::AfterDoubleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/After\"value\"",
                     self.log_table()
@@ -67,10 +67,10 @@ impl ArrayP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
-                        self.state = ArrayState::AfterLeftSquareBracket;
+                        self.state = State::AfterLeftSquareBracket;
                     }
                     TokenType::RightSquareBracket => {
-                        self.state = ArrayState::End;
+                        self.state = State::End;
                         return PResult::End;
                     }
                     _ => {
@@ -83,7 +83,7 @@ impl ArrayP {
                     }
                 }
             }
-            ArrayState::AfterLeftSquareBracket => {
+            State::AfterLeftSquareBracket => {
                 match token.type_ {
                     TokenType::DoubleQuotation => {
                         Log::trace_t(
@@ -93,7 +93,7 @@ impl ArrayP {
                                 .str("token", &format!("{:?}", token)),
                         );
                         self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
-                        self.state = ArrayState::DoubleQuotedString;
+                        self.state = State::DoubleQuotedString;
                     }
                     TokenType::Key => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
@@ -102,7 +102,7 @@ impl ArrayP {
                         }
                         let m = self.buffer.as_mut().unwrap();
                         m.push_literal_string(&LiteralString::new(token));
-                        self.state = ArrayState::AfterItem;
+                        self.state = State::AfterItem;
                         Log::trace_t(
                             "ArrayP#parse/After[/Key",
                             self.log_table()
@@ -119,7 +119,7 @@ impl ArrayP {
                                 .str("token", &format!("{:?}", token)),
                         );
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
-                        self.state = ArrayState::SingleQuotedString;
+                        self.state = State::SingleQuotedString;
                     }
                     TokenType::WhiteSpace => {
                         Log::trace_t(
@@ -139,7 +139,7 @@ impl ArrayP {
                     }
                 }
             }
-            ArrayState::AfterItem => {
+            State::AfterItem => {
                 Log::trace_t(
                     "ArrayP#parse/After*",
                     self.log_table()
@@ -148,10 +148,10 @@ impl ArrayP {
                 );
                 match token.type_ {
                     TokenType::Comma => {
-                        self.state = ArrayState::AfterLeftSquareBracket;
+                        self.state = State::AfterLeftSquareBracket;
                     }
                     TokenType::RightSquareBracket => {
-                        self.state = ArrayState::End;
+                        self.state = State::End;
                         return PResult::End;
                     }
                     _ => {
@@ -164,7 +164,7 @@ impl ArrayP {
                     }
                 }
             }
-            ArrayState::AfterSingleQuotedString => {
+            State::AfterSingleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/After'value'",
                     self.log_table()
@@ -174,10 +174,10 @@ impl ArrayP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
-                        self.state = ArrayState::AfterLeftSquareBracket;
+                        self.state = State::AfterLeftSquareBracket;
                     }
                     TokenType::RightSquareBracket => {
-                        self.state = ArrayState::End;
+                        self.state = State::End;
                         return PResult::End;
                     }
                     _ => {
@@ -190,7 +190,7 @@ impl ArrayP {
                     }
                 }
             }
-            ArrayState::DoubleQuotedString => {
+            State::DoubleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/\"value\"",
                     self.log_table()
@@ -207,7 +207,7 @@ impl ArrayP {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_double_quote_string(&child_m);
                             self.double_quoted_string_p = None;
-                            self.state = ArrayState::AfterDoubleQuotedString;
+                            self.state = State::AfterDoubleQuotedString;
                         } else {
                             return PResult::Err(
                                 self.log_table()
@@ -229,7 +229,7 @@ impl ArrayP {
                     PResult::Ongoing => {}
                 }
             }
-            ArrayState::End => {
+            State::End => {
                 Log::trace_t(
                     "ArrayP#parse/End",
                     self.log_table()
@@ -243,7 +243,7 @@ impl ArrayP {
                         .clone(),
                 );
             }
-            ArrayState::SingleQuotedString => {
+            State::SingleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse/'value'",
                     self.log_table()
@@ -260,7 +260,7 @@ impl ArrayP {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_single_quote_string(&child_m);
                             self.single_quoted_string_p = None;
-                            self.state = ArrayState::AfterSingleQuotedString;
+                            self.state = State::AfterSingleQuotedString;
                         } else {
                             return PResult::Err(
                                 self.log_table()
