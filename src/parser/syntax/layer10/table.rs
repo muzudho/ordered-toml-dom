@@ -2,7 +2,7 @@
 //! テーブル構文パーサー。  
 
 use crate::model::layer30::Table as TableM;
-use crate::parser::syntax::{PResult, TableP};
+use crate::parser::syntax::layer10::{PResult, TableP};
 use crate::token::{Token, TokenType};
 use casual_logger::Table as LogTable;
 

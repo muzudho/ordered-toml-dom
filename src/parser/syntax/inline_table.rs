@@ -3,7 +3,7 @@
 
 use crate::model::layer20::InlineTable;
 use crate::parser::syntax::{
-    machine_state::InlineTableState, usize_to_i128, InlineTableP, KeyValueP, PResult,
+    layer10::PResult, machine_state::InlineTableState, usize_to_i128, InlineTableP, KeyValueP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};

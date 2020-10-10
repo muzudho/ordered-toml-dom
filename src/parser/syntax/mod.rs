@@ -8,18 +8,16 @@ pub mod inline_table;
 pub mod key_value;
 pub mod layer10;
 pub mod machine_state;
-pub mod table;
 
 use crate::model::{
     layer20::{Array, InlineTable, KeyValue},
-    layer30::{ArrayOfTable, DocumentElement, Table as TableM},
+    layer30::{ArrayOfTable, DocumentElement},
 };
 use crate::parser::syntax::{
-    layer10::{CommentP, DoubleQuotedStringP, SingleQuotedStringP},
+    layer10::{CommentP, DoubleQuotedStringP, SingleQuotedStringP, TableP},
     machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState},
 };
 use crate::token::Token;
-use casual_logger::Table as LogTable;
 use std::convert::TryInto;
 
 fn usize_to_i128(num: usize) -> i128 {
@@ -28,16 +26,6 @@ fn usize_to_i128(num: usize) -> i128 {
     } else {
         -1
     }
-}
-
-/// Result of syntax parser.  
-/// 構文パーサーの結果。  
-pub enum PResult {
-    /// End of syntax.
-    End,
-    Ongoing,
-    /// Error.
-    Err(LogTable),
 }
 
 /// Array of table syntax parser.  
@@ -94,13 +82,4 @@ pub struct KeyValueP {
     single_quoted_string_p: Option<SingleQuotedStringP>,
     state: KeyValueState,
     temp_key: Token,
-}
-
-/// Table syntax parser.  
-/// テーブル構文パーサー。  
-///
-/// Example: `"value"`.  
-#[derive(Clone)]
-pub struct TableP {
-    buffer: Option<TableM>,
 }

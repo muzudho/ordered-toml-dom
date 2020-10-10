@@ -2,7 +2,7 @@
 //! 二重引用符文字列構文パーサー。  
 
 use crate::model::layer10::DoubleQuotedString;
-use crate::parser::syntax::{layer10::DoubleQuotedStringP, PResult};
+use crate::parser::syntax::layer10::{DoubleQuotedStringP, PResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 

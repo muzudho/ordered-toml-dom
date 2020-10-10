@@ -13,7 +13,7 @@ pub mod syntax_scanner;
 mod token;
 
 use crate::model::layer40::Document;
-use crate::parser::{lexical_parser::LexicalParser, syntax::PResult};
+use crate::parser::{lexical_parser::LexicalParser, syntax::layer10::PResult};
 use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
