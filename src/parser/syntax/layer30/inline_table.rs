@@ -2,12 +2,12 @@
 //! インライン・テーブル構文パーサー。  
 
 use crate::model::{
-    layer20::InlineTable,
-    layer5::token::{Token, TokenType},
+    layer10::token::{Token, TokenType},
+    layer30::InlineTable,
 };
 use crate::parser::syntax::{
-    layer10::PResult,
-    layer20::{usize_to_i128, InlineTableP, KeyValueP},
+    layer20::PResult,
+    layer30::{usize_to_i128, InlineTableP, KeyValueP},
 };
 use casual_logger::{Log, Table};
 

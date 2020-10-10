@@ -8,8 +8,8 @@
 //! ```
 
 use crate::model::{
-    layer10::{DoubleQuotedString, LiteralString, SingleQuotedString},
-    layer20::{Array, ItemValue},
+    layer20::{DoubleQuotedString, LiteralString, SingleQuotedString},
+    layer30::{Array, ItemValue},
 };
 use std::fmt;
 

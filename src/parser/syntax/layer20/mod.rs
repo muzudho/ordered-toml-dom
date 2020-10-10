@@ -1,57 +1,66 @@
-pub mod array;
-pub mod inline_table;
-pub mod key_value;
+pub mod array_of_table;
+pub mod comment;
+pub mod double_quoted_string;
+pub mod single_quoted_string;
+pub mod table;
 
 use crate::model::{
-    layer20::{Array, InlineTable, KeyValue},
-    layer5::token::Token,
+    layer20::{Comment, DoubleQuotedString, SingleQuotedString},
+    layer40::{ArrayOfTable, Table as TableM},
 };
-use crate::parser::syntax::{
-    layer10::{DoubleQuotedStringP, SingleQuotedStringP},
-    layer20::{array::ArrayState, inline_table::InlineTableState, key_value::KeyValueState},
-};
-use std::convert::TryInto;
+use casual_logger::Table as LogTable;
 
-pub fn usize_to_i128(num: usize) -> i128 {
-    if let Ok(n) = num.try_into() {
-        n
-    } else {
-        -1
-    }
-}
-
-/// Array parser.  
-/// 配列パーサー。  
+/// Array of table syntax parser.  
+/// テーブル配列構文パーサー。  
 ///
-/// Example: `[ 'a', 'b', 'c' ]`.  
+/// Example: `"value"`.  
 #[derive(Clone)]
-pub struct ArrayP {
-    buffer: Option<Array>,
-    double_quoted_string_p: Option<Box<DoubleQuotedStringP>>,
-    single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
-    state: ArrayState,
+pub struct ArrayOfTableP {
+    buffer: Option<ArrayOfTable>,
 }
 
-/// Inline table syntax parser.  
-/// インライン・テーブル構文パーサー。  
+/// Comment parser.  
+/// コメント・パーサー。  
 ///
-/// Example: `{ key = value, key = value }`.  
-pub struct InlineTableP {
-    state: InlineTableState,
-    buffer: Option<InlineTable>,
-    key_value_p: Option<Box<KeyValueP>>,
+/// Example: `# comment`.  
+#[derive(Clone)]
+pub struct CommentP {
+    buffer: Option<Comment>,
 }
 
-/// Key value syntax parser.  
-/// キー値構文パーサー。  
+/// Double quoted string syntax parser.  
+/// 二重引用符文字列構文パーサー。  
 ///
-/// `key = value`.  
-pub struct KeyValueP {
-    array_p: Option<ArrayP>,
-    buffer: Option<KeyValue>,
-    double_quoted_string_p: Option<DoubleQuotedStringP>,
-    inline_table_p: Option<InlineTableP>,
-    single_quoted_string_p: Option<SingleQuotedStringP>,
-    state: KeyValueState,
-    temp_key: Token,
+/// Example: `"value"`.  
+#[derive(Clone)]
+pub struct DoubleQuotedStringP {
+    buffer: Option<DoubleQuotedString>,
+}
+
+/// Result of syntax parser.  
+/// 構文パーサーの結果。  
+pub enum PResult {
+    /// End of syntax.
+    End,
+    Ongoing,
+    /// Error.
+    Err(LogTable),
+}
+
+/// Single quoted string syntax parser.  
+/// 単一引用符文字列構文パーサー。  
+///
+/// Example: `'value'`.  
+#[derive(Clone)]
+pub struct SingleQuotedStringP {
+    buffer: Option<SingleQuotedString>,
+}
+
+/// Table syntax parser.  
+/// テーブル構文パーサー。  
+///
+/// Example: `"value"`.  
+#[derive(Clone)]
+pub struct TableP {
+    buffer: Option<TableM>,
 }

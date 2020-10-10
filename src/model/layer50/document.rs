@@ -1,7 +1,7 @@
 //! Document model.  
 //! ドキュメント・モデル。  
 
-use crate::model::{layer30::DocumentElement, layer40::Document};
+use crate::model::{layer40::DocumentElement, layer50::Document};
 use std::fmt;
 
 impl Default for Document {

@@ -2,13 +2,13 @@
 //! `縦幅のある行` 構文パーサー。  
 
 use crate::model::{
-    layer30::DocumentElement,
-    layer5::token::{Token, TokenType},
+    layer10::token::{Token, TokenType},
+    layer40::DocumentElement,
 };
 use crate::parser::syntax::{
-    layer10::{ArrayOfTableP, CommentP, PResult, TableP},
-    layer20::{usize_to_i128, KeyValueP},
-    layer30::DocumentElementP,
+    layer20::{ArrayOfTableP, CommentP, PResult, TableP},
+    layer30::{usize_to_i128, KeyValueP},
+    layer40::DocumentElementP,
 };
 use casual_logger::Table;
 

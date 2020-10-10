@@ -11,8 +11,8 @@ pub mod model;
 mod parser;
 pub mod syntax_scanner;
 
-use crate::model::{layer40::Document, layer5::token};
-use crate::parser::{lexical_parser::LexicalParser, syntax::layer10::PResult};
+use crate::model::{layer10::token, layer50::Document};
+use crate::parser::{lexical_parser::LexicalParser, syntax::layer20::PResult};
 use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;

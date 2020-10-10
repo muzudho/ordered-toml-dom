@@ -2,9 +2,9 @@
 //! 縦幅のある行 モデル。  
 
 use crate::model::{
-    layer10::Comment,
-    layer20::KeyValue,
-    layer30::{ArrayOfTable, DocumentElement, Table},
+    layer20::Comment,
+    layer30::KeyValue,
+    layer40::{ArrayOfTable, DocumentElement, Table},
 };
 use std::fmt;
 

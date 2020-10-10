@@ -1,28 +1,65 @@
-pub mod array_of_table;
-pub mod document_element;
-pub mod table;
+pub mod array;
+pub mod inline_table;
+pub mod item_value;
+pub mod key_value;
+pub mod right_value;
 
-use crate::model::{layer10::Comment, layer20::KeyValue};
+use crate::model::layer20::{DoubleQuotedString, LiteralString, SingleQuotedString};
 
-/// WIP.  
+/// It has multiple item values.  
+/// 複数の項目値を持ちます。  
 #[derive(Clone)]
-pub struct ArrayOfTable {
-    pub value: String,
+pub struct Array {
+    items: Vec<ItemValue>,
 }
 
-/// Either a Empty-line, Comment, Key Value, Table or a Array-of-table.  
-/// 空行、コメント、キー値、テーブル、テーブルの配列のいずれかです。  
+/// It has multiple key-values.  
+/// 複数の キー・バリュー を持ちます。  
 #[derive(Clone)]
-pub enum DocumentElement {
-    ArrayOfTable(ArrayOfTable),
-    Comment(Comment),
-    EmptyLine,
+pub struct InlineTable {
+    items: Vec<KeyValue>,
+}
+
+/// Array, inline table item.  
+/// 配列、インライン・テーブルの項目です。  
+#[derive(Clone)]
+pub enum ItemValue {
+    /// Recursive.
+    /// 再帰的。
+    Array(Array),
+    DoubleQuotedString(DoubleQuotedString),
+    /// Recursive.
+    /// 再帰的。
+    InlineTable(InlineTable),
+    /// Recursive.
+    /// 再帰的。
     KeyValue(KeyValue),
-    Table(Table),
+    LiteralString(LiteralString),
+    SingleQuotedString(SingleQuotedString),
 }
 
-/// WIP.  
+/// It has a key and a value.  
+/// キーと値を持ちます。  
 #[derive(Clone)]
-pub struct Table {
-    pub value: String,
+pub struct KeyValue {
+    pub key: String,
+    /// Recursive.
+    /// 再帰的。
+    pub value: Box<RightValue>,
+}
+
+/// The right side of the key value model.  
+/// キー値モデルの右辺です。  
+#[derive(Clone)]
+pub enum RightValue {
+    /// Recursive.
+    /// 再帰的。
+    Array(Array),
+    DoubleQuotedString(DoubleQuotedString),
+    /// Recursive.
+    /// 再帰的。
+    InlineTable(InlineTable),
+    // No KeyValue.
+    LiteralString(LiteralString),
+    SingleQuotedString(SingleQuotedString),
 }

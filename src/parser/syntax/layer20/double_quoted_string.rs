@@ -1,22 +1,22 @@
-//! Table syntax parser.  
-//! テーブル構文パーサー。  
+//! Double quoted string syntax parser.  
+//! 二重引用符文字列構文パーサー。  
 
 use crate::model::{
-    layer30::Table as TableM,
-    layer5::token::{Token, TokenType},
+    layer10::token::{Token, TokenType},
+    layer20::DoubleQuotedString,
 };
-use crate::parser::syntax::layer10::{PResult, TableP};
-use casual_logger::Table as LogTable;
+use crate::parser::syntax::layer20::{DoubleQuotedStringP, PResult};
+use casual_logger::Table;
 
-impl TableP {
-    pub fn flush(&mut self) -> Option<TableM> {
+impl DoubleQuotedStringP {
+    pub fn flush(&mut self) -> Option<DoubleQuotedString> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        TableP {
-            buffer: Some(TableM::default()),
+        DoubleQuotedStringP {
+            buffer: Some(DoubleQuotedString::default()),
         }
     }
     /// # Returns
@@ -38,8 +38,8 @@ impl TableP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self) -> LogTable {
-        let mut t = LogTable::default().clone();
+    pub fn log_table(&self) -> Table {
+        let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));
         }

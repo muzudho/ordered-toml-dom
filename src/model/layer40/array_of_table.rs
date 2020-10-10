@@ -1,22 +1,22 @@
-//! Table model.  
-//! テーブル・モデル。  
+//! Array of table model.  
+//! テーブルの配列モデル。  
 
-use crate::model::{layer30::Table, layer5::token::Token};
+use crate::model::{layer10::token::Token, layer40::ArrayOfTable};
 use std::fmt;
 
-impl Default for Table {
+impl Default for ArrayOfTable {
     fn default() -> Self {
-        Table {
+        ArrayOfTable {
             value: String::new(),
         }
     }
 }
-impl Table {
+impl ArrayOfTable {
     pub fn push_token(&mut self, token: &Token) {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for Table {
+impl fmt::Debug for ArrayOfTable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "\"{}\"", self.value)
     }

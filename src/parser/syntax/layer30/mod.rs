@@ -1,19 +1,57 @@
-pub mod document_element;
+pub mod array;
+pub mod inline_table;
+pub mod key_value;
 
-use crate::model::layer30::DocumentElement;
-use crate::parser::syntax::{
-    layer10::{ArrayOfTableP, CommentP, TableP},
-    layer20::KeyValueP,
-    layer30::document_element::DocumentElementState,
+use crate::model::{
+    layer10::token::Token,
+    layer30::{Array, InlineTable, KeyValue},
 };
+use crate::parser::syntax::{
+    layer20::{DoubleQuotedStringP, SingleQuotedStringP},
+    layer30::{array::ArrayState, inline_table::InlineTableState, key_value::KeyValueState},
+};
+use std::convert::TryInto;
 
-/// Broad-line syntax parser.  
-/// `縦幅のある行` パーサー。  
-pub struct DocumentElementP {
-    array_of_table_p: Option<ArrayOfTableP>,
-    buffer: Option<DocumentElement>,
-    comment_p: Option<CommentP>,
-    key_value_p: Option<KeyValueP>,
-    state: DocumentElementState,
-    table_p: Option<TableP>,
+pub fn usize_to_i128(num: usize) -> i128 {
+    if let Ok(n) = num.try_into() {
+        n
+    } else {
+        -1
+    }
+}
+
+/// Array parser.  
+/// 配列パーサー。  
+///
+/// Example: `[ 'a', 'b', 'c' ]`.  
+#[derive(Clone)]
+pub struct ArrayP {
+    buffer: Option<Array>,
+    double_quoted_string_p: Option<Box<DoubleQuotedStringP>>,
+    single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
+    state: ArrayState,
+}
+
+/// Inline table syntax parser.  
+/// インライン・テーブル構文パーサー。  
+///
+/// Example: `{ key = value, key = value }`.  
+pub struct InlineTableP {
+    state: InlineTableState,
+    buffer: Option<InlineTable>,
+    key_value_p: Option<Box<KeyValueP>>,
+}
+
+/// Key value syntax parser.  
+/// キー値構文パーサー。  
+///
+/// `key = value`.  
+pub struct KeyValueP {
+    array_p: Option<ArrayP>,
+    buffer: Option<KeyValue>,
+    double_quoted_string_p: Option<DoubleQuotedStringP>,
+    inline_table_p: Option<InlineTableP>,
+    single_quoted_string_p: Option<SingleQuotedStringP>,
+    state: KeyValueState,
+    temp_key: Token,
 }

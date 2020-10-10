@@ -2,13 +2,13 @@
 //! キー値構文パーサー。  
 
 use crate::model::{
-    layer10::LiteralString,
-    layer20::{KeyValue, RightValue},
-    layer5::token::{Token, TokenType},
+    layer10::token::{Token, TokenType},
+    layer20::LiteralString,
+    layer30::{KeyValue, RightValue},
 };
 use crate::parser::syntax::{
-    layer10::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
-    layer20::{usize_to_i128, ArrayP, InlineTableP, KeyValueP},
+    layer20::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
+    layer30::{usize_to_i128, ArrayP, InlineTableP, KeyValueP},
 };
 use casual_logger::{Log, Table};
 
