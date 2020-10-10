@@ -7,15 +7,13 @@
 extern crate lazy_static;
 extern crate regex;
 
-pub mod lexical_parser;
 pub mod model;
 mod parser;
 pub mod syntax_scanner;
 mod token;
 
-use crate::lexical_parser::LexicalParser;
 use crate::model::layer40::Document;
-use crate::parser::syntax::ResultSP;
+use crate::parser::{lexical_parser::LexicalParser, syntax::ResultSP};
 use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
