@@ -24,14 +24,17 @@ use casual_logger::{Log, Table};
 /// Example: `[ 'a', 'b', 'c' ]`.  
 #[derive(Clone, Debug)]
 pub enum State {
-    /// `[ "a",` の次。
-    AfterCommaBefindDoubleQuotedString,
-    /// [ か , の次。
+    /// After `[ "a",`.
+    AfterCommaBefindQuotedString,
+    /// After `[ true,`.
+    AfterCommaBehindKeyWithoutDot,
+    /// After `[` or `,`.
     AfterDoubleQuotedString,
+    /// After `[`.
     AfterLeftSquareBracket,
     AfterSingleQuotedString,
-    /// , か ] を待ちます。
-    AfterItem,
+    /// `[ true` , か ] を待ちます。
+    AfterKeyWithoutDot,
     DoubleQuotedString,
     End,
     SingleQuotedString,
@@ -60,17 +63,69 @@ impl ArrayP {
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
             // `[ "a",` の次。
-            State::AfterCommaBefindDoubleQuotedString => {
+            State::AfterCommaBefindQuotedString => {
                 match token.type_ {
                     TokenType::DoubleQuotation => {
                         Log::trace_t(
-                            "ArrayP#parse/After[/\"",
+                            "ArrayP#parse/After[/\"\",",
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
                         self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
                         self.state = State::DoubleQuotedString;
+                    }
+                    TokenType::SingleQuotation => {
+                        Log::trace_t(
+                            "ArrayP#parse/After[/'/',",
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token)),
+                        );
+                        self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
+                        self.state = State::SingleQuotedString;
+                    }
+                    TokenType::WhiteSpace => {
+                        Log::trace_t(
+                            "ArrayP#parse/After[/\"\",/WhiteSpace",
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token)),
+                        );
+                    } // Ignore it.
+                    // `]`.
+                    TokenType::RightSquareBracket => {
+                        self.state = State::End;
+                        return PResult::End;
+                    }
+                    _ => {
+                        return PResult::Err(
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
+                }
+            }
+            // After `[ true,`.
+            State::AfterCommaBehindKeyWithoutDot => {
+                match token.type_ {
+                    TokenType::KeyWithoutDot => {
+                        // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
+                        if let None = self.buffer {
+                            self.buffer = Some(Array::default());
+                        }
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_literal_string(&LiteralString::new(token));
+                        self.state = State::AfterKeyWithoutDot;
+                        Log::trace_t(
+                            "ArrayP#parse/After[/Key",
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token))
+                                .str("buffer", &format!("{:?}", self.buffer)),
+                        );
                     }
                     TokenType::WhiteSpace => {
                         Log::trace_t(
@@ -80,6 +135,11 @@ impl ArrayP {
                                 .str("token", &format!("{:?}", token)),
                         );
                     } // Ignore it.
+                    // `]`.
+                    TokenType::RightSquareBracket => {
+                        self.state = State::End;
+                        return PResult::End;
+                    }
                     _ => {
                         return PResult::Err(
                             self.log_table()
@@ -101,7 +161,7 @@ impl ArrayP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
-                        self.state = State::AfterCommaBefindDoubleQuotedString;
+                        self.state = State::AfterCommaBefindQuotedString;
                     }
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -137,7 +197,7 @@ impl ArrayP {
                         }
                         let m = self.buffer.as_mut().unwrap();
                         m.push_literal_string(&LiteralString::new(token));
-                        self.state = State::AfterItem;
+                        self.state = State::AfterKeyWithoutDot;
                         Log::trace_t(
                             "ArrayP#parse/After[/Key",
                             self.log_table()
@@ -174,7 +234,7 @@ impl ArrayP {
                     }
                 }
             }
-            State::AfterItem => {
+            State::AfterKeyWithoutDot => {
                 Log::trace_t(
                     "ArrayP#parse/After*",
                     self.log_table()
@@ -183,7 +243,7 @@ impl ArrayP {
                 );
                 match token.type_ {
                     TokenType::Comma => {
-                        self.state = State::AfterLeftSquareBracket;
+                        self.state = State::AfterCommaBehindKeyWithoutDot;
                     }
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -210,7 +270,7 @@ impl ArrayP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
-                        self.state = State::AfterLeftSquareBracket;
+                        self.state = State::AfterCommaBefindQuotedString;
                     }
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
