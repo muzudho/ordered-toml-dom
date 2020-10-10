@@ -1,8 +1,7 @@
 //! Table model.  
 //! テーブル・モデル。  
 
-use crate::model::layer30::Table;
-use crate::token::Token;
+use crate::model::{layer30::Table, layer5::token::Token};
 use std::fmt;
 
 impl Default for Table {

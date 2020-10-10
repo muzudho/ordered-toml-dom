@@ -1,9 +1,11 @@
 //! Double quoted string syntax parser.  
 //! 二重引用符文字列構文パーサー。  
 
-use crate::model::layer10::DoubleQuotedString;
+use crate::model::{
+    layer10::DoubleQuotedString,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::layer10::{DoubleQuotedStringP, PResult};
-use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
 impl DoubleQuotedStringP {

@@ -1,12 +1,14 @@
 //! Inline table syntax parser.  
 //! インライン・テーブル構文パーサー。  
 
-use crate::model::layer20::InlineTable;
+use crate::model::{
+    layer20::InlineTable,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::{
     layer10::PResult,
     layer20::{usize_to_i128, InlineTableP, KeyValueP},
 };
-use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
 
 /// Inline table syntax machine state.  

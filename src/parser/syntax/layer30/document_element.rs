@@ -1,13 +1,15 @@
 //! Broad-line syntax parser.  
 //! `縦幅のある行` 構文パーサー。  
 
-use crate::model::layer30::DocumentElement;
+use crate::model::{
+    layer30::DocumentElement,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::{
     layer10::{ArrayOfTableP, CommentP, PResult, TableP},
     layer20::{usize_to_i128, KeyValueP},
     layer30::DocumentElementP,
 };
-use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
 /// Line syntax machine state.  

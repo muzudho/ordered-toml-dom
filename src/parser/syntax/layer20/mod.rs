@@ -2,12 +2,14 @@ pub mod array;
 pub mod inline_table;
 pub mod key_value;
 
-use crate::model::layer20::{Array, InlineTable, KeyValue};
+use crate::model::{
+    layer20::{Array, InlineTable, KeyValue},
+    layer5::token::Token,
+};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, SingleQuotedStringP},
     layer20::{array::ArrayState, inline_table::InlineTableState, key_value::KeyValueState},
 };
-use crate::token::Token;
 use std::convert::TryInto;
 
 pub fn usize_to_i128(num: usize) -> i128 {

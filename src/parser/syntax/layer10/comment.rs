@@ -1,9 +1,11 @@
 //! Comment syntax parser.  
 //! コメント構文パーサー。  
 
-use crate::model::layer10::Comment;
+use crate::model::{
+    layer10::Comment,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::layer10::{CommentP, PResult};
-use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
 impl CommentP {

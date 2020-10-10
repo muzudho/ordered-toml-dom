@@ -1,8 +1,7 @@
 //! Array of table model.  
 //! テーブルの配列モデル。  
 
-use crate::model::layer30::ArrayOfTable;
-use crate::token::Token;
+use crate::model::{layer30::ArrayOfTable, layer5::token::Token};
 use std::fmt;
 
 impl Default for ArrayOfTable {

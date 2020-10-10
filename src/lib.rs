@@ -10,9 +10,8 @@ extern crate regex;
 pub mod model;
 mod parser;
 pub mod syntax_scanner;
-mod token;
 
-use crate::model::layer40::Document;
+use crate::model::{layer40::Document, layer5::token};
 use crate::parser::{lexical_parser::LexicalParser, syntax::layer10::PResult};
 use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};

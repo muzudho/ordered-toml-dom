@@ -7,8 +7,7 @@
 //! // "ハロー"
 //! ```
 
-use crate::model::layer10::DoubleQuotedString;
-use crate::token::Token;
+use crate::model::{layer10::DoubleQuotedString, layer5::token::Token};
 use std::fmt;
 
 impl Default for DoubleQuotedString {

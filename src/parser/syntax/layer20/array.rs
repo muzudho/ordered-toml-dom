@@ -7,12 +7,15 @@
 //! // [ 1, 2, 3 ]
 //! ```
 
-use crate::model::{layer10::LiteralString, layer20::Array};
+use crate::model::{
+    layer10::LiteralString,
+    layer20::Array,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
     layer20::{usize_to_i128, ArrayP},
 };
-use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
 
 /// Array syntax machine state.  

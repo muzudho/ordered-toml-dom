@@ -1,9 +1,11 @@
 //! Array of ArrayOfTable syntax parser.  
 //! テーブルの配列構文パーサー。  
 
-use crate::model::layer30::ArrayOfTable as ArrayOfTableM;
+use crate::model::{
+    layer30::ArrayOfTable as ArrayOfTableM,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::layer10::{ArrayOfTableP, PResult};
-use crate::token::{Token, TokenType};
 use casual_logger::Table as LogTable;
 
 impl ArrayOfTableP {

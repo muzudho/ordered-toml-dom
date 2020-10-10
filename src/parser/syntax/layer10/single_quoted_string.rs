@@ -1,9 +1,11 @@
 //! Single quoted string syntax parser.  
 //! 単一引用符文字列構文パーサー。  
 
-use crate::model::layer10::SingleQuotedString;
+use crate::model::{
+    layer10::SingleQuotedString,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::layer10::{PResult, SingleQuotedStringP};
-use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
 impl SingleQuotedStringP {

@@ -1,9 +1,11 @@
 //! Table syntax parser.  
 //! テーブル構文パーサー。  
 
-use crate::model::layer30::Table as TableM;
+use crate::model::{
+    layer30::Table as TableM,
+    layer5::token::{Token, TokenType},
+};
 use crate::parser::syntax::layer10::{PResult, TableP};
-use crate::token::{Token, TokenType};
 use casual_logger::Table as LogTable;
 
 impl TableP {

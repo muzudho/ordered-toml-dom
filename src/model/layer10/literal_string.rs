@@ -7,8 +7,7 @@
 //! // work_number
 //! ```
 
-use crate::model::layer10::LiteralString;
-use crate::token::Token;
+use crate::model::{layer10::LiteralString, layer5::token::Token};
 use std::fmt;
 
 impl Default for LiteralString {

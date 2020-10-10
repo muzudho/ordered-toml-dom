@@ -7,8 +7,7 @@
 //! // 'ハロー'
 //! ```
 
-use crate::model::layer10::SingleQuotedString;
-use crate::token::Token;
+use crate::model::{layer10::SingleQuotedString, layer5::token::Token};
 use std::fmt;
 
 impl Default for SingleQuotedString {
