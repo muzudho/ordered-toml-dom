@@ -8,7 +8,8 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     layer210::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
-    layer220::{usize_to_i128, ArrayP, InlineTableP, KeyValueP},
+    layer220::{usize_to_i128, ArrayP},
+    layer225::{InlineTableP, KeyValueP},
 };
 use casual_logger::{Log, Table};
 

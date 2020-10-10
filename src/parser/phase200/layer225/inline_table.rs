@@ -7,7 +7,8 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     layer210::PResult,
-    layer220::{usize_to_i128, InlineTableP, KeyValueP},
+    layer220::usize_to_i128,
+    layer225::{InlineTableP, KeyValueP},
 };
 use casual_logger::{Log, Table};
 
@@ -43,9 +44,11 @@ impl InlineTableP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
+            // After `{`.
             State::AfterLeftCurlyBracket => {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
+                    // `apple.banana`
                     TokenType::Key => {
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
                         self.state = State::KeyValue;
@@ -59,6 +62,7 @@ impl InlineTableP {
                     )),
                 }
             }
+            // `apple.banana`.
             State::KeyValue => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
@@ -89,6 +93,7 @@ impl InlineTableP {
                     PResult::Ongoing => {}
                 }
             }
+            // After `apple.banana`.
             State::AfterKeyValue => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
                 // `,`

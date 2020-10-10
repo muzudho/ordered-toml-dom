@@ -7,7 +7,8 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
-    layer220::{usize_to_i128, KeyValueP},
+    layer220::usize_to_i128,
+    layer225::KeyValueP,
     layer230::DocumentElementP,
 };
 use casual_logger::Table;
