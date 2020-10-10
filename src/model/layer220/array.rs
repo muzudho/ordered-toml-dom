@@ -28,6 +28,9 @@ impl Array {
     pub fn push_double_quote_string(&mut self, m: &DoubleQuotedString) {
         self.items.push(ItemValue::DoubleQuotedString(m.clone()));
     }
+    pub fn push_array(&mut self, m: &Array) {
+        self.items.push(ItemValue::Array(m.clone()));
+    }
 }
 impl fmt::Debug for Array {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

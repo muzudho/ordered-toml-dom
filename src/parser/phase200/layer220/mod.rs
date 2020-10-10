@@ -22,6 +22,8 @@ pub fn usize_to_i128(num: usize) -> i128 {
 #[derive(Clone)]
 pub struct ArrayP {
     buffer: Option<Array>,
+    /// Recursive.
+    array_p: Option<Box<ArrayP>>,
     double_quoted_string_p: Option<Box<DoubleQuotedStringP>>,
     single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
     state: ArrayState,

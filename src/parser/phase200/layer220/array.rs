@@ -35,6 +35,8 @@ pub enum State {
     AfterSingleQuotedString,
     /// `[ true` , か ] を待ちます。
     AfterKeyWithoutDot,
+    /// After `[`.
+    Array,
     DoubleQuotedString,
     End,
     SingleQuotedString,
@@ -44,6 +46,7 @@ impl Default for ArrayP {
     fn default() -> Self {
         ArrayP {
             buffer: None,
+            array_p: None,
             double_quoted_string_p: None,
             single_quoted_string_p: None,
             state: State::First,
@@ -180,6 +183,17 @@ impl ArrayP {
             // After `[`.
             State::First => {
                 match token.type_ {
+                    // `[`. Recursive.
+                    TokenType::LeftSquareBracket => {
+                        Log::trace_t(
+                            "ArrayP#parse/After[/[",
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token)),
+                        );
+                        self.array_p = Some(Box::new(ArrayP::default()));
+                        self.state = State::Array;
+                    }
                     TokenType::DoubleQuotation => {
                         Log::trace_t(
                             "ArrayP#parse/After[/\"",
@@ -284,6 +298,46 @@ impl ArrayP {
                                 .clone(),
                         )
                     }
+                }
+            }
+            // `[array]`.
+            State::Array => {
+                Log::trace_t(
+                    "ArrayP#parse/[array]",
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
+                );
+                let p = self.array_p.as_mut().unwrap();
+                match p.parse(token) {
+                    PResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            if let None = self.buffer {
+                                self.buffer = Some(Array::default());
+                            }
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_array(&child_m);
+                            self.double_quoted_string_p = None;
+                            self.state = State::AfterDoubleQuotedString;
+                        } else {
+                            return PResult::Err(
+                                self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    PResult::Err(table) => {
+                        return PResult::Err(
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
+                    PResult::Ongoing => {}
                 }
             }
             // "dog".
