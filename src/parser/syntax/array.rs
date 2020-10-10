@@ -11,7 +11,7 @@ use crate::model::{layer10::LiteralString, layer20::Array};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, SingleQuotedStringP},
     machine_state::ArrayState,
-    usize_to_i128, ArrayP, SyntaxParserResult,
+    usize_to_i128, ArrayP, ResultSP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
@@ -34,9 +34,9 @@ impl ArrayP {
     }
     /// # Returns
     ///
-    /// * `SyntaxParserResult` - Result.  
+    /// * `ResultSP` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
+    pub fn parse(&mut self, token: &Token) -> ResultSP {
         match self.state {
             ArrayState::AfterDoubleQuotedString => {
                 Log::trace_t(
@@ -52,10 +52,10 @@ impl ArrayP {
                     }
                     TokenType::RightSquareBracket => {
                         self.state = ArrayState::End;
-                        return SyntaxParserResult::End;
+                        return ResultSP::End;
                     }
                     _ => {
-                        return SyntaxParserResult::Err(
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -111,7 +111,7 @@ impl ArrayP {
                         );
                     } // Ignore it.
                     _ => {
-                        return SyntaxParserResult::Err(
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -133,10 +133,10 @@ impl ArrayP {
                     }
                     TokenType::RightSquareBracket => {
                         self.state = ArrayState::End;
-                        return SyntaxParserResult::End;
+                        return ResultSP::End;
                     }
                     _ => {
-                        return SyntaxParserResult::Err(
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -159,10 +159,10 @@ impl ArrayP {
                     }
                     TokenType::RightSquareBracket => {
                         self.state = ArrayState::End;
-                        return SyntaxParserResult::End;
+                        return ResultSP::End;
                     }
                     _ => {
-                        return SyntaxParserResult::Err(
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -180,7 +180,7 @@ impl ArrayP {
                 );
                 let p = self.double_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
                                 self.buffer = Some(Array::default());
@@ -190,7 +190,7 @@ impl ArrayP {
                             self.double_quoted_string_p = None;
                             self.state = ArrayState::AfterDoubleQuotedString;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -198,8 +198,8 @@ impl ArrayP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -207,7 +207,7 @@ impl ArrayP {
                                 .clone(),
                         )
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             ArrayState::End => {
@@ -217,7 +217,7 @@ impl ArrayP {
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
-                return SyntaxParserResult::Err(
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -233,7 +233,7 @@ impl ArrayP {
                 );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
                                 self.buffer = Some(Array::default());
@@ -243,7 +243,7 @@ impl ArrayP {
                             self.single_quoted_string_p = None;
                             self.state = ArrayState::AfterSingleQuotedString;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -251,8 +251,8 @@ impl ArrayP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -260,11 +260,11 @@ impl ArrayP {
                                 .clone(),
                         )
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
         }
-        SyntaxParserResult::Ongoing
+        ResultSP::Ongoing
     }
     pub fn log_table(&self) -> Table {
         let mut t = Table::default().clone();

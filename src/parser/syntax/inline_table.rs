@@ -3,7 +3,7 @@
 
 use crate::model::layer20::InlineTable;
 use crate::parser::syntax::{
-    machine_state::InlineTableState, usize_to_i128, InlineTableP, KeyValueP, SyntaxParserResult,
+    machine_state::InlineTableState, usize_to_i128, InlineTableP, KeyValueP, ResultSP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
@@ -25,9 +25,9 @@ impl InlineTableP {
     }
     /// # Returns
     ///
-    /// * `SyntaxParserResult` - Result.  
+    /// * `ResultSP` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
+    pub fn parse(&mut self, token: &Token) -> ResultSP {
         match self.state {
             InlineTableState::AfterLeftCurlyBracket => {
                 match token.type_ {
@@ -48,14 +48,14 @@ impl InlineTableP {
             InlineTableState::KeyValue => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_key_value(&child_m);
                             self.key_value_p = None;
                             self.state = InlineTableState::AfterKeyValue;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -63,8 +63,8 @@ impl InlineTableP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -72,7 +72,7 @@ impl InlineTableP {
                                 .clone(),
                         )
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             InlineTableState::AfterKeyValue => match token.type_ {
@@ -83,7 +83,7 @@ impl InlineTableP {
                 }
                 // `}`
                 TokenType::RightCurlyBracket => {
-                    return SyntaxParserResult::End;
+                    return ResultSP::End;
                 }
                 _ => panic!(Log::fatal_t(
                     "InlineTableP#parse/AfterValue",
@@ -93,7 +93,7 @@ impl InlineTableP {
                 )),
             },
         }
-        SyntaxParserResult::Ongoing
+        ResultSP::Ongoing
     }
     pub fn log_table(&self) -> Table {
         let mut t = Table::default()

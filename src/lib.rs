@@ -15,7 +15,7 @@ mod token;
 
 use crate::lexical_parser::LexicalParser;
 use crate::model::layer40::Document;
-use crate::parser::syntax::SyntaxParserResult;
+use crate::parser::syntax::ResultSP;
 use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
@@ -61,8 +61,8 @@ impl Toml {
                     */
                     let mut line_syntax_scanner = SyntaxScanner::default();
                     match line_syntax_scanner.scan_line(&lexical_p.product(), &mut doc) {
-                        SyntaxParserResult::End => {} // Ignored it.
-                        SyntaxParserResult::Err(table) => {
+                        ResultSP::End => {} // Ignored it.
+                        ResultSP::Err(table) => {
                             aot.table(
                                 Toml::err_table()
                                     .int(
@@ -79,7 +79,7 @@ impl Toml {
                                     .sub_t("line_scanner", &line_syntax_scanner.err_table()),
                             );
                         }
-                        SyntaxParserResult::Ongoing => {
+                        ResultSP::Ongoing => {
                             aot.table(
                                 Toml::err_table()
                                     .int(

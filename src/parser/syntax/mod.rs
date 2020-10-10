@@ -32,7 +32,7 @@ fn usize_to_i128(num: usize) -> i128 {
 
 /// Result of syntax parser.  
 /// 構文パーサーの結果。  
-pub enum SyntaxParserResult {
+pub enum ResultSP {
     /// End of syntax.
     End,
     Ongoing,

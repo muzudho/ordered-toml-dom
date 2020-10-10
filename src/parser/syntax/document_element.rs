@@ -4,7 +4,7 @@
 use crate::model::layer30::DocumentElement;
 use crate::parser::syntax::{
     layer10::CommentP, machine_state::BroadLineState, usize_to_i128, ArrayOfTableP,
-    DocumentElementP, KeyValueP, SyntaxParserResult, TableP,
+    DocumentElementP, KeyValueP, ResultSP, TableP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
@@ -30,13 +30,13 @@ impl DocumentElementP {
 
     /// # Returns
     ///
-    /// * `SyntaxParserResult` - Result.  
+    /// * `ResultSP` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
+    pub fn parse(&mut self, token: &Token) -> ResultSP {
         match self.state {
             BroadLineState::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
-                return SyntaxParserResult::Err(
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -44,7 +44,7 @@ impl DocumentElementP {
                 );
             }
             BroadLineState::AfterComment => {
-                return SyntaxParserResult::Err(
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -52,9 +52,9 @@ impl DocumentElementP {
                 );
             }
             BroadLineState::AfterKeyValue => match token.type_ {
-                TokenType::EndOfLine => return SyntaxParserResult::End,
+                TokenType::EndOfLine => return ResultSP::End,
                 _ => {
-                    return SyntaxParserResult::Err(
+                    return ResultSP::Err(
                         self.log_table()
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
@@ -76,7 +76,7 @@ impl DocumentElementP {
             },
             BroadLineState::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
-                return SyntaxParserResult::Err(
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -86,14 +86,14 @@ impl DocumentElementP {
             BroadLineState::ArrayOfTable => {
                 let p = self.array_of_table_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_array_of_table(&child_m));
                             self.array_of_table_p = None;
                             self.state = BroadLineState::AfterArrayOfTable;
-                            return SyntaxParserResult::End;
+                            return ResultSP::End;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -101,8 +101,8 @@ impl DocumentElementP {
                             );
                         }
                     } // Ignored it.
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -110,20 +110,20 @@ impl DocumentElementP {
                                 .clone(),
                         );
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             BroadLineState::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_comment(&child_m));
                             self.comment_p = None;
                             self.state = BroadLineState::AfterComment;
-                            return SyntaxParserResult::End;
+                            return ResultSP::End;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -131,8 +131,8 @@ impl DocumentElementP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -140,20 +140,20 @@ impl DocumentElementP {
                                 .clone(),
                         );
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             BroadLineState::First => match token.type_ {
                 TokenType::EndOfLine => {
                     if let Some(_) = &self.comment_p {
-                        return SyntaxParserResult::End;
+                        return ResultSP::End;
                     }
                     if let Some(_) = &self.key_value_p {
-                        return SyntaxParserResult::End;
+                        return ResultSP::End;
                     }
                     self.buffer = Some(DocumentElement::EmptyLine);
                     self.state = BroadLineState::Finished;
-                    return SyntaxParserResult::End;
+                    return ResultSP::End;
                 }
                 // `[`
                 TokenType::LeftSquareBracket => {
@@ -174,7 +174,7 @@ impl DocumentElementP {
                 }
             },
             BroadLineState::Finished => {
-                return SyntaxParserResult::Err(
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -184,14 +184,14 @@ impl DocumentElementP {
             BroadLineState::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_key_value(&child_m));
                             self.key_value_p = None;
                             self.state = BroadLineState::AfterKeyValue;
-                            return SyntaxParserResult::End;
+                            return ResultSP::End;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -199,8 +199,8 @@ impl DocumentElementP {
                             );
                         }
                     } // Ignored it.
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -208,14 +208,14 @@ impl DocumentElementP {
                                 .clone(),
                         );
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             BroadLineState::Table => {
                 return self.parse_table(token);
             }
             BroadLineState::Unimplemented => {
-                return SyntaxParserResult::Err(
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -224,19 +224,19 @@ impl DocumentElementP {
             }
         }
 
-        SyntaxParserResult::Ongoing
+        ResultSP::Ongoing
     }
-    fn parse_table(&mut self, token: &Token) -> SyntaxParserResult {
+    fn parse_table(&mut self, token: &Token) -> ResultSP {
         let p = self.table_p.as_mut().unwrap();
         match p.parse(token) {
-            SyntaxParserResult::End => {
+            ResultSP::End => {
                 if let Some(child_m) = p.flush() {
                     self.buffer = Some(DocumentElement::from_table(&child_m));
                     self.table_p = None;
                     self.state = BroadLineState::AfterTable;
-                    return SyntaxParserResult::End;
+                    return ResultSP::End;
                 } else {
-                    return SyntaxParserResult::Err(
+                    return ResultSP::Err(
                         self.log_table()
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
@@ -244,8 +244,8 @@ impl DocumentElementP {
                     );
                 }
             } // Ignored it.
-            SyntaxParserResult::Err(table) => {
-                return SyntaxParserResult::Err(
+            ResultSP::Err(table) => {
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -253,7 +253,7 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            SyntaxParserResult::Ongoing => SyntaxParserResult::Ongoing,
+            ResultSP::Ongoing => ResultSP::Ongoing,
         }
     }
     pub fn log_table(&self) -> Table {

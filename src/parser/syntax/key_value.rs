@@ -8,7 +8,7 @@ use crate::model::{
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, SingleQuotedStringP},
     machine_state::KeyValueState,
-    usize_to_i128, ArrayP, InlineTableP, KeyValueP, SyntaxParserResult,
+    usize_to_i128, ArrayP, InlineTableP, KeyValueP, ResultSP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
@@ -32,9 +32,9 @@ impl KeyValueP {
     }
     /// # Returns
     ///
-    /// * `SyntaxParserResult` - Result.  
+    /// * `ResultSP` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> SyntaxParserResult {
+    pub fn parse(&mut self, token: &Token) -> ResultSP {
         match self.state {
             KeyValueState::AfterKey => {
                 match token.type_ {
@@ -56,7 +56,7 @@ impl KeyValueP {
                         );
                     }
                     _ => {
-                        return SyntaxParserResult::Err(
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -90,7 +90,7 @@ impl KeyValueP {
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
-                        return SyntaxParserResult::End;
+                        return ResultSP::End;
                     }
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());
@@ -131,7 +131,7 @@ impl KeyValueP {
                         );
                     } //Ignored it.
                     _ => {
-                        return SyntaxParserResult::Err(
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -149,7 +149,7 @@ impl KeyValueP {
                 );
                 let p = self.inline_table_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
@@ -157,9 +157,9 @@ impl KeyValueP {
                             ));
                             self.inline_table_p = None;
                             self.state = KeyValueState::End;
-                            return SyntaxParserResult::End;
+                            return ResultSP::End;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -167,8 +167,8 @@ impl KeyValueP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -176,7 +176,7 @@ impl KeyValueP {
                                 .clone(),
                         )
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             KeyValueState::AfterLeftSquareBracket => {
@@ -188,15 +188,15 @@ impl KeyValueP {
                 );
                 let p = self.array_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer =
                                 Some(KeyValue::new(&self.temp_key, &RightValue::Array(child_m)));
                             self.array_p = None;
                             self.state = KeyValueState::End;
-                            return SyntaxParserResult::End;
+                            return ResultSP::End;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -204,8 +204,8 @@ impl KeyValueP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -213,7 +213,7 @@ impl KeyValueP {
                                 .clone(),
                         )
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             KeyValueState::DoubleQuotedString => {
@@ -223,7 +223,7 @@ impl KeyValueP {
                 );
                 let p = self.double_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
@@ -231,9 +231,9 @@ impl KeyValueP {
                             ));
                             self.double_quoted_string_p = None;
                             self.state = KeyValueState::End;
-                            return SyntaxParserResult::End;
+                            return ResultSP::End;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -241,8 +241,8 @@ impl KeyValueP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -250,7 +250,7 @@ impl KeyValueP {
                                 .clone(),
                         )
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             KeyValueState::SingleQuotedString => {
@@ -262,7 +262,7 @@ impl KeyValueP {
                 );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
-                    SyntaxParserResult::End => {
+                    ResultSP::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(
                                 &self.temp_key,
@@ -270,9 +270,9 @@ impl KeyValueP {
                             ));
                             self.single_quoted_string_p = None;
                             self.state = KeyValueState::End;
-                            return SyntaxParserResult::End;
+                            return ResultSP::End;
                         } else {
-                            return SyntaxParserResult::Err(
+                            return ResultSP::Err(
                                 self.log_table()
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
@@ -280,8 +280,8 @@ impl KeyValueP {
                             );
                         }
                     }
-                    SyntaxParserResult::Err(table) => {
-                        return SyntaxParserResult::Err(
+                    ResultSP::Err(table) => {
+                        return ResultSP::Err(
                             self.log_table()
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
@@ -289,11 +289,11 @@ impl KeyValueP {
                                 .clone(),
                         )
                     }
-                    SyntaxParserResult::Ongoing => {}
+                    ResultSP::Ongoing => {}
                 }
             }
             KeyValueState::End => {
-                return SyntaxParserResult::Err(
+                return ResultSP::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
@@ -301,7 +301,7 @@ impl KeyValueP {
                 );
             }
         }
-        SyntaxParserResult::Ongoing
+        ResultSP::Ongoing
     }
     pub fn log_table(&self) -> Table {
         let mut t = Table::default()
