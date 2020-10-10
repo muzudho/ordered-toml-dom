@@ -92,7 +92,7 @@ impl KeyValueP {
                                 .str("token", &format!("{:?}", token)),
                         );
                     }
-                    TokenType::Key => {
+                    TokenType::KeyWithoutDot => {
                         // TODO true, false
                         self.buffer = Some(KeyValue::new(
                             &self.temp_key,

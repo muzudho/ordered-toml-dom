@@ -140,7 +140,7 @@ impl LexicalParser {
                 };
                 if matched {
                     // A key.
-                    self.buf_token_type = TokenType::Key;
+                    self.buf_token_type = TokenType::KeyWithoutDot;
                     self.state = Some(LineMachineState::Key);
                 } else {
                     self.buf_token_type = TokenType::Otherwise;

@@ -50,7 +50,8 @@ pub enum TokenType {
     DoubleQuotation,
     EndOfLine,
     Equals,
-    Key,
+    /// キーに使える文字で構成した単語。ドットは含まない。
+    KeyWithoutDot,
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
     Otherwise,

@@ -49,7 +49,7 @@ impl InlineTableP {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `apple.banana`
-                    TokenType::Key => {
+                    TokenType::KeyWithoutDot => {
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
                         self.state = State::KeyValue;
                     }

@@ -185,8 +185,8 @@ impl DocumentElementP {
                 TokenType::LeftSquareBracket => {
                     self.state = State::AfterLeftSquareBracket;
                 }
-                // `apple.banana`
-                TokenType::Key => {
+                // `true`
+                TokenType::KeyWithoutDot => {
                     self.key_value_p = Some(KeyValueP::new(&token));
                     self.state = State::KeyValueSyntax;
                 }
