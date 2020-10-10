@@ -27,7 +27,7 @@ pub enum State {
     /// After `[array]`.
     AfterArray,
     /// After `[],`.
-    AfterCommaBefindArray,
+    AfterCommaBehindArray,
     /// After `[ "a",`.
     AfterCommaBefindQuotedString,
     /// After `[ true,`.
@@ -81,7 +81,7 @@ impl ArrayP {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `,`.
                     TokenType::Comma => {
-                        self.state = State::AfterCommaBefindArray;
+                        self.state = State::AfterCommaBehindArray;
                     }
                     // `]`.
                     TokenType::RightSquareBracket => {
@@ -99,7 +99,7 @@ impl ArrayP {
                 }
             }
             // After `[],`.
-            State::AfterCommaBefindArray => {
+            State::AfterCommaBehindArray => {
                 match token.type_ {
                     // `[`.
                     TokenType::LeftSquareBracket => {
@@ -293,6 +293,11 @@ impl ArrayP {
             // After `[`.
             State::First => {
                 match token.type_ {
+                    // `]`. Empty array.
+                    TokenType::RightSquareBracket => {
+                        self.state = State::End;
+                        return PResult::End;
+                    }
                     // `[`. Recursive.
                     TokenType::LeftSquareBracket => {
                         Log::trace_t(
@@ -513,10 +518,13 @@ impl ArrayP {
             .str("state", &format!("{:?}", self.state));
 
         if let Some(p) = &self.double_quoted_string_p {
-            t.sub_t("double_quoted_string", &p.log_table());
+            t.sub_t("double_quoted_string_p", &p.log_table());
         }
         if let Some(p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string", &p.log_table());
+            t.sub_t("single_quoted_string_p", &p.log_table());
+        }
+        if let Some(p) = &self.array_p {
+            t.sub_t("array_p", &p.log_table());
         }
 
         t
