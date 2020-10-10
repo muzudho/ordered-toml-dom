@@ -11,10 +11,26 @@ use crate::model::{layer10::LiteralString, layer20::Array};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
     layer20::{usize_to_i128, ArrayP},
-    machine_state::ArrayState,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
+
+/// Array syntax machine state.  
+/// 配列構文状態遷移。  
+///
+/// Example: `[ 'a', 'b', 'c' ]`.  
+#[derive(Clone, Debug)]
+pub enum ArrayState {
+    /// [ か , の次。
+    AfterDoubleQuotedString,
+    AfterLeftSquareBracket,
+    AfterSingleQuotedString,
+    /// , か ] を待ちます。
+    AfterItem,
+    DoubleQuotedString,
+    End,
+    SingleQuotedString,
+}
 
 impl Default for ArrayP {
     fn default() -> Self {

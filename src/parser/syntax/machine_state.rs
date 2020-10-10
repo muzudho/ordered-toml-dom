@@ -1,45 +1,6 @@
 //! Machine state.  
 //! 状態遷移。  
 
-/// Array syntax machine state.  
-/// 配列構文状態遷移。  
-///
-/// Example: `[ 'a', 'b', 'c' ]`.  
-#[derive(Clone, Debug)]
-pub enum ArrayState {
-    /// [ か , の次。
-    AfterDoubleQuotedString,
-    AfterLeftSquareBracket,
-    AfterSingleQuotedString,
-    /// , か ] を待ちます。
-    AfterItem,
-    DoubleQuotedString,
-    End,
-    SingleQuotedString,
-}
-
-/// Line syntax machine state.  
-/// 行構文状態遷移。  
-#[derive(Debug)]
-pub enum BroadLineState {
-    AfterArrayOfTable,
-    AfterComment,
-    AfterKeyValue,
-    AfterLeftSquareBracket,
-    AfterTable,
-    /// `[[name]]`
-    ArrayOfTable,
-    /// `# comment`.
-    CommentSyntax,
-    Finished,
-    First,
-    /// `key = right_value`.
-    KeyValueSyntax,
-    /// `[name]`
-    Table,
-    Unimplemented,
-}
-
 /// Inline table syntax machine state.  
 /// インライン・テーブル構文状態遷移。  
 ///

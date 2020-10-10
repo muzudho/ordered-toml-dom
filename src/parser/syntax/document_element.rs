@@ -5,11 +5,32 @@ use crate::model::layer30::DocumentElement;
 use crate::parser::syntax::{
     layer10::{ArrayOfTableP, CommentP, PResult, TableP},
     layer20::{usize_to_i128, KeyValueP},
-    machine_state::BroadLineState,
     DocumentElementP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
+
+/// Line syntax machine state.  
+/// 行構文状態遷移。  
+#[derive(Debug)]
+pub enum DocumentElementState {
+    AfterArrayOfTable,
+    AfterComment,
+    AfterKeyValue,
+    AfterLeftSquareBracket,
+    AfterTable,
+    /// `[[name]]`
+    ArrayOfTable,
+    /// `# comment`.
+    CommentSyntax,
+    Finished,
+    First,
+    /// `key = right_value`.
+    KeyValueSyntax,
+    /// `[name]`
+    Table,
+    Unimplemented,
+}
 
 impl Default for DocumentElementP {
     fn default() -> Self {
@@ -18,7 +39,7 @@ impl Default for DocumentElementP {
             buffer: None,
             comment_p: None,
             key_value_p: None,
-            state: BroadLineState::First,
+            state: DocumentElementState::First,
             table_p: None,
         }
     }
@@ -36,7 +57,7 @@ impl DocumentElementP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
-            BroadLineState::AfterArrayOfTable => {
+            DocumentElementState::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
                     self.log_table()
@@ -45,7 +66,7 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            BroadLineState::AfterComment => {
+            DocumentElementState::AfterComment => {
                 return PResult::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
@@ -53,7 +74,7 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            BroadLineState::AfterKeyValue => match token.type_ {
+            DocumentElementState::AfterKeyValue => match token.type_ {
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
                     return PResult::Err(
@@ -64,19 +85,19 @@ impl DocumentElementP {
                     );
                 }
             },
-            BroadLineState::AfterLeftSquareBracket => match token.type_ {
+            DocumentElementState::AfterLeftSquareBracket => match token.type_ {
                 // `[`
                 TokenType::LeftSquareBracket => {
                     self.array_of_table_p = Some(ArrayOfTableP::new());
-                    self.state = BroadLineState::ArrayOfTable;
+                    self.state = DocumentElementState::ArrayOfTable;
                 }
                 _ => {
                     self.table_p = Some(TableP::new());
-                    self.state = BroadLineState::Table;
+                    self.state = DocumentElementState::Table;
                     return self.parse_table(token);
                 }
             },
-            BroadLineState::AfterTable => {
+            DocumentElementState::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
                     self.log_table()
@@ -85,14 +106,14 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            BroadLineState::ArrayOfTable => {
+            DocumentElementState::ArrayOfTable => {
                 let p = self.array_of_table_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_array_of_table(&child_m));
                             self.array_of_table_p = None;
-                            self.state = BroadLineState::AfterArrayOfTable;
+                            self.state = DocumentElementState::AfterArrayOfTable;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -115,14 +136,14 @@ impl DocumentElementP {
                     PResult::Ongoing => {}
                 }
             }
-            BroadLineState::CommentSyntax => {
+            DocumentElementState::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_comment(&child_m));
                             self.comment_p = None;
-                            self.state = BroadLineState::AfterComment;
+                            self.state = DocumentElementState::AfterComment;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -145,7 +166,7 @@ impl DocumentElementP {
                     PResult::Ongoing => {}
                 }
             }
-            BroadLineState::First => match token.type_ {
+            DocumentElementState::First => match token.type_ {
                 TokenType::EndOfLine => {
                     if let Some(_) = &self.comment_p {
                         return PResult::End;
@@ -154,28 +175,28 @@ impl DocumentElementP {
                         return PResult::End;
                     }
                     self.buffer = Some(DocumentElement::EmptyLine);
-                    self.state = BroadLineState::Finished;
+                    self.state = DocumentElementState::Finished;
                     return PResult::End;
                 }
                 // `[`
                 TokenType::LeftSquareBracket => {
-                    self.state = BroadLineState::AfterLeftSquareBracket;
+                    self.state = DocumentElementState::AfterLeftSquareBracket;
                 }
                 TokenType::Key => {
                     self.key_value_p = Some(KeyValueP::new(&token));
-                    self.state = BroadLineState::KeyValueSyntax;
+                    self.state = DocumentElementState::KeyValueSyntax;
                 }
                 // `#`
                 TokenType::Sharp => {
                     self.comment_p = Some(CommentP::new());
-                    self.state = BroadLineState::CommentSyntax;
+                    self.state = DocumentElementState::CommentSyntax;
                 }
                 TokenType::WhiteSpace => {} // Ignored it.
                 _ => {
-                    self.state = BroadLineState::Unimplemented;
+                    self.state = DocumentElementState::Unimplemented;
                 }
             },
-            BroadLineState::Finished => {
+            DocumentElementState::Finished => {
                 return PResult::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
@@ -183,14 +204,14 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            BroadLineState::KeyValueSyntax => {
+            DocumentElementState::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_key_value(&child_m));
                             self.key_value_p = None;
-                            self.state = BroadLineState::AfterKeyValue;
+                            self.state = DocumentElementState::AfterKeyValue;
                             return PResult::End;
                         } else {
                             return PResult::Err(
@@ -213,10 +234,10 @@ impl DocumentElementP {
                     PResult::Ongoing => {}
                 }
             }
-            BroadLineState::Table => {
+            DocumentElementState::Table => {
                 return self.parse_table(token);
             }
-            BroadLineState::Unimplemented => {
+            DocumentElementState::Unimplemented => {
                 return PResult::Err(
                     self.log_table()
                         .int("column_number", usize_to_i128(token.column_number))
@@ -235,7 +256,7 @@ impl DocumentElementP {
                 if let Some(child_m) = p.flush() {
                     self.buffer = Some(DocumentElement::from_table(&child_m));
                     self.table_p = None;
-                    self.state = BroadLineState::AfterTable;
+                    self.state = DocumentElementState::AfterTable;
                     return PResult::End;
                 } else {
                     return PResult::Err(
