@@ -1,5 +1,8 @@
 apple = 'pie'
 
+number_array = [1, 2, 3]
+string_array = ["a", 'b', '"c"']
+
 [banana]
 apple = 'juice'
 
