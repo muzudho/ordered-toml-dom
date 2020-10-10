@@ -1,20 +1,21 @@
 //! Syntax parser.  
 //! 構文パーサー。  
 
-pub mod array;
 pub mod document_element;
 pub mod inline_table;
 pub mod key_value;
 pub mod layer10;
+pub mod layer20;
 pub mod machine_state;
 
 use crate::model::{
-    layer20::{Array, InlineTable, KeyValue},
+    layer20::{InlineTable, KeyValue},
     layer30::DocumentElement,
 };
 use crate::parser::syntax::{
     layer10::{ArrayOfTableP, CommentP, DoubleQuotedStringP, SingleQuotedStringP, TableP},
-    machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState},
+    layer20::ArrayP,
+    machine_state::{BroadLineState, InlineTableState, KeyValueState},
 };
 use crate::token::Token;
 use std::convert::TryInto;
@@ -25,18 +26,6 @@ fn usize_to_i128(num: usize) -> i128 {
     } else {
         -1
     }
-}
-
-/// Array parser.  
-/// 配列パーサー。  
-///
-/// Example: `[ 'a', 'b', 'c' ]`.  
-#[derive(Clone)]
-pub struct ArrayP {
-    buffer: Option<Array>,
-    double_quoted_string_p: Option<Box<DoubleQuotedStringP>>,
-    single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
-    state: ArrayState,
 }
 
 /// Broad-line syntax parser.  
