@@ -5,7 +5,7 @@ use crate::model::{
     layer110::token::{Token, TokenType},
     layer220::InlineTable,
 };
-use crate::parser::syntax::{
+use crate::parser::{
     layer210::PResult,
     layer220::{usize_to_i128, InlineTableP, KeyValueP},
 };

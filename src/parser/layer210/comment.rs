@@ -5,7 +5,7 @@ use crate::model::{
     layer110::token::{Token, TokenType},
     layer210::Comment,
 };
-use crate::parser::syntax::layer210::{CommentP, PResult};
+use crate::parser::layer210::{CommentP, PResult};
 use casual_logger::Table;
 
 impl CommentP {

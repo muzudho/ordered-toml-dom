@@ -6,7 +6,7 @@ use crate::model::{
     layer110::token::Token,
     layer220::{Array, InlineTable, KeyValue},
 };
-use crate::parser::syntax::{
+use crate::parser::{
     layer210::{DoubleQuotedStringP, SingleQuotedStringP},
     layer220::{array::ArrayState, inline_table::InlineTableState, key_value::KeyValueState},
 };

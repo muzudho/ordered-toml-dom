@@ -2,7 +2,7 @@
 //! 構文走査器。  
 
 use crate::model::{layer110::token::TokenLine, layer310::Document};
-use crate::parser::syntax::{layer210::PResult, layer230::DocumentElementP};
+use crate::parser::{layer210::PResult, layer230::DocumentElementP};
 use casual_logger::Table;
 
 /// Syntax scanner.  

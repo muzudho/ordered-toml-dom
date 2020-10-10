@@ -5,7 +5,7 @@ use crate::model::{
     layer110::token::{Token, TokenType},
     layer230::Table as TableM,
 };
-use crate::parser::syntax::layer210::{PResult, TableP};
+use crate::parser::layer210::{PResult, TableP};
 use casual_logger::Table as LogTable;
 
 impl TableP {

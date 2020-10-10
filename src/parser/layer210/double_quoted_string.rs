@@ -1,22 +1,22 @@
-//! Single quoted string syntax parser.  
-//! 単一引用符文字列構文パーサー。  
+//! Double quoted string syntax parser.  
+//! 二重引用符文字列構文パーサー。  
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::SingleQuotedString,
+    layer210::DoubleQuotedString,
 };
-use crate::parser::syntax::layer210::{PResult, SingleQuotedStringP};
+use crate::parser::layer210::{DoubleQuotedStringP, PResult};
 use casual_logger::Table;
 
-impl SingleQuotedStringP {
-    pub fn flush(&mut self) -> Option<SingleQuotedString> {
+impl DoubleQuotedStringP {
+    pub fn flush(&mut self) -> Option<DoubleQuotedString> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        SingleQuotedStringP {
-            buffer: Some(SingleQuotedString::default()),
+        DoubleQuotedStringP {
+            buffer: Some(DoubleQuotedString::default()),
         }
     }
     /// # Returns
@@ -25,8 +25,8 @@ impl SingleQuotedStringP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match token.type_ {
-            // `'`
-            TokenType::SingleQuotation => {
+            // `"`
+            TokenType::DoubleQuotation => {
                 // End of syntax.
                 // 構文の終わり。
                 return PResult::End;

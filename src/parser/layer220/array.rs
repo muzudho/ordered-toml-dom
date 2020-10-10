@@ -12,7 +12,7 @@ use crate::model::{
     layer210::LiteralString,
     layer220::Array,
 };
-use crate::parser::syntax::{
+use crate::parser::{
     layer210::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
     layer220::{usize_to_i128, ArrayP},
 };

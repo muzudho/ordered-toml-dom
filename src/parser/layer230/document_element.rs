@@ -5,7 +5,7 @@ use crate::model::{
     layer110::token::{Token, TokenType},
     layer230::DocumentElement,
 };
-use crate::parser::syntax::{
+use crate::parser::{
     layer210::{ArrayOfTableP, CommentP, PResult, TableP},
     layer220::{usize_to_i128, KeyValueP},
     layer230::DocumentElementP,
