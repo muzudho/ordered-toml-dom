@@ -2,7 +2,7 @@
 //! コメント構文パーサー。  
 
 use crate::model::layer10::Comment;
-use crate::parser::syntax::{layer10::CommentP, ResultSP};
+use crate::parser::syntax::{layer10::CommentP, PResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
@@ -17,11 +17,11 @@ impl CommentP {
     }
     /// # Returns
     ///
-    /// * `ResultSP` - Result.  
+    /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> ResultSP {
+    pub fn parse(&mut self, token: &Token) -> PResult {
         match token.type_ {
-            TokenType::EndOfLine => return ResultSP::End,
+            TokenType::EndOfLine => return PResult::End,
             _ => {
                 if let None = self.buffer {
                     self.buffer = Some(Comment::default());
@@ -30,7 +30,7 @@ impl CommentP {
                 m.push_token(token);
             }
         }
-        ResultSP::Ongoing
+        PResult::Ongoing
     }
     pub fn log_table(&self) -> Table {
         let mut t = Table::default().str("Parse", "CommentP").clone();

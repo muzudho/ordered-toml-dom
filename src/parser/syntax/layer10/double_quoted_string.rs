@@ -2,7 +2,7 @@
 //! 二重引用符文字列構文パーサー。  
 
 use crate::model::layer10::DoubleQuotedString;
-use crate::parser::syntax::{layer10::DoubleQuotedStringP, ResultSP};
+use crate::parser::syntax::{layer10::DoubleQuotedStringP, PResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
@@ -19,22 +19,22 @@ impl DoubleQuotedStringP {
     }
     /// # Returns
     ///
-    /// * `ResultSP` - Result.  
+    /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> ResultSP {
+    pub fn parse(&mut self, token: &Token) -> PResult {
         match token.type_ {
             // `"`
             TokenType::DoubleQuotation => {
                 // End of syntax.
                 // 構文の終わり。
-                return ResultSP::End;
+                return PResult::End;
             }
             _ => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token);
             }
         }
-        ResultSP::Ongoing
+        PResult::Ongoing
     }
     pub fn log_table(&self) -> Table {
         let mut t = Table::default().clone();

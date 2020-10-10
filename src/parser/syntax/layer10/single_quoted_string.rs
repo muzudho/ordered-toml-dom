@@ -2,7 +2,7 @@
 //! 単一引用符文字列構文パーサー。  
 
 use crate::model::layer10::SingleQuotedString;
-use crate::parser::syntax::{layer10::SingleQuotedStringP, ResultSP};
+use crate::parser::syntax::{layer10::SingleQuotedStringP, PResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
@@ -19,22 +19,22 @@ impl SingleQuotedStringP {
     }
     /// # Returns
     ///
-    /// * `ResultSP` - Result.  
+    /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> ResultSP {
+    pub fn parse(&mut self, token: &Token) -> PResult {
         match token.type_ {
             // `'`
             TokenType::SingleQuotation => {
                 // End of syntax.
                 // 構文の終わり。
-                return ResultSP::End;
+                return PResult::End;
             }
             _ => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token);
             }
         }
-        ResultSP::Ongoing
+        PResult::Ongoing
     }
     pub fn log_table(&self) -> Table {
         let mut t = Table::default().clone();

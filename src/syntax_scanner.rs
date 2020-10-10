@@ -2,37 +2,37 @@
 //! 構文走査器。  
 
 use crate::model::layer40::Document;
-use crate::parser::syntax::{DocumentElementP, ResultSP};
+use crate::parser::syntax::{DocumentElementP, PResult};
 use crate::token::TokenLine;
 use casual_logger::Table;
 
 /// Syntax scanner.  
 /// 構文走査器。  
 pub struct SyntaxScanner {
-    pub broad_line_p: DocumentElementP,
+    pub document_element_p: DocumentElementP,
 }
 impl Default for SyntaxScanner {
     fn default() -> Self {
         SyntaxScanner {
-            broad_line_p: DocumentElementP::default(),
+            document_element_p: DocumentElementP::default(),
         }
     }
 }
 impl SyntaxScanner {
     /// # Returns
     ///
-    /// * `ResultSP` - Result.  
+    /// * `PResult` - Result.  
     ///                             結果。
-    pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut Document) -> ResultSP {
+    pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut Document) -> PResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
-            match self.broad_line_p.parse(token) {
-                ResultSP::End => {
-                    if let Some(child_m) = self.broad_line_p.flush() {
+            match self.document_element_p.parse(token) {
+                PResult::End => {
+                    if let Some(child_m) = self.document_element_p.flush() {
                         dom.push_broad_line(&child_m);
                     } else {
                         let mut err_token_line = TokenLine::new(token_line.row_number);
                         err_token_line.tokens = token_line.tokens[i..].to_vec();
-                        return ResultSP::Err(
+                        return PResult::Err(
                             self.err_table()
                                 .str("token_line", &format!("{:?}", token_line))
                                 .str("rest", &format!("{:?}", err_token_line))
@@ -40,25 +40,25 @@ impl SyntaxScanner {
                         );
                     }
                 }
-                ResultSP::Err(table) => {
-                    return ResultSP::Err(
+                PResult::Err(table) => {
+                    return PResult::Err(
                         self.err_table()
                             .str("token_line", &format!("{:?}", token_line))
                             .sub_t("error", &table)
                             .clone(),
                     );
                 }
-                ResultSP::Ongoing => {}
+                PResult::Ongoing => {}
             }
         }
 
-        ResultSP::Ongoing
+        PResult::Ongoing
     }
 
     pub fn err_table(&self) -> Table {
         let mut t = Table::default();
         t.str("parser", "syntax_scanner.rs/SyntaxScanner#scan_line")
-            .sub_t("line", &self.broad_line_p.log_table());
+            .sub_t("line", &self.document_element_p.log_table());
         t
     }
 }
