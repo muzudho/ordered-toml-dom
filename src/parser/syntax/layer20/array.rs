@@ -10,9 +10,8 @@
 use crate::model::{layer10::LiteralString, layer20::Array};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
-    layer20::ArrayP,
+    layer20::{usize_to_i128, ArrayP},
     machine_state::ArrayState,
-    usize_to_i128,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};

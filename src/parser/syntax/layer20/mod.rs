@@ -8,6 +8,15 @@ use crate::parser::syntax::{
     machine_state::{ArrayState, InlineTableState, KeyValueState},
 };
 use crate::token::Token;
+use std::convert::TryInto;
+
+pub fn usize_to_i128(num: usize) -> i128 {
+    if let Ok(n) = num.try_into() {
+        n
+    } else {
+        -1
+    }
+}
 
 /// Array parser.  
 /// 配列パーサー。  
