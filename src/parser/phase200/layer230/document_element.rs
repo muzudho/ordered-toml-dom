@@ -96,7 +96,7 @@ impl DocumentElementP {
                 _ => {
                     self.header_p_of_table = Some(HeaderPOfTable::new());
                     self.state = State::Table;
-                    return self.parse_table(token);
+                    return self.parse_header_of_table(token);
                 }
             },
             State::AfterTable => {
@@ -184,6 +184,7 @@ impl DocumentElementP {
                 TokenType::LeftSquareBracket => {
                     self.state = State::AfterLeftSquareBracket;
                 }
+                // `apple.banana`
                 TokenType::Key => {
                     self.key_value_p = Some(KeyValueP::new(&token));
                     self.state = State::KeyValueSyntax;
@@ -237,7 +238,7 @@ impl DocumentElementP {
                 }
             }
             State::Table => {
-                return self.parse_table(token);
+                return self.parse_header_of_table(token);
             }
             State::Unimplemented => {
                 return PResult::Err(
@@ -251,7 +252,9 @@ impl DocumentElementP {
 
         PResult::Ongoing
     }
-    fn parse_table(&mut self, token: &Token) -> PResult {
+    /// Header of table.  
+    /// テーブル・ヘッダー。  
+    fn parse_header_of_table(&mut self, token: &Token) -> PResult {
         let p = self.header_p_of_table.as_mut().unwrap();
         match p.parse(token) {
             PResult::End => {
