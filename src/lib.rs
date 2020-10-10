@@ -9,13 +9,13 @@ extern crate regex;
 
 pub mod lexical_parser;
 pub mod model;
-mod syntax;
+mod parser;
 pub mod syntax_scanner;
 mod token;
 
 use crate::lexical_parser::LexicalParser;
 use crate::model::layer40::Document;
-use crate::syntax::SyntaxParserResult;
+use crate::parser::syntax::SyntaxParserResult;
 use crate::syntax_scanner::SyntaxScanner;
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;

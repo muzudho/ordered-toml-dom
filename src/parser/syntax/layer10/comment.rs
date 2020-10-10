@@ -2,7 +2,7 @@
 //! コメント構文パーサー。  
 
 use crate::model::layer10::Comment;
-use crate::syntax::{layer10::CommentP, SyntaxParserResult};
+use crate::parser::syntax::{layer10::CommentP, SyntaxParserResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 

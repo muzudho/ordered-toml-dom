@@ -2,7 +2,7 @@
 //! 構文走査器。  
 
 use crate::model::layer40::Document;
-use crate::syntax::{DocumentElementP, SyntaxParserResult};
+use crate::parser::syntax::{DocumentElementP, SyntaxParserResult};
 use crate::token::TokenLine;
 use casual_logger::Table;
 

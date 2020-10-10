@@ -5,11 +5,10 @@ use crate::model::{
     layer10::LiteralString,
     layer20::{KeyValue, RightValue},
 };
-use crate::syntax::usize_to_i128;
-use crate::syntax::{
+use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, SingleQuotedStringP},
     machine_state::KeyValueState,
-    ArrayP, InlineTableP, KeyValueP, SyntaxParserResult,
+    usize_to_i128, ArrayP, InlineTableP, KeyValueP, SyntaxParserResult,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};

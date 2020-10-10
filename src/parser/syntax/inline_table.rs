@@ -2,8 +2,9 @@
 //! インライン・テーブル構文パーサー。  
 
 use crate::model::layer20::InlineTable;
-use crate::syntax::usize_to_i128;
-use crate::syntax::{machine_state::InlineTableState, InlineTableP, KeyValueP, SyntaxParserResult};
+use crate::parser::syntax::{
+    machine_state::InlineTableState, usize_to_i128, InlineTableP, KeyValueP, SyntaxParserResult,
+};
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
 

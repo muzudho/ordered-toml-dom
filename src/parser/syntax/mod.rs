@@ -14,7 +14,7 @@ use crate::model::{
     layer20::{Array, InlineTable, KeyValue},
     layer30::{ArrayOfTable, DocumentElement, Table as TableM},
 };
-use crate::syntax::{
+use crate::parser::syntax::{
     layer10::{CommentP, DoubleQuotedStringP, SingleQuotedStringP},
     machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState},
 };
