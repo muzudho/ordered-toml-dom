@@ -4,7 +4,6 @@
 pub mod document_element;
 pub mod layer10;
 pub mod layer20;
-pub mod machine_state;
 
 use crate::model::layer30::DocumentElement;
 use crate::parser::syntax::{

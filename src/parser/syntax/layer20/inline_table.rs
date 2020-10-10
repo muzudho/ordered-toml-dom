@@ -5,10 +5,20 @@ use crate::model::layer20::InlineTable;
 use crate::parser::syntax::{
     layer10::PResult,
     layer20::{usize_to_i128, InlineTableP, KeyValueP},
-    machine_state::InlineTableState,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
+
+/// Inline table syntax machine state.  
+/// インライン・テーブル構文状態遷移。  
+///
+/// Example: `{ key = value, key = value }`.  
+#[derive(Debug)]
+pub enum InlineTableState {
+    AfterLeftCurlyBracket,
+    KeyValue,
+    AfterKeyValue,
+}
 
 impl Default for InlineTableP {
     fn default() -> Self {

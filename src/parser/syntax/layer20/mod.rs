@@ -5,8 +5,7 @@ pub mod key_value;
 use crate::model::layer20::{Array, InlineTable, KeyValue};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, SingleQuotedStringP},
-    layer20::array::ArrayState,
-    machine_state::{InlineTableState, KeyValueState},
+    layer20::{array::ArrayState, inline_table::InlineTableState, key_value::KeyValueState},
 };
 use crate::token::Token;
 use std::convert::TryInto;

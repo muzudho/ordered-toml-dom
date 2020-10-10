@@ -8,10 +8,24 @@ use crate::model::{
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
     layer20::{usize_to_i128, ArrayP, InlineTableP, KeyValueP},
-    machine_state::KeyValueState,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::{Log, Table};
+
+/// Key value syntax machine state.  
+/// キー値構文状態遷移。  
+///
+/// Example: `key = right_value`.  
+#[derive(Debug)]
+pub enum KeyValueState {
+    AfterKey,
+    AfterEquals,
+    AfterLeftCurlyBracket,
+    AfterLeftSquareBracket,
+    DoubleQuotedString,
+    SingleQuotedString,
+    End,
+}
 
 impl KeyValueP {
     pub fn new(key: &Token) -> Self {
