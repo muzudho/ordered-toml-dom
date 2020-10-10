@@ -31,7 +31,7 @@ pub enum State {
     /// After `[` or `,`.
     AfterDoubleQuotedString,
     /// After `[`.
-    AfterLeftSquareBracket,
+    First,
     AfterSingleQuotedString,
     /// `[ true` , か ] を待ちます。
     AfterKeyWithoutDot,
@@ -46,7 +46,7 @@ impl Default for ArrayP {
             buffer: None,
             double_quoted_string_p: None,
             single_quoted_string_p: None,
-            state: State::AfterLeftSquareBracket,
+            state: State::First,
         }
     }
 }
@@ -178,7 +178,7 @@ impl ArrayP {
                 }
             }
             // After `[`.
-            State::AfterLeftSquareBracket => {
+            State::First => {
                 match token.type_ {
                     TokenType::DoubleQuotation => {
                         Log::trace_t(

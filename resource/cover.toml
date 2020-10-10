@@ -1,7 +1,10 @@
+# Comment.
+
 apple = 'pie'
 
 number_array = [1, 2, 3]
 string_array = ["a", 'b', '"c"']
+mix_array = [[1, 2, 3], ["a", 'b', '"c"'], 3]
 
 [banana]
 apple = 'juice'
