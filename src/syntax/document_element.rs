@@ -1,18 +1,18 @@
 //! Broad-line syntax parser.  
 //! `縦幅のある行` 構文パーサー。  
 
-use crate::model::layer30::BroadLine;
+use crate::model::layer30::DocumentElement;
 use crate::syntax::usize_to_i128;
 use crate::syntax::{
-    layer10::CommentP, machine_state::BroadLineState, ArrayOfTableP, BroadLineP, KeyValueP,
+    layer10::CommentP, machine_state::BroadLineState, ArrayOfTableP, DocumentElementP, KeyValueP,
     SyntaxParserResult, TableP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
 
-impl Default for BroadLineP {
+impl Default for DocumentElementP {
     fn default() -> Self {
-        BroadLineP {
+        DocumentElementP {
             array_of_table_p: None,
             buffer: None,
             comment_p: None,
@@ -22,8 +22,8 @@ impl Default for BroadLineP {
         }
     }
 }
-impl BroadLineP {
-    pub fn flush(&mut self) -> Option<BroadLine> {
+impl DocumentElementP {
+    pub fn flush(&mut self) -> Option<DocumentElement> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
@@ -89,7 +89,7 @@ impl BroadLineP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(BroadLine::from_array_of_table(&child_m));
+                            self.buffer = Some(DocumentElement::from_array_of_table(&child_m));
                             self.array_of_table_p = None;
                             self.state = BroadLineState::AfterArrayOfTable;
                             return SyntaxParserResult::End;
@@ -119,7 +119,7 @@ impl BroadLineP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(BroadLine::from_comment(&child_m));
+                            self.buffer = Some(DocumentElement::from_comment(&child_m));
                             self.comment_p = None;
                             self.state = BroadLineState::AfterComment;
                             return SyntaxParserResult::End;
@@ -152,7 +152,7 @@ impl BroadLineP {
                     if let Some(_) = &self.key_value_p {
                         return SyntaxParserResult::End;
                     }
-                    self.buffer = Some(BroadLine::EmptyLine);
+                    self.buffer = Some(DocumentElement::EmptyLine);
                     self.state = BroadLineState::Finished;
                     return SyntaxParserResult::End;
                 }
@@ -187,7 +187,7 @@ impl BroadLineP {
                 match p.parse(token) {
                     SyntaxParserResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(BroadLine::from_key_value(&child_m));
+                            self.buffer = Some(DocumentElement::from_key_value(&child_m));
                             self.key_value_p = None;
                             self.state = BroadLineState::AfterKeyValue;
                             return SyntaxParserResult::End;
@@ -232,7 +232,7 @@ impl BroadLineP {
         match p.parse(token) {
             SyntaxParserResult::End => {
                 if let Some(child_m) = p.flush() {
-                    self.buffer = Some(BroadLine::from_table(&child_m));
+                    self.buffer = Some(DocumentElement::from_table(&child_m));
                     self.table_p = None;
                     self.state = BroadLineState::AfterTable;
                     return SyntaxParserResult::End;
@@ -259,7 +259,7 @@ impl BroadLineP {
     }
     pub fn log_table(&self) -> Table {
         let mut t = Table::default()
-            .str("parser", "BroadLineP#parse")
+            .str("parser", "DocumentElementP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {

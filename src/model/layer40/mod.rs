@@ -1,12 +1,12 @@
 pub mod document;
 
-use crate::model::{layer20::KeyValue, layer30::BroadLine};
+use crate::model::layer30::DocumentElement;
 
-/// It has multiple `broad_line`.  
+/// It has multiple `document_element`.  
 /// 複数の `縦幅を持つ行` を持ちます。  
 #[derive(Clone)]
 pub struct Document {
     /// Line with height.
     /// 縦幅を持つ行。
-    pub broad_lines: Vec<BroadLine>,
+    pub elements: Vec<DocumentElement>,
 }

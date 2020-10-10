@@ -5,7 +5,7 @@
 
 use casual_logger::{Log, Table};
 use toml_menu::{
-    model::{layer20::RightValue, layer30::BroadLine},
+    model::{layer20::RightValue, layer30::DocumentElement},
     Toml,
 };
 
@@ -15,27 +15,27 @@ fn main() {
     Log::remove_old_logs();
     let doc = Toml::from_file("./resource/key-value.toml");
     Log::info_t(
-        "Count elements.",
-        Table::default().uint("BroadLineCount", doc.broad_lines.len() as u128),
+        "Count document elements.",
+        Table::default().uint("DocumentElementsCount", doc.elements.len() as u128),
     );
-    for elem in doc.broad_lines {
+    for elem in doc.elements {
         match elem {
-            BroadLine::ArrayOfTable(m) => {
+            DocumentElement::ArrayOfTable(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("ArrayOfTable", &format!("{:?}", m)),
                 );
             }
-            BroadLine::Comment(m) => {
+            DocumentElement::Comment(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("Comment", &format!("{:?}", m)),
                 );
             }
-            BroadLine::EmptyLine => {
+            DocumentElement::EmptyLine => {
                 Log::info_t("Scan a Broad-line.", Table::default().str("EmptyLine", ""));
             }
-            BroadLine::KeyValue(m) => {
+            DocumentElement::KeyValue(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("KeyValue", &format!("{:?}", m)),
@@ -48,7 +48,7 @@ fn main() {
                     RightValue::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
                 }
             }
-            BroadLine::Table(m) => {
+            DocumentElement::Table(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("Table", &format!("{:?}", m)),

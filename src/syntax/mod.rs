@@ -3,7 +3,7 @@
 
 pub mod array;
 pub mod array_of_table;
-pub mod broad_line;
+pub mod document_element;
 pub mod inline_table;
 pub mod key_value;
 pub mod layer10;
@@ -12,7 +12,7 @@ pub mod table;
 
 use crate::model::{
     layer20::{Array, InlineTable, KeyValue},
-    layer30::{ArrayOfTable, BroadLine, Table as TableM},
+    layer30::{ArrayOfTable, DocumentElement, Table as TableM},
 };
 use crate::syntax::{
     layer10::{CommentP, DoubleQuotedStringP, SingleQuotedStringP},
@@ -63,9 +63,9 @@ pub struct ArrayP {
 
 /// Broad-line syntax parser.  
 /// `縦幅のある行` パーサー。  
-pub struct BroadLineP {
+pub struct DocumentElementP {
     array_of_table_p: Option<ArrayOfTableP>,
-    buffer: Option<BroadLine>,
+    buffer: Option<DocumentElement>,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
     state: BroadLineState,

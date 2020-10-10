@@ -2,19 +2,19 @@
 //! 構文走査器。  
 
 use crate::model::layer40::Document;
-use crate::syntax::{BroadLineP, SyntaxParserResult};
+use crate::syntax::{DocumentElementP, SyntaxParserResult};
 use crate::token::TokenLine;
 use casual_logger::Table;
 
 /// Syntax scanner.  
 /// 構文走査器。  
 pub struct SyntaxScanner {
-    pub broad_line_p: BroadLineP,
+    pub broad_line_p: DocumentElementP,
 }
 impl Default for SyntaxScanner {
     fn default() -> Self {
         SyntaxScanner {
-            broad_line_p: BroadLineP::default(),
+            broad_line_p: DocumentElementP::default(),
         }
     }
 }

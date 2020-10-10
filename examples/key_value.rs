@@ -34,8 +34,8 @@ fn main() {
     Log::remove_old_logs();
     let doc = Toml::from_file("./resource/key-value.toml");
     Log::println_t(
-        "Count elements.",
-        Table::default().uint("BroadLineCount", doc.broad_lines.len() as u128),
+        "Count document elements.",
+        Table::default().uint("DocumentElementsCount", doc.elements.len() as u128),
     );
     let a_name = "sq";
     let a_value = if let Some(elem) = doc.child(a_name) {
