@@ -1,22 +1,22 @@
-//! Single quoted string syntax parser.  
-//! 単一引用符文字列構文パーサー。  
+//! Array of ArrayOfTable syntax parser.  
+//! テーブルの配列構文パーサー。  
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::SingleQuotedString,
+    layer230::ArrayOfTable as ArrayOfTableM,
 };
-use crate::parser::layer210::{PResult, SingleQuotedStringP};
-use casual_logger::Table;
+use crate::parser::phase200::layer210::{ArrayOfTableP, PResult};
+use casual_logger::Table as LogTable;
 
-impl SingleQuotedStringP {
-    pub fn flush(&mut self) -> Option<SingleQuotedString> {
+impl ArrayOfTableP {
+    pub fn flush(&mut self) -> Option<ArrayOfTableM> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        SingleQuotedStringP {
-            buffer: Some(SingleQuotedString::default()),
+        ArrayOfTableP {
+            buffer: Some(ArrayOfTableM::default()),
         }
     }
     /// # Returns
@@ -25,8 +25,7 @@ impl SingleQuotedStringP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match token.type_ {
-            // `'`
-            TokenType::SingleQuotation => {
+            TokenType::DoubleQuotation => {
                 // End of syntax.
                 // 構文の終わり。
                 return PResult::End;
@@ -38,8 +37,8 @@ impl SingleQuotedStringP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self) -> Table {
-        let mut t = Table::default().clone();
+    pub fn log_table(&self) -> LogTable {
+        let mut t = LogTable::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));
         }

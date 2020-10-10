@@ -1,7 +1,7 @@
 pub mod document_element;
 
 use crate::model::layer230::DocumentElement;
-use crate::parser::{
+use crate::parser::phase200::{
     layer210::{ArrayOfTableP, CommentP, TableP},
     layer220::KeyValueP,
     layer230::document_element::DocumentElementState,

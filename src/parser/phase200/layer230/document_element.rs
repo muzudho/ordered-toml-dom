@@ -5,7 +5,7 @@ use crate::model::{
     layer110::token::{Token, TokenType},
     layer230::DocumentElement,
 };
-use crate::parser::{
+use crate::parser::phase200::{
     layer210::{ArrayOfTableP, CommentP, PResult, TableP},
     layer220::{usize_to_i128, KeyValueP},
     layer230::DocumentElementP,
@@ -112,8 +112,8 @@ impl DocumentElementP {
                 let p = self.array_of_table_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(DocumentElement::from_array_of_table(&child_m));
+                        if let Some(m) = p.flush() {
+                            self.buffer = Some(DocumentElement::from_array_of_table(&m));
                             self.array_of_table_p = None;
                             self.state = DocumentElementState::AfterArrayOfTable;
                             return PResult::End;
@@ -142,8 +142,8 @@ impl DocumentElementP {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(DocumentElement::from_comment(&child_m));
+                        if let Some(m) = p.flush() {
+                            self.buffer = Some(DocumentElement::from_comment(&m));
                             self.comment_p = None;
                             self.state = DocumentElementState::AfterComment;
                             return PResult::End;
@@ -210,8 +210,8 @@ impl DocumentElementP {
                 let p = self.key_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(DocumentElement::from_key_value(&child_m));
+                        if let Some(m) = p.flush() {
+                            self.buffer = Some(DocumentElement::from_key_value(&m));
                             self.key_value_p = None;
                             self.state = DocumentElementState::AfterKeyValue;
                             return PResult::End;
@@ -255,8 +255,8 @@ impl DocumentElementP {
         let p = self.table_p.as_mut().unwrap();
         match p.parse(token) {
             PResult::End => {
-                if let Some(child_m) = p.flush() {
-                    self.buffer = Some(DocumentElement::from_table(&child_m));
+                if let Some(m) = p.flush() {
+                    self.buffer = Some(DocumentElement::from_table(&m));
                     self.table_p = None;
                     self.state = DocumentElementState::AfterTable;
                     return PResult::End;

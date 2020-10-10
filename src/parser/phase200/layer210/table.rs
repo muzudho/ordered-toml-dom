@@ -1,22 +1,22 @@
-//! Array of ArrayOfTable syntax parser.  
-//! テーブルの配列構文パーサー。  
+//! Table syntax parser.  
+//! テーブル構文パーサー。  
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer230::ArrayOfTable as ArrayOfTableM,
+    layer230::Table as TableM,
 };
-use crate::parser::layer210::{ArrayOfTableP, PResult};
+use crate::parser::phase200::layer210::{PResult, TableP};
 use casual_logger::Table as LogTable;
 
-impl ArrayOfTableP {
-    pub fn flush(&mut self) -> Option<ArrayOfTableM> {
+impl TableP {
+    pub fn flush(&mut self) -> Option<TableM> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        ArrayOfTableP {
-            buffer: Some(ArrayOfTableM::default()),
+        TableP {
+            buffer: Some(TableM::default()),
         }
     }
     /// # Returns
@@ -25,6 +25,7 @@ impl ArrayOfTableP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match token.type_ {
+            // `"`
             TokenType::DoubleQuotation => {
                 // End of syntax.
                 // 構文の終わり。

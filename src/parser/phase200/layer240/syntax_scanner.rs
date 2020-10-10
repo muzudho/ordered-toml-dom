@@ -2,7 +2,7 @@
 //! 構文走査器。  
 
 use crate::model::{layer110::token::TokenLine, layer310::Document};
-use crate::parser::{layer210::PResult, layer230::DocumentElementP};
+use crate::parser::phase200::{layer210::PResult, layer230::DocumentElementP};
 use casual_logger::Table;
 
 /// Syntax scanner.  
@@ -22,12 +22,12 @@ impl SyntaxScanner {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn scan_line(&mut self, token_line: &TokenLine, dom: &mut Document) -> PResult {
+    pub fn scan_line(&mut self, token_line: &TokenLine, doc: &mut Document) -> PResult {
         for (i, token) in token_line.tokens.iter().enumerate() {
             match self.document_element_p.parse(token) {
                 PResult::End => {
-                    if let Some(child_m) = self.document_element_p.flush() {
-                        dom.push_broad_line(&child_m);
+                    if let Some(element) = self.document_element_p.flush() {
+                        doc.push_element(&element);
                     } else {
                         let mut err_token_line = TokenLine::new(token_line.row_number);
                         err_token_line.tokens = token_line.tokens[i..].to_vec();

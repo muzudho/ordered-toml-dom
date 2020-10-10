@@ -34,7 +34,7 @@ impl Document {
         }
         None
     }
-    pub fn push_broad_line(&mut self, m: &DocumentElement) {
+    pub fn push_element(&mut self, m: &DocumentElement) {
         self.elements.push(m.clone());
     }
 }
