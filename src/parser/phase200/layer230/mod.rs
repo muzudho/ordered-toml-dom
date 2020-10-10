@@ -2,7 +2,7 @@ pub mod document_element;
 
 use crate::model::layer230::DocumentElement;
 use crate::parser::phase200::{
-    layer210::{ArrayOfTableP, CommentP, TableP},
+    layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable},
     layer220::KeyValueP,
     layer230::document_element::State as DocumentElementState,
 };
@@ -10,10 +10,10 @@ use crate::parser::phase200::{
 /// Broad-line syntax parser.  
 /// `縦幅のある行` パーサー。  
 pub struct DocumentElementP {
-    array_of_table_p: Option<ArrayOfTableP>,
+    header_p_of_array_of_table: Option<HeaderPOfArrayOfTable>,
     buffer: Option<DocumentElement>,
     comment_p: Option<CommentP>,
     key_value_p: Option<KeyValueP>,
     state: DocumentElementState,
-    table_p: Option<TableP>,
+    header_p_of_table: Option<HeaderPOfTable>,
 }

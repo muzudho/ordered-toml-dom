@@ -1,12 +1,12 @@
-pub mod array_of_table;
 pub mod document_element;
-pub mod table;
+pub mod header_of_array_of_table;
+pub mod header_of_table;
 
 use crate::model::{layer210::Comment, layer220::KeyValue};
 
 /// WIP.  
 #[derive(Clone)]
-pub struct ArrayOfTable {
+pub struct HeaderOfArrayOfTable {
     pub value: String,
 }
 
@@ -14,15 +14,15 @@ pub struct ArrayOfTable {
 /// 空行、コメント、キー値、テーブル、テーブルの配列のいずれかです。  
 #[derive(Clone)]
 pub enum DocumentElement {
-    ArrayOfTable(ArrayOfTable),
+    HeaderOfArrayOfTable(HeaderOfArrayOfTable),
     Comment(Comment),
     EmptyLine,
     KeyValue(KeyValue),
-    Table(Table),
+    HeaderOfTable(HeaderOfTable),
 }
 
 /// WIP.  
 #[derive(Clone)]
-pub struct Table {
+pub struct HeaderOfTable {
     pub value: String,
 }

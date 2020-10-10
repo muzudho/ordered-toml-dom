@@ -3,20 +3,20 @@
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer230::Table as TableM,
+    layer230::HeaderOfTable,
 };
-use crate::parser::phase200::layer210::{PResult, TableP};
+use crate::parser::phase200::layer210::{HeaderPOfTable, PResult};
 use casual_logger::Table as LogTable;
 
-impl TableP {
-    pub fn flush(&mut self) -> Option<TableM> {
+impl HeaderPOfTable {
+    pub fn flush(&mut self) -> Option<HeaderOfTable> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        TableP {
-            buffer: Some(TableM::default()),
+        HeaderPOfTable {
+            buffer: Some(HeaderOfTable::default()),
         }
     }
     /// # Returns

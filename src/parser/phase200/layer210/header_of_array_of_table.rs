@@ -1,22 +1,22 @@
-//! Array of ArrayOfTable syntax parser.  
+//! Array of HeaderOfArrayOfTable syntax parser.  
 //! テーブルの配列構文パーサー。  
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer230::ArrayOfTable as ArrayOfTableM,
+    layer230::HeaderOfArrayOfTable,
 };
-use crate::parser::phase200::layer210::{ArrayOfTableP, PResult};
+use crate::parser::phase200::layer210::{HeaderPOfArrayOfTable, PResult};
 use casual_logger::Table as LogTable;
 
-impl ArrayOfTableP {
-    pub fn flush(&mut self) -> Option<ArrayOfTableM> {
+impl HeaderPOfArrayOfTable {
+    pub fn flush(&mut self) -> Option<HeaderOfArrayOfTable> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        ArrayOfTableP {
-            buffer: Some(ArrayOfTableM::default()),
+        HeaderPOfArrayOfTable {
+            buffer: Some(HeaderOfArrayOfTable::default()),
         }
     }
     /// # Returns

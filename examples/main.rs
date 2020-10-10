@@ -19,10 +19,10 @@ fn main() {
     );
     for elem in doc.elements {
         match elem {
-            DocumentElement::ArrayOfTable(m) => {
+            DocumentElement::HeaderOfArrayOfTable(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
-                    Table::default().str("ArrayOfTable", &format!("{:?}", m)),
+                    Table::default().str("HeaderOfArrayOfTable", &format!("{:?}", m)),
                 );
             }
             DocumentElement::Comment(m) => {
@@ -47,7 +47,7 @@ fn main() {
                     RightValue::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
                 }
             }
-            DocumentElement::Table(m) => {
+            DocumentElement::HeaderOfTable(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("Table", &format!("{:?}", m)),

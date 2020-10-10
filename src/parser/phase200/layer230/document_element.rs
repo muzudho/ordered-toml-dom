@@ -6,7 +6,7 @@ use crate::model::{
     layer230::DocumentElement,
 };
 use crate::parser::phase200::{
-    layer210::{ArrayOfTableP, CommentP, PResult, TableP},
+    layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
     layer220::{usize_to_i128, KeyValueP},
     layer230::DocumentElementP,
 };
@@ -22,7 +22,7 @@ pub enum State {
     AfterLeftSquareBracket,
     AfterTable,
     /// `[[name]]`
-    ArrayOfTable,
+    HeaderOfArrayOfTable,
     /// `# comment`.
     CommentSyntax,
     Finished,
@@ -37,12 +37,12 @@ pub enum State {
 impl Default for DocumentElementP {
     fn default() -> Self {
         DocumentElementP {
-            array_of_table_p: None,
+            header_p_of_array_of_table: None,
             buffer: None,
             comment_p: None,
             key_value_p: None,
             state: State::First,
-            table_p: None,
+            header_p_of_table: None,
         }
     }
 }
@@ -90,11 +90,11 @@ impl DocumentElementP {
             State::AfterLeftSquareBracket => match token.type_ {
                 // `[`
                 TokenType::LeftSquareBracket => {
-                    self.array_of_table_p = Some(ArrayOfTableP::new());
-                    self.state = State::ArrayOfTable;
+                    self.header_p_of_array_of_table = Some(HeaderPOfArrayOfTable::new());
+                    self.state = State::HeaderOfArrayOfTable;
                 }
                 _ => {
-                    self.table_p = Some(TableP::new());
+                    self.header_p_of_table = Some(HeaderPOfTable::new());
                     self.state = State::Table;
                     return self.parse_table(token);
                 }
@@ -108,13 +108,13 @@ impl DocumentElementP {
                         .clone(),
                 );
             }
-            State::ArrayOfTable => {
-                let p = self.array_of_table_p.as_mut().unwrap();
+            State::HeaderOfArrayOfTable => {
+                let p = self.header_p_of_array_of_table.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
-                            self.buffer = Some(DocumentElement::from_array_of_table(&m));
-                            self.array_of_table_p = None;
+                            self.buffer = Some(DocumentElement::from_header_of_array_of_table(&m));
+                            self.header_p_of_array_of_table = None;
                             self.state = State::AfterArrayOfTable;
                             return PResult::End;
                         } else {
@@ -252,12 +252,12 @@ impl DocumentElementP {
         PResult::Ongoing
     }
     fn parse_table(&mut self, token: &Token) -> PResult {
-        let p = self.table_p.as_mut().unwrap();
+        let p = self.header_p_of_table.as_mut().unwrap();
         match p.parse(token) {
             PResult::End => {
                 if let Some(m) = p.flush() {
-                    self.buffer = Some(DocumentElement::from_table(&m));
-                    self.table_p = None;
+                    self.buffer = Some(DocumentElement::from_header_of_table(&m));
+                    self.header_p_of_table = None;
                     self.state = State::AfterTable;
                     return PResult::End;
                 } else {

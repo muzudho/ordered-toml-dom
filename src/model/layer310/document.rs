@@ -15,7 +15,7 @@ impl Document {
     pub fn child(&self, name: &str) -> Option<&DocumentElement> {
         for elem in &self.elements {
             match elem {
-                DocumentElement::ArrayOfTable(_) => {
+                DocumentElement::HeaderOfArrayOfTable(_) => {
                     // TODO
                 }
                 DocumentElement::Comment(_) => {}
@@ -27,7 +27,7 @@ impl Document {
                         return Some(elem);
                     }
                 }
-                DocumentElement::Table(_) => {
+                DocumentElement::HeaderOfTable(_) => {
                     // TODO
                 }
             }
