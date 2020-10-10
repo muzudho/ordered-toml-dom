@@ -2,7 +2,6 @@
 //! 構文パーサー。  
 
 pub mod array;
-pub mod array_of_table;
 pub mod document_element;
 pub mod inline_table;
 pub mod key_value;
@@ -11,10 +10,10 @@ pub mod machine_state;
 
 use crate::model::{
     layer20::{Array, InlineTable, KeyValue},
-    layer30::{ArrayOfTable, DocumentElement},
+    layer30::DocumentElement,
 };
 use crate::parser::syntax::{
-    layer10::{CommentP, DoubleQuotedStringP, SingleQuotedStringP, TableP},
+    layer10::{ArrayOfTableP, CommentP, DoubleQuotedStringP, SingleQuotedStringP, TableP},
     machine_state::{ArrayState, BroadLineState, InlineTableState, KeyValueState},
 };
 use crate::token::Token;
@@ -26,15 +25,6 @@ fn usize_to_i128(num: usize) -> i128 {
     } else {
         -1
     }
-}
-
-/// Array of table syntax parser.  
-/// テーブル配列構文パーサー。  
-///
-/// Example: `"value"`.  
-#[derive(Clone)]
-pub struct ArrayOfTableP {
-    buffer: Option<ArrayOfTable>,
 }
 
 /// Array parser.  

@@ -3,9 +3,9 @@
 
 use crate::model::layer30::DocumentElement;
 use crate::parser::syntax::{
-    layer10::{CommentP, PResult, TableP},
+    layer10::{ArrayOfTableP, CommentP, PResult, TableP},
     machine_state::BroadLineState,
-    usize_to_i128, ArrayOfTableP, DocumentElementP, KeyValueP,
+    usize_to_i128, DocumentElementP, KeyValueP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::Table;

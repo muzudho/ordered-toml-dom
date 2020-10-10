@@ -1,3 +1,4 @@
+pub mod array_of_table;
 pub mod comment;
 pub mod double_quoted_string;
 pub mod single_quoted_string;
@@ -5,9 +6,18 @@ pub mod table;
 
 use crate::model::{
     layer10::{Comment, DoubleQuotedString, SingleQuotedString},
-    layer30::Table as TableM,
+    layer30::{ArrayOfTable, Table as TableM},
 };
 use casual_logger::Table as LogTable;
+
+/// Array of table syntax parser.  
+/// テーブル配列構文パーサー。  
+///
+/// Example: `"value"`.  
+#[derive(Clone)]
+pub struct ArrayOfTableP {
+    buffer: Option<ArrayOfTable>,
+}
 
 /// Comment parser.  
 /// コメント・パーサー。  
