@@ -13,7 +13,7 @@ mod parser;
 use crate::model::layer310::Document;
 use crate::parser::{
     phase100::lexical_parser::LexicalParser,
-    phase200::{layer210::PResult, layer240::syntax_scanner::SyntaxScanner},
+    phase200::{layer210::PResult, layer240::document::DocumentParser},
 };
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
@@ -57,7 +57,7 @@ impl Toml {
                             .str("token_line", &format!("=|{:?}|", lexical_p)),
                     );
                     */
-                    let mut line_syntax_scanner = SyntaxScanner::default();
+                    let mut line_syntax_scanner = DocumentParser::default();
                     match line_syntax_scanner.scan_line(&lexical_p.product(), &mut doc) {
                         PResult::End => {} // Ignored it.
                         PResult::Err(table) => {

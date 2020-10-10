@@ -1,23 +1,23 @@
-//! Syntax scanner.  
-//! 構文走査器。  
+//! Document syntax parser.  
+//! ドキュメント構文解析器。  
 
 use crate::model::{layer110::token::TokenLine, layer310::Document};
 use crate::parser::phase200::{layer210::PResult, layer230::DocumentElementP};
 use casual_logger::Table;
 
-/// Syntax scanner.  
-/// 構文走査器。  
-pub struct SyntaxScanner {
+/// Document syntax parser.  
+/// ドキュメント構文解析器。  
+pub struct DocumentParser {
     pub document_element_p: DocumentElementP,
 }
-impl Default for SyntaxScanner {
+impl Default for DocumentParser {
     fn default() -> Self {
-        SyntaxScanner {
+        DocumentParser {
             document_element_p: DocumentElementP::default(),
         }
     }
 }
-impl SyntaxScanner {
+impl DocumentParser {
     /// # Returns
     ///
     /// * `PResult` - Result.  
@@ -26,15 +26,14 @@ impl SyntaxScanner {
         for (i, token) in token_line.tokens.iter().enumerate() {
             match self.document_element_p.parse(token) {
                 PResult::End => {
-                    if let Some(element) = self.document_element_p.flush() {
-                        doc.push_element(&element);
+                    if let Some(m) = self.document_element_p.flush() {
+                        doc.push_element(&m);
                     } else {
-                        let mut err_token_line = TokenLine::new(token_line.row_number);
-                        err_token_line.tokens = token_line.tokens[i..].to_vec();
+                        let remaining_tokens = token_line.remaining_tokens(i);
                         return PResult::Err(
                             self.err_table()
                                 .str("token_line", &format!("{:?}", token_line))
-                                .str("rest", &format!("{:?}", err_token_line))
+                                .str("remaining_tokens", &format!("{:?}", remaining_tokens))
                                 .clone(),
                         );
                     }
@@ -56,7 +55,7 @@ impl SyntaxScanner {
 
     pub fn err_table(&self) -> Table {
         let mut t = Table::default();
-        t.str("parser", "syntax_scanner.rs/SyntaxScanner#scan_line")
+        t.str("parser", "document_parser.rs/DocumentParser#scan_line")
             .sub_t("line", &self.document_element_p.log_table());
         t
     }

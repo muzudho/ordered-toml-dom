@@ -1,1 +1,1 @@
-pub mod syntax_scanner;
+pub mod document;

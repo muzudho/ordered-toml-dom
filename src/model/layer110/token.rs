@@ -16,6 +16,15 @@ impl TokenLine {
             tokens: Vec::new(),
         }
     }
+
+    /// Remaining tokens.
+    /// 残りのトークン。
+    pub fn remaining_tokens(&self, token_number: usize) -> Self {
+        TokenLine {
+            row_number: self.row_number,
+            tokens: self.tokens[token_number..].to_vec(),
+        }
+    }
 }
 impl fmt::Debug for TokenLine {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
