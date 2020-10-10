@@ -69,9 +69,39 @@ impl ArrayP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
+            // After `]`.
+            State::AfterArray => {
+                Log::trace_t(
+                    "ArrayP#parse| [array] -> this",
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
+                );
+                match token.type_ {
+                    TokenType::WhiteSpace => {} // Ignore it.
+                    // `,`.
+                    TokenType::Comma => {
+                        self.state = State::AfterCommaBefindArray;
+                    }
+                    // `]`.
+                    TokenType::RightSquareBracket => {
+                        self.state = State::End;
+                        return PResult::End;
+                    }
+                    _ => {
+                        return PResult::Err(
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
+                }
+            }
             // After `[],`.
             State::AfterCommaBefindArray => {
                 match token.type_ {
+                    // `[`.
                     TokenType::LeftSquareBracket => {
                         Log::trace_t(
                             "ArrayP#parse| [], -> [",
@@ -193,33 +223,6 @@ impl ArrayP {
                     }
                 }
             }
-            // After `]`.
-            State::AfterArray => {
-                Log::trace_t(
-                    "ArrayP#parse| [array] -> this",
-                    self.log_table()
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
-                match token.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
-                    TokenType::Comma => {
-                        self.state = State::AfterCommaBefindArray;
-                    }
-                    TokenType::RightSquareBracket => {
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    _ => {
-                        return PResult::Err(
-                            self.log_table()
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
-                }
-            }
             // After `"`.
             State::AfterDoubleQuotedString => {
                 Log::trace_t(
@@ -245,6 +248,46 @@ impl ArrayP {
                                 .clone(),
                         )
                     }
+                }
+            }
+            // `[array]`.
+            State::Array => {
+                Log::trace_t(
+                    "ArrayP#parse| [array]",
+                    self.log_table()
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
+                );
+                let p = self.array_p.as_mut().unwrap();
+                match p.parse(token) {
+                    PResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            if let None = self.buffer {
+                                self.buffer = Some(Array::default());
+                            }
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_array(&child_m);
+                            self.array_p = None;
+                            self.state = State::AfterArray;
+                        } else {
+                            return PResult::Err(
+                                self.log_table()
+                                    .int("column_number", usize_to_i128(token.column_number))
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    PResult::Err(table) => {
+                        return PResult::Err(
+                            self.log_table()
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
+                                .clone(),
+                        )
+                    }
+                    PResult::Ongoing => {}
                 }
             }
             // After `[`.
@@ -365,46 +408,6 @@ impl ArrayP {
                                 .clone(),
                         )
                     }
-                }
-            }
-            // `[array]`.
-            State::Array => {
-                Log::trace_t(
-                    "ArrayP#parse| [array]",
-                    self.log_table()
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
-                let p = self.array_p.as_mut().unwrap();
-                match p.parse(token) {
-                    PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            if let None = self.buffer {
-                                self.buffer = Some(Array::default());
-                            }
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_array(&child_m);
-                            self.double_quoted_string_p = None;
-                            self.state = State::AfterArray;
-                        } else {
-                            return PResult::Err(
-                                self.log_table()
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
-                    }
-                    PResult::Err(table) => {
-                        return PResult::Err(
-                            self.log_table()
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
-                                .clone(),
-                        )
-                    }
-                    PResult::Ongoing => {}
                 }
             }
             // "dog".
