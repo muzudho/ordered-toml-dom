@@ -4,8 +4,8 @@
 //! `cargo run --example main`
 
 use casual_logger::{Log, Table};
-use toml_menu::{
-    model::{layer30::RightValue, layer40::DocumentElement},
+use tomboy_toml_dom::{
+    model::{layer220::RightValue, layer230::DocumentElement},
     Toml,
 };
 

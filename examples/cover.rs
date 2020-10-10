@@ -4,7 +4,7 @@
 //! `cargo run --example cover`
 
 use casual_logger::{Level, Log, Table};
-use toml_menu::Toml;
+use tomboy_toml_dom::Toml;
 
 pub trait LogExt {
     fn println(s: &str);

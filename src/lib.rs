@@ -9,11 +9,12 @@ extern crate regex;
 
 pub mod model;
 mod parser;
-pub mod syntax_scanner;
 
-use crate::model::{layer10::token, layer50::Document};
-use crate::parser::{lexical_parser::LexicalParser, syntax::layer20::PResult};
-use crate::syntax_scanner::SyntaxScanner;
+use crate::model::layer310::Document;
+use crate::parser::{
+    lexical_parser::LexicalParser,
+    syntax::{layer210::PResult, layer310::syntax_scanner::SyntaxScanner},
+};
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
 use std::convert::TryInto;

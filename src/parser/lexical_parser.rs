@@ -1,6 +1,6 @@
 //! Divide into words.  
 //! 単語に分けます。  
-use crate::model::layer10::token::{Token, TokenLine, TokenType};
+use crate::model::layer110::token::{Token, TokenLine, TokenType};
 use crate::RE_KEY;
 use casual_logger::Log;
 use std::fmt;
