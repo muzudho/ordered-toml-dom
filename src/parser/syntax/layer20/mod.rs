@@ -1,12 +1,13 @@
 pub mod array;
 pub mod inline_table;
+pub mod key_value;
 
-use crate::model::layer20::{Array, InlineTable};
+use crate::model::layer20::{Array, InlineTable, KeyValue};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, SingleQuotedStringP},
-    machine_state::{ArrayState, InlineTableState},
-    KeyValueP,
+    machine_state::{ArrayState, InlineTableState, KeyValueState},
 };
+use crate::token::Token;
 
 /// Array parser.  
 /// 配列パーサー。  
@@ -28,4 +29,18 @@ pub struct InlineTableP {
     state: InlineTableState,
     buffer: Option<InlineTable>,
     key_value_p: Option<Box<KeyValueP>>,
+}
+
+/// Key value syntax parser.  
+/// キー値構文パーサー。  
+///
+/// `key = value`.  
+pub struct KeyValueP {
+    array_p: Option<ArrayP>,
+    buffer: Option<KeyValue>,
+    double_quoted_string_p: Option<DoubleQuotedStringP>,
+    inline_table_p: Option<InlineTableP>,
+    single_quoted_string_p: Option<SingleQuotedStringP>,
+    state: KeyValueState,
+    temp_key: Token,
 }
