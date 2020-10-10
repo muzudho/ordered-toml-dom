@@ -2,7 +2,7 @@
 //! テーブルの配列構文パーサー。  
 
 use crate::model::layer30::ArrayOfTable as ArrayOfTableM;
-use crate::parser::syntax::{layer10::PResult, ArrayOfTableP};
+use crate::parser::syntax::layer10::{ArrayOfTableP, PResult};
 use crate::token::{Token, TokenType};
 use casual_logger::Table as LogTable;
 

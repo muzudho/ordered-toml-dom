@@ -5,7 +5,7 @@ use crate::model::layer30::DocumentElement;
 use crate::parser::syntax::{
     layer10::{ArrayOfTableP, CommentP, PResult, TableP},
     layer20::{usize_to_i128, KeyValueP},
-    DocumentElementP,
+    layer30::DocumentElementP,
 };
 use crate::token::{Token, TokenType};
 use casual_logger::Table;
