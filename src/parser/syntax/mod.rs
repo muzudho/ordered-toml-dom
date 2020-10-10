@@ -2,20 +2,16 @@
 //! 構文パーサー。  
 
 pub mod document_element;
-pub mod inline_table;
 pub mod key_value;
 pub mod layer10;
 pub mod layer20;
 pub mod machine_state;
 
-use crate::model::{
-    layer20::{InlineTable, KeyValue},
-    layer30::DocumentElement,
-};
+use crate::model::{layer20::KeyValue, layer30::DocumentElement};
 use crate::parser::syntax::{
     layer10::{ArrayOfTableP, CommentP, DoubleQuotedStringP, SingleQuotedStringP, TableP},
-    layer20::ArrayP,
-    machine_state::{BroadLineState, InlineTableState, KeyValueState},
+    layer20::{ArrayP, InlineTableP},
+    machine_state::{BroadLineState, KeyValueState},
 };
 use crate::token::Token;
 use std::convert::TryInto;
@@ -37,16 +33,6 @@ pub struct DocumentElementP {
     key_value_p: Option<KeyValueP>,
     state: BroadLineState,
     table_p: Option<TableP>,
-}
-
-/// Inline table syntax parser.  
-/// インライン・テーブル構文パーサー。  
-///
-/// Example: `{ key = value, key = value }`.  
-pub struct InlineTableP {
-    state: InlineTableState,
-    buffer: Option<InlineTable>,
-    key_value_p: Option<Box<KeyValueP>>,
 }
 
 /// Key value syntax parser.  

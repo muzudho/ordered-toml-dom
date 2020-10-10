@@ -1,9 +1,11 @@
 pub mod array;
+pub mod inline_table;
 
-use crate::model::layer20::Array;
+use crate::model::layer20::{Array, InlineTable};
 use crate::parser::syntax::{
     layer10::{DoubleQuotedStringP, SingleQuotedStringP},
-    machine_state::ArrayState,
+    machine_state::{ArrayState, InlineTableState},
+    KeyValueP,
 };
 
 /// Array parser.  
@@ -16,4 +18,14 @@ pub struct ArrayP {
     double_quoted_string_p: Option<Box<DoubleQuotedStringP>>,
     single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
     state: ArrayState,
+}
+
+/// Inline table syntax parser.  
+/// インライン・テーブル構文パーサー。  
+///
+/// Example: `{ key = value, key = value }`.  
+pub struct InlineTableP {
+    state: InlineTableState,
+    buffer: Option<InlineTable>,
+    key_value_p: Option<Box<KeyValueP>>,
 }
