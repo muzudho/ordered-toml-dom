@@ -10,7 +10,7 @@ use crate::parser::phase200::{
     layer220::usize_to_i128,
     layer225::{InlineTableP, KeyValueP},
 };
-use casual_logger::{Log, Table};
+use casual_logger::Table;
 
 /// Inline table syntax machine state.  
 /// インライン・テーブル構文状態遷移。  
@@ -18,7 +18,8 @@ use casual_logger::{Log, Table};
 /// Example: `{ key = value, key = value }`.  
 #[derive(Debug)]
 pub enum State {
-    AfterLeftCurlyBracket,
+    // First. After `{`.
+    First,
     KeyValue,
     AfterKeyValue,
 }
@@ -26,7 +27,7 @@ pub enum State {
 impl Default for InlineTableP {
     fn default() -> Self {
         InlineTableP {
-            state: State::AfterLeftCurlyBracket,
+            state: State::First,
             buffer: Some(InlineTable::default()),
             key_value_p: None,
         }
@@ -45,13 +46,17 @@ impl InlineTableP {
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
             // After `{`.
-            State::AfterLeftCurlyBracket => {
+            State::First => {
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `apple.banana`
                     TokenType::KeyWithoutDot => {
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
                         self.state = State::KeyValue;
+                    }
+                    TokenType::RightCurlyBracket => {
+                        // Empty inline-table.
+                        return PResult::End;
                     }
                     _ => {
                         return PResult::Err(
@@ -70,8 +75,7 @@ impl InlineTableP {
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_key_value(&child_m);
+                            self.buffer.as_mut().unwrap().push_key_value(&child_m);
                             self.key_value_p = None;
                             self.state = State::AfterKeyValue;
                         } else {
@@ -100,7 +104,7 @@ impl InlineTableP {
                 TokenType::WhiteSpace => {} // Ignore it.
                 // `,`
                 TokenType::Comma => {
-                    self.state = State::AfterLeftCurlyBracket;
+                    self.state = State::First;
                 }
                 // `}`
                 TokenType::RightCurlyBracket => {
