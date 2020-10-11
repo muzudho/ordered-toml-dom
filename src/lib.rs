@@ -39,9 +39,8 @@ impl Toml {
             "Read a file.",
             Table::default().str("File", &format!("{}", path)),
         );
-        let mut info_aot = ArrayOfTable::default().clone();
         let mut error_aot = ArrayOfTable::default().clone();
-        let mut doc = Document::default();
+        let mut output_document = Document::default();
         match File::open(path) {
             Ok(file) => {
                 for (i, line) in BufReader::new(file).lines().enumerate() {
@@ -53,16 +52,11 @@ impl Toml {
                     Log::trace(&format!("from_file/line=|{}|", line));
                     let mut lexical_p = LexicalParser::new(row_number);
                     lexical_p.parse_line(&line);
-                    /*
-                    Log::trace_t(
-                        "Toml::from_file/line_tokens",
-                        Toml::err_table()
-                            .str("line", &line)
-                            .str("token_line", &format!("=|{:?}|", lexical_p)),
-                    );
-                    */
+
                     let mut document_line_scanner = DocumentLineScanner::default();
-                    match document_line_scanner.scan_line(&lexical_p.product(), &mut doc) {
+                    match document_line_scanner
+                        .scan_line(&lexical_p.product(), &mut output_document)
+                    {
                         PResult::End => {} // Ignored it.
                         PResult::Err(mut table) => {
                             error_aot.table(
@@ -87,26 +81,7 @@ impl Toml {
                                 ),
                             );
                         }
-                        PResult::Ongoing => {
-                            // 正常
-                            /*
-                            info_aot.table(
-                                Table::default()
-                                    .str("place_of_occurrence", "lib.rs.85.")
-                                    .int(
-                                        "row_number",
-                                        if let Ok(n) = row_number.try_into() {
-                                            n
-                                        } else {
-                                            -1
-                                        },
-                                    )
-                                    .str("line", &format!("{}", line))
-                                    .str("token_line", &format!("{:?}", lexical_p))
-                                    .sub_t("document_line_scanner", &document_line_scanner.log_snapshot()),
-                            );
-                            */
-                        }
+                        PResult::Ongoing => {} // Ignored it.
                     }
                 }
             }
@@ -114,17 +89,13 @@ impl Toml {
         }
         Log::info_t(
             "Product.",
-            Table::default().str("product_dom", &format!("{:?}", doc)),
-        );
-        Log::info_t(
-            "Finish of Toml#from_file().",
-            Table::default().sub_aot("info_aot", &info_aot),
+            Table::default().str("output_document", &format!("{:?}", output_document)),
         );
         Log::error_t(
-            "Finish of Toml#from_file() error.",
+            "List if error exists.",
             Table::default().sub_aot("error_aot", &error_aot),
         );
 
-        doc
+        output_document
     }
 }
