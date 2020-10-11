@@ -64,7 +64,8 @@ impl Toml {
                             aot.table(
                                 table.sub_t(
                                     "snapshot",
-                                    Toml::log_table("code.65.")
+                                    Toml::log_snapshot()
+                                        .str("place_of_occurrence", "lib.rs.65.")
                                         .int(
                                             "row_number",
                                             if let Ok(n) = row_number.try_into() {
@@ -81,7 +82,8 @@ impl Toml {
                         }
                         PResult::Ongoing => {
                             aot.table(
-                                Toml::log_table("code.85")
+                                Toml::log_snapshot()
+                                    .str("place_of_occurrence", "lib.rs.85.")
                                     .int(
                                         "row_number",
                                         if let Ok(n) = row_number.try_into() {
@@ -102,19 +104,22 @@ impl Toml {
         }
         Log::info_t(
             "Product.",
-            Toml::log_table("code.109.").str("product_dom", &format!("{:?}", doc)),
+            Toml::log_snapshot()
+                .str("place_of_occurrence", "lib.rs.109.")
+                .str("product_dom", &format!("{:?}", doc)),
         );
         Log::info_t(
             "Finish of Toml#from_file().",
-            Toml::log_table("code.113.").sub_aot("file", &aot),
+            Toml::log_snapshot()
+                .str("place_of_occurrence", "lib.rs.113.")
+                .sub_aot("file", &aot),
         );
 
         doc
     }
-    pub fn log_table(place_of_occurrence: &str) -> Table {
+    pub fn log_snapshot() -> Table {
         let t = Table::default()
             .str("Parse", "lib.rs/Toml#from_file")
-            .str("place_of_occurrence", place_of_occurrence)
             .clone();
         t
     }
