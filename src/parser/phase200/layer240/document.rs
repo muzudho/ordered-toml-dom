@@ -33,6 +33,8 @@ impl DocumentParser {
                         return PResult::Err(
                             self.log_snapshot()
                                 .str("place_of_occurrence", "document.rs.34.")
+                                .str("token_index", &format!("{:?}", i))
+                                .str("token", &format!("{:?}", token))
                                 .str("token_line", &format!("{:?}", token_line))
                                 .str("remaining_tokens", &format!("{:?}", remaining_tokens))
                                 .clone(),
@@ -60,8 +62,10 @@ impl DocumentParser {
 
     pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default();
-        t.str("parser", "document_parser.rs")
-            .sub_t("line", &self.document_element_p.log_snapshot());
+        t.sub_t(
+            "document_element_p",
+            &self.document_element_p.log_snapshot(),
+        );
         t
     }
 }

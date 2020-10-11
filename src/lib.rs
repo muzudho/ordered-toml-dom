@@ -35,7 +35,10 @@ impl Toml {
     /// Line scan.
     /// 行走査。
     pub fn from_file(path: &str) -> Document {
-        Log::info(&format!("Read=|{}|", path));
+        Log::info_t(
+            "Read a file.",
+            Table::default().str("File", &format!("{}", path)),
+        );
         let mut info_aot = ArrayOfTable::default().clone();
         let mut error_aot = ArrayOfTable::default().clone();
         let mut doc = Document::default();
@@ -65,7 +68,7 @@ impl Toml {
                             error_aot.table(
                                 table.sub_t(
                                     "snapshot",
-                                    Toml::log_snapshot()
+                                    Table::default()
                                         .str("via", "lib.rs.65.")
                                         .int(
                                             "row_number",
@@ -77,13 +80,13 @@ impl Toml {
                                         )
                                         .str("line", &format!("{}", line))
                                         .str("token_line", &format!("{:?}", lexical_p))
-                                        .sub_t("line_scanner", &document_p.log_snapshot()),
+                                        .sub_t("document_p", &document_p.log_snapshot()),
                                 ),
                             );
                         }
                         PResult::Ongoing => {
                             info_aot.table(
-                                Toml::log_snapshot()
+                                Table::default()
                                     .str("place_of_occurrence", "lib.rs.85.")
                                     .int(
                                         "row_number",
@@ -95,7 +98,7 @@ impl Toml {
                                     )
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
-                                    .sub_t("line_scanner", &document_p.log_snapshot()),
+                                    .sub_t("document_p", &document_p.log_snapshot()),
                             );
                         }
                     }
@@ -105,29 +108,17 @@ impl Toml {
         }
         Log::info_t(
             "Product.",
-            Toml::log_snapshot()
-                .str("place_of_occurrence", "lib.rs.109.")
-                .str("product_dom", &format!("{:?}", doc)),
+            Table::default().str("product_dom", &format!("{:?}", doc)),
         );
         Log::info_t(
             "Finish of Toml#from_file().",
-            Toml::log_snapshot()
-                .str("place_of_occurrence", "lib.rs.113.")
-                .sub_aot("file", &info_aot),
+            Table::default().sub_aot("info_aot", &info_aot),
         );
         Log::error_t(
             "Finish of Toml#from_file() error.",
-            Toml::log_snapshot()
-                .str("place_of_occurrence", "lib.rs.121.")
-                .sub_aot("file", &error_aot),
+            Table::default().sub_aot("error_aot", &error_aot),
         );
 
         doc
-    }
-    pub fn log_snapshot() -> Table {
-        let t = Table::default()
-            .str("Parse", "lib.rs/Toml#from_file")
-            .clone();
-        t
     }
 }

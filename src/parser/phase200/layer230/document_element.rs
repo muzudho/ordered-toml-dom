@@ -313,14 +313,13 @@ impl DocumentElementP {
     }
     pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default()
-            .str("parser", "DocumentElementP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {
-            t.sub_t("comment", &comment_p.log_snapshot());
+            t.sub_t("comment_p", &comment_p.log_snapshot());
         }
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log_snapshot());
+            t.sub_t("key_value_p", &key_value_p.log_snapshot());
         }
         t
     }

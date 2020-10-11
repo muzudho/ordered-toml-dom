@@ -51,26 +51,13 @@ impl KeyValueP {
     ///                             結果。
     pub fn parse(&mut self, token: &Token) -> PResult {
         match self.state {
+            // After `literal`.
             State::AfterKey => {
                 match token.type_ {
-                    TokenType::WhiteSpace => {
-                        Log::trace_t(
-                            "KeyValueP#parse/AfterKey/WhiteSpace",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.59.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
-                    } //Ignored it.
+                    TokenType::WhiteSpace => {} //Ignored it.
+                    // `=`.
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
-                        Log::trace_t(
-                            "KeyValueP#parse/AfterKey/=",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.68.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                     }
                     _ => {
                         return PResult::Err(
@@ -83,19 +70,15 @@ impl KeyValueP {
                     }
                 }
             }
+            // After `=`.
             State::AfterEquals => {
                 match token.type_ {
+                    // `"`.
                     TokenType::DoubleQuotation => {
                         self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
                         self.state = State::DoubleQuotedString;
-                        Log::trace_t(
-                            "KeyValueP#parse/After=/\"",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.90.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                     }
+                    // `literal`.
                     TokenType::KeyWithoutDot => {
                         // TODO true, false
                         self.buffer = Some(KeyValue::new(
@@ -103,57 +86,24 @@ impl KeyValueP {
                             &RightValue::LiteralString(LiteralString::new(&token)),
                         ));
                         self.state = State::End;
-                        Log::trace_t(
-                            "KeyValueP#parse/After=/Key",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.104.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                         return PResult::End;
                     }
+                    // `{`.
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());
                         self.state = State::AfterLeftCurlyBracket;
-                        Log::trace_t(
-                            "KeyValueP#parse/After=/{",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.115.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                     }
+                    // `[`.
                     TokenType::LeftSquareBracket => {
                         self.array_p = Some(ArrayP::default());
                         self.state = State::AfterLeftSquareBracket;
-                        Log::trace_t(
-                            "KeyValueP#parse/After=/[",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.125.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                     }
+                    // `'`.
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_p = Some(SingleQuotedStringP::new());
                         self.state = State::SingleQuotedString;
-                        Log::trace_t(
-                            "KeyValueP#parse/After=/'",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.135.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                     }
-                    TokenType::WhiteSpace => {
-                        Log::trace_t(
-                            "KeyValueP#parse/After=/WhiteSpace",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.143.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
-                    } //Ignored it.
+                    TokenType::WhiteSpace => {} //Ignored it.
                     _ => {
                         return PResult::Err(
                             self.log_snapshot()
@@ -165,14 +115,8 @@ impl KeyValueP {
                     }
                 }
             }
+            // After `{`.
             State::AfterLeftCurlyBracket => {
-                Log::trace_t(
-                    "KeyValueP#parse/After=/After{",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "key_value.rs.161.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 let p = self.inline_table_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -210,14 +154,8 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
+            // After `[`.
             State::AfterLeftSquareBracket => {
-                Log::trace_t(
-                    "KeyValueP#parse/After=/After[",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "key_value.rs.200.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 let p = self.array_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -253,11 +191,8 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
+            // `"abc"`.
             State::DoubleQuotedString => {
-                Log::trace_t(
-                    "KeyValueP#parse/After=/\"value\"",
-                    Table::default().str("token", &format!("{:?}", token)),
-                );
                 let p = self.double_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -292,14 +227,8 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
+            // `'abc'`.
             State::SingleQuotedString => {
-                Log::trace_t(
-                    "KeyValueP#parse/After=/'value'",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "key_value.rs.274.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -351,7 +280,6 @@ impl KeyValueP {
     }
     pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default()
-            .str("parser", "KeyValueP#parse")
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
