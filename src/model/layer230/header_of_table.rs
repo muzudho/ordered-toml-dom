@@ -1,5 +1,11 @@
-//! Table model.  
-//! テーブル・モデル。  
+//! Model of header of table.  
+//! テーブル・ヘッダー・モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // [name.name.name]
+//! ```
 
 use crate::model::{layer110::token::Token, layer230::HeaderOfTable};
 use std::fmt;
@@ -18,6 +24,6 @@ impl HeaderOfTable {
 }
 impl fmt::Debug for HeaderOfTable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "\"{}\"", self.value)
+        write!(f, "[{}]", self.value)
     }
 }

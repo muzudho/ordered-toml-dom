@@ -1,5 +1,11 @@
-//! Array of table model.  
-//! テーブルの配列モデル。  
+//! Model of header of array of table.  
+//! テーブルの配列のヘッダー・モデル。  
+//!
+//! # Examples
+//!
+//! ```
+//! // [[name.name.name]]
+//! ```
 
 use crate::model::{layer110::token::Token, layer230::HeaderOfArrayOfTable};
 use std::fmt;
@@ -18,6 +24,6 @@ impl HeaderOfArrayOfTable {
 }
 impl fmt::Debug for HeaderOfArrayOfTable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "\"{}\"", self.value)
+        write!(f, "[[{}]]", self.value)
     }
 }
