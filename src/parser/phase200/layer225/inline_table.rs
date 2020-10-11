@@ -80,7 +80,7 @@ impl InlineTableP {
                             self.state = State::AfterKeyValue;
                         } else {
                             return PResult::Err(
-                                self.log_table("code.77.")
+                                self.log_table("inline_table.rs.77.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -99,7 +99,7 @@ impl InlineTableP {
                     PResult::Ongoing => {}
                 }
             }
-            // After `apple.banana`.
+            // After `banana = 3`.
             State::AfterKeyValue => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
                 // `,`
@@ -112,7 +112,7 @@ impl InlineTableP {
                 }
                 _ => {
                     return PResult::Err(
-                        self.log_table("code.109.")
+                        self.log_table("inline_table.rs.109.")
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -122,14 +122,14 @@ impl InlineTableP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, code_location: &str) -> Table {
+    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
         let mut t = Table::default()
-            .str("code_location", code_location)
+            .str("place_of_occurrence", place_of_occurrence)
             .str("parser", "InlineTableP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log_table("code.123."));
+            t.sub_t("key_value", &key_value_p.log_table(place_of_occurrence));
         }
         t
     }

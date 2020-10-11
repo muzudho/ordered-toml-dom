@@ -37,9 +37,9 @@ impl HeaderPOfArrayOfTable {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, code_location: &str) -> LogTable {
+    pub fn log_table(&self, place_of_occurrence: &str) -> LogTable {
         let mut t = LogTable::default()
-            .str("code_location", code_location)
+            .str("place_of_occurrence", place_of_occurrence)
             .clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));

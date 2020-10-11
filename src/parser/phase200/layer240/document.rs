@@ -31,7 +31,7 @@ impl DocumentParser {
                     } else {
                         let remaining_tokens = token_line.remaining_tokens(i);
                         return PResult::Err(
-                            self.err_table()
+                            self.log_table("code.34.")
                                 .str("token_line", &format!("{:?}", token_line))
                                 .str("remaining_tokens", &format!("{:?}", remaining_tokens))
                                 .clone(),
@@ -40,7 +40,7 @@ impl DocumentParser {
                 }
                 PResult::Err(table) => {
                     return PResult::Err(
-                        self.err_table()
+                        self.log_table("document.rs.43.")
                             .str("token_line", &format!("{:?}", token_line))
                             .sub_t("error", &table)
                             .clone(),
@@ -53,10 +53,13 @@ impl DocumentParser {
         PResult::Ongoing
     }
 
-    pub fn err_table(&self) -> Table {
+    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
         let mut t = Table::default();
         t.str("parser", "document_parser.rs/DocumentParser#scan_line")
-            .sub_t("line", &self.document_element_p.log_table("code.59."));
+            .sub_t(
+                "line",
+                &self.document_element_p.log_table(place_of_occurrence),
+            );
         t
     }
 }

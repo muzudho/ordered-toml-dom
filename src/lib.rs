@@ -62,7 +62,7 @@ impl Toml {
                         PResult::End => {} // Ignored it.
                         PResult::Err(table) => {
                             aot.table(
-                                Toml::err_table()
+                                Toml::log_table("code.65.")
                                     .int(
                                         "row_number",
                                         if let Ok(n) = row_number.try_into() {
@@ -74,12 +74,15 @@ impl Toml {
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
                                     .sub_t("error", &table)
-                                    .sub_t("line_scanner", &line_syntax_scanner.err_table()),
+                                    .sub_t(
+                                        "line_scanner",
+                                        &line_syntax_scanner.log_table("lib.rs.77."),
+                                    ),
                             );
                         }
                         PResult::Ongoing => {
                             aot.table(
-                                Toml::err_table()
+                                Toml::log_table("code.85")
                                     .int(
                                         "row_number",
                                         if let Ok(n) = row_number.try_into() {
@@ -90,7 +93,10 @@ impl Toml {
                                     )
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
-                                    .sub_t("line_scanner", &line_syntax_scanner.err_table()),
+                                    .sub_t(
+                                        "line_scanner",
+                                        &line_syntax_scanner.log_table("code.96."),
+                                    ),
                             );
                         }
                     }
@@ -100,18 +106,19 @@ impl Toml {
         }
         Log::info_t(
             "Product.",
-            Toml::err_table().str("product_dom", &format!("{:?}", doc)),
+            Toml::log_table("code.109.").str("product_dom", &format!("{:?}", doc)),
         );
         Log::info_t(
             "Finish of Toml#from_file().",
-            Toml::err_table().sub_aot("file", &aot),
+            Toml::log_table("code.113.").sub_aot("file", &aot),
         );
 
         doc
     }
-    pub fn err_table() -> Table {
+    pub fn log_table(place_of_occurrence: &str) -> Table {
         let t = Table::default()
             .str("Parse", "lib.rs/Toml#from_file")
+            .str("place_of_occurrence", place_of_occurrence)
             .clone();
         t
     }

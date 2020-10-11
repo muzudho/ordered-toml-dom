@@ -184,7 +184,7 @@ impl KeyValueP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("code.187.")
+                            self.log_table("key_value.rs.187.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -318,9 +318,9 @@ impl KeyValueP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, code_location: &str) -> Table {
+    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
         let mut t = Table::default()
-            .str("code_location", code_location)
+            .str("place_of_occurrence", place_of_occurrence)
             .str("parser", "KeyValueP#parse")
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", &self.buffer))
@@ -328,16 +328,19 @@ impl KeyValueP {
         if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
             t.sub_t(
                 "double_quoted_string",
-                &double_quoted_string_p.log_table("code.328."),
+                &double_quoted_string_p.log_table(place_of_occurrence),
             );
         }
         if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t("inline_table", &inline_table_p.log_table("code.331."));
+            t.sub_t(
+                "inline_table",
+                &inline_table_p.log_table(place_of_occurrence),
+            );
         }
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
             t.sub_t(
                 "single_quoted_string",
-                &single_quoted_string_p.log_table("code.334."),
+                &single_quoted_string_p.log_table(place_of_occurrence),
             );
         }
         t

@@ -2,6 +2,7 @@
 # このファイルはテスト用です。
 
 int = 1 
+float = 1.1 
 sq = 'a' 
 sqc = 'A' # Comment 1.
 dq = "b" 

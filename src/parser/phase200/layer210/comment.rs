@@ -34,10 +34,10 @@ impl CommentP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, code_location: &str) -> Table {
+    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
         let mut t = Table::default()
             .str("Parse", "CommentP")
-            .str("code_location", code_location)
+            .str("place_of_occurrence", place_of_occurrence)
             .clone();
         if let Some(m) = &self.buffer {
             t.str("buffer", &format!("{:?}", m));

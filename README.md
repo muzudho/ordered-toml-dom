@@ -14,5 +14,7 @@ cargo run --example cover
 
 cargo run --example mix_array
 
+cargo run --example key_value
+
 cargo run --example inline_table
 ```

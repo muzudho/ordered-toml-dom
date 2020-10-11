@@ -228,7 +228,7 @@ impl DocumentElementP {
                     } // Ignored it.
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("code.231.")
+                            self.log_table("document_element.rs.231.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -285,17 +285,17 @@ impl DocumentElementP {
             PResult::Ongoing => PResult::Ongoing,
         }
     }
-    pub fn log_table(&self, code_location: &str) -> Table {
+    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
         let mut t = Table::default()
-            .str("code_location", code_location)
+            .str("place_of_occurrence", place_of_occurrence)
             .str("parser", "DocumentElementP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {
-            t.sub_t("comment", &comment_p.log_table("code.294."));
+            t.sub_t("comment", &comment_p.log_table(place_of_occurrence));
         }
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log_table("code.297."));
+            t.sub_t("key_value", &key_value_p.log_table(place_of_occurrence));
         }
         t
     }

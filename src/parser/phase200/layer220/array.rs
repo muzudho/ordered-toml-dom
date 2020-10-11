@@ -507,21 +507,21 @@ impl ArrayP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, code_location: &str) -> Table {
+    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
         let mut t = Table::default()
-            .str("code_location", code_location)
+            .str("place_of_occurrence", place_of_occurrence)
             .str("parser", "ArrayP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
 
         if let Some(p) = &self.double_quoted_string_p {
-            t.sub_t("double_quoted_string_p", &p.log_table("code.517."));
+            t.sub_t("double_quoted_string_p", &p.log_table(place_of_occurrence));
         }
         if let Some(p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string_p", &p.log_table("code.520."));
+            t.sub_t("single_quoted_string_p", &p.log_table(place_of_occurrence));
         }
         if let Some(p) = &self.array_p {
-            t.sub_t("array_p", &p.log_table("code.528."));
+            t.sub_t("array_p", &p.log_table(place_of_occurrence));
         }
 
         t
