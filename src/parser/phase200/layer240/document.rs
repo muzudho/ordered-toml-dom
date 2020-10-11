@@ -61,7 +61,7 @@ impl DocumentParser {
     pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default();
         t.str("parser", "document_parser.rs")
-            .sub_t("line", &self.document_element_p.log_table("no-data"));
+            .sub_t("line", &self.document_element_p.log_snapshot());
         t
     }
 }

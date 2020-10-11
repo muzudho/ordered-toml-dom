@@ -63,7 +63,8 @@ impl DocumentElementP {
             State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
-                    self.log_table("document_element.rs.66.")
+                    self.log_snapshot()
+                        .str("place_of_occurrence", "document_element.rs.66.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -71,7 +72,8 @@ impl DocumentElementP {
             }
             State::AfterComment => {
                 return PResult::Err(
-                    self.log_table("document_element.rs.74.")
+                    self.log_snapshot()
+                        .str("place_of_occurrence", "document_element.rs.74.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -81,7 +83,8 @@ impl DocumentElementP {
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
                     return PResult::Err(
-                        self.log_table("document_element.rs.84.")
+                        self.log_snapshot()
+                            .str("place_of_occurrence", "document_element.rs.84.")
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -103,7 +106,8 @@ impl DocumentElementP {
             State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
-                    self.log_table("document_element.rs.106.")
+                    self.log_snapshot()
+                        .str("place_of_occurrence", "document_element.rs.106.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -120,7 +124,8 @@ impl DocumentElementP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table("document_element.rs.123.")
+                                self.log_snapshot()
+                                    .str("place_of_occurrence", "document_element.rs.123.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -129,7 +134,8 @@ impl DocumentElementP {
                     } // Ignored it.
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("document_element.rs.132.")
+                            self.log_snapshot()
+                                .str("place_of_occurrence", "document_element.rs.132.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -150,7 +156,8 @@ impl DocumentElementP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table("document_element.rs.153.")
+                                self.log_snapshot()
+                                    .str("place_of_occurrence", "document_element.rs.153.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -159,7 +166,8 @@ impl DocumentElementP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("document_element.rs.162.")
+                            self.log_snapshot()
+                                .str("place_of_occurrence", "document_element.rs.162.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -202,7 +210,8 @@ impl DocumentElementP {
             },
             State::Finished => {
                 return PResult::Err(
-                    self.log_table("document_element.rs.205.")
+                    self.log_snapshot()
+                        .str("place_of_occurrence", "document_element.rs.205.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -219,7 +228,8 @@ impl DocumentElementP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table("document_element.rs.222.")
+                                self.log_snapshot()
+                                    .str("place_of_occurrence", "document_element.rs.222.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -228,7 +238,8 @@ impl DocumentElementP {
                     } // Ignored it.
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("document_element.rs.231.")
+                            self.log_snapshot()
+                                .str("place_of_occurrence", "document_element.rs.231.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -243,7 +254,8 @@ impl DocumentElementP {
             }
             State::Unimplemented => {
                 return PResult::Err(
-                    self.log_table("document_element.rs.246.")
+                    self.log_snapshot()
+                        .str("place_of_occurrence", "document_element.rs.246.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -266,7 +278,8 @@ impl DocumentElementP {
                     return PResult::End;
                 } else {
                     return PResult::Err(
-                        self.log_table("document_element.rs.269.")
+                        self.log_snapshot()
+                            .str("place_of_occurrence", "document_element.rs.269.")
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -275,7 +288,8 @@ impl DocumentElementP {
             } // Ignored it.
             PResult::Err(table) => {
                 return PResult::Err(
-                    self.log_table("document_element.rs.278.")
+                    self.log_snapshot()
+                        .str("place_of_occurrence", "document_element.rs.278.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .sub_t("error", &table)
@@ -285,17 +299,16 @@ impl DocumentElementP {
             PResult::Ongoing => PResult::Ongoing,
         }
     }
-    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
+    pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default()
-            .str("place_of_occurrence", place_of_occurrence)
             .str("parser", "DocumentElementP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {
-            t.sub_t("comment", &comment_p.log_table(place_of_occurrence));
+            t.sub_t("comment", &comment_p.log_table("no-data"));
         }
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log_table(place_of_occurrence));
+            t.sub_t("key_value", &key_value_p.log_table("no-data"));
         }
         t
     }
