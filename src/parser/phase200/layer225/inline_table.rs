@@ -132,7 +132,7 @@ impl InlineTableP {
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log_table("no-data"));
+            t.sub_t("key_value", &key_value_p.log_snapshot());
         }
         t
     }
