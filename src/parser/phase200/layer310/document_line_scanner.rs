@@ -7,17 +7,17 @@ use casual_logger::Table;
 
 /// Document syntax parser.  
 /// ドキュメント構文解析器。  
-pub struct DocumentParser {
+pub struct DocumentLineScanner {
     pub document_element_p: DocumentElementP,
 }
-impl Default for DocumentParser {
+impl Default for DocumentLineScanner {
     fn default() -> Self {
-        DocumentParser {
+        DocumentLineScanner {
             document_element_p: DocumentElementP::default(),
         }
     }
 }
-impl DocumentParser {
+impl DocumentLineScanner {
     /// # Returns
     ///
     /// * `PResult` - Result.  

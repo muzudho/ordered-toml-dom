@@ -13,7 +13,7 @@ mod parser;
 use crate::model::layer310::Document;
 use crate::parser::{
     phase100::lexical_parser::LexicalParser,
-    phase200::{layer210::PResult, layer240::document::DocumentParser},
+    phase200::{layer210::PResult, layer310::document_line_scanner::DocumentLineScanner},
 };
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
@@ -61,8 +61,8 @@ impl Toml {
                             .str("token_line", &format!("=|{:?}|", lexical_p)),
                     );
                     */
-                    let mut document_p = DocumentParser::default();
-                    match document_p.scan_line(&lexical_p.product(), &mut doc) {
+                    let mut document_line_scanner = DocumentLineScanner::default();
+                    match document_line_scanner.scan_line(&lexical_p.product(), &mut doc) {
                         PResult::End => {} // Ignored it.
                         PResult::Err(mut table) => {
                             error_aot.table(
@@ -80,7 +80,10 @@ impl Toml {
                                         )
                                         .str("line", &format!("{}", line))
                                         .str("token_line", &format!("{:?}", lexical_p))
-                                        .sub_t("document_p", &document_p.log_snapshot()),
+                                        .sub_t(
+                                            "document_line_scanner",
+                                            &document_line_scanner.log_snapshot(),
+                                        ),
                                 ),
                             );
                         }
@@ -100,7 +103,7 @@ impl Toml {
                                     )
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
-                                    .sub_t("document_p", &document_p.log_snapshot()),
+                                    .sub_t("document_line_scanner", &document_line_scanner.log_snapshot()),
                             );
                             */
                         }
