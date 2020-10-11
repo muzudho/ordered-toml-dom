@@ -89,13 +89,16 @@ impl InlineTableP {
                             );
                         }
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "inline_table.rs.86.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "inline_table.rs.86.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         )
                     }

@@ -80,6 +80,8 @@ impl DocumentElementP {
                 );
             }
             State::AfterKeyValue => match token.type_ {
+                TokenType::WhiteSpace => {} // Ignore it.
+                // `,`
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
                     return PResult::Err(
@@ -132,13 +134,16 @@ impl DocumentElementP {
                             );
                         }
                     } // Ignored it.
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "document_element.rs.132.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "document_element.rs.132.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         );
                     }
@@ -164,13 +169,16 @@ impl DocumentElementP {
                             );
                         }
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "document_element.rs.162.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "document_element.rs.162.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         );
                     }
@@ -236,13 +244,17 @@ impl DocumentElementP {
                             );
                         }
                     } // Ignored it.
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "document_element.rs.231.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "document_element.rs.231.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token))
+                                        .sub_t("error", &table),
+                                )
                                 .clone(),
                         );
                     }

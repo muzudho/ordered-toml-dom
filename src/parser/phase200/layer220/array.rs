@@ -288,13 +288,16 @@ impl ArrayP {
                         self.array_p = None;
                         self.state = State::AfterArray;
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.283.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "array.rs.283.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         )
                     }
@@ -466,13 +469,16 @@ impl ArrayP {
                             );
                         }
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.448.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "array.rs.448.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         )
                     }
@@ -525,13 +531,16 @@ impl ArrayP {
                             );
                         }
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.502.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "array.rs.502.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         )
                     }

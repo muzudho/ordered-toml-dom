@@ -36,7 +36,8 @@ impl Toml {
     /// 行走査。
     pub fn from_file(path: &str) -> Document {
         Log::info(&format!("Read=|{}|", path));
-        let mut aot = ArrayOfTable::default().clone();
+        let mut info_aot = ArrayOfTable::default().clone();
+        let mut error_aot = ArrayOfTable::default().clone();
         let mut doc = Document::default();
         match File::open(path) {
             Ok(file) => {
@@ -61,11 +62,11 @@ impl Toml {
                     match document_p.scan_line(&lexical_p.product(), &mut doc) {
                         PResult::End => {} // Ignored it.
                         PResult::Err(mut table) => {
-                            aot.table(
+                            error_aot.table(
                                 table.sub_t(
                                     "snapshot",
                                     Toml::log_snapshot()
-                                        .str("place_of_occurrence", "lib.rs.65.")
+                                        .str("via", "lib.rs.65.")
                                         .int(
                                             "row_number",
                                             if let Ok(n) = row_number.try_into() {
@@ -81,7 +82,7 @@ impl Toml {
                             );
                         }
                         PResult::Ongoing => {
-                            aot.table(
+                            info_aot.table(
                                 Toml::log_snapshot()
                                     .str("place_of_occurrence", "lib.rs.85.")
                                     .int(
@@ -112,7 +113,13 @@ impl Toml {
             "Finish of Toml#from_file().",
             Toml::log_snapshot()
                 .str("place_of_occurrence", "lib.rs.113.")
-                .sub_aot("file", &aot),
+                .sub_aot("file", &info_aot),
+        );
+        Log::error_t(
+            "Finish of Toml#from_file() error.",
+            Toml::log_snapshot()
+                .str("place_of_occurrence", "lib.rs.121.")
+                .sub_aot("file", &error_aot),
         );
 
         doc

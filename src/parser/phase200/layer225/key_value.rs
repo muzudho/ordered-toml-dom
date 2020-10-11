@@ -194,13 +194,16 @@ impl KeyValueP {
                             );
                         }
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.187.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "key_value.rs.187.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         )
                     }
@@ -234,13 +237,16 @@ impl KeyValueP {
                             );
                         }
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.224.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "key_value.rs.224.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         )
                     }
@@ -315,13 +321,16 @@ impl KeyValueP {
                             );
                         }
                     }
-                    PResult::Err(table) => {
+                    PResult::Err(mut table) => {
                         return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.300.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
+                            table
+                                .sub_t(
+                                    "snapshot",
+                                    self.log_snapshot()
+                                        .str("via", "key_value.rs.300.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token)),
+                                )
                                 .clone(),
                         )
                     }

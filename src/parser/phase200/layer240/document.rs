@@ -45,7 +45,7 @@ impl DocumentParser {
                             .sub_t(
                                 "snapshot",
                                 self.log_snapshot()
-                                    .str("place_of_occurrence", "document.rs.43.")
+                                    .str("via", "document.rs.43.")
                                     .str("token_line", &format!("{:?}", token_line)),
                             )
                             .clone(),
