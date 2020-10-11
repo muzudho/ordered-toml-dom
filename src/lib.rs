@@ -67,7 +67,7 @@ impl Toml {
                         PResult::Err(mut table) => {
                             error_aot.table(
                                 table.sub_t(
-                                    "snapshot",
+                                    &format!("row_{}", row_number),
                                     Table::default()
                                         .str("via", "lib.rs.65.")
                                         .int(
@@ -85,6 +85,8 @@ impl Toml {
                             );
                         }
                         PResult::Ongoing => {
+                            // 正常
+                            /*
                             info_aot.table(
                                 Table::default()
                                     .str("place_of_occurrence", "lib.rs.85.")
@@ -100,6 +102,7 @@ impl Toml {
                                     .str("token_line", &format!("{:?}", lexical_p))
                                     .sub_t("document_p", &document_p.log_snapshot()),
                             );
+                            */
                         }
                     }
                 }
