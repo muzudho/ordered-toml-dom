@@ -56,7 +56,7 @@ impl KeyValueP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "KeyValueP#parse/AfterKey/WhiteSpace",
-                            self.log_table()
+                            self.log_table("code.59.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -65,14 +65,14 @@ impl KeyValueP {
                         self.state = State::AfterEquals;
                         Log::trace_t(
                             "KeyValueP#parse/AfterKey/=",
-                            self.log_table()
+                            self.log_table("code.68.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table()
+                            self.log_table("code.75.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -87,7 +87,7 @@ impl KeyValueP {
                         self.state = State::DoubleQuotedString;
                         Log::trace_t(
                             "KeyValueP#parse/After=/\"",
-                            self.log_table()
+                            self.log_table("code.90.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -101,7 +101,7 @@ impl KeyValueP {
                         self.state = State::End;
                         Log::trace_t(
                             "KeyValueP#parse/After=/Key",
-                            self.log_table()
+                            self.log_table("code.104.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -112,7 +112,7 @@ impl KeyValueP {
                         self.state = State::AfterLeftCurlyBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/{",
-                            self.log_table()
+                            self.log_table("code.115.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -122,7 +122,7 @@ impl KeyValueP {
                         self.state = State::AfterLeftSquareBracket;
                         Log::trace_t(
                             "KeyValueP#parse/After=/[",
-                            self.log_table()
+                            self.log_table("code.125.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -132,7 +132,7 @@ impl KeyValueP {
                         self.state = State::SingleQuotedString;
                         Log::trace_t(
                             "KeyValueP#parse/After=/'",
-                            self.log_table()
+                            self.log_table("code.135.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -140,14 +140,14 @@ impl KeyValueP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "KeyValueP#parse/After=/WhiteSpace",
-                            self.log_table()
+                            self.log_table("code.143.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
                     } //Ignored it.
                     _ => {
                         return PResult::Err(
-                            self.log_table()
+                            self.log_table("code.150.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -158,7 +158,7 @@ impl KeyValueP {
             State::AfterLeftCurlyBracket => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/After{",
-                    self.log_table()
+                    self.log_table("code.161.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -175,7 +175,7 @@ impl KeyValueP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table()
+                                self.log_table("code.178.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -184,7 +184,7 @@ impl KeyValueP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table()
+                            self.log_table("code.187.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -197,7 +197,7 @@ impl KeyValueP {
             State::AfterLeftSquareBracket => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/After[",
-                    self.log_table()
+                    self.log_table("code.200.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -212,7 +212,7 @@ impl KeyValueP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table()
+                                self.log_table("code.215.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -221,7 +221,7 @@ impl KeyValueP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table()
+                            self.log_table("code.224.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -249,7 +249,7 @@ impl KeyValueP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table()
+                                self.log_table("code.252.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -258,7 +258,7 @@ impl KeyValueP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table()
+                            self.log_table("code.261.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -271,7 +271,7 @@ impl KeyValueP {
             State::SingleQuotedString => {
                 Log::trace_t(
                     "KeyValueP#parse/After=/'value'",
-                    self.log_table()
+                    self.log_table("code.274.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -288,7 +288,7 @@ impl KeyValueP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table()
+                                self.log_table("code.291.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -297,7 +297,7 @@ impl KeyValueP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table()
+                            self.log_table("code.300.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -309,7 +309,7 @@ impl KeyValueP {
             }
             State::End => {
                 return PResult::Err(
-                    self.log_table()
+                    self.log_table("code.312.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -318,20 +318,27 @@ impl KeyValueP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self) -> Table {
+    pub fn log_table(&self, code_location: &str) -> Table {
         let mut t = Table::default()
+            .str("code_location", code_location)
             .str("parser", "KeyValueP#parse")
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
         if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
-            t.sub_t("double_quoted_string", &double_quoted_string_p.log_table());
+            t.sub_t(
+                "double_quoted_string",
+                &double_quoted_string_p.log_table("code.328."),
+            );
         }
         if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t("inline_table", &inline_table_p.log_table());
+            t.sub_t("inline_table", &inline_table_p.log_table("code.331."));
         }
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string", &single_quoted_string_p.log_table());
+            t.sub_t(
+                "single_quoted_string",
+                &single_quoted_string_p.log_table("code.334."),
+            );
         }
         t
     }

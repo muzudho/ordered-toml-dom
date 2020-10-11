@@ -9,8 +9,8 @@ Tomboy is a pun.
 
 ```shell
 cargo run --example main
-```
 
-```shell
 cargo run --example cover
+
+cargo run --example mix_array
 ```

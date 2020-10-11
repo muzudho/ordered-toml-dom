@@ -37,8 +37,10 @@ impl HeaderPOfArrayOfTable {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self) -> LogTable {
-        let mut t = LogTable::default().clone();
+    pub fn log_table(&self, code_location: &str) -> LogTable {
+        let mut t = LogTable::default()
+            .str("code_location", code_location)
+            .clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));
         }

@@ -56,7 +56,7 @@ impl DocumentParser {
     pub fn err_table(&self) -> Table {
         let mut t = Table::default();
         t.str("parser", "document_parser.rs/DocumentParser#scan_line")
-            .sub_t("line", &self.document_element_p.log_table());
+            .sub_t("line", &self.document_element_p.log_table("code.59."));
         t
     }
 }

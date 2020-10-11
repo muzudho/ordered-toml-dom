@@ -55,7 +55,7 @@ impl InlineTableP {
                     }
                     _ => panic!(Log::fatal_t(
                         "InlineTableP#parse/AfterValue",
-                        self.log_table()
+                        self.log_table("code.58.")
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("state", &format!("{:?}", self.state))
                             .str("token", &format!("{:?}", token))
@@ -74,7 +74,7 @@ impl InlineTableP {
                             self.state = State::AfterKeyValue;
                         } else {
                             return PResult::Err(
-                                self.log_table()
+                                self.log_table("code.77.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -83,7 +83,7 @@ impl InlineTableP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table()
+                            self.log_table("code.86.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -106,7 +106,7 @@ impl InlineTableP {
                 }
                 _ => panic!(Log::fatal_t(
                     "InlineTableP#parse/AfterValue",
-                    self.log_table()
+                    self.log_table("code.109.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                 )),
@@ -114,13 +114,14 @@ impl InlineTableP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self) -> Table {
+    pub fn log_table(&self, code_location: &str) -> Table {
         let mut t = Table::default()
+            .str("code_location", code_location)
             .str("parser", "InlineTableP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log_table());
+            t.sub_t("key_value", &key_value_p.log_table("code.123."));
         }
         t
     }

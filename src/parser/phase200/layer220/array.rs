@@ -73,7 +73,7 @@ impl ArrayP {
             State::AfterArray => {
                 Log::trace_t(
                     "ArrayP#parse| [array] -> this",
-                    self.log_table("76")
+                    self.log_table("code.76.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -90,7 +90,7 @@ impl ArrayP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("93")
+                            self.log_table("code.93.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -105,7 +105,7 @@ impl ArrayP {
                     TokenType::LeftSquareBracket => {
                         Log::trace_t(
                             "ArrayP#parse| [], -> [",
-                            self.log_table("108")
+                            self.log_table("code.108.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -115,7 +115,7 @@ impl ArrayP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "ArrayP#parse| [], -> WhiteSpace",
-                            self.log_table("118")
+                            self.log_table("code.118.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -127,7 +127,7 @@ impl ArrayP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("130")
+                            self.log_table("code.130.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -141,7 +141,7 @@ impl ArrayP {
                     TokenType::DoubleQuotation => {
                         Log::trace_t(
                             "ArrayP#parse| \"a\", -> \"",
-                            self.log_table("144")
+                            self.log_table("code.144.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -151,7 +151,7 @@ impl ArrayP {
                     TokenType::SingleQuotation => {
                         Log::trace_t(
                             "ArrayP#parse| \"a\", -> '",
-                            self.log_table("154")
+                            self.log_table("code.154.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -161,7 +161,7 @@ impl ArrayP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "ArrayP#parse| \"a\", -> WhiteSpace",
-                            self.log_table("164")
+                            self.log_table("code.164.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -173,7 +173,7 @@ impl ArrayP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("176")
+                            self.log_table("code.176.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -194,7 +194,7 @@ impl ArrayP {
                         self.state = State::AfterKeyWithoutDot;
                         Log::trace_t(
                             "ArrayP#parse| [ literal, -> KeyWithoutDot",
-                            self.log_table("197")
+                            self.log_table("code.197.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .str("buffer", &format!("{:?}", self.buffer)),
@@ -203,7 +203,7 @@ impl ArrayP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "ArrayP#parse| [ -> WhiteSpace",
-                            self.log_table("206")
+                            self.log_table("code.206.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -215,7 +215,7 @@ impl ArrayP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("218")
+                            self.log_table("code.218.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -227,7 +227,7 @@ impl ArrayP {
             State::AfterDoubleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse| \"value\" -> this",
-                    self.log_table("230")
+                    self.log_table("code.230.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -242,7 +242,7 @@ impl ArrayP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("245")
+                            self.log_table("code.245.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -254,7 +254,7 @@ impl ArrayP {
             State::Array => {
                 Log::trace_t(
                     "ArrayP#parse| [array]",
-                    self.log_table("257")
+                    self.log_table("code.257.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -275,7 +275,7 @@ impl ArrayP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("283")
+                            self.log_table("code.283.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -297,7 +297,7 @@ impl ArrayP {
                     TokenType::LeftSquareBracket => {
                         Log::trace_t(
                             "ArrayP#parse| [ -> [",
-                            self.log_table("305")
+                            self.log_table("code.305.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -307,7 +307,7 @@ impl ArrayP {
                     TokenType::DoubleQuotation => {
                         Log::trace_t(
                             "ArrayP#parse| [ -> \"",
-                            self.log_table("315")
+                            self.log_table("code.315.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -324,7 +324,7 @@ impl ArrayP {
                         self.state = State::AfterKeyWithoutDot;
                         Log::trace_t(
                             "ArrayP#parse| [ -> KeyWithoutDot",
-                            self.log_table("332")
+                            self.log_table("code.332.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .str("buffer", &format!("{:?}", self.buffer)),
@@ -333,7 +333,7 @@ impl ArrayP {
                     TokenType::SingleQuotation => {
                         Log::trace_t(
                             "ArrayP#parse| [ -> /'",
-                            self.log_table("341")
+                            self.log_table("code.341.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
@@ -343,14 +343,14 @@ impl ArrayP {
                     TokenType::WhiteSpace => {
                         Log::trace_t(
                             "ArrayP#parse| [ -> WhiteSpace",
-                            self.log_table("351")
+                            self.log_table("code.351.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token)),
                         );
                     } // Ignore it.
                     _ => {
                         return PResult::Err(
-                            self.log_table("358")
+                            self.log_table("code.358.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -361,7 +361,7 @@ impl ArrayP {
             State::AfterKeyWithoutDot => {
                 Log::trace_t(
                     "ArrayP#parse| KeyWithoutDot -> this",
-                    self.log_table("369")
+                    self.log_table("code.369.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -375,7 +375,7 @@ impl ArrayP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("383")
+                            self.log_table("code.383.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -387,7 +387,7 @@ impl ArrayP {
             State::AfterSingleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse| 'value' -> this",
-                    self.log_table("395")
+                    self.log_table("code.395.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -402,7 +402,7 @@ impl ArrayP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("410")
+                            self.log_table("code.410.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .clone(),
@@ -414,7 +414,7 @@ impl ArrayP {
             State::DoubleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse| \"value\"",
-                    self.log_table("422")
+                    self.log_table("code.422.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -431,7 +431,7 @@ impl ArrayP {
                             self.state = State::AfterDoubleQuotedString;
                         } else {
                             return PResult::Err(
-                                self.log_table("439")
+                                self.log_table("code.439.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -440,7 +440,7 @@ impl ArrayP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("448")
+                            self.log_table("code.448.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -453,12 +453,12 @@ impl ArrayP {
             State::End => {
                 Log::trace_t(
                     "ArrayP#parse| End",
-                    self.log_table("461")
+                    self.log_table("code.461.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
                 return PResult::Err(
-                    self.log_table("466")
+                    self.log_table("code.466.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -468,7 +468,7 @@ impl ArrayP {
             State::SingleQuotedString => {
                 Log::trace_t(
                     "ArrayP#parse| 'value'",
-                    self.log_table("476")
+                    self.log_table("code.476.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token)),
                 );
@@ -485,7 +485,7 @@ impl ArrayP {
                             self.state = State::AfterSingleQuotedString;
                         } else {
                             return PResult::Err(
-                                self.log_table("493")
+                                self.log_table("code.493.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -494,7 +494,7 @@ impl ArrayP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("502")
+                            self.log_table("code.502.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -508,19 +508,20 @@ impl ArrayP {
         PResult::Ongoing
     }
     pub fn log_table(&self, code_location: &str) -> Table {
-        let mut t = Table::default().clone();
-        t.str("parser", "ArrayP#parse")
+        let mut t = Table::default()
+            .str("code_location", code_location)
+            .str("parser", "ArrayP#parse")
             .str("state", &format!("{:?}", self.state))
-            .str("code_location", code_location);
+            .clone();
 
         if let Some(p) = &self.double_quoted_string_p {
-            t.sub_t("double_quoted_string_p", &p.log_table());
+            t.sub_t("double_quoted_string_p", &p.log_table("code.517."));
         }
         if let Some(p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string_p", &p.log_table());
+            t.sub_t("single_quoted_string_p", &p.log_table("code.520."));
         }
         if let Some(p) = &self.array_p {
-            t.sub_t("array_p", &p.log_table("528"));
+            t.sub_t("array_p", &p.log_table("code.528."));
         }
 
         t
