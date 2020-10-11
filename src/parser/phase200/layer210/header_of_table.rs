@@ -38,10 +38,8 @@ impl HeaderPOfTable {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, place_of_occurrence: &str) -> LogTable {
-        let mut t = LogTable::default()
-            .str("place_of_occurrence", place_of_occurrence)
-            .clone();
+    pub fn log_snapshot(&self) -> LogTable {
+        let mut t = LogTable::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));
         }

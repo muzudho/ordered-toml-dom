@@ -349,7 +349,7 @@ impl KeyValueP {
         if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
             t.sub_t(
                 "double_quoted_string",
-                &double_quoted_string_p.log_table("no-data"),
+                &double_quoted_string_p.log_snapshot(),
             );
         }
         if let Some(inline_table_p) = &self.inline_table_p {
