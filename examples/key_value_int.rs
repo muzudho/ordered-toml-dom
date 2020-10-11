@@ -45,7 +45,7 @@ fn main() {
     } else {
         format!("NotFound")
     };
-    Log::println_t("Find int_1=", Table::default().str(a_name, &a_value));
+    Log::println_t("Test.", Table::default().str(a_name, &a_value));
 
     Log::flush();
     Log::println("Finished.");

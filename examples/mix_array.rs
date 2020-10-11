@@ -47,7 +47,7 @@ fn main() {
     } else {
         format!("")
     };
-    Log::println_t("Find a=", Table::default().str(a_name, &a_value));
+    Log::println_t("Test.", Table::default().str(a_name, &a_value));
 
     Log::flush();
     Log::println("Finished.");

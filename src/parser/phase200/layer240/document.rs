@@ -23,22 +23,24 @@ impl DocumentParser {
     /// * `PResult` - Result.  
     ///                             結果。
     pub fn scan_line(&mut self, token_line: &TokenLine, doc: &mut Document) -> PResult {
-        for (i, token) in token_line.tokens.iter().enumerate() {
+        for (_i, token) in token_line.tokens.iter().enumerate() {
             match self.document_element_p.parse(token) {
                 PResult::End => {
                     if let Some(m) = self.document_element_p.flush() {
                         doc.push_element(&m);
                     } else {
-                        let remaining_tokens = token_line.remaining_tokens(i);
+                        // TODO 何も取得できないことがある？
+                        /*
                         return PResult::Err(
                             self.log_snapshot()
                                 .str("place_of_occurrence", "document.rs.34.")
                                 .str("token_index", &format!("{:?}", i))
                                 .str("token", &format!("{:?}", token))
                                 .str("token_line", &format!("{:?}", token_line))
-                                .str("remaining_tokens", &format!("{:?}", remaining_tokens))
+                                .str("remaining_tokens", &format!("{:?}", token_line.remaining_tokens(i)))
                                 .clone(),
                         );
+                        */
                     }
                 }
                 PResult::Err(mut table) => {

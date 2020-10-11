@@ -46,7 +46,7 @@ fn main() {
         format!("")
     };
     Log::println_t(
-        &format!("Find {}=", a_name),
+        &format!("Test {}.", a_name),
         Table::default().str(a_name, &a_value),
     );
     Log::flush();

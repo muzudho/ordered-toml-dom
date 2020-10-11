@@ -45,7 +45,7 @@ fn main() {
     } else {
         format!("NotFound")
     };
-    Log::println_t("Find int_1=", Table::default().str(a_name, &a_value));
+    Log::println_t("Test 1.", Table::default().str(a_name, &a_value));
     // Test.
     let a_name = "float_1";
     let a_value = if let Some(elem) = doc.child(a_name) {
@@ -53,7 +53,7 @@ fn main() {
     } else {
         format!("NotFound")
     };
-    Log::println_t("Find float_1=", Table::default().str(a_name, &a_value));
+    Log::println_t("Test 2.", Table::default().str(a_name, &a_value));
     // Test.
     let a_name = "sqstr_1";
     let a_value = if let Some(elem) = doc.child(a_name) {
@@ -61,7 +61,7 @@ fn main() {
     } else {
         format!("NotFound")
     };
-    Log::println_t("Find sqstr_1=", Table::default().str(a_name, &a_value));
+    Log::println_t("Test 3.", Table::default().str(a_name, &a_value));
 
     Log::flush();
     Log::println("Finished.");
