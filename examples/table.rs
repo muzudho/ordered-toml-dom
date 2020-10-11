@@ -40,7 +40,7 @@ fn main() {
         Table::default().uint("DocumentElementsCount", doc.elements.len() as u128),
     );
     let a_name = "food";
-    let a_value = if let Some(elem) = doc.child(a_name) {
+    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
         format!("{:?}", elem)
     } else {
         format!("")

@@ -12,7 +12,8 @@ impl Default for Document {
     }
 }
 impl Document {
-    pub fn child(&self, name: &str) -> Option<&DocumentElement> {
+    /// WIP.
+    pub fn get_element_by_name(&self, name: &str) -> Option<&DocumentElement> {
         for elem in &self.elements {
             match elem {
                 DocumentElement::HeaderOfArrayOfTable(_) => {
@@ -21,9 +22,9 @@ impl Document {
                 DocumentElement::Comment(_) => {}
                 DocumentElement::EmptyLine => {}
                 DocumentElement::KeyValue(m) => {
-                    println!("m.key={}", m.key);
+                    // println!("m.key={}", m.key); // In development.
                     if m.key == name {
-                        println!("HIT m.key={}", m.key);
+                        // println!("HIT m.key={}", m.key);// In development.
                         return Some(elem);
                     }
                 }
@@ -41,11 +42,11 @@ impl Document {
 impl fmt::Debug for Document {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
-        for item in &self.elements {
+        for elem in &self.elements {
             buf.push_str(&format!(
                 "{:?}
 ",
-                item
+                elem
             ));
         }
         write!(f, "{}", buf)

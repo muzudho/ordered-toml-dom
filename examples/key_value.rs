@@ -40,7 +40,7 @@ fn main() {
 
     // Test.
     let a_name = "int_1";
-    let a_value = if let Some(elem) = doc.child(a_name) {
+    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
         format!("{:?}", elem)
     } else {
         format!("NotFound")
@@ -48,7 +48,7 @@ fn main() {
     Log::println_t("Test 1.", Table::default().str(a_name, &a_value));
     // Test.
     let a_name = "float_1";
-    let a_value = if let Some(elem) = doc.child(a_name) {
+    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
         format!("{:?}", elem)
     } else {
         format!("NotFound")
@@ -56,7 +56,7 @@ fn main() {
     Log::println_t("Test 2.", Table::default().str(a_name, &a_value));
     // Test.
     let a_name = "sqstr_1";
-    let a_value = if let Some(elem) = doc.child(a_name) {
+    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
         format!("{:?}", elem)
     } else {
         format!("NotFound")
