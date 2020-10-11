@@ -332,10 +332,7 @@ impl KeyValueP {
             );
         }
         if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t(
-                "inline_table",
-                &inline_table_p.log_table(place_of_occurrence),
-            );
+            t.sub_t("inline_table", &inline_table_p.log_snapshot());
         }
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
             t.sub_t(

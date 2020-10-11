@@ -60,7 +60,8 @@ impl InlineTableP {
                     }
                     _ => {
                         return PResult::Err(
-                            self.log_table("code.58.")
+                            self.log_snapshot()
+                                .str("place_of_occurrence", "inline_table.rs.58.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("state", &format!("{:?}", self.state))
                                 .str("token", &format!("{:?}", token))
@@ -80,7 +81,8 @@ impl InlineTableP {
                             self.state = State::AfterKeyValue;
                         } else {
                             return PResult::Err(
-                                self.log_table("inline_table.rs.77.")
+                                self.log_snapshot()
+                                    .str("place_of_occurrence", "inline_table.rs.77.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -89,7 +91,8 @@ impl InlineTableP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("code.86.")
+                            self.log_snapshot()
+                                .str("place_of_occurrence", "inline_table.rs.86.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -112,7 +115,8 @@ impl InlineTableP {
                 }
                 _ => {
                     return PResult::Err(
-                        self.log_table("inline_table.rs.109.")
+                        self.log_snapshot()
+                            .str("place_of_occurrence", "inline_table.rs.109.")
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -122,14 +126,13 @@ impl InlineTableP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
+    pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default()
-            .str("place_of_occurrence", place_of_occurrence)
             .str("parser", "InlineTableP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log_table(place_of_occurrence));
+            t.sub_t("key_value", &key_value_p.log_table("no-data"));
         }
         t
     }
