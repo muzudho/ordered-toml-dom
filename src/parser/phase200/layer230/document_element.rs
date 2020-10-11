@@ -63,7 +63,7 @@ impl DocumentElementP {
             State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
-                    self.log_table("code.66.")
+                    self.log_table("document_element.rs.66.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -71,7 +71,7 @@ impl DocumentElementP {
             }
             State::AfterComment => {
                 return PResult::Err(
-                    self.log_table("code.74.")
+                    self.log_table("document_element.rs.74.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -81,7 +81,7 @@ impl DocumentElementP {
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
                     return PResult::Err(
-                        self.log_table("code.84.")
+                        self.log_table("document_element.rs.84.")
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -103,7 +103,7 @@ impl DocumentElementP {
             State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
                 return PResult::Err(
-                    self.log_table("code.106.")
+                    self.log_table("document_element.rs.106.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -120,7 +120,7 @@ impl DocumentElementP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table("code.123.")
+                                self.log_table("document_element.rs.123.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -129,7 +129,7 @@ impl DocumentElementP {
                     } // Ignored it.
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("code.132.")
+                            self.log_table("document_element.rs.132.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -150,7 +150,7 @@ impl DocumentElementP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table("code.153.")
+                                self.log_table("document_element.rs.153.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -159,7 +159,7 @@ impl DocumentElementP {
                     }
                     PResult::Err(table) => {
                         return PResult::Err(
-                            self.log_table("code.162.")
+                            self.log_table("document_element.rs.162.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
                                 .sub_t("error", &table)
@@ -202,7 +202,7 @@ impl DocumentElementP {
             },
             State::Finished => {
                 return PResult::Err(
-                    self.log_table("code.205.")
+                    self.log_table("document_element.rs.205.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -219,7 +219,7 @@ impl DocumentElementP {
                             return PResult::End;
                         } else {
                             return PResult::Err(
-                                self.log_table("code.222.")
+                                self.log_table("document_element.rs.222.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
@@ -243,7 +243,7 @@ impl DocumentElementP {
             }
             State::Unimplemented => {
                 return PResult::Err(
-                    self.log_table("code.246.")
+                    self.log_table("document_element.rs.246.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .clone(),
@@ -266,7 +266,7 @@ impl DocumentElementP {
                     return PResult::End;
                 } else {
                     return PResult::Err(
-                        self.log_table("code.269.")
+                        self.log_table("document_element.rs.269.")
                             .int("column_number", usize_to_i128(token.column_number))
                             .str("token", &format!("{:?}", token))
                             .clone(),
@@ -275,7 +275,7 @@ impl DocumentElementP {
             } // Ignored it.
             PResult::Err(table) => {
                 return PResult::Err(
-                    self.log_table("code.278.")
+                    self.log_table("document_element.rs.278.")
                         .int("column_number", usize_to_i128(token.column_number))
                         .str("token", &format!("{:?}", token))
                         .sub_t("error", &table)

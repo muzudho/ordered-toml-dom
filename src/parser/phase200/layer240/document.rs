@@ -31,18 +31,23 @@ impl DocumentParser {
                     } else {
                         let remaining_tokens = token_line.remaining_tokens(i);
                         return PResult::Err(
-                            self.log_table("code.34.")
+                            self.log_snapshot()
+                                .str("place_of_occurrence", "document.rs.34.")
                                 .str("token_line", &format!("{:?}", token_line))
                                 .str("remaining_tokens", &format!("{:?}", remaining_tokens))
                                 .clone(),
                         );
                     }
                 }
-                PResult::Err(table) => {
+                PResult::Err(mut table) => {
                     return PResult::Err(
-                        self.log_table("document.rs.43.")
-                            .str("token_line", &format!("{:?}", token_line))
-                            .sub_t("error", &table)
+                        table
+                            .sub_t(
+                                "snapshot",
+                                self.log_snapshot()
+                                    .str("place_of_occurrence", "document.rs.43.")
+                                    .str("token_line", &format!("{:?}", token_line)),
+                            )
                             .clone(),
                     );
                 }
@@ -53,13 +58,10 @@ impl DocumentParser {
         PResult::Ongoing
     }
 
-    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
+    pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default();
-        t.str("parser", "document_parser.rs/DocumentParser#scan_line")
-            .sub_t(
-                "line",
-                &self.document_element_p.log_table(place_of_occurrence),
-            );
+        t.str("parser", "document_parser.rs")
+            .sub_t("line", &self.document_element_p.log_table("no-data"));
         t
     }
 }

@@ -37,13 +37,32 @@ fn main() {
         "Count document elements.",
         Table::default().uint("DocumentElementsCount", doc.elements.len() as u128),
     );
-    let a_name = "sq";
+
+    // Test.
+    let a_name = "int_1";
     let a_value = if let Some(elem) = doc.child(a_name) {
         format!("{:?}", elem)
     } else {
-        format!("")
+        format!("NotFound")
     };
-    Log::println_t("Find a=", Table::default().str(a_name, &a_value));
+    Log::println_t("Find int_1=", Table::default().str(a_name, &a_value));
+    // Test.
+    let a_name = "float_1";
+    let a_value = if let Some(elem) = doc.child(a_name) {
+        format!("{:?}", elem)
+    } else {
+        format!("NotFound")
+    };
+    Log::println_t("Find float_1=", Table::default().str(a_name, &a_value));
+    // Test.
+    let a_name = "sqstr_1";
+    let a_value = if let Some(elem) = doc.child(a_name) {
+        format!("{:?}", elem)
+    } else {
+        format!("NotFound")
+    };
+    Log::println_t("Find sqstr_1=", Table::default().str(a_name, &a_value));
+
     Log::flush();
     Log::println("Finished.");
 }

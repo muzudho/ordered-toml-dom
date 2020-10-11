@@ -57,27 +57,26 @@ impl Toml {
                             .str("token_line", &format!("=|{:?}|", lexical_p)),
                     );
                     */
-                    let mut line_syntax_scanner = DocumentParser::default();
-                    match line_syntax_scanner.scan_line(&lexical_p.product(), &mut doc) {
+                    let mut document_p = DocumentParser::default();
+                    match document_p.scan_line(&lexical_p.product(), &mut doc) {
                         PResult::End => {} // Ignored it.
-                        PResult::Err(table) => {
+                        PResult::Err(mut table) => {
                             aot.table(
-                                Toml::log_table("code.65.")
-                                    .int(
-                                        "row_number",
-                                        if let Ok(n) = row_number.try_into() {
-                                            n
-                                        } else {
-                                            -1
-                                        },
-                                    )
-                                    .str("line", &format!("{}", line))
-                                    .str("token_line", &format!("{:?}", lexical_p))
-                                    .sub_t("error", &table)
-                                    .sub_t(
-                                        "line_scanner",
-                                        &line_syntax_scanner.log_table("lib.rs.77."),
-                                    ),
+                                table.sub_t(
+                                    "snapshot",
+                                    Toml::log_table("code.65.")
+                                        .int(
+                                            "row_number",
+                                            if let Ok(n) = row_number.try_into() {
+                                                n
+                                            } else {
+                                                -1
+                                            },
+                                        )
+                                        .str("line", &format!("{}", line))
+                                        .str("token_line", &format!("{:?}", lexical_p))
+                                        .sub_t("line_scanner", &document_p.log_snapshot()),
+                                ),
                             );
                         }
                         PResult::Ongoing => {
@@ -93,10 +92,7 @@ impl Toml {
                                     )
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
-                                    .sub_t(
-                                        "line_scanner",
-                                        &line_syntax_scanner.log_table("code.96."),
-                                    ),
+                                    .sub_t("line_scanner", &document_p.log_snapshot()),
                             );
                         }
                     }

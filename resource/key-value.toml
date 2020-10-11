@@ -1,9 +1,11 @@
 # This file is a test.
 # このファイルはテスト用です。
 
-int = 1 
-float = 1.1 
-sq = 'a' 
-sqc = 'A' # Comment 1.
-dq = "b" 
-dqc = "B" # Comment 2.
+int_1 = 1 
+int_2 = 123 
+float_1 = 1.1 
+float_2 = 12.34 
+sqstr_1 = 'a' 
+sqstr_2 = 'A' # Comment 1.
+dqstr_1 = "b" 
+dqstr_2 = "B" # Comment 2.
