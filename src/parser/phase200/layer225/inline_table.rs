@@ -53,13 +53,15 @@ impl InlineTableP {
                         self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
                         self.state = State::KeyValue;
                     }
-                    _ => panic!(Log::fatal_t(
-                        "InlineTableP#parse/AfterValue",
-                        self.log_table("code.58.")
-                            .int("column_number", usize_to_i128(token.column_number))
-                            .str("state", &format!("{:?}", self.state))
-                            .str("token", &format!("{:?}", token))
-                    )),
+                    _ => {
+                        return PResult::Err(
+                            self.log_table("code.58.")
+                                .int("column_number", usize_to_i128(token.column_number))
+                                .str("state", &format!("{:?}", self.state))
+                                .str("token", &format!("{:?}", token))
+                                .clone(),
+                        )
+                    }
                 }
             }
             // `apple.banana`.
@@ -104,12 +106,14 @@ impl InlineTableP {
                 TokenType::RightCurlyBracket => {
                     return PResult::End;
                 }
-                _ => panic!(Log::fatal_t(
-                    "InlineTableP#parse/AfterValue",
-                    self.log_table("code.109.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                )),
+                _ => {
+                    return PResult::Err(
+                        self.log_table("code.109.")
+                            .int("column_number", usize_to_i128(token.column_number))
+                            .str("token", &format!("{:?}", token))
+                            .clone(),
+                    )
+                }
             },
         }
         PResult::Ongoing

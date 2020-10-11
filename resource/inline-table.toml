@@ -1,0 +1,4 @@
+inline_table_1 = {}
+inline_table_2 = { name = "a" }
+inline_table_3 = { name = "b", weight = 93.5 }
+inline_table_4 = { name = "c", weight = 80.0, directory = 'c:\temp' }
