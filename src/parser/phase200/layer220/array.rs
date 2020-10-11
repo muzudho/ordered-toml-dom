@@ -551,7 +551,7 @@ impl ArrayP {
             t.sub_t("double_quoted_string_p", &p.log_snapshot());
         }
         if let Some(p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string_p", &p.log_table("no-data"));
+            t.sub_t("single_quoted_string_p", &p.log_snapshot());
         }
         if let Some(p) = &self.array_p {
             t.sub_t("array_p", &p.log_snapshot());

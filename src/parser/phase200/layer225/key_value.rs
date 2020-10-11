@@ -358,7 +358,7 @@ impl KeyValueP {
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
             t.sub_t(
                 "single_quoted_string",
-                &single_quoted_string_p.log_table("no-data"),
+                &single_quoted_string_p.log_snapshot(),
             );
         }
         t

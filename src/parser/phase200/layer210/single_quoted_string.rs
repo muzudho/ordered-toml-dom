@@ -38,10 +38,8 @@ impl SingleQuotedStringP {
         }
         PResult::Ongoing
     }
-    pub fn log_table(&self, place_of_occurrence: &str) -> Table {
-        let mut t = Table::default()
-            .str("place_of_occurrence", place_of_occurrence)
-            .clone();
+    pub fn log_snapshot(&self) -> Table {
+        let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));
         }
