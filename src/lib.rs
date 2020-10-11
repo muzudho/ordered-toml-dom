@@ -49,7 +49,7 @@ impl Toml {
                         Ok(line) => line,
                         Err(why) => panic!(Log::fatal(&format!("{}", why))),
                     };
-                    Log::trace(&format!("from_file/line=|{}|", line));
+                    // Log::trace(&format!("from_file/line=|{}|", line));
                     let mut lexical_p = LexicalParser::new(row_number);
                     lexical_p.parse_line(&line);
 
@@ -87,10 +87,6 @@ impl Toml {
             }
             Err(why) => panic!("{}", why),
         }
-        Log::info_t(
-            "Product.",
-            Table::default().str("output_document", &format!("{:?}", output_document)),
-        );
         Log::error_t(
             "List if error exists.",
             Table::default().sub_aot("error_aot", &error_aot),

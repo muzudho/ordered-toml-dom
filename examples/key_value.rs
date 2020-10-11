@@ -33,35 +33,37 @@ fn main() {
     Log::set_file_name("key-value");
     Log::remove_old_logs();
     let doc = Toml::from_file("./resource/key-value.toml");
-    Log::println_t(
-        "Count document elements.",
-        Table::default().uint("DocumentElementsCount", doc.elements.len() as u128),
+    Log::info_t(
+        "Product.",
+        Table::default()
+            .uint("DocumentElementCount", doc.elements.len() as u128)
+            .str("OutputDocument", &format!("{:?}", doc)),
     );
 
     // Test.
-    let a_name = "int_1";
-    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
+    let key_1 = "int_1";
+    let key_value_1 = if let Some(elem) = doc.get_key_value_by_key(key_1) {
         format!("{:?}", elem)
     } else {
         format!("NotFound")
     };
-    Log::println_t("Test 1.", Table::default().str(a_name, &a_value));
+    Log::println_t("Test.1.", Table::default().str(key_1, &key_value_1));
     // Test.
-    let a_name = "float_1";
-    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
+    let key_2 = "float_1";
+    let key_value_2 = if let Some(elem) = doc.get_key_value_by_key(key_2) {
         format!("{:?}", elem)
     } else {
         format!("NotFound")
     };
-    Log::println_t("Test 2.", Table::default().str(a_name, &a_value));
+    Log::println_t("Test.2.", Table::default().str(key_2, &key_value_2));
     // Test.
-    let a_name = "sqstr_1";
-    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
+    let key_3 = "sqstr_1";
+    let key_value_3 = if let Some(elem) = doc.get_key_value_by_key(key_3) {
         format!("{:?}", elem)
     } else {
         format!("NotFound")
     };
-    Log::println_t("Test 3.", Table::default().str(a_name, &a_value));
+    Log::println_t("Test.3.", Table::default().str(key_3, &key_value_3));
 
     Log::flush();
     Log::println("Finished.");

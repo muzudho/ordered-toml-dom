@@ -12,8 +12,7 @@ impl Default for Document {
     }
 }
 impl Document {
-    /// WIP.
-    pub fn get_element_by_name(&self, name: &str) -> Option<&DocumentElement> {
+    pub fn get_key_value_by_key(&self, key: &str) -> Option<&DocumentElement> {
         for elem in &self.elements {
             match elem {
                 DocumentElement::HeaderOfArrayOfTable(_) => {
@@ -23,7 +22,7 @@ impl Document {
                 DocumentElement::EmptyLine => {}
                 DocumentElement::KeyValue(m) => {
                     // println!("m.key={}", m.key); // In development.
-                    if m.key == name {
+                    if m.key == key {
                         // println!("HIT m.key={}", m.key);// In development.
                         return Some(elem);
                     }

@@ -15,8 +15,10 @@ fn main() {
     Log::remove_old_logs();
     let doc = Toml::from_file("./resource/key-value.toml");
     Log::info_t(
-        "Count document elements.",
-        Table::default().uint("DocumentElementsCount", doc.elements.len() as u128),
+        "Product.",
+        Table::default()
+            .uint("DocumentElementCount", doc.elements.len() as u128)
+            .str("OutputDocument", &format!("{:?}", doc)),
     );
     for elem in doc.elements {
         match elem {

@@ -35,18 +35,20 @@ fn main() {
     Log::set_retention_days(-1);
     Log::remove_old_logs();
     let doc = Toml::from_file("./resource/cover.toml");
-    Log::println_t(
-        "Count document elements.",
-        Table::default().uint("DocumentElementCount", doc.elements.len() as u128),
+    Log::info_t(
+        "Product.",
+        Table::default()
+            .uint("DocumentElementCount", doc.elements.len() as u128)
+            .str("OutputDocument", &format!("{:?}", doc)),
     );
     // Test.
-    let a_name = "sq";
-    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
+    let key = "apple";
+    let key_value = if let Some(elem) = doc.get_key_value_by_key(key) {
         format!("{:?}", elem)
     } else {
         format!("")
     };
-    Log::println_t("Test.", Table::default().str(a_name, &a_value));
+    Log::println_t("Test.1.", Table::default().str(key, &key_value));
     Log::flush();
     Log::println("Finished.");
 }

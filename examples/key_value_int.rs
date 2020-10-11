@@ -33,19 +33,21 @@ fn main() {
     Log::set_file_name("key-value-int");
     Log::remove_old_logs();
     let doc = Toml::from_file("./resource/key-value-int.toml");
-    Log::println_t(
-        "Count document elements.",
-        Table::default().uint("DocumentElementsCount", doc.elements.len() as u128),
+    Log::info_t(
+        "Product.",
+        Table::default()
+            .uint("DocumentElementCount", doc.elements.len() as u128)
+            .str("OutputDocument", &format!("{:?}", doc)),
     );
 
     // Test.
-    let a_name = "int_1";
-    let a_value = if let Some(elem) = doc.get_element_by_name(a_name) {
+    let key = "int_1";
+    let key_value = if let Some(elem) = doc.get_key_value_by_key(key) {
         format!("{:?}", elem)
     } else {
         format!("NotFound")
     };
-    Log::println_t("Test.", Table::default().str(a_name, &a_value));
+    Log::println_t("Test.1.", Table::default().str(key, &key_value));
 
     Log::flush();
     Log::println("Finished.");
