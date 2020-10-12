@@ -1,7 +1,7 @@
 //! Test key value.
 //! キー値テスト。
 //!
-//! `cargo run --example key_value_int`
+//! `cargo run --example key_value_number`
 
 extern crate tomboy_toml_dom;
 
@@ -13,22 +13,22 @@ use tomboy_toml_dom::Toml;
 
 fn main() {
     // Configuration a log.
-    Log::set_file_name("exa-key-value-int");
+    Log::set_file_name("exa-key-value-number");
     Log::remove_old_logs();
 
     // Read a Toml file.
-    let toml_file = "./resource/key-value-int.toml";
+    let toml_file = "./resource/key-value-number.toml";
     let doc = Toml::from_file(toml_file);
 
     let mut has_error = false;
 
     // Test.
     let key = "int_max";
-    if let Some(literal_string) = doc.get_literal_string_by_key(key) {
-        if literal_string.value != "2147483647" {
+    if let Some(number) = doc.get_i128_by_key(key) {
+        if number != 2147483647 {
             Log::error_t(
                 &format!("Test: {}", key),
-                Table::default().str(key, &format!("{:?}", literal_string.value)),
+                Table::default().str(key, &format!("{:?}", number)),
             );
         }
     } else {
@@ -38,11 +38,25 @@ fn main() {
 
     // Test.
     let key = "int_min";
-    if let Some(literal_string) = doc.get_literal_string_by_key(key) {
-        if literal_string.value != "-2147483647" {
+    if let Some(number) = doc.get_i128_by_key(key) {
+        if number != -2147483647 {
             Log::error_t(
                 &format!("Test: {}", key),
-                Table::default().str(key, &format!("{:?}", literal_string.value)),
+                Table::default().str(key, &format!("{:?}", number)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "float_1";
+    if let Some(number) = doc.get_f64_by_key(key) {
+        if number != 3.14 {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", number)),
             );
         }
     } else {

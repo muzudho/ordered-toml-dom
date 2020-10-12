@@ -79,7 +79,8 @@ impl KeyValueP {
                         self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
                         self.state = State::DoubleQuotedString;
                     }
-                    // `literal`.
+                    // literal.
+                    // TODO: 浮動小数点型の `.` や、 日付型に含まれる `:` なども拾えないか？
                     TokenType::KeyWithoutDot => {
                         // TODO true, false
                         self.buffer = Some(KeyValue::new(

@@ -24,7 +24,7 @@ cargo run --example comment
 cargo run --example cover
 cargo run --example example
 cargo run --example inline_table
-cargo run --example key_value_int
+cargo run --example key_value_number
 cargo run --example key_value_wip
 cargo run --example key_value
 cargo run --example main
@@ -68,6 +68,17 @@ fn main() {
     if let Some(apple) = doc.get_str_by_key("apple") {
         println!("apple = {}", apple);
         // apple = pie
+    }
+
+    // Read a boolean.
+    // 論理値読取。
+    if let Some(adult) = doc.get_bool_by_key("adult") {
+        println!("adult = {}", adult);
+        // adult = true
+    }
+    if let Some(student) = doc.get_bool_by_key("student") {
+        println!("student = {}", student);
+        // student = false
     }
 }
 ```
