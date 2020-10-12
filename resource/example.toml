@@ -1,2 +1,4 @@
 age = 40
 apple = "pie"
+adult = true
+student = false

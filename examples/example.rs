@@ -26,4 +26,15 @@ fn main() {
         println!("apple = {}", apple);
         // apple = pie
     }
+
+    // Read a boolean.
+    // 論理値読取。
+    if let Some(adult) = doc.get_bool_by_key("adult") {
+        println!("adult = {}", adult);
+        // adult = true
+    }
+    if let Some(student) = doc.get_bool_by_key("student") {
+        println!("student = {}", student);
+        // student = false
+    }
 }
