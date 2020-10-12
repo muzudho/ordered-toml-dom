@@ -9,9 +9,10 @@ It's a tryal and error process. Specifications will change.
 Tomboy is a pun.  
 トムボーイ（おてんば娘）は語呂合わせです。  
 
-* References
-  * [Developer's blog(開発者ブログ)](https://crieit.net/drafts/5f8094a14a0cf/resume)  
-  * [TOML parsing（TOMLの構文解析）](https://crieit.net/posts/TOML-parsing-TOML)
+References:  
+
+* [Developer's blog(開発者ブログ)](https://crieit.net/drafts/5f8094a14a0cf/resume)
+* [TOML parsing（TOMLの構文解析）](https://crieit.net/posts/TOML-parsing-TOML)
 
 ## Run (実行)
 
@@ -60,6 +61,13 @@ fn main() {
     if let Some(age) = doc.get_int128_by_key("age") {
         println!("age = {}", age);
         // age = 40
+    }
+
+    // Read a string.
+    // 文字列読取。
+    if let Some(apple) = doc.get_str_by_key("apple") {
+        println!("apple = {}", apple);
+        // apple = pie
     }
 }
 ```

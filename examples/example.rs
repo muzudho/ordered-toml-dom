@@ -19,4 +19,11 @@ fn main() {
         println!("age = {}", age);
         // age = 40
     }
+
+    // Read a string.
+    // 文字列読取。
+    if let Some(apple) = doc.get_str_by_key("apple") {
+        println!("apple = {}", apple);
+        // apple = pie
+    }
 }

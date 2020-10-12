@@ -1,7 +1,7 @@
 //! Test key value.
 //! キー値テスト。
 //!
-//! `cargo run --example key_value`
+//! `cargo run --example key_value_int`
 
 extern crate tomboy_toml_dom;
 

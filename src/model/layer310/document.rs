@@ -73,6 +73,27 @@ impl Document {
         None
     }
 
+    /// Right string of `left = "abc"`.  
+    /// キー・バリューの右の文字列。  
+    pub fn get_str_by_key(&self, key: &str) -> Option<&str> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key == key {
+                    match &*key_value.value {
+                        RightValue::DoubleQuotedString(literal_string) => {
+                            return Some(&literal_string.value);
+                        }
+                        RightValue::SingleQuotedString(literal_string) => {
+                            return Some(&literal_string.value);
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+        None
+    }
+
     pub fn push_element(&mut self, m: &DocumentElement) {
         self.elements.push(m.clone());
     }
