@@ -3,6 +3,7 @@
 
 use crate::model::{layer110::token::TokenLine, layer310::Document};
 use crate::parser::phase200::{layer210::PResult, layer230::DocumentElementP};
+use crate::util::random_name;
 use casual_logger::Table;
 
 /// Document syntax parser.  
@@ -47,7 +48,7 @@ impl DocumentLineScanner {
                     return PResult::Err(
                         table
                             .sub_t(
-                                "snapshot",
+                                &random_name(),
                                 self.log_snapshot()
                                     .str("via", "document.rs.43.")
                                     .str("token_line", &format!("{:?}", token_line)),

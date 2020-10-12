@@ -16,6 +16,7 @@ use crate::parser::phase200::{
     layer210::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
     layer220::{usize_to_i128, ArrayP},
 };
+use crate::util::random_name;
 use casual_logger::{Log, Table};
 
 /// Array syntax machine state.  
@@ -292,7 +293,7 @@ impl ArrayP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "array.rs.283.")
                                         .int("column_number", usize_to_i128(token.column_number))
@@ -473,7 +474,7 @@ impl ArrayP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "array.rs.448.")
                                         .int("column_number", usize_to_i128(token.column_number))
@@ -535,7 +536,7 @@ impl ArrayP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "array.rs.502.")
                                         .int("column_number", usize_to_i128(token.column_number))

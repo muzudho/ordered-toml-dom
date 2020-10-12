@@ -24,7 +24,7 @@ fn main() {
 
     // Test.
     let key = "int_1";
-    if let Some(elem) = doc.get_key_value_by_key(key) {
+    if let Some(elem) = doc.get_right_value_by_key(key) {
         Log::info_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
     } else {
         has_error = true;
@@ -33,7 +33,7 @@ fn main() {
 
     // Test.
     let key = "float_1";
-    if let Some(elem) = doc.get_key_value_by_key(key) {
+    if let Some(elem) = doc.get_right_value_by_key(key) {
         Log::info_t("Test.2.", Table::default().str(key, &format!("{:?}", elem)));
     } else {
         has_error = true;
@@ -42,7 +42,7 @@ fn main() {
 
     // Test.
     let key = "sqstr_1";
-    if let Some(elem) = doc.get_key_value_by_key(key) {
+    if let Some(elem) = doc.get_right_value_by_key(key) {
         Log::info_t("Test.3.", Table::default().str(key, &format!("{:?}", elem)));
     } else {
         has_error = true;

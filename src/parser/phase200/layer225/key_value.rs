@@ -11,7 +11,8 @@ use crate::parser::phase200::{
     layer220::{usize_to_i128, ArrayP},
     layer225::{InlineTableP, KeyValueP},
 };
-use casual_logger::{Log, Table};
+use crate::util::random_name;
+use casual_logger::Table;
 
 /// Key value syntax machine state.  
 /// キー値構文状態遷移。  
@@ -142,7 +143,7 @@ impl KeyValueP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "key_value.rs.187.")
                                         .int("column_number", usize_to_i128(token.column_number))
@@ -179,7 +180,7 @@ impl KeyValueP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "key_value.rs.224.")
                                         .int("column_number", usize_to_i128(token.column_number))
@@ -254,7 +255,7 @@ impl KeyValueP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "key_value.rs.300.")
                                         .int("column_number", usize_to_i128(token.column_number))

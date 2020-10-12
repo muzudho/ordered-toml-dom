@@ -11,6 +11,7 @@ use crate::parser::phase200::{
     layer225::KeyValueP,
     layer230::DocumentElementP,
 };
+use crate::util::random_name;
 use casual_logger::Table;
 
 /// Line syntax machine state.  
@@ -138,7 +139,7 @@ impl DocumentElementP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "document_element.rs.132.")
                                         .int("column_number", usize_to_i128(token.column_number))
@@ -173,7 +174,7 @@ impl DocumentElementP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "document_element.rs.162.")
                                         .int("column_number", usize_to_i128(token.column_number))
@@ -248,7 +249,7 @@ impl DocumentElementP {
                         return PResult::Err(
                             table
                                 .sub_t(
-                                    "snapshot",
+                                    &random_name(),
                                     self.log_snapshot()
                                         .str("via", "document_element.rs.231.")
                                         .int("column_number", usize_to_i128(token.column_number))

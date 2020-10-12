@@ -5,10 +5,12 @@
 
 #[macro_use]
 extern crate lazy_static;
+extern crate rand;
 extern crate regex;
 
 pub mod model;
 mod parser;
+mod util;
 
 use crate::model::layer310::Document;
 use crate::parser::{

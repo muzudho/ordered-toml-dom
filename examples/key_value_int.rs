@@ -9,8 +9,6 @@ mod modules;
 
 use crate::modules::log_ext::LogExt;
 use casual_logger::{Log, Table};
-use tomboy_toml_dom::model::layer220::RightValue;
-use tomboy_toml_dom::model::layer230::DocumentElement::KeyValue;
 use tomboy_toml_dom::Toml;
 
 fn main() {
@@ -26,27 +24,33 @@ fn main() {
 
     // Test.
     let key = "int_max";
-    if let Some(elem) = doc.get_key_value_by_key(key) {
-        if let KeyValue(key_value) = elem {
-            if key_value.key != key {
-                Log::error_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
-            }
-            if let RightValue::LiteralString(literal_string) = &*key_value.value {
-                if literal_string.value != "2147483647" {
-                    Log::error_t(
-                        "Test.1.",
-                        Table::default().str(key, &format!("{:?}", literal_string.value)),
-                    );
-                }
-            }
-        } else {
-            Log::error_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
+    if let Some(literal_string) = doc.get_literal_string_by_key(key) {
+        if literal_string.value != "2147483647" {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", literal_string.value)),
+            );
         }
     } else {
         has_error = true;
-        Log::error_t("Test.1.", Table::default().str(key, ""));
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 
+    // Test.
+    let key = "int_min";
+    if let Some(literal_string) = doc.get_literal_string_by_key(key) {
+        if literal_string.value != "-2147483647" {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", literal_string.value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Error handling.
     if has_error {
         Log::info_toml_document(toml_file, &doc);
     }

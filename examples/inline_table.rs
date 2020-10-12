@@ -26,7 +26,7 @@ fn main() {
 
     // Test.
     let key = "inline_table_3";
-    if let Some(elem) = doc.get_key_value_by_key(key) {
+    if let Some(elem) = doc.get_right_value_by_key(key) {
         Log::info_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
     } else {
         has_error = true;

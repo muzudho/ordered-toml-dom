@@ -1,6 +1,9 @@
 //! Document model.  
 //! ドキュメント・モデル。  
 
+use crate::model::layer210::LiteralString;
+use crate::model::layer220::RightValue;
+use crate::model::layer230::DocumentElement::KeyValue;
 use crate::model::{layer230::DocumentElement, layer310::Document};
 use std::fmt;
 
@@ -12,7 +15,9 @@ impl Default for Document {
     }
 }
 impl Document {
-    pub fn get_key_value_by_key(&self, key: &str) -> Option<&DocumentElement> {
+    /// Right of `left = right`.  
+    /// キー・バリューの右値。  
+    pub fn get_right_value_by_key(&self, key: &str) -> Option<&DocumentElement> {
         for elem in &self.elements {
             match elem {
                 DocumentElement::HeaderOfArrayOfTable(_) => {
@@ -34,6 +39,22 @@ impl Document {
         }
         None
     }
+
+    /// Right of `left = right`.  
+    /// キー・バリューの右値。  
+    pub fn get_literal_string_by_key(&self, key: &str) -> Option<&LiteralString> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key == key {
+                    if let RightValue::LiteralString(literal_string) = &*key_value.value {
+                        return Some(literal_string);
+                    }
+                }
+            }
+        }
+        None
+    }
+
     pub fn push_element(&mut self, m: &DocumentElement) {
         self.elements.push(m.clone());
     }
