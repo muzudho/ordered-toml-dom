@@ -7,7 +7,7 @@ pub mod single_quoted_string;
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct Comment {
-    value: String,
+    pub value: String,
 }
 
 /// It has one string.  
@@ -21,7 +21,7 @@ pub struct DoubleQuotedString {
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct LiteralString {
-    value: String,
+    pub value: String,
 }
 
 /// It has one string.  

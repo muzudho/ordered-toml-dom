@@ -9,6 +9,8 @@ mod modules;
 
 use crate::modules::log_ext::LogExt;
 use casual_logger::{Log, Table};
+use tomboy_toml_dom::model::layer220::RightValue;
+use tomboy_toml_dom::model::layer230::DocumentElement::KeyValue;
 use tomboy_toml_dom::Toml;
 
 fn main() {
@@ -23,9 +25,23 @@ fn main() {
     let mut has_error = false;
 
     // Test.
-    let key = "int_1";
+    let key = "int_max";
     if let Some(elem) = doc.get_key_value_by_key(key) {
-        Log::info_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
+        if let KeyValue(key_value) = elem {
+            if key_value.key != key {
+                Log::error_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
+            }
+            if let RightValue::LiteralString(literal_string) = &*key_value.value {
+                if literal_string.value != "2147483647" {
+                    Log::error_t(
+                        "Test.1.",
+                        Table::default().str(key, &format!("{:?}", literal_string.value)),
+                    );
+                }
+            }
+        } else {
+            Log::error_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
+        }
     } else {
         has_error = true;
         Log::error_t("Test.1.", Table::default().str(key, ""));
