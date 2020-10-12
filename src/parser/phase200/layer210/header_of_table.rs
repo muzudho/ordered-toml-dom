@@ -6,7 +6,7 @@ use crate::model::{
     layer230::HeaderOfTable,
 };
 use crate::parser::phase200::layer210::{HeaderPOfTable, PResult};
-use casual_logger::Table as LogTable;
+// use casual_logger::Table as LogTable;
 
 impl HeaderPOfTable {
     pub fn flush(&mut self) -> Option<HeaderOfTable> {
@@ -38,6 +38,8 @@ impl HeaderPOfTable {
         }
         PResult::Ongoing
     }
+
+    /* TODO
     pub fn log_snapshot(&self) -> LogTable {
         let mut t = LogTable::default().clone();
         if let Some(m) = &self.buffer {
@@ -45,4 +47,5 @@ impl HeaderPOfTable {
         }
         t
     }
+    */
 }

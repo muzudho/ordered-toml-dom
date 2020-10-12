@@ -20,7 +20,7 @@ fn main() {
     Log::remove_old_logs();
 
     // Read a Toml file.
-    let toml_file = "./resource/example.type.toml";
+    let toml_file = "./resource/edit-1.type.toml";
     let doc = Toml::from_file(toml_file);
     Log::info_toml_document(toml_file, &doc);
 

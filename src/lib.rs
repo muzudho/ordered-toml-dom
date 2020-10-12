@@ -1,7 +1,19 @@
-//! TOML parser.  
-//! トムル解析器。  
-//!
-//! `cargo run --example main`
+//! For those who are struggling with Rust's cool syntax, our goal is to provide a TOML parser that's as easy as pointing to a menu and eating fast food.  
+//! Rustのイケてる構文に難儀している人のために、メニューを指差してファーストフードを食べるぐらい簡単な操作のTOMLパーサーを提供することを目標とします。  
+
+// Run:
+//
+// `cargo run --example main`
+//
+// Publish:
+//
+// (1) `cargo test`
+// (2) `cargo run --example cover`
+// (3) Open auto-generated log file. I check it.
+// (4) Remove the log file.
+// (5) Version up on Cargo.toml.
+// (6) `cargo doc --open`
+// (7) Comit to Git-hub.
 
 #[macro_use]
 extern crate lazy_static;

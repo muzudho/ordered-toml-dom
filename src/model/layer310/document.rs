@@ -55,6 +55,24 @@ impl Document {
         None
     }
 
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_int128_by_key(&self, key: &str) -> Option<i128> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key == key {
+                    if let RightValue::LiteralString(literal_string) = &*key_value.value {
+                        match literal_string.value.parse() {
+                            Ok(n) => return Some(n),
+                            Err(_) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
     pub fn push_element(&mut self, m: &DocumentElement) {
         self.elements.push(m.clone());
     }
