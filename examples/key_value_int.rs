@@ -2,6 +2,7 @@
 //! キー値テスト。
 //!
 //! `cargo run --example key_value`
+
 extern crate tomboy_toml_dom;
 
 mod modules;
@@ -11,18 +12,14 @@ use casual_logger::{Log, Table};
 use tomboy_toml_dom::Toml;
 
 fn main() {
+    // Configuration a log.
     Log::println("Start.");
     Log::set_file_name("key-value-int");
     Log::remove_old_logs();
 
-    // Read a file.
+    // Read a Toml file.
     let doc = Toml::from_file("./resource/key-value-int.toml");
-    Log::info_t(
-        "Product.",
-        Table::default()
-            .uint("DocumentElementCount", doc.elements.len() as u128)
-            .str("OutputDocument", &format!("{:?}", doc)),
-    );
+    Log::info_toml_document(&doc);
 
     // Test.
     let key = "int_1";

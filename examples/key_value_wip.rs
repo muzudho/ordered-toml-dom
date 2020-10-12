@@ -3,6 +3,11 @@
 //!
 //! `cargo run --example key_value`
 
+extern crate tomboy_toml_dom;
+
+mod modules;
+
+use crate::modules::log_ext::LogExt;
 use casual_logger::{Log, Table};
 use tomboy_toml_dom::{
     model::{layer220::RightValue, layer230::DocumentElement},
@@ -10,16 +15,15 @@ use tomboy_toml_dom::{
 };
 
 fn main() {
-    println!("Start.");
+    // Configuration a log.
     Log::set_file_name("key-value");
     Log::remove_old_logs();
+    println!("Start.");
+
+    // Read a Toml file.
     let doc = Toml::from_file("./resource/key-value.toml");
-    Log::info_t(
-        "Product.",
-        Table::default()
-            .uint("DocumentElementCount", doc.elements.len() as u128)
-            .str("OutputDocument", &format!("{:?}", doc)),
-    );
+    Log::info_toml_document(&doc);
+
     for elem in doc.elements {
         match elem {
             DocumentElement::HeaderOfArrayOfTable(m) => {
