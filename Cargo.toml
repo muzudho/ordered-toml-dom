@@ -3,6 +3,14 @@ name = "tomboy-toml-dom"
 version = "0.1.0"
 authors = ["むずでょ <muzudho1@gmail.com>"]
 edition = "2018"
+description = """
+For those who are struggling with Rust's cool syntax, our goal is to provide a TOML parser that's as easy as pointing to a menu and eating fast food.  
+"""
+readme = "README.md"
+repository = "https://github.com/muzudho/tomboy-toml-dom"
+license = "MIT"
+keywords = ["toml"]
+categories = ["development-tools::debugging"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
