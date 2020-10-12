@@ -1,7 +1,7 @@
-//! Test key value.
-//! キー値テスト。
+//! Test.
+//! テスト。
 //!
-//! `cargo run --example key_value`
+//! `cargo run --example comment`
 extern crate tomboy_toml_dom;
 
 mod modules;
@@ -12,11 +12,11 @@ use tomboy_toml_dom::Toml;
 
 fn main() {
     Log::println("Start.");
-    Log::set_file_name("key-value-int");
+    Log::set_file_name("comment");
     Log::remove_old_logs();
 
     // Read a file.
-    let doc = Toml::from_file("./resource/key-value-int.toml");
+    let doc = Toml::from_file("./resource/comment.toml");
     Log::info_t(
         "Product.",
         Table::default()
@@ -24,13 +24,7 @@ fn main() {
             .str("OutputDocument", &format!("{:?}", doc)),
     );
 
-    // Test.
-    let key = "int_1";
-    if let Some(elem) = doc.get_key_value_by_key(key) {
-        Log::info_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
-    } else {
-        Log::error_t("Test.1.", Table::default().str(key, ""));
-    }
+    // TODO コメントはどうやって Get する？
 
     Log::flush();
     Log::println("Finished.");
