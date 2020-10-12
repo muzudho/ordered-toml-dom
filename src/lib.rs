@@ -39,7 +39,7 @@ impl Toml {
             "Read a file.",
             Table::default().str("File", &format!("{}", path)),
         );
-        let mut error_aot = ArrayOfTable::default().clone();
+        let mut error_tables = Vec::<Table>::new();
         let mut output_document = Document::default();
         match File::open(path) {
             Ok(file) => {
@@ -58,27 +58,26 @@ impl Toml {
                         .scan_line(&lexical_p.product(), &mut output_document)
                     {
                         PResult::End => {} // Ignored it.
-                        PResult::Err(mut table) => {
-                            error_aot.table(
-                                table.sub_t(
-                                    &format!("row_{}", row_number),
-                                    Table::default()
-                                        .str("via", "lib.rs.65.")
-                                        .int(
-                                            "row_number",
-                                            if let Ok(n) = row_number.try_into() {
-                                                n
-                                            } else {
-                                                -1
-                                            },
-                                        )
-                                        .str("line", &format!("{}", line))
-                                        .str("token_line", &format!("{:?}", lexical_p))
-                                        .sub_t(
-                                            "document_line_scanner",
-                                            &document_line_scanner.log_snapshot(),
-                                        ),
-                                ),
+                        PResult::Err(table) => {
+                            error_tables.push(
+                                Table::default()
+                                    .str("via", "lib.rs.65.")
+                                    .int(
+                                        "row_number",
+                                        if let Ok(n) = row_number.try_into() {
+                                            n
+                                        } else {
+                                            -1
+                                        },
+                                    )
+                                    .str("line", &format!("{}", line))
+                                    .str("token_line", &format!("{:?}", lexical_p))
+                                    .sub_t("table", &table)
+                                    .sub_t(
+                                        "document_line_scanner",
+                                        &document_line_scanner.log_snapshot(),
+                                    )
+                                    .clone(),
                             );
                         }
                         PResult::Ongoing => {} // Ignored it.
@@ -87,10 +86,17 @@ impl Toml {
             }
             Err(why) => panic!("{}", why),
         }
-        Log::error_t(
-            "List if error exists.",
-            Table::default().sub_aot("error_aot", &error_aot),
-        );
+
+        if !error_tables.is_empty() {
+            let mut error_aot = ArrayOfTable::default();
+            for err_tbl in error_tables {
+                error_aot.table(&err_tbl);
+            }
+            Log::error_t(
+                "List if error exists.",
+                Table::default().sub_aot("error_aot", &error_aot),
+            );
+        }
 
         output_document
     }

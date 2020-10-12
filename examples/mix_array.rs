@@ -13,11 +13,10 @@ use tomboy_toml_dom::Toml;
 
 fn main() {
     // Configuration a log.
-    Log::set_file_name("test-mix-array");
+    Log::set_file_name("exa-test-mix-array");
     Log::set_level(Level::Debug);
     Log::set_retention_days(-1);
     Log::remove_old_logs();
-    Log::println("Start.");
 
     // Read a Toml file.
     let doc = Toml::from_file("./resource/mix-array.toml");
@@ -32,5 +31,4 @@ fn main() {
     }
 
     Log::flush();
-    Log::println("Finished.");
 }

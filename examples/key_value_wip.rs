@@ -16,9 +16,8 @@ use tomboy_toml_dom::{
 
 fn main() {
     // Configuration a log.
-    Log::set_file_name("key-value");
+    Log::set_file_name("exa-key-value");
     Log::remove_old_logs();
-    println!("Start.");
 
     // Read a Toml file.
     let doc = Toml::from_file("./resource/key-value.toml");
@@ -62,6 +61,6 @@ fn main() {
             }
         }
     }
+
     Log::flush();
-    println!("Finished.");
 }

@@ -13,8 +13,7 @@ use tomboy_toml_dom::Toml;
 
 fn main() {
     // Configuration a log.
-    Log::println("Start.");
-    Log::set_file_name("key-value-int");
+    Log::set_file_name("exa-key-value-int");
     Log::remove_old_logs();
 
     // Read a Toml file.
@@ -30,5 +29,4 @@ fn main() {
     }
 
     Log::flush();
-    Log::println("Finished.");
 }

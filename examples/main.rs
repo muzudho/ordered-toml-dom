@@ -16,8 +16,8 @@ use tomboy_toml_dom::{
 
 fn main() {
     // Configuration a log.
+    Log::set_file_name("exa-main");
     Log::remove_old_logs();
-    println!("Start.");
 
     // Read a Toml file.
     let doc = Toml::from_file("./resource/example.type.toml");
@@ -61,6 +61,6 @@ fn main() {
             }
         }
     }
+
     Log::flush();
-    println!("Finished.");
 }

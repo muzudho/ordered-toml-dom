@@ -13,9 +13,8 @@ use tomboy_toml_dom::Toml;
 
 fn main() {
     // Configuration a log.
-    Log::set_file_name("comment");
+    Log::set_file_name("exa-comment");
     Log::remove_old_logs();
-    Log::println("Start.");
 
     // Read a Toml file.
     let doc = Toml::from_file("./resource/comment.toml");
@@ -24,5 +23,4 @@ fn main() {
     // TODO コメントはどうやって Get する？
 
     Log::flush();
-    Log::println("Finished.");
 }
