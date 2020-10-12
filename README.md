@@ -58,7 +58,7 @@ fn main() {
 
     // Read a number.
     // 数値読取。
-    if let Some(age) = doc.get_int128_by_key("age") {
+    if let Some(age) = doc.get_i128_by_key("age") {
         println!("age = {}", age);
         // age = 40
     }
@@ -82,3 +82,8 @@ fn main() {
     }
 }
 ```
+
+## TODO
+
+* [ ] Parsing a literal string containing dots. Example: `3.14`.  
+    ドットを含むリテラル文字列の解析。例： `3.14`。
