@@ -14,6 +14,8 @@
 // (5) Version up on Cargo.toml.
 // (6) `cargo doc --open`
 // (7) Comit to Git-hub.
+// (8) `cargo publish --dry-run`
+// (9) `cargo publish`
 
 #[macro_use]
 extern crate lazy_static;
