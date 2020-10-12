@@ -1,14 +1,11 @@
 //! For those who are struggling with Rust's cool syntax, our goal is to provide a TOML parser that's as easy as pointing to a menu and eating fast food.  
 //! Rustのイケてる構文に難儀している人のために、メニューを指差してファーストフードを食べるぐらい簡単な操作のTOMLパーサーを提供することを目標とします。  
 
-// Run:
-//
-// `cargo run --example main`
-//
 // Publish:
 //
 // (1) `cargo test`
-// (2) `cargo run --example cover`
+// (2a) `cargo run --example cover`
+// (2b) `cargo run --example example`
 // (3) Open auto-generated log file. I check it.
 // (4) Remove the log file.
 // (5) Version up on Cargo.toml.
@@ -41,7 +38,7 @@ use std::sync::Mutex;
 lazy_static! {
     /// Without dot.
     /// ドットは含みません。
-    pub static ref RE_KEY: Mutex<Regex> = Mutex::new(Regex::new(r"[A-Za-z0-9_-]$").unwrap());
+    static ref RE_KEY: Mutex<Regex> = Mutex::new(Regex::new(r"[A-Za-z0-9_-]$").unwrap());
 }
 
 /// TOML.  
