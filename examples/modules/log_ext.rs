@@ -4,7 +4,7 @@ use tomboy_toml_dom::model::layer310::Document;
 pub trait LogExt {
     fn println(s: &str);
     fn println_t(s: &str, t: &mut Table);
-    fn info_toml_document(doc: &Document);
+    fn info_toml_document(toml_file: &str, doc: &Document);
 }
 
 impl LogExt for Log {
@@ -24,10 +24,11 @@ impl LogExt for Log {
         Log::infoln_t(s, t);
     }
 
-    fn info_toml_document(doc: &Document) {
+    fn info_toml_document(toml_file: &str, doc: &Document) {
         Log::info_t(
-            "Product.",
+            "Read",
             Table::default()
+                .str("File", &format!("{}", toml_file))
                 .uint("DocumentElementCount", doc.elements.len() as u128)
                 .str("OutputDocument", &format!("{:?}", doc)),
         );

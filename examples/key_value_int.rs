@@ -17,15 +17,22 @@ fn main() {
     Log::remove_old_logs();
 
     // Read a Toml file.
-    let doc = Toml::from_file("./resource/key-value-int.toml");
-    Log::info_toml_document(&doc);
+    let toml_file = "./resource/key-value-int.toml";
+    let doc = Toml::from_file(toml_file);
+
+    let mut has_error = false;
 
     // Test.
     let key = "int_1";
     if let Some(elem) = doc.get_key_value_by_key(key) {
         Log::info_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
     } else {
+        has_error = true;
         Log::error_t("Test.1.", Table::default().str(key, ""));
+    }
+
+    if has_error {
+        Log::info_toml_document(toml_file, &doc);
     }
 
     Log::flush();

@@ -17,8 +17,9 @@ fn main() {
     Log::remove_old_logs();
 
     // Read a Toml file.
-    let doc = Toml::from_file("./resource/comment.toml");
-    Log::info_toml_document(&doc);
+    let toml_file = "./resource/comment.toml";
+    let doc = Toml::from_file(toml_file);
+    Log::info_toml_document(toml_file, &doc);
 
     // TODO コメントはどうやって Get する？
 

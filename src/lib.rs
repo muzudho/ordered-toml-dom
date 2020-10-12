@@ -35,10 +35,6 @@ impl Toml {
     /// Line scan.
     /// 行走査。
     pub fn from_file(path: &str) -> Document {
-        Log::info_t(
-            "Read a file.",
-            Table::default().str("File", &format!("{}", path)),
-        );
         let mut error_tables = Vec::<Table>::new();
         let mut output_document = Document::default();
         match File::open(path) {

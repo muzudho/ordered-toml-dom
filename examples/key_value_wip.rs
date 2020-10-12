@@ -20,8 +20,9 @@ fn main() {
     Log::remove_old_logs();
 
     // Read a Toml file.
-    let doc = Toml::from_file("./resource/key-value.toml");
-    Log::info_toml_document(&doc);
+    let toml_file = "./resource/key-value.toml";
+    let doc = Toml::from_file(toml_file);
+    Log::info_toml_document(toml_file, &doc);
 
     for elem in doc.elements {
         match elem {
