@@ -19,6 +19,10 @@ fn main() {
         println!("age = {}", age);
         // age = 40
     }
+    if let Some(age) = doc.get_f64_by_key("weight") {
+        println!("weight = {}", age);
+        // age = 93.5
+    }
 
     // Read a string.
     // 文字列読取。

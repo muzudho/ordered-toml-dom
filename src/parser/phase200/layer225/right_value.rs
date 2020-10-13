@@ -7,7 +7,7 @@ use crate::model::{
     layer225::RightValue,
 };
 use crate::parser::phase200::{
-    layer210::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
+    layer210::{DoubleQuotedStringP, LiteralStringP, PResult, SingleQuotedStringP},
     layer220::{usize_to_i128, ArrayP},
     layer225::{InlineTableP, RightValueP},
 };
@@ -25,6 +25,7 @@ pub enum State {
     DoubleQuotedString,
     First,
     SingleQuotedString,
+    LiteralString,
     End,
 }
 
@@ -32,9 +33,10 @@ impl Default for RightValueP {
     fn default() -> Self {
         RightValueP {
             array_p: None,
+            buffer: None,
             double_quoted_string_p: None,
             inline_table_p: None,
-            buffer: None,
+            literal_string_p: None,
             single_quoted_string_p: None,
             state: State::First,
         }
@@ -165,14 +167,6 @@ impl RightValueP {
                         self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
                         self.state = State::DoubleQuotedString;
                     }
-                    // literal.
-                    // TODO: 浮動小数点型の `.` や、 日付型に含まれる `:` なども拾えないか？
-                    TokenType::KeyWithoutDot => {
-                        // TODO true, false
-                        self.buffer = Some(RightValue::LiteralString(LiteralString::new(&token)));
-                        self.state = State::End;
-                        return PResult::End;
-                    }
                     // `{`.
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());
@@ -190,14 +184,42 @@ impl RightValueP {
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
                     _ => {
+                        self.literal_string_p = Some(LiteralStringP::new());
+                        self.state = State::LiteralString;
+                    }
+                }
+            }
+            // `abc`.
+            State::LiteralString => {
+                let p = self.literal_string_p.as_mut().unwrap();
+                match p.parse(token) {
+                    PResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            self.buffer = Some(RightValue::LiteralString(child_m));
+                            self.literal_string_p = None;
+                            self.state = State::End;
+                            return PResult::End;
+                        } else {
+                            return PResult::Err(
+                                self.log_snapshot()
+                                    .str("place_of_occurrence", "right_value.rs.205.")
+                                    .int("column_number", usize_to_i128(token.column_number))
+                                    .str("token", &format!("{:?}", token))
+                                    .clone(),
+                            );
+                        }
+                    }
+                    PResult::Err(table) => {
                         return PResult::Err(
                             self.log_snapshot()
-                                .str("place_of_occurrence", "right_value.rs.84.")
+                                .str("place_of_occurrence", "right_value.rs.215.")
                                 .int("column_number", usize_to_i128(token.column_number))
                                 .str("token", &format!("{:?}", token))
+                                .sub_t("error", &table)
                                 .clone(),
                         )
                     }
+                    PResult::Ongoing => {}
                 }
             }
             // `'abc'`.

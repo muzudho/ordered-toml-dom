@@ -2,10 +2,11 @@ pub mod comment;
 pub mod double_quoted_string;
 pub mod header_of_array_of_table;
 pub mod header_of_table;
+pub mod literal_string;
 pub mod single_quoted_string;
 
 use crate::model::{
-    layer210::{Comment, DoubleQuotedString, SingleQuotedString},
+    layer210::{Comment, DoubleQuotedString, LiteralString, SingleQuotedString},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use casual_logger::Table as LogTable;
@@ -44,6 +45,15 @@ pub struct HeaderPOfArrayOfTable {
 #[derive(Clone)]
 pub struct HeaderPOfTable {
     buffer: Option<HeaderOfTable>,
+}
+
+/// Literal string syntax parser.  
+/// リテラル文字列構文パーサー。  
+///
+/// Example: `abc`.  
+#[derive(Clone)]
+pub struct LiteralStringP {
+    buffer: Option<LiteralString>,
 }
 
 /// Result of syntax parser.  

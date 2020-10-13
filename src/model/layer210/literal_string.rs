@@ -23,6 +23,13 @@ impl LiteralString {
             value: token.value.to_string(),
         }
     }
+
+    pub fn from_str(text: &str) -> Self {
+        LiteralString {
+            value: text.to_string(),
+        }
+    }
+
     pub fn push_token(&mut self, token: &Token) {
         self.value.push_str(&token.value);
     }
