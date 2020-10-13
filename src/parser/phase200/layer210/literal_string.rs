@@ -6,7 +6,6 @@ use crate::model::{
     layer210::LiteralString,
 };
 use crate::parser::phase200::layer210::{LiteralStringP, PResult};
-use casual_logger::Table;
 
 impl LiteralStringP {
     pub fn flush(&mut self) -> Option<LiteralString> {
