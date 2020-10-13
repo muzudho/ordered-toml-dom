@@ -3,13 +3,12 @@
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::LiteralString,
-    layer225::{KeyValue, RightValue},
+    layer225::KeyValue,
 };
 use crate::parser::phase200::{
-    layer210::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
-    layer220::{usize_to_i128, ArrayP},
-    layer225::{InlineTableP, KeyValueP},
+    layer210::PResult,
+    layer220::usize_to_i128,
+    layer225::{KeyValueP, RightValueP},
 };
 use crate::util::random_name;
 use casual_logger::Table;
@@ -22,30 +21,26 @@ use casual_logger::Table;
 pub enum State {
     AfterKey,
     AfterEquals,
-    AfterLeftCurlyBracket,
-    AfterLeftSquareBracket,
-    DoubleQuotedString,
-    SingleQuotedString,
+    RightValue,
     End,
 }
 
 impl KeyValueP {
     pub fn new(key: &Token) -> Self {
         KeyValueP {
-            array_p: None,
             buffer: None,
-            double_quoted_string_p: None,
-            inline_table_p: None,
-            single_quoted_string_p: None,
-            state: State::AfterKey,
+            right_value_p: None,
             temp_key: key.clone(),
+            state: State::AfterKey,
         }
     }
+
     pub fn flush(&mut self) -> Option<KeyValue> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
+
     /// # Returns
     ///
     /// * `PResult` - Result.  
@@ -76,34 +71,34 @@ impl KeyValueP {
                 match token.type_ {
                     // `"`.
                     TokenType::DoubleQuotation => {
-                        self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
-                        self.state = State::DoubleQuotedString;
+                        self.right_value_p = Some(RightValueP::default());
+                        self.state = State::RightValue;
+                        return self.right_value_p.as_mut().unwrap().parse(token);
                     }
                     // literal.
                     // TODO: 浮動小数点型の `.` や、 日付型に含まれる `:` なども拾えないか？
                     TokenType::KeyWithoutDot => {
-                        // TODO true, false
-                        self.buffer = Some(KeyValue::new(
-                            &self.temp_key,
-                            &RightValue::LiteralString(LiteralString::new(&token)),
-                        ));
-                        self.state = State::End;
-                        return PResult::End;
+                        self.right_value_p = Some(RightValueP::default());
+                        self.state = State::RightValue;
+                        return self.right_value_p.as_mut().unwrap().parse(token);
                     }
                     // `{`.
                     TokenType::LeftCurlyBracket => {
-                        self.inline_table_p = Some(InlineTableP::default());
-                        self.state = State::AfterLeftCurlyBracket;
+                        self.right_value_p = Some(RightValueP::default());
+                        self.state = State::RightValue;
+                        return self.right_value_p.as_mut().unwrap().parse(token);
                     }
                     // `[`.
                     TokenType::LeftSquareBracket => {
-                        self.array_p = Some(ArrayP::default());
-                        self.state = State::AfterLeftSquareBracket;
+                        self.right_value_p = Some(RightValueP::default());
+                        self.state = State::RightValue;
+                        return self.right_value_p.as_mut().unwrap().parse(token);
                     }
                     // `'`.
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(SingleQuotedStringP::new());
-                        self.state = State::SingleQuotedString;
+                        self.right_value_p = Some(RightValueP::default());
+                        self.state = State::RightValue;
+                        return self.right_value_p.as_mut().unwrap().parse(token);
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
                     _ => {
@@ -117,17 +112,14 @@ impl KeyValueP {
                     }
                 }
             }
-            // After `{`.
-            State::AfterLeftCurlyBracket => {
-                let p = self.inline_table_p.as_mut().unwrap();
+            // After `=`.
+            State::RightValue => {
+                let p = self.right_value_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(KeyValue::new(
-                                &self.temp_key,
-                                &RightValue::InlineTable(child_m),
-                            ));
-                            self.inline_table_p = None;
+                            self.buffer = Some(KeyValue::new(&self.temp_key, &child_m));
+                            self.right_value_p = None;
                             self.state = State::End;
                             return PResult::End;
                         } else {
@@ -156,118 +148,6 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
-            // After `[`.
-            State::AfterLeftSquareBracket => {
-                let p = self.array_p.as_mut().unwrap();
-                match p.parse(token) {
-                    PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer =
-                                Some(KeyValue::new(&self.temp_key, &RightValue::Array(child_m)));
-                            self.array_p = None;
-                            self.state = State::End;
-                            return PResult::End;
-                        } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "key_value.rs.215.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
-                    }
-                    PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "key_value.rs.224.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
-                    }
-                    PResult::Ongoing => {}
-                }
-            }
-            // `"abc"`.
-            State::DoubleQuotedString => {
-                let p = self.double_quoted_string_p.as_mut().unwrap();
-                match p.parse(token) {
-                    PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(KeyValue::new(
-                                &self.temp_key,
-                                &RightValue::DoubleQuotedString(child_m),
-                            ));
-                            self.double_quoted_string_p = None;
-                            self.state = State::End;
-                            return PResult::End;
-                        } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "key_value.rs.252.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
-                    }
-                    PResult::Err(table) => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "key_value.rs.261.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
-                                .clone(),
-                        )
-                    }
-                    PResult::Ongoing => {}
-                }
-            }
-            // `'abc'`.
-            State::SingleQuotedString => {
-                let p = self.single_quoted_string_p.as_mut().unwrap();
-                match p.parse(token) {
-                    PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(KeyValue::new(
-                                &self.temp_key,
-                                &RightValue::SingleQuotedString(child_m),
-                            ));
-                            self.single_quoted_string_p = None;
-                            self.state = State::End;
-                            return PResult::End;
-                        } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "key_value.rs.291.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
-                        }
-                    }
-                    PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "key_value.rs.300.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
-                    }
-                    PResult::Ongoing => {}
-                }
-            }
             State::End => {
                 return PResult::Err(
                     self.log_snapshot()
@@ -283,22 +163,9 @@ impl KeyValueP {
     pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default()
             .str("state", &format!("{:?}", self.state))
-            .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
-        if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
-            t.sub_t(
-                "double_quoted_string",
-                &double_quoted_string_p.log_snapshot(),
-            );
-        }
-        if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t("inline_table", &inline_table_p.log_snapshot());
-        }
-        if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
-            t.sub_t(
-                "single_quoted_string",
-                &single_quoted_string_p.log_snapshot(),
-            );
+        if let Some(right_value_p) = &self.right_value_p {
+            t.sub_t("right_value_p", &right_value_p.log_snapshot());
         }
         t
     }

@@ -13,7 +13,7 @@ use tomboy_toml_dom::Toml;
 
 fn main() {
     // Configuration a log.
-    Log::set_file_name("exa-test-mix-array");
+    Log::set_file_name("exa-mix-array");
     Log::set_level(Level::Debug);
     Log::set_retention_days(-1);
     Log::remove_old_logs();

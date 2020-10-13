@@ -16,7 +16,7 @@ use tomboy_toml_dom::{
 
 fn main() {
     // Configuration a log.
-    Log::set_file_name("exa-key-value");
+    Log::set_file_name("exa-key-value-wip");
     Log::remove_old_logs();
 
     // Read a Toml file.
