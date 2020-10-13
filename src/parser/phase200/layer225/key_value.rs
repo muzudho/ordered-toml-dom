@@ -73,32 +73,222 @@ impl KeyValueP {
                     TokenType::DoubleQuotation => {
                         self.right_value_p = Some(RightValueP::default());
                         self.state = State::RightValue;
-                        return self.right_value_p.as_mut().unwrap().parse(token);
+                        let p = self.right_value_p.as_mut().unwrap();
+                        match p.parse(token) {
+                            PResult::End => {
+                                if let Some(child_m) = p.flush() {
+                                    self.buffer = Some(KeyValue::new(&self.temp_key, &child_m));
+                                    self.right_value_p = None;
+                                    self.state = State::End;
+                                    return PResult::End;
+                                } else {
+                                    return PResult::Err(
+                                        self.log_snapshot()
+                                            .str("place_of_occurrence", "key_value.rs.87.")
+                                            .int(
+                                                "column_number",
+                                                usize_to_i128(token.column_number),
+                                            )
+                                            .str("token", &format!("{:?}", token))
+                                            .clone(),
+                                    );
+                                }
+                            }
+                            PResult::Err(mut table) => {
+                                return PResult::Err(
+                                    table
+                                        .sub_t(
+                                            &random_name(),
+                                            self.log_snapshot()
+                                                .str("via", "key_value.rs.187.")
+                                                .int(
+                                                    "column_number",
+                                                    usize_to_i128(token.column_number),
+                                                )
+                                                .str("token", &format!("{:?}", token)),
+                                        )
+                                        .clone(),
+                                )
+                            }
+                            PResult::Ongoing => {}
+                        }
                     }
                     // literal.
                     // TODO: 浮動小数点型の `.` や、 日付型に含まれる `:` なども拾えないか？
                     TokenType::KeyWithoutDot => {
                         self.right_value_p = Some(RightValueP::default());
                         self.state = State::RightValue;
-                        return self.right_value_p.as_mut().unwrap().parse(token);
+                        let p = self.right_value_p.as_mut().unwrap();
+                        match p.parse(token) {
+                            PResult::End => {
+                                if let Some(child_m) = p.flush() {
+                                    self.buffer = Some(KeyValue::new(&self.temp_key, &child_m));
+                                    self.right_value_p = None;
+                                    self.state = State::End;
+                                    return PResult::End;
+                                } else {
+                                    return PResult::Err(
+                                        self.log_snapshot()
+                                            .str("place_of_occurrence", "key_value.rs.132.")
+                                            .int(
+                                                "column_number",
+                                                usize_to_i128(token.column_number),
+                                            )
+                                            .str("token", &format!("{:?}", token))
+                                            .clone(),
+                                    );
+                                }
+                            }
+                            PResult::Err(mut table) => {
+                                return PResult::Err(
+                                    table
+                                        .sub_t(
+                                            &random_name(),
+                                            self.log_snapshot()
+                                                .str("via", "key_value.rs.187.")
+                                                .int(
+                                                    "column_number",
+                                                    usize_to_i128(token.column_number),
+                                                )
+                                                .str("token", &format!("{:?}", token)),
+                                        )
+                                        .clone(),
+                                )
+                            }
+                            PResult::Ongoing => {}
+                        }
                     }
                     // `{`.
                     TokenType::LeftCurlyBracket => {
                         self.right_value_p = Some(RightValueP::default());
                         self.state = State::RightValue;
-                        return self.right_value_p.as_mut().unwrap().parse(token);
+                        let p = self.right_value_p.as_mut().unwrap();
+                        match p.parse(token) {
+                            PResult::End => {
+                                if let Some(child_m) = p.flush() {
+                                    self.buffer = Some(KeyValue::new(&self.temp_key, &child_m));
+                                    self.right_value_p = None;
+                                    self.state = State::End;
+                                    return PResult::End;
+                                } else {
+                                    return PResult::Err(
+                                        self.log_snapshot()
+                                            .str("place_of_occurrence", "key_value.rs.165.")
+                                            .int(
+                                                "column_number",
+                                                usize_to_i128(token.column_number),
+                                            )
+                                            .str("token", &format!("{:?}", token))
+                                            .clone(),
+                                    );
+                                }
+                            }
+                            PResult::Err(mut table) => {
+                                return PResult::Err(
+                                    table
+                                        .sub_t(
+                                            &random_name(),
+                                            self.log_snapshot()
+                                                .str("via", "key_value.rs.187.")
+                                                .int(
+                                                    "column_number",
+                                                    usize_to_i128(token.column_number),
+                                                )
+                                                .str("token", &format!("{:?}", token)),
+                                        )
+                                        .clone(),
+                                )
+                            }
+                            PResult::Ongoing => {}
+                        }
                     }
                     // `[`.
                     TokenType::LeftSquareBracket => {
                         self.right_value_p = Some(RightValueP::default());
                         self.state = State::RightValue;
-                        return self.right_value_p.as_mut().unwrap().parse(token);
+                        let p = self.right_value_p.as_mut().unwrap();
+                        match p.parse(token) {
+                            PResult::End => {
+                                if let Some(child_m) = p.flush() {
+                                    self.buffer = Some(KeyValue::new(&self.temp_key, &child_m));
+                                    self.right_value_p = None;
+                                    self.state = State::End;
+                                    return PResult::End;
+                                } else {
+                                    return PResult::Err(
+                                        self.log_snapshot()
+                                            .str("place_of_occurrence", "key_value.rs.209.")
+                                            .int(
+                                                "column_number",
+                                                usize_to_i128(token.column_number),
+                                            )
+                                            .str("token", &format!("{:?}", token))
+                                            .clone(),
+                                    );
+                                }
+                            }
+                            PResult::Err(mut table) => {
+                                return PResult::Err(
+                                    table
+                                        .sub_t(
+                                            &random_name(),
+                                            self.log_snapshot()
+                                                .str("via", "key_value.rs.187.")
+                                                .int(
+                                                    "column_number",
+                                                    usize_to_i128(token.column_number),
+                                                )
+                                                .str("token", &format!("{:?}", token)),
+                                        )
+                                        .clone(),
+                                )
+                            }
+                            PResult::Ongoing => {}
+                        }
                     }
                     // `'`.
                     TokenType::SingleQuotation => {
                         self.right_value_p = Some(RightValueP::default());
                         self.state = State::RightValue;
-                        return self.right_value_p.as_mut().unwrap().parse(token);
+                        let p = self.right_value_p.as_mut().unwrap();
+                        match p.parse(token) {
+                            PResult::End => {
+                                if let Some(child_m) = p.flush() {
+                                    self.buffer = Some(KeyValue::new(&self.temp_key, &child_m));
+                                    self.right_value_p = None;
+                                    self.state = State::End;
+                                    return PResult::End;
+                                } else {
+                                    return PResult::Err(
+                                        self.log_snapshot()
+                                            .str("place_of_occurrence", "key_value.rs.253.")
+                                            .int(
+                                                "column_number",
+                                                usize_to_i128(token.column_number),
+                                            )
+                                            .str("token", &format!("{:?}", token))
+                                            .clone(),
+                                    );
+                                }
+                            }
+                            PResult::Err(mut table) => {
+                                return PResult::Err(
+                                    table
+                                        .sub_t(
+                                            &random_name(),
+                                            self.log_snapshot()
+                                                .str("via", "key_value.rs.187.")
+                                                .int(
+                                                    "column_number",
+                                                    usize_to_i128(token.column_number),
+                                                )
+                                                .str("token", &format!("{:?}", token)),
+                                        )
+                                        .clone(),
+                                )
+                            }
+                            PResult::Ongoing => {}
+                        }
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
                     _ => {
