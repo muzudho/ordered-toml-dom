@@ -3,7 +3,6 @@
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::LiteralString,
     layer225::RightValue,
 };
 use crate::parser::phase200::{

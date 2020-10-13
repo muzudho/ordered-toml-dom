@@ -40,6 +40,7 @@ impl LiteralStringP {
         }
         PResult::Ongoing
     }
+    /*
     pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
@@ -47,4 +48,5 @@ impl LiteralStringP {
         }
         t
     }
+    */
 }
