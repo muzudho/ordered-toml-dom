@@ -28,16 +28,16 @@ pub enum State {
 impl KeyValueP {
     pub fn new(key: &Token) -> Self {
         KeyValueP {
-            buffer: None,
+            product: None,
             right_value_p: None,
-            temp_key: key.clone(),
             state: State::AfterKey,
+            temp_key: key.clone(),
         }
     }
 
     pub fn flush(&mut self) -> Option<KeyValue> {
-        let m = self.buffer.clone();
-        self.buffer = None;
+        let m = self.product.clone();
+        self.product = None;
         m
     }
 
@@ -118,7 +118,7 @@ impl KeyValueP {
                 match p.parse(token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(KeyValue::new(&self.temp_key, &child_m));
+                            self.product = Some(KeyValue::new(&self.temp_key, &child_m));
                             self.right_value_p = None;
                             self.state = State::End;
                             return PResult::End;
@@ -162,6 +162,7 @@ impl KeyValueP {
     }
     pub fn log_snapshot(&self) -> Table {
         let mut t = Table::default()
+            .str("product", &format!("{:?}", &self.product))
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(right_value_p) = &self.right_value_p {

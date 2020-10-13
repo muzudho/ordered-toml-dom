@@ -32,9 +32,9 @@ impl Default for RightValueP {
     fn default() -> Self {
         RightValueP {
             array_p: None,
-            buffer: None,
             double_quoted_string_p: None,
             inline_table_p: None,
+            buffer: None,
             single_quoted_string_p: None,
             state: State::First,
         }

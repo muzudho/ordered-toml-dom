@@ -238,7 +238,7 @@ impl DocumentElementP {
                         } else {
                             return PResult::Err(
                                 self.log_snapshot()
-                                    .str("place_of_occurrence", "document_element.rs.222.")
+                                    .str("place_of_occurrence", "document_element.rs.222./KeyValueSyntax p.flush() is None.")
                                     .int("column_number", usize_to_i128(token.column_number))
                                     .str("token", &format!("{:?}", token))
                                     .clone(),
