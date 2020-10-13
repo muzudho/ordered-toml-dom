@@ -9,6 +9,7 @@ use crate::model::{
     layer210::{Comment, DoubleQuotedString, LiteralString, SingleQuotedString},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
+use crate::parser::phase200::layer210::double_quoted_string::State as DoubleQuotedStringState;
 use casual_logger::Table as LogTable;
 
 /// Comment parser.  
@@ -27,6 +28,7 @@ pub struct CommentP {
 #[derive(Clone)]
 pub struct DoubleQuotedStringP {
     buffer: Option<DoubleQuotedString>,
+    state: DoubleQuotedStringState,
 }
 
 /// Header of array of table syntax parser.  

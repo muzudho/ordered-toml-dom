@@ -69,9 +69,16 @@ fn main() {
 
     // WIP. Read a string.
     // 作業中。 文字列読取。
+    //
+    // "pie"
     if let Some(apple) = doc.get_str_by_key("apple") {
         println!("apple = {}", apple);
         // apple = pie
+    }
+    // "., ={}[]'\"\\!?"
+    if let Some(double_quoted_punctuation) = doc.get_str_by_key("double_quoted_punctuation") {
+        println!("double_quoted_punctuation = {}", double_quoted_punctuation);
+        // double_quoted_punctuation = ., ={}[]'"\!?
     }
 
     // Read a boolean.
@@ -89,7 +96,14 @@ fn main() {
 
 ## TODO
 
-* [x] Parsing a literal string containing dots. Example: `3.14`.  
-    ドットを含むリテラル文字列の解析。例： `3.14`。
-* [ ] Double quoted string.
-* [ ] Single quoted string.
+* [ ] String
+  * [x] Parsing a literal string containing dots. Example: `3.14`.  
+      ドットを含むリテラル文字列の解析。例： `3.14`。
+  * [x] Double quoted string.
+  * [ ] Triple double quoted string.
+  * [ ] Single quoted string.
+  * [ ] Triple single quoted string.
+  * [x] Double quoted punctuation.
+  * [ ] Triple double quoted punctuation.
+  * [ ] Single quoted punctuation.
+  * [ ] Triple single quoted punctuation.

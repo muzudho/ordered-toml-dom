@@ -40,6 +40,8 @@ impl fmt::Debug for TokenLine {
 /// トークンの種類。  
 #[derive(Clone, Copy, Debug)]
 pub enum TokenType {
+    /// \  
+    Backslash,
     /// }  
     CloseCurlyBracket,
     /// ,  

@@ -26,9 +26,16 @@ fn main() {
 
     // WIP. Read a string.
     // 作業中。 文字列読取。
+    //
+    // "pie"
     if let Some(apple) = doc.get_str_by_key("apple") {
         println!("apple = {}", apple);
         // apple = pie
+    }
+    // "., ={}[]'\"\\!?"
+    if let Some(double_quoted_punctuation) = doc.get_str_by_key("double_quoted_punctuation") {
+        println!("double_quoted_punctuation = {}", double_quoted_punctuation);
+        // double_quoted_punctuation = ., ={}[]'"\!?
     }
 
     // Read a boolean.

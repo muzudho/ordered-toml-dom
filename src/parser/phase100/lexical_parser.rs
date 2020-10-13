@@ -103,6 +103,9 @@ impl LexicalParser {
                 self.buf_token_type = TokenType::WhiteSpace;
                 self.state = Some(LineMachineState::WhiteSpace);
             }
+            '\\' => {
+                self.buf_token_type = TokenType::Backslash;
+            }
             ',' => {
                 self.buf_token_type = TokenType::Comma;
             }

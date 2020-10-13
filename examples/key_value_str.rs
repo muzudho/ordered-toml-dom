@@ -36,6 +36,130 @@ fn main() {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 
+    // Test.
+    let key = "double_quoted_letter";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value != "Hello, world!!" {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "triple_double_quoted_letter";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value
+            != "Hello,
+world!!"
+        {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "single_quoted_letter";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value != "Hello, world!!" {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "triple_single_quoted_letter";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value
+            != "Hello,
+world!!"
+        {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "double_quoted_punctuation";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value != "., ={}[]'\"\\!?" {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "triple_double_quoted_punctuation";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value
+            != "., ={}[]'\"\\
+!?"
+        {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "single_quoted_punctuation";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value != "., ={}[]\"\\!?" {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
+    // Test.
+    let key = "triple_single_quoted_punctuation";
+    if let Some(right_value) = doc.get_str_by_key(key) {
+        if right_value
+            != "., ={}[]'\"\\
+!?"
+        {
+            Log::error_t(
+                &format!("Test: {}", key),
+                Table::default().str(key, &format!("{:?}", right_value)),
+            );
+        }
+    } else {
+        has_error = true;
+        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+    }
+
     // Error handling.
     if has_error {
         Log::info_toml_document(toml_file, &doc);

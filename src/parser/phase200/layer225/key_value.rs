@@ -1,5 +1,11 @@
 //! Key value syntax parser.  
 //! キー値構文パーサー。  
+//!
+//! # Examples
+//!
+//! ```
+//! // key = right_value
+//! ```
 
 use crate::model::{
     layer110::token::{Token, TokenType},
@@ -13,10 +19,8 @@ use crate::parser::phase200::{
 use crate::util::random_name;
 use casual_logger::Table;
 
-/// Key value syntax machine state.  
-/// キー値構文状態遷移。  
-///
-/// Example: `key = right_value`.  
+/// Syntax machine state.  
+/// 構文状態遷移。  
 #[derive(Debug)]
 pub enum State {
     // After key.
