@@ -62,9 +62,13 @@ fn main() {
         println!("age = {}", age);
         // age = 40
     }
+    if let Some(age) = doc.get_f64_by_key("weight") {
+        println!("weight = {}", age);
+        // weight = 93.5
+    }
 
-    // Read a string.
-    // 文字列読取。
+    // WIP. Read a string.
+    // 作業中。 文字列読取。
     if let Some(apple) = doc.get_str_by_key("apple") {
         println!("apple = {}", apple);
         // apple = pie
@@ -85,5 +89,7 @@ fn main() {
 
 ## TODO
 
-* [ ] Parsing a literal string containing dots. Example: `3.14`.  
+* [x] Parsing a literal string containing dots. Example: `3.14`.  
     ドットを含むリテラル文字列の解析。例： `3.14`。
+* [ ] Double quoted string.
+* [ ] Single quoted string.

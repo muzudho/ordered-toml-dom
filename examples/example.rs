@@ -21,11 +21,11 @@ fn main() {
     }
     if let Some(age) = doc.get_f64_by_key("weight") {
         println!("weight = {}", age);
-        // age = 93.5
+        // weight = 93.5
     }
 
-    // Read a string.
-    // 文字列読取。
+    // WIP. Read a string.
+    // 作業中。 文字列読取。
     if let Some(apple) = doc.get_str_by_key("apple") {
         println!("apple = {}", apple);
         // apple = pie

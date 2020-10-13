@@ -167,7 +167,23 @@ impl RightValueP {
                         self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
                         self.state = State::DoubleQuotedString;
                     }
-                    TokenType::KeyWithoutDot => {
+                    // `{`.
+                    TokenType::LeftCurlyBracket => {
+                        self.inline_table_p = Some(InlineTableP::default());
+                        self.state = State::AfterLeftCurlyBracket;
+                    }
+                    // `[`.
+                    TokenType::LeftSquareBracket => {
+                        self.array_p = Some(ArrayP::default());
+                        self.state = State::AfterLeftSquareBracket;
+                    }
+                    // `'`.
+                    TokenType::SingleQuotation => {
+                        self.single_quoted_string_p = Some(SingleQuotedStringP::new());
+                        self.state = State::SingleQuotedString;
+                    }
+                    TokenType::WhiteSpace => {} //Ignored it.
+                    TokenType::KeyWithoutDot | _ => {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                         let p = self.literal_string_p.as_mut().unwrap();
@@ -203,26 +219,6 @@ impl RightValueP {
                             }
                             PResult::Ongoing => {}
                         }
-                    }
-                    // `{`.
-                    TokenType::LeftCurlyBracket => {
-                        self.inline_table_p = Some(InlineTableP::default());
-                        self.state = State::AfterLeftCurlyBracket;
-                    }
-                    // `[`.
-                    TokenType::LeftSquareBracket => {
-                        self.array_p = Some(ArrayP::default());
-                        self.state = State::AfterLeftSquareBracket;
-                    }
-                    // `'`.
-                    TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(SingleQuotedStringP::new());
-                        self.state = State::SingleQuotedString;
-                    }
-                    TokenType::WhiteSpace => {} //Ignored it.
-                    _ => {
-                        self.literal_string_p = Some(LiteralStringP::new());
-                        self.state = State::LiteralString;
                     }
                 }
             }
