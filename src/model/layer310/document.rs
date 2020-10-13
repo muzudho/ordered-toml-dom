@@ -2,7 +2,7 @@
 //! ドキュメント・モデル。  
 
 use crate::model::layer210::LiteralString;
-use crate::model::layer220::RightValue;
+use crate::model::layer225::RightValue;
 use crate::model::layer230::DocumentElement::KeyValue;
 use crate::model::{layer230::DocumentElement, layer310::Document};
 use std::fmt;

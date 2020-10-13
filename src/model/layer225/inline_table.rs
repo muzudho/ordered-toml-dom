@@ -7,7 +7,7 @@
 //! // { name="a", pass="b", age=3 }
 //! ```
 
-use crate::model::layer220::{InlineTable, KeyValue};
+use crate::model::layer225::{InlineTable, KeyValue};
 use std::fmt;
 
 impl Default for InlineTable {

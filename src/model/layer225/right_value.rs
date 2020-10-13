@@ -1,7 +1,7 @@
 //! Right value model.  
 //! 右値モデル。  
 
-use crate::model::layer220::RightValue;
+use crate::model::layer225::RightValue;
 use std::fmt;
 
 impl fmt::Debug for RightValue {
