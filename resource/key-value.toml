@@ -3,7 +3,7 @@
 
 int_1 = 1 
 int_2 = 123 
-float_1 = 1.1 
+pi_1 = 3.14 
 float_2 = 12.34 
 sqstr_1 = 'a' 
 sqstr_2 = 'A' # Comment 1.

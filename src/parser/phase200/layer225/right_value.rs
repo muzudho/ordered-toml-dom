@@ -167,6 +167,43 @@ impl RightValueP {
                         self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
                         self.state = State::DoubleQuotedString;
                     }
+                    TokenType::KeyWithoutDot => {
+                        self.literal_string_p = Some(LiteralStringP::new());
+                        self.state = State::LiteralString;
+                        let p = self.literal_string_p.as_mut().unwrap();
+                        match p.parse(token) {
+                            PResult::End => {
+                                if let Some(child_m) = p.flush() {
+                                    self.buffer = Some(RightValue::LiteralString(child_m));
+                                    self.literal_string_p = None;
+                                    self.state = State::End;
+                                    return PResult::End;
+                                } else {
+                                    return PResult::Err(
+                                        self.log_snapshot()
+                                            .str("place_of_occurrence", "right_value.rs.185.")
+                                            .int(
+                                                "column_number",
+                                                usize_to_i128(token.column_number),
+                                            )
+                                            .str("token", &format!("{:?}", token))
+                                            .clone(),
+                                    );
+                                }
+                            }
+                            PResult::Err(table) => {
+                                return PResult::Err(
+                                    self.log_snapshot()
+                                        .str("place_of_occurrence", "right_value.rs.198.")
+                                        .int("column_number", usize_to_i128(token.column_number))
+                                        .str("token", &format!("{:?}", token))
+                                        .sub_t("error", &table)
+                                        .clone(),
+                                )
+                            }
+                            PResult::Ongoing => {}
+                        }
+                    }
                     // `{`.
                     TokenType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());

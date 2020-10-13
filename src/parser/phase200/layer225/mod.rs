@@ -31,9 +31,9 @@ pub struct InlineTableP {
 /// `key = value`.  
 pub struct KeyValueP {
     buffer: Option<KeyValue>,
+    key: Token,
     right_value_p: Option<RightValueP>,
     state: KeyValueState,
-    temp_key: Token,
 }
 
 /// Right value syntax parser.  

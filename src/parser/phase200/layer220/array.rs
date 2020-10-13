@@ -200,7 +200,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralString::new(token));
+                        m.push_literal_string(&LiteralString::from_token(token));
                         self.state = State::AfterKeyWithoutDot;
                         Log::trace_t(
                             "ArrayP#parse| [ literal, -> KeyWithoutDot",
@@ -342,7 +342,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralString::new(token));
+                        m.push_literal_string(&LiteralString::from_token(token));
                         self.state = State::AfterKeyWithoutDot;
                         Log::trace_t(
                             "ArrayP#parse| [ -> KeyWithoutDot",

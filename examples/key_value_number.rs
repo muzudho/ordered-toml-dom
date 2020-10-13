@@ -33,7 +33,10 @@ fn main() {
         }
     } else {
         has_error = true;
-        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+        Log::error_t(
+            &format!("Test: |{}| is not found.", key),
+            Table::default().str(key, ""),
+        );
     }
 
     // Test.
@@ -47,11 +50,14 @@ fn main() {
         }
     } else {
         has_error = true;
-        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+        Log::error_t(
+            &format!("Test: |{}| is not found.", key),
+            Table::default().str(key, ""),
+        );
     }
 
     // Test.
-    let key = "float_1";
+    let key = "pi_1";
     if let Some(number) = doc.get_f64_by_key(key) {
         if number != 3.14 {
             Log::error_t(
@@ -61,7 +67,10 @@ fn main() {
         }
     } else {
         has_error = true;
-        Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
+        Log::error_t(
+            &format!("Test: |{}| is not found.", key),
+            Table::default().str(key, ""),
+        );
     }
 
     // Error handling.

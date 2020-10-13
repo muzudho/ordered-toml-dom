@@ -32,7 +32,7 @@ fn main() {
     }
 
     // Test.
-    let key = "float_1";
+    let key = "pi_1";
     if let Some(elem) = doc.get_right_value_by_key(key) {
         Log::info_t("Test.2.", Table::default().str(key, &format!("{:?}", elem)));
     } else {

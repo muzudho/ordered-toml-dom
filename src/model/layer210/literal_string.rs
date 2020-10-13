@@ -18,7 +18,7 @@ impl Default for LiteralString {
     }
 }
 impl LiteralString {
-    pub fn new(token: &Token) -> Self {
+    pub fn from_token(token: &Token) -> Self {
         LiteralString {
             value: token.value.to_string(),
         }

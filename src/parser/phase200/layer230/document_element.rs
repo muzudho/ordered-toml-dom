@@ -202,7 +202,7 @@ impl DocumentElementP {
                 TokenType::LeftSquareBracket => {
                     self.state = State::AfterLeftSquareBracket;
                 }
-                // `true`
+                // `abc`
                 TokenType::KeyWithoutDot => {
                     self.key_value_p = Some(KeyValueP::new(&token));
                     self.state = State::KeyValueSyntax;
