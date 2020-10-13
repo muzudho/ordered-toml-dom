@@ -30,7 +30,7 @@ pub struct InlineTableP {
 ///
 /// `key = value`.  
 pub struct KeyValueP {
-    product: Option<KeyValue>,
+    buffer: Option<KeyValue>,
     right_value_p: Option<RightValueP>,
     state: KeyValueState,
     temp_key: Token,
