@@ -11,7 +11,7 @@ use crate::parser::phase200::{
     layer225::{InlineTableP, RightValueP},
 };
 use crate::util::random_name;
-use casual_logger::Table;
+use casual_logger::Table as LogTable;
 
 /// Key value syntax machine state.  
 /// キー値構文状態遷移。  
@@ -65,27 +65,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "right_value.rs.113.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return self.err_after_left_curly_bracket_empty_flush(token);
                         }
                     }
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "right_value.rs.126.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
+                        return self.err_after_left_curly_bracket_via(token, &mut table)
                     }
                     PResult::Ongoing => {}
                 }
@@ -101,27 +85,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "right_value.rs.149.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return self.err_after_left_square_bracket_empty_flush(token);
                         }
                     }
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "right_value.rs.162.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
+                        return self.err_after_left_square_bracket_via(token, &mut table)
                     }
                     PResult::Ongoing => {}
                 }
@@ -137,24 +105,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "right_value.rs.185.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return self.err_double_quoted_string_empty_flush(token);
                         }
                     }
-                    PResult::Err(table) => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "right_value.rs.195.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
-                                .clone(),
-                        )
+                    PResult::Err(mut table) => {
+                        return self.err_double_quoted_string_via(token, &mut table)
                     }
                     PResult::Ongoing => {}
                 }
@@ -194,27 +149,11 @@ impl RightValueP {
                                     self.state = State::End;
                                     return PResult::End;
                                 } else {
-                                    return PResult::Err(
-                                        self.log_snapshot()
-                                            .str("place_of_occurrence", "right_value.rs.185.")
-                                            .int(
-                                                "column_number",
-                                                usize_to_i128(token.column_number),
-                                            )
-                                            .str("token", &format!("{:?}", token))
-                                            .clone(),
-                                    );
+                                    return self.err_parse_key_without_dot_empty_flush(token);
                                 }
                             }
-                            PResult::Err(table) => {
-                                return PResult::Err(
-                                    self.log_snapshot()
-                                        .str("place_of_occurrence", "right_value.rs.198.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token))
-                                        .sub_t("error", &table)
-                                        .clone(),
-                                )
+                            PResult::Err(mut table) => {
+                                return self.err_parse_key_without_dot_via(token, &mut table)
                             }
                             PResult::Ongoing => {}
                         }
@@ -232,24 +171,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "right_value.rs.205.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return self.err_parse_literal_string_empty_flush(token);
                         }
                     }
-                    PResult::Err(table) => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "right_value.rs.215.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .sub_t("error", &table)
-                                .clone(),
-                        )
+                    PResult::Err(mut table) => {
+                        return self.err_parse_literal_string_via(token, &mut table)
                     }
                     PResult::Ongoing => {}
                 }
@@ -265,45 +191,26 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "right_value.rs.218.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return self.err_parse_single_quoted_string_empty_flush(token);
                         }
                     }
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "right_value.rs.231.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
+                        return self.err_parse_single_quoted_string_via(token, &mut table)
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "right_value.rs.244.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return self.err_parse_end(token);
             }
         }
         PResult::Ongoing
     }
-    pub fn log_snapshot(&self) -> Table {
-        let mut t = Table::default()
+
+    /// Log.  
+    /// ログ。  
+    pub fn log_snapshot(&self) -> LogTable {
+        let mut t = LogTable::default()
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
@@ -323,5 +230,202 @@ impl RightValueP {
             );
         }
         t
+    }
+
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_after_left_curly_bracket_empty_flush(&self, token: &Token) -> PResult {
+        PResult::Err(
+            self.log_snapshot()
+                .str(
+                    "place_of_occurrence",
+                    "right_value.rs/err_after_left_curly_bracket_empty_flush",
+                )
+                .int("column_number", usize_to_i128(token.column_number))
+                .str("token", &format!("{:?}", token))
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_after_left_curly_bracket_via(&self, token: &Token, table: &mut LogTable) -> PResult {
+        PResult::Err(
+            table
+                .sub_t(
+                    &random_name(),
+                    self.log_snapshot()
+                        .str("via", "right_value.rs/err_after_left_curly_bracket_via")
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
+                )
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_after_left_square_bracket_empty_flush(&self, token: &Token) -> PResult {
+        PResult::Err(
+            self.log_snapshot()
+                .str(
+                    "place_of_occurrence",
+                    "right_value.rs/err_after_left_square_bracket_empty_flush",
+                )
+                .int("column_number", usize_to_i128(token.column_number))
+                .str("token", &format!("{:?}", token))
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_after_left_square_bracket_via(&self, token: &Token, table: &mut LogTable) -> PResult {
+        PResult::Err(
+            table
+                .sub_t(
+                    &random_name(),
+                    self.log_snapshot()
+                        .str("via", "right_value.rs/err_after_left_square_bracket_via")
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
+                )
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_double_quoted_string_empty_flush(&self, token: &Token) -> PResult {
+        PResult::Err(
+            self.log_snapshot()
+                .str(
+                    "place_of_occurrence",
+                    "right_value.rs/err_double_quoted_string_empty_flush",
+                )
+                .int("column_number", usize_to_i128(token.column_number))
+                .str("token", &format!("{:?}", token))
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_double_quoted_string_via(&self, token: &Token, table: &mut LogTable) -> PResult {
+        PResult::Err(
+            table
+                .sub_t(
+                    &random_name(),
+                    self.log_snapshot()
+                        .str(
+                            "place_of_occurrence",
+                            "right_value.rs/err_double_quoted_string_via",
+                        )
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
+                )
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_parse_key_without_dot_empty_flush(&self, token: &Token) -> PResult {
+        PResult::Err(
+            self.log_snapshot()
+                .str(
+                    "place_of_occurrence",
+                    "right_value.rs/err_parse_key_without_dot_empty_flush",
+                )
+                .int("column_number", usize_to_i128(token.column_number))
+                .str("token", &format!("{:?}", token))
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_parse_key_without_dot_via(&self, token: &Token, table: &mut LogTable) -> PResult {
+        PResult::Err(
+            table
+                .sub_t(
+                    &random_name(),
+                    self.log_snapshot()
+                        .str(
+                            "place_of_occurrence",
+                            "right_value.rs/err_parse_key_without_dot_via",
+                        )
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token))
+                        .sub_t("error", &table),
+                )
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_parse_literal_string_empty_flush(&self, token: &Token) -> PResult {
+        PResult::Err(
+            self.log_snapshot()
+                .str(
+                    "place_of_occurrence",
+                    "right_value.rs/err_parse_literal_string_empty_flush",
+                )
+                .int("column_number", usize_to_i128(token.column_number))
+                .str("token", &format!("{:?}", token))
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_parse_literal_string_via(&self, token: &Token, table: &mut LogTable) -> PResult {
+        PResult::Err(
+            table
+                .sub_t(
+                    &random_name(),
+                    self.log_snapshot()
+                        .str(
+                            "place_of_occurrence",
+                            "right_value.rs/err_parse_literal_string_via",
+                        )
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token))
+                        .sub_t("error", &table),
+                )
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_parse_single_quoted_string_empty_flush(&self, token: &Token) -> PResult {
+        PResult::Err(
+            self.log_snapshot()
+                .str(
+                    "place_of_occurrence",
+                    "right_value.rs/err_parse_single_quoted_string_empty_flush",
+                )
+                .int("column_number", usize_to_i128(token.column_number))
+                .str("token", &format!("{:?}", token))
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_parse_single_quoted_string_via(&self, token: &Token, table: &mut LogTable) -> PResult {
+        PResult::Err(
+            table
+                .sub_t(
+                    &random_name(),
+                    self.log_snapshot()
+                        .str("via", "right_value.rs/err_parse_single_quoted_string_via")
+                        .int("column_number", usize_to_i128(token.column_number))
+                        .str("token", &format!("{:?}", token)),
+                )
+                .clone(),
+        )
+    }
+    /// Error message.  
+    /// エラー・メッセージ。  
+    fn err_parse_end(&self, token: &Token) -> PResult {
+        PResult::Err(
+            self.log_snapshot()
+                .str("place_of_occurrence", "right_value.rs/err_parse_end")
+                .int("column_number", usize_to_i128(token.column_number))
+                .str("token", &format!("{:?}", token))
+                .clone(),
+        )
     }
 }
