@@ -11,7 +11,7 @@ use casual_logger::Table;
 impl Default for DocumentLineScanner {
     fn default() -> Self {
         DocumentLineScanner {
-            document_element_p: DocumentElementP::default(),
+            document_element_p: None,
         }
     }
 }
@@ -22,10 +22,15 @@ impl DocumentLineScanner {
     ///                             結果。
     pub fn scan_line(&mut self, token_line: &TokenLine, doc: &mut Document) -> PResult {
         for (_i, token) in token_line.tokens.iter().enumerate() {
-            match self.document_element_p.parse(token) {
+            if let None = self.document_element_p {
+                self.document_element_p = Some(DocumentElementP::default());
+            }
+            let p = self.document_element_p.as_mut().unwrap();
+            match p.parse(token) {
                 PResult::End => {
-                    if let Some(m) = self.document_element_p.flush() {
+                    if let Some(m) = p.flush() {
                         doc.push_element(&m);
+                        self.document_element_p = None;
                     } else {
                         // TODO 何も取得できないことがある？
                         /*
@@ -47,7 +52,9 @@ impl DocumentLineScanner {
     /// ログ。  
     pub fn log(&self) -> Table {
         let mut t = Table::default();
-        t.sub_t("document_element_p", &self.document_element_p.log());
+        if let Some(p) = &self.document_element_p {
+            t.sub_t("document_element_p", &p.log());
+        }
         t
     }
 }
