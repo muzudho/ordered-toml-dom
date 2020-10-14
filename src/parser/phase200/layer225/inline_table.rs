@@ -43,7 +43,7 @@ impl InlineTableP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> PResult {
+    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
             // After `{`.
             State::First => {
@@ -64,7 +64,7 @@ impl InlineTableP {
             // `apple.banana`.
             State::KeyValue => {
                 let p = self.key_value_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer.as_mut().unwrap().push_key_value(&child_m);

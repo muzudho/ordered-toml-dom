@@ -68,7 +68,7 @@ impl ArrayP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> PResult {
+    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
             // After `]`.
             State::AfterArray => {
@@ -161,7 +161,7 @@ impl ArrayP {
             // `[array]`.
             State::Array => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -242,7 +242,7 @@ impl ArrayP {
             // "dog".
             State::DoubleQuotedString => {
                 let p = self.double_quoted_string_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {

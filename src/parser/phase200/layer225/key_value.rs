@@ -50,7 +50,7 @@ impl KeyValueP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> PResult {
+    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
             // After key.
             State::First => {
@@ -71,7 +71,7 @@ impl KeyValueP {
             // After `=`.
             State::RightValue => {
                 let p = self.right_value_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(&self.key, &child_m));

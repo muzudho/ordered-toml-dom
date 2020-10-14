@@ -52,12 +52,12 @@ impl RightValueP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> PResult {
+    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
             // After `{`.
             State::AfterLeftCurlyBracket => {
                 let p = self.inline_table_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::InlineTable(child_m));
@@ -77,7 +77,7 @@ impl RightValueP {
             // After `[`.
             State::AfterLeftSquareBracket => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::Array(child_m));
@@ -97,7 +97,7 @@ impl RightValueP {
             // `"abc"`.
             State::DoubleQuotedString => {
                 let p = self.double_quoted_string_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::DoubleQuotedString(child_m));

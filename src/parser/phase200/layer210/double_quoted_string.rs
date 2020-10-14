@@ -53,7 +53,7 @@ impl DoubleQuotedStringP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> PResult {
+    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
             State::AfterBackslash => {
                 match token.type_ {

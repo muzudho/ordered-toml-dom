@@ -175,7 +175,7 @@ impl DocumentElementP {
             }
             State::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_key_value(&m));
