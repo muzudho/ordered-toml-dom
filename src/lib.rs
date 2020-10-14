@@ -27,7 +27,7 @@ mod util;
 use crate::model::layer310::Document;
 use crate::parser::{
     phase100::lexical_parser::LexicalParser,
-    phase200::{layer210::PResult, layer310::document_line_scanner::DocumentLineScanner},
+    phase200::{layer210::PResult, layer310::DocumentLineScanner},
 };
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;

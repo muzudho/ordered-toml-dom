@@ -4,15 +4,10 @@
 use crate::model::{layer110::token::TokenLine, layer310::Document};
 use crate::parser::phase200::{
     error_via,
-    {layer210::PResult, layer230::DocumentElementP},
+    {layer210::PResult, layer230::DocumentElementP, layer310::DocumentLineScanner},
 };
 use casual_logger::Table;
 
-/// Document syntax parser.  
-/// ドキュメント構文解析器。  
-pub struct DocumentLineScanner {
-    pub document_element_p: DocumentElementP,
-}
 impl Default for DocumentLineScanner {
     fn default() -> Self {
         DocumentLineScanner {
