@@ -47,6 +47,16 @@ fn main() {
         );
         // double_quoted_escape_backslash = \
     }
+    // "\""
+    if let Some(double_quoted_escape_double_quotation) =
+        doc.get_str_by_key("double_quoted_escape_double_quotation")
+    {
+        println!(
+            "double_quoted_escape_double_quotation = {}",
+            double_quoted_escape_double_quotation
+        );
+        // double_quoted_escape_double_quotation = \
+    }
     // "., ={}[]'\"\\!?"
     if let Some(double_quoted_punctuation) = doc.get_str_by_key("double_quoted_punctuation") {
         println!("double_quoted_punctuation = {}", double_quoted_punctuation);

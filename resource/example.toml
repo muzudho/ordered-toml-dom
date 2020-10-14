@@ -6,17 +6,20 @@ student = false
 
 double_quoted_empty = ""
 double_quoted_escape_backslash = "\\"
+double_quoted_escape_double_quotation = "\""
 double_quoted_letter = "Hello, world!!"
+double_quoted_punctuation = "., ={}[]'\"\\!?"
+
 triple_double_quoted_letter = """Hello,
 world!!"""
+
 single_quoted_empty = ''
 single_quoted_letter = 'Hello, world!!'
+single_quoted_punctuation = '., ={}[]"\!?'
+
 triple_single_quoted_letter = '''Hello,
 world!!'''
-
-double_quoted_punctuation = "., ={}[]'\"\\!?"
 triple_double_quoted_punctuation = """., ={}[]'"\\
 !?"""
-single_quoted_punctuation = '., ={}[]"\!?'
 triple_single_quoted_punctuation = '''., ={}[]'"\
 !?'''

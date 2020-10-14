@@ -26,8 +26,8 @@ use casual_logger::Table;
 pub enum State {
     // After `\`.
     // `\` の後。
-    AfterBackslash,
-    Contents,
+    SingleLineAfterBackslash,
+    SingleLine,
     End,
     // After double quotation.
     // 二重引用符の後。
@@ -52,7 +52,7 @@ impl DoubleQuotedStringP {
     ///                             結果。
     pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
-            State::AfterBackslash => {
+            State::SingleLineAfterBackslash => {
                 match token.type_ {
                     // `"`
                     TokenType::EndOfLine => {
@@ -62,13 +62,13 @@ impl DoubleQuotedStringP {
                     }
                     _ => {
                         // Escaped.
-                        self.state = State::Contents;
+                        self.state = State::SingleLine;
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
                     }
                 }
             }
-            State::Contents => {
+            State::SingleLine => {
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
@@ -80,7 +80,7 @@ impl DoubleQuotedStringP {
                     TokenType::Backslash => {
                         // Escape sequence.
                         // エスケープ・シーケンス。
-                        self.state = State::AfterBackslash;
+                        self.state = State::SingleLineAfterBackslash;
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
@@ -115,12 +115,12 @@ impl DoubleQuotedStringP {
                     TokenType::Backslash => {
                         // Escape sequence.
                         // エスケープ・シーケンス。
-                        self.state = State::AfterBackslash;
+                        self.state = State::SingleLineAfterBackslash;
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
-                        self.state = State::Contents;
+                        self.state = State::SingleLine;
                     }
                 }
             }
