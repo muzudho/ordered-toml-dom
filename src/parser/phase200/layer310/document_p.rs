@@ -4,18 +4,18 @@
 use crate::model::{layer110::token::TokenLine, layer310::Document};
 use crate::parser::phase200::{
     error_via,
-    {layer210::PResult, layer230::DocumentElementP, layer310::DocumentLineScanner},
+    {layer210::PResult, layer230::DocumentElementP, layer310::DocumentP},
 };
 use casual_logger::Table;
 
-impl Default for DocumentLineScanner {
+impl Default for DocumentP {
     fn default() -> Self {
-        DocumentLineScanner {
+        DocumentP {
             document_element_p: None,
         }
     }
 }
-impl DocumentLineScanner {
+impl DocumentP {
     /// # Returns
     ///
     /// * `PResult` - Result.  

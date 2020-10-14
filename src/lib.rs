@@ -27,7 +27,7 @@ mod util;
 use crate::model::layer310::Document;
 use crate::parser::{
     phase100::lexical_parser::LexicalParser,
-    phase200::{layer210::PResult, layer310::DocumentLineScanner},
+    phase200::{layer210::PResult, layer310::DocumentP},
 };
 use casual_logger::{ArrayOfTable, Log, Table};
 use regex::Regex;
@@ -53,6 +53,7 @@ impl Toml {
         let mut output_document = Document::default();
         match File::open(path) {
             Ok(file) => {
+                let mut document_p = DocumentP::default();
                 for (i, line) in BufReader::new(file).lines().enumerate() {
                     let row_number = i + 1;
                     let line = match line {
@@ -63,10 +64,7 @@ impl Toml {
                     let mut lexical_p = LexicalParser::new(row_number);
                     lexical_p.parse_line(&line);
 
-                    let mut document_line_scanner = DocumentLineScanner::default();
-                    match document_line_scanner
-                        .scan_line(&lexical_p.product(), &mut output_document)
-                    {
+                    match document_p.scan_line(&lexical_p.product(), &mut output_document) {
                         PResult::End => {} // Ignored it.
                         PResult::Err(table) => {
                             error_tables.push(
@@ -83,7 +81,7 @@ impl Toml {
                                     .str("line", &format!("{}", line))
                                     .str("token_line", &format!("{:?}", lexical_p))
                                     .sub_t("table", &table)
-                                    .sub_t("document_line_scanner", &document_line_scanner.log())
+                                    .sub_t("document_p", &document_p.log())
                                     .clone(),
                             );
                         }
