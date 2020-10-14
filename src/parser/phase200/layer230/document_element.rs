@@ -58,7 +58,7 @@ impl DocumentElementP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> PResult {
+    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
             State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
@@ -117,7 +117,7 @@ impl DocumentElementP {
             }
             State::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_comment(&m));
