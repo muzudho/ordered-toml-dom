@@ -12,11 +12,10 @@ use crate::model::{
     layer225::KeyValue,
 };
 use crate::parser::phase200::{
+    error, error_via,
     layer210::PResult,
-    layer220::usize_to_i128,
     layer225::{KeyValueP, RightValueP},
 };
-use crate::util::random_name;
 use casual_logger::Table as LogTable;
 
 /// Syntax machine state.  
@@ -61,7 +60,7 @@ impl KeyValueP {
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
                     }
-                    _ => return self.err_parse_first_otherwise(token),
+                    _ => return error(&mut self.log(), token, "key_value.rs.65."),
                 }
             }
             // After `=`.
@@ -80,23 +79,23 @@ impl KeyValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return self.err_parse_right_value_empty_flush(token);
+                            return error(&mut self.log(), token, "key_value.rs.84.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return self.err_parse_key_value_via(token, &mut table)
+                        return error_via(&mut table, &mut self.log(), token, "key_value.rs.88.")
                     }
                     PResult::Ongoing => {}
                 }
             }
-            State::End => return self.err_parse_end(token),
+            State::End => return error(&mut self.log(), token, "key_value.rs.93."),
         }
         PResult::Ongoing
     }
 
     /// Log.  
     /// ログ。  
-    pub fn log_snapshot(&self) -> LogTable {
+    pub fn log(&self) -> LogTable {
         let mut t = LogTable::default()
             .str("buffer", &format!("{:?}", &self.buffer))
             .str("state", &format!("{:?}", self.state))
@@ -105,63 +104,5 @@ impl KeyValueP {
             t.sub_t("right_value_p", &right_value_p.log());
         }
         t
-    }
-
-    /// Error message.  
-    /// エラー・メッセージ。  
-    fn err_parse_first_otherwise(&self, token: &Token) -> PResult {
-        PResult::Err(
-            self.log_snapshot()
-                .str(
-                    "place_of_occurrence",
-                    "key_value.rs/err_parse_first_otherwise",
-                )
-                .int("column_number", usize_to_i128(token.column_number))
-                .str("token", &format!("{:?}", token))
-                .clone(),
-        )
-    }
-
-    /// Error message.  
-    /// エラー・メッセージ。  
-    fn err_parse_right_value_empty_flush(&self, token: &Token) -> PResult {
-        PResult::Err(
-            self.log_snapshot()
-                .str(
-                    "place_of_occurrence",
-                    "key_value.rs/err_parse_right_value_empty_flush",
-                )
-                .int("column_number", usize_to_i128(token.column_number))
-                .str("token", &format!("{:?}", token))
-                .clone(),
-        )
-    }
-
-    /// Error message.  
-    /// エラー・メッセージ。  
-    fn err_parse_key_value_via(&self, token: &Token, table: &mut LogTable) -> PResult {
-        PResult::Err(
-            table
-                .sub_t(
-                    &random_name(),
-                    self.log_snapshot()
-                        .str("via", "key_value.rs.187.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                )
-                .clone(),
-        )
-    }
-
-    /// Error message.  
-    /// エラー・メッセージ。  
-    fn err_parse_end(&self, token: &Token) -> PResult {
-        PResult::Err(
-            self.log_snapshot()
-                .str("place_of_occurrence", "key_value.rs.312.")
-                .int("column_number", usize_to_i128(token.column_number))
-                .str("token", &format!("{:?}", token))
-                .clone(),
-        )
     }
 }

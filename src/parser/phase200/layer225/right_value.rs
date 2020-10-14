@@ -6,11 +6,11 @@ use crate::model::{
     layer225::RightValue,
 };
 use crate::parser::phase200::{
+    error, error_via,
     layer210::{DoubleQuotedStringP, LiteralStringP, PResult, SingleQuotedStringP},
-    layer220::{usize_to_i128, ArrayP},
+    layer220::ArrayP,
     layer225::{InlineTableP, RightValueP},
 };
-use crate::util::random_name;
 use casual_logger::Table as LogTable;
 
 /// Key value syntax machine state.  
@@ -226,7 +226,7 @@ impl RightValueP {
             );
         }
         if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t("inline_table", &inline_table_p.log_snapshot());
+            t.sub_t("inline_table", &inline_table_p.log());
         }
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
             t.sub_t(
@@ -236,37 +236,4 @@ impl RightValueP {
         }
         t
     }
-}
-
-/// Error message.  
-/// エラー・メッセージ。  
-fn error(table: &mut LogTable, token: &Token, place_of_occurrence: &str) -> PResult {
-    PResult::Err(
-        table
-            .str("place_of_occurrence", place_of_occurrence)
-            .int("column_number", usize_to_i128(token.column_number))
-            .str("token", &format!("{:?}", token))
-            .clone(),
-    )
-}
-
-/// Error message.  
-/// エラー・メッセージ。  
-fn error_via(
-    escalated_table1: &mut LogTable,
-    this_table: &mut LogTable,
-    token: &Token,
-    place_of_occurrence: &str,
-) -> PResult {
-    PResult::Err(
-        escalated_table1
-            .sub_t(
-                &random_name(),
-                this_table
-                    .str("via", place_of_occurrence)
-                    .int("column_number", usize_to_i128(token.column_number))
-                    .str("token", &format!("{:?}", token)),
-            )
-            .clone(),
-    )
 }
