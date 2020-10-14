@@ -12,8 +12,8 @@ use crate::model::{
     layer210::DoubleQuotedString,
 };
 use crate::parser::phase200::{
+    error,
     layer210::{DoubleQuotedStringP, PResult},
-    layer220::usize_to_i128,
 };
 use casual_logger::Table;
 
@@ -54,13 +54,7 @@ impl DoubleQuotedStringP {
                     TokenType::EndOfLine => {
                         // End of line.
                         // 行の終わり。
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "double_quoted_string.rs.59.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        );
+                        return error(&mut self.log(), token, "double_quoted_string.rs.59.");
                     }
                     _ => {
                         // Escaped.
@@ -71,13 +65,7 @@ impl DoubleQuotedStringP {
                 }
             }
             State::End => {
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "double_quoted_string.rs.66.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return error(&mut self.log(), token, "double_quoted_string.rs.66.");
             }
             State::First => {
                 match token.type_ {
@@ -103,7 +91,9 @@ impl DoubleQuotedStringP {
 
         PResult::Ongoing
     }
-    pub fn log_snapshot(&self) -> Table {
+    /// Log.  
+    /// ログ。  
+    pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));

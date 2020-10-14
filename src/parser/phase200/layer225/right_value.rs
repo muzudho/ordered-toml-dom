@@ -220,19 +220,13 @@ impl RightValueP {
             .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
         if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
-            t.sub_t(
-                "double_quoted_string",
-                &double_quoted_string_p.log_snapshot(),
-            );
+            t.sub_t("double_quoted_string", &double_quoted_string_p.log());
         }
         if let Some(inline_table_p) = &self.inline_table_p {
             t.sub_t("inline_table", &inline_table_p.log());
         }
         if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
-            t.sub_t(
-                "single_quoted_string",
-                &single_quoted_string_p.log_snapshot(),
-            );
+            t.sub_t("single_quoted_string", &single_quoted_string_p.log());
         }
         t
     }

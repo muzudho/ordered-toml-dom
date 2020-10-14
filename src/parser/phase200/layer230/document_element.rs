@@ -6,12 +6,11 @@ use crate::model::{
     layer230::DocumentElement,
 };
 use crate::parser::phase200::{
+    error, error_via,
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
-    layer220::usize_to_i128,
     layer225::KeyValueP,
     layer230::DocumentElementP,
 };
-use crate::util::random_name;
 use casual_logger::Table;
 
 /// Line syntax machine state.  
@@ -63,35 +62,17 @@ impl DocumentElementP {
         match self.state {
             State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "document_element.rs.66.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return error(&mut self.log(), token, "document_element.rs.66.");
             }
             State::AfterComment => {
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "document_element.rs.74.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return error(&mut self.log(), token, "document_element.rs.74.");
             }
             State::AfterKeyValue => match token.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
                 // `,`
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
-                    return PResult::Err(
-                        self.log_snapshot()
-                            .str("place_of_occurrence", "document_element.rs.84.")
-                            .int("column_number", usize_to_i128(token.column_number))
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    );
+                    return error(&mut self.log(), token, "document_element.rs.84.");
                 }
             },
             State::AfterLeftSquareBracket => match token.type_ {
@@ -108,13 +89,7 @@ impl DocumentElementP {
             },
             State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "document_element.rs.106.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return error(&mut self.log(), token, "document_element.rs.106.");
             }
             State::HeaderOfArrayOfTable => {
                 let p = self.header_p_of_array_of_table.as_mut().unwrap();
@@ -126,26 +101,15 @@ impl DocumentElementP {
                             self.state = State::AfterArrayOfTable;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "document_element.rs.123.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return error(&mut self.log(), token, "document_element.rs.123.");
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "document_element.rs.132.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            token,
+                            "document_element.rs.132.",
                         );
                     }
                     PResult::Ongoing => {}
@@ -161,26 +125,15 @@ impl DocumentElementP {
                             self.state = State::AfterComment;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "document_element.rs.153.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return error(&mut self.log(), token, "document_element.rs.153.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "document_element.rs.162.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            token,
+                            "document_element.rs.162.",
                         );
                     }
                     PResult::Ongoing => {}
@@ -218,13 +171,7 @@ impl DocumentElementP {
                 }
             },
             State::Finished => {
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "document_element.rs.205.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return error(&mut self.log(), token, "document_element.rs.205.");
             }
             State::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
@@ -236,27 +183,15 @@ impl DocumentElementP {
                             self.state = State::AfterKeyValue;
                             return PResult::End;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "document_element.rs.222./KeyValueSyntax p.flush() is None.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return error(&mut self.log(), token, "document_element.rs.222.");
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "document_element.rs.231.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token))
-                                        .sub_t("error", &table),
-                                )
-                                .clone(),
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            token,
+                            "document_element.rs.231.",
                         );
                     }
                     PResult::Ongoing => {}
@@ -266,13 +201,7 @@ impl DocumentElementP {
                 return self.parse_header_of_table(token);
             }
             State::Unimplemented => {
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "document_element.rs.246.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return error(&mut self.log(), token, "document_element.rs.246.");
             }
         }
 
@@ -290,34 +219,28 @@ impl DocumentElementP {
                     self.state = State::AfterTable;
                     return PResult::End;
                 } else {
-                    return PResult::Err(
-                        self.log_snapshot()
-                            .str("place_of_occurrence", "document_element.rs.269.")
-                            .int("column_number", usize_to_i128(token.column_number))
-                            .str("token", &format!("{:?}", token))
-                            .clone(),
-                    );
+                    return error(&mut self.log(), token, "document_element.rs.269.");
                 }
             } // Ignored it.
-            PResult::Err(table) => {
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "document_element.rs.278.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .sub_t("error", &table)
-                        .clone(),
+            PResult::Err(mut table) => {
+                return error_via(
+                    &mut table,
+                    &mut self.log(),
+                    token,
+                    "document_element.rs.278.",
                 );
             }
             PResult::Ongoing => PResult::Ongoing,
         }
     }
-    pub fn log_snapshot(&self) -> Table {
+    /// Log.  
+    /// ログ。  
+    pub fn log(&self) -> Table {
         let mut t = Table::default()
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(comment_p) = &self.comment_p {
-            t.sub_t("comment_p", &comment_p.log_snapshot());
+            t.sub_t("comment_p", &comment_p.log());
         }
         if let Some(key_value_p) = &self.key_value_p {
             t.sub_t("key_value_p", &key_value_p.log());

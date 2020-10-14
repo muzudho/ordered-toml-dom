@@ -34,7 +34,9 @@ impl CommentP {
         }
         PResult::Ongoing
     }
-    pub fn log_snapshot(&self) -> Table {
+    /// Log.  
+    /// ログ。  
+    pub fn log(&self) -> Table {
         let mut t = Table::default().str("Parse", "CommentP").clone();
         if let Some(m) = &self.buffer {
             t.str("buffer", &format!("{:?}", m));

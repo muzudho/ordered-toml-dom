@@ -38,7 +38,9 @@ impl SingleQuotedStringP {
         }
         PResult::Ongoing
     }
-    pub fn log_snapshot(&self) -> Table {
+    /// Log.  
+    /// ログ。  
+    pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
             t.str("value", &format!("{:?}", m));

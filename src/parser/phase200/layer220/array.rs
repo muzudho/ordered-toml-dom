@@ -13,11 +13,11 @@ use crate::model::{
     layer220::Array,
 };
 use crate::parser::phase200::{
+    error, error_via,
     layer210::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
-    layer220::{usize_to_i128, ArrayP},
+    layer220::ArrayP,
 };
-use crate::util::random_name;
-use casual_logger::{Log, Table};
+use casual_logger::Table;
 
 /// Array syntax machine state.  
 /// 配列構文状態遷移。  
@@ -72,13 +72,6 @@ impl ArrayP {
         match self.state {
             // After `]`.
             State::AfterArray => {
-                Log::trace_t(
-                    "ArrayP#parse| [array] -> this",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.76.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `,`.
@@ -90,15 +83,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.93.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+                    _ => return error(&mut self.log(), token, "array.rs.93."),
                 }
             }
             // After `[],`.
@@ -106,89 +91,36 @@ impl ArrayP {
                 match token.type_ {
                     // `[`.
                     TokenType::LeftSquareBracket => {
-                        Log::trace_t(
-                            "ArrayP#parse| [], -> [",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.108.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
-                    TokenType::WhiteSpace => {
-                        Log::trace_t(
-                            "ArrayP#parse| [], -> WhiteSpace",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.118.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
-                    } // Ignore it.
+                    TokenType::WhiteSpace => {} // Ignore it.
                     // `]`.
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.130.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+                    _ => return error(&mut self.log(), token, "array.rs.130."),
                 }
             }
             // `"a",` の次。
             State::AfterCommaBefindQuotedString => {
                 match token.type_ {
                     TokenType::DoubleQuotation => {
-                        Log::trace_t(
-                            "ArrayP#parse| \"a\", -> \"",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.144.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                         self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
                     TokenType::SingleQuotation => {
-                        Log::trace_t(
-                            "ArrayP#parse| \"a\", -> '",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.154.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
                         self.state = State::SingleQuotedString;
                     }
-                    TokenType::WhiteSpace => {
-                        Log::trace_t(
-                            "ArrayP#parse| \"a\", -> WhiteSpace",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.164.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
-                    } // Ignore it.
+                    TokenType::WhiteSpace => {} // Ignore it.
                     // `]`.
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.176.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+                    _ => return error(&mut self.log(), token, "array.rs.176."),
                 }
             }
             // After `literal,`.
@@ -202,49 +134,18 @@ impl ArrayP {
                         let m = self.buffer.as_mut().unwrap();
                         m.push_literal_string(&LiteralString::from_token(token));
                         self.state = State::AfterKeyWithoutDot;
-                        Log::trace_t(
-                            "ArrayP#parse| [ literal, -> KeyWithoutDot",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.197.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .str("buffer", &format!("{:?}", self.buffer)),
-                        );
                     }
-                    TokenType::WhiteSpace => {
-                        Log::trace_t(
-                            "ArrayP#parse| [ -> WhiteSpace",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.206.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
-                    } // Ignore it.
+                    TokenType::WhiteSpace => {} // Ignore it.
                     // `]`.
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.218.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+                    _ => return error(&mut self.log(), token, "array.rs.218."),
                 }
             }
             // After `"`.
             State::AfterDoubleQuotedString => {
-                Log::trace_t(
-                    "ArrayP#parse| \"value\" -> this",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.230.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
@@ -254,26 +155,11 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.245.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+                    _ => return error(&mut self.log(), token, "array.rs.245."),
                 }
             }
             // `[array]`.
             State::Array => {
-                Log::trace_t(
-                    "ArrayP#parse| [array]",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.257.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 let p = self.array_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -290,17 +176,7 @@ impl ArrayP {
                         self.state = State::AfterArray;
                     }
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "array.rs.283.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
+                        return error_via(&mut table, &mut self.log(), token, "array.rs.283.");
                     }
                     PResult::Ongoing => {}
                 }
@@ -315,24 +191,10 @@ impl ArrayP {
                     }
                     // `[`. Recursive.
                     TokenType::LeftSquareBracket => {
-                        Log::trace_t(
-                            "ArrayP#parse| [ -> [",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.305.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
                     TokenType::DoubleQuotation => {
-                        Log::trace_t(
-                            "ArrayP#parse| [ -> \"",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.315.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                         self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
@@ -344,82 +206,27 @@ impl ArrayP {
                         let m = self.buffer.as_mut().unwrap();
                         m.push_literal_string(&LiteralString::from_token(token));
                         self.state = State::AfterKeyWithoutDot;
-                        Log::trace_t(
-                            "ArrayP#parse| [ -> KeyWithoutDot",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.332.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .str("buffer", &format!("{:?}", self.buffer)),
-                        );
                     }
                     TokenType::SingleQuotation => {
-                        Log::trace_t(
-                            "ArrayP#parse| [ -> /'",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.341.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
                         self.state = State::SingleQuotedString;
                     }
-                    TokenType::WhiteSpace => {
-                        Log::trace_t(
-                            "ArrayP#parse| [ -> WhiteSpace",
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.351.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token)),
-                        );
-                    } // Ignore it.
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.358.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+                    TokenType::WhiteSpace => {} // Ignore it.
+                    _ => return error(&mut self.log(), token, "array.rs.358."),
                 }
             }
-            State::AfterKeyWithoutDot => {
-                Log::trace_t(
-                    "ArrayP#parse| KeyWithoutDot -> this",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.369.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
-                match token.type_ {
-                    TokenType::Comma => {
-                        self.state = State::AfterCommaBehindKeyWithoutDot;
-                    }
-                    TokenType::RightSquareBracket => {
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.383.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+            State::AfterKeyWithoutDot => match token.type_ {
+                TokenType::Comma => {
+                    self.state = State::AfterCommaBehindKeyWithoutDot;
                 }
-            }
+                TokenType::RightSquareBracket => {
+                    self.state = State::End;
+                    return PResult::End;
+                }
+                _ => return error(&mut self.log(), token, "array.rs.383."),
+            },
             // After `'`.
             State::AfterSingleQuotedString => {
-                Log::trace_t(
-                    "ArrayP#parse| 'value' -> this",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.395.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 match token.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
@@ -429,26 +236,11 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => {
-                        return PResult::Err(
-                            self.log_snapshot()
-                                .str("place_of_occurrence", "array.rs.410.")
-                                .int("column_number", usize_to_i128(token.column_number))
-                                .str("token", &format!("{:?}", token))
-                                .clone(),
-                        )
-                    }
+                    _ => return error(&mut self.log(), token, "array.rs.410."),
                 }
             }
             // "dog".
             State::DoubleQuotedString => {
-                Log::trace_t(
-                    "ArrayP#parse| \"value\"",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.422.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 let p = self.double_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -461,56 +253,20 @@ impl ArrayP {
                             self.double_quoted_string_p = None;
                             self.state = State::AfterDoubleQuotedString;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "array.rs.439.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return error(&mut self.log(), token, "array.rs.439.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "array.rs.448.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
+                        return error_via(&mut table, &mut self.log(), token, "array.rs.448.");
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                Log::trace_t(
-                    "ArrayP#parse| End",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.461.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
-                return PResult::Err(
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.466.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token))
-                        .clone(),
-                );
+                return error(&mut self.log(), token, "array.rs.466.");
             }
             // `'C:\temp'`.
             State::SingleQuotedString => {
-                Log::trace_t(
-                    "ArrayP#parse| 'value'",
-                    self.log_snapshot()
-                        .str("place_of_occurrence", "array.rs.476.")
-                        .int("column_number", usize_to_i128(token.column_number))
-                        .str("token", &format!("{:?}", token)),
-                );
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(token) {
                     PResult::End => {
@@ -523,27 +279,11 @@ impl ArrayP {
                             self.single_quoted_string_p = None;
                             self.state = State::AfterSingleQuotedString;
                         } else {
-                            return PResult::Err(
-                                self.log_snapshot()
-                                    .str("place_of_occurrence", "array.rs.493.")
-                                    .int("column_number", usize_to_i128(token.column_number))
-                                    .str("token", &format!("{:?}", token))
-                                    .clone(),
-                            );
+                            return error(&mut self.log(), token, "array.rs.493.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return PResult::Err(
-                            table
-                                .sub_t(
-                                    &random_name(),
-                                    self.log_snapshot()
-                                        .str("via", "array.rs.502.")
-                                        .int("column_number", usize_to_i128(token.column_number))
-                                        .str("token", &format!("{:?}", token)),
-                                )
-                                .clone(),
-                        )
+                        return error_via(&mut table, &mut self.log(), token, "array.rs.502.");
                     }
                     PResult::Ongoing => {}
                 }
@@ -551,20 +291,22 @@ impl ArrayP {
         }
         PResult::Ongoing
     }
-    pub fn log_snapshot(&self) -> Table {
+    /// Log.  
+    /// ログ。  
+    pub fn log(&self) -> Table {
         let mut t = Table::default()
             .str("parser", "ArrayP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
 
         if let Some(p) = &self.double_quoted_string_p {
-            t.sub_t("double_quoted_string_p", &p.log_snapshot());
+            t.sub_t("double_quoted_string_p", &p.log());
         }
         if let Some(p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string_p", &p.log_snapshot());
+            t.sub_t("single_quoted_string_p", &p.log());
         }
         if let Some(p) = &self.array_p {
-            t.sub_t("array_p", &p.log_snapshot());
+            t.sub_t("array_p", &p.log());
         }
 
         t
