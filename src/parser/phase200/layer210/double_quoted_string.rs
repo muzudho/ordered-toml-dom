@@ -24,14 +24,21 @@ use casual_logger::Table;
 /// 構文状態遷移。  
 #[derive(Debug, Clone)]
 pub enum State {
-    // After `\`.
-    // `\` の後。
-    SingleLineAfterBackslash,
-    SingleLine,
+    BeforeMultiLine,
     End,
     // After double quotation.
     // 二重引用符の後。
     First,
+    MultiLine,
+    // After `\`.
+    // `\` の後。
+    MultiLineAfterBackslash,
+    MultiLineEnd1,
+    MultiLineEnd2,
+    // After `\`.
+    // `\` の後。
+    SingleLineAfterBackslash,
+    SingleLine,
 }
 
 impl DoubleQuotedStringP {
@@ -52,9 +59,89 @@ impl DoubleQuotedStringP {
     ///                             結果。
     pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
-            State::SingleLineAfterBackslash => {
+            State::End => {
+                return error(&mut self.log(), token, "double_quoted_string.rs.66.");
+            }
+            State::First => {
                 match token.type_ {
                     // `"`
+                    TokenType::DoubleQuotation => {
+                        if let Some(look_ahead_token) = look_ahead_token {
+                            match look_ahead_token.type_ {
+                                TokenType::DoubleQuotation => {
+                                    // Before triple double quoted string.
+                                    self.state = State::BeforeMultiLine;
+                                }
+                                _ => {
+                                    // End of syntax. Empty string.
+                                    // 構文の終わり。 空文字列。
+                                    self.state = State::End;
+                                    return PResult::End;
+                                }
+                            }
+                        } else {
+                            return error(&mut self.log(), token, "double_quoted_string.rs.112.");
+                        }
+                    }
+                    TokenType::Backslash => {
+                        // Escape sequence.
+                        // エスケープ・シーケンス。
+                        self.state = State::SingleLineAfterBackslash;
+                    }
+                    _ => {
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&token);
+                        self.state = State::SingleLine;
+                    }
+                }
+            }
+            State::BeforeMultiLine => {
+                self.state = State::MultiLine;
+            }
+            State::MultiLine => {
+                match token.type_ {
+                    // `"`
+                    TokenType::DoubleQuotation => {
+                        self.state = State::MultiLineEnd1;
+                    }
+                    TokenType::Backslash => {
+                        // Escape sequence.
+                        // エスケープ・シーケンス。
+                        self.state = State::MultiLineAfterBackslash;
+                    }
+                    _ => {
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&token);
+                    }
+                }
+            }
+            State::MultiLineEnd1 => {
+                match token.type_ {
+                    // `"`
+                    TokenType::DoubleQuotation => {
+                        self.state = State::MultiLineEnd2;
+                    }
+                    _ => {
+                        return error(&mut self.log(), token, "double_quoted_string.rs.124.");
+                    }
+                }
+            }
+            State::MultiLineEnd2 => {
+                match token.type_ {
+                    // `"`
+                    TokenType::DoubleQuotation => {
+                        // End of syntax.
+                        // 構文の終わり。
+                        self.state = State::End;
+                        return PResult::End;
+                    }
+                    _ => {
+                        return error(&mut self.log(), token, "double_quoted_string.rs.136.");
+                    }
+                }
+            }
+            State::MultiLineAfterBackslash => {
+                match token.type_ {
                     TokenType::EndOfLine => {
                         // End of line.
                         // 行の終わり。
@@ -62,7 +149,7 @@ impl DoubleQuotedStringP {
                     }
                     _ => {
                         // Escaped.
-                        self.state = State::SingleLine;
+                        self.state = State::MultiLine;
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
                     }
@@ -88,39 +175,19 @@ impl DoubleQuotedStringP {
                     }
                 }
             }
-            State::End => {
-                return error(&mut self.log(), token, "double_quoted_string.rs.66.");
-            }
-            State::First => {
+            State::SingleLineAfterBackslash => {
                 match token.type_ {
                     // `"`
-                    TokenType::DoubleQuotation => {
-                        if let Some(look_ahead_token) = look_ahead_token {
-                            match look_ahead_token.type_ {
-                                TokenType::DoubleQuotation => {
-                                    // TODO WIP. Triple double quoted string.
-                                    return error(&mut self.log(), token, "double_quoted_string.rs.102. WIP. Triple double quoted string.");
-                                }
-                                _ => {
-                                    // End of syntax. Empty string.
-                                    // 構文の終わり。 空文字列。
-                                    self.state = State::End;
-                                    return PResult::End;
-                                }
-                            }
-                        } else {
-                            return error(&mut self.log(), token, "double_quoted_string.rs.112.");
-                        }
-                    }
-                    TokenType::Backslash => {
-                        // Escape sequence.
-                        // エスケープ・シーケンス。
-                        self.state = State::SingleLineAfterBackslash;
+                    TokenType::EndOfLine => {
+                        // End of line.
+                        // 行の終わり。
+                        return error(&mut self.log(), token, "double_quoted_string.rs.59.");
                     }
                     _ => {
+                        // Escaped.
+                        self.state = State::SingleLine;
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
-                        self.state = State::SingleLine;
                     }
                 }
             }
