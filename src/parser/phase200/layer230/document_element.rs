@@ -84,7 +84,7 @@ impl DocumentElementP {
                 _ => {
                     self.header_p_of_table = Some(HeaderPOfTable::new());
                     self.state = State::Table;
-                    return self.parse_header_of_table(token);
+                    return self.parse_header_of_table(look_ahead_token, token);
                 }
             },
             State::AfterTable => {
@@ -93,7 +93,7 @@ impl DocumentElementP {
             }
             State::HeaderOfArrayOfTable => {
                 let p = self.header_p_of_array_of_table.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_header_of_array_of_table(&m));
@@ -198,7 +198,7 @@ impl DocumentElementP {
                 }
             }
             State::Table => {
-                return self.parse_header_of_table(token);
+                return self.parse_header_of_table(look_ahead_token, token);
             }
             State::Unimplemented => {
                 return error(&mut self.log(), token, "document_element.rs.246.");
@@ -209,9 +209,13 @@ impl DocumentElementP {
     }
     /// Header of table.  
     /// テーブル・ヘッダー。  
-    fn parse_header_of_table(&mut self, token: &Token) -> PResult {
+    fn parse_header_of_table(
+        &mut self,
+        look_ahead_token: Option<&Token>,
+        token: &Token,
+    ) -> PResult {
         let p = self.header_p_of_table.as_mut().unwrap();
-        match p.parse(token) {
+        match p.parse(look_ahead_token, token) {
             PResult::End => {
                 if let Some(m) = p.flush() {
                     self.buffer = Some(DocumentElement::from_header_of_table(&m));
