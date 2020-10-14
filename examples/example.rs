@@ -32,6 +32,21 @@ fn main() {
         println!("apple = {}", apple);
         // apple = pie
     }
+    // ""
+    if let Some(double_quoted_empty) = doc.get_str_by_key("double_quoted_empty") {
+        println!("double_quoted_empty = {}", double_quoted_empty);
+        // double_quoted_empty =
+    }
+    // "\\"
+    if let Some(double_quoted_escape_backslash) =
+        doc.get_str_by_key("double_quoted_escape_backslash")
+    {
+        println!(
+            "double_quoted_escape_backslash = {}",
+            double_quoted_escape_backslash
+        );
+        // double_quoted_escape_backslash = \
+    }
     // "., ={}[]'\"\\!?"
     if let Some(double_quoted_punctuation) = doc.get_str_by_key("double_quoted_punctuation") {
         println!("double_quoted_punctuation = {}", double_quoted_punctuation);

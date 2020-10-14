@@ -27,14 +27,11 @@ pub enum State {
     // After `\`.
     // `\` の後。
     AfterBackslash,
-    DoubleQuotedString,
+    Contents,
     End,
     // After double quotation.
     // 二重引用符の後。
     First,
-    // After 2nd double quotation.
-    // ２つ目の二重引用符の後。
-    Second,
 }
 
 impl DoubleQuotedStringP {
@@ -65,13 +62,13 @@ impl DoubleQuotedStringP {
                     }
                     _ => {
                         // Escaped.
-                        self.state = State::DoubleQuotedString;
+                        self.state = State::Contents;
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
                     }
                 }
             }
-            State::DoubleQuotedString => {
+            State::Contents => {
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
@@ -98,8 +95,22 @@ impl DoubleQuotedStringP {
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
-                        self.state = State::Second;
-                        return PResult::End;
+                        if let Some(look_ahead_token) = look_ahead_token {
+                            match look_ahead_token.type_ {
+                                TokenType::DoubleQuotation => {
+                                    // TODO WIP. Triple double quoted string.
+                                    return error(&mut self.log(), token, "double_quoted_string.rs.102. WIP. Triple double quoted string.");
+                                }
+                                _ => {
+                                    // End of syntax. Empty string.
+                                    // 構文の終わり。 空文字列。
+                                    self.state = State::End;
+                                    return PResult::End;
+                                }
+                            }
+                        } else {
+                            return error(&mut self.log(), token, "double_quoted_string.rs.112.");
+                        }
                     }
                     TokenType::Backslash => {
                         // Escape sequence.
@@ -109,28 +120,8 @@ impl DoubleQuotedStringP {
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
+                        self.state = State::Contents;
                     }
-                }
-            }
-            // After `""`.
-            State::Second => {
-                match token.type_ {
-                    /*
-                    // It's a `"""`.
-                    TokenType::DoubleQuotation => {
-                        self.state = State::DoubleQuotedString;
-                        return PResult::End;
-                    }
-                    */
-                    // It's a empty string. `""`.
-                    TokenType::EndOfLine | TokenType::WhiteSpace => {
-                        // End of syntax.
-                        // 構文の終わり。
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    // TODO `"",`.
-                    _ => return error(&mut self.log(), token, "double_quoted_string.rs.130."),
                 }
             }
         }
