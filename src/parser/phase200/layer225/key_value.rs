@@ -102,7 +102,7 @@ impl KeyValueP {
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(right_value_p) = &self.right_value_p {
-            t.sub_t("right_value_p", &right_value_p.log_snapshot());
+            t.sub_t("right_value_p", &right_value_p.log());
         }
         t
     }
