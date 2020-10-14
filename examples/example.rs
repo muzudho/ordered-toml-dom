@@ -62,6 +62,16 @@ fn main() {
         println!("double_quoted_punctuation = {}", double_quoted_punctuation);
         // double_quoted_punctuation = ., ={}[]'"\!?
     }
+    // """Hello,
+    // world!!"""
+    if let Some(triple_double_quoted_letter) = doc.get_str_by_key("triple_double_quoted_letter") {
+        println!(
+            "triple_double_quoted_letter = {}",
+            triple_double_quoted_letter
+        );
+        // triple_double_quoted_letter = Hello,
+        // world!!
+    }
 
     // Read a boolean.
     // 論理値読取。

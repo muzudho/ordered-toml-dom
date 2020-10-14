@@ -75,10 +75,45 @@ fn main() {
         println!("apple = {}", apple);
         // apple = pie
     }
+    // ""
+    if let Some(double_quoted_empty) = doc.get_str_by_key("double_quoted_empty") {
+        println!("double_quoted_empty = {}", double_quoted_empty);
+        // double_quoted_empty =
+    }
+    // "\\"
+    if let Some(double_quoted_escape_backslash) =
+        doc.get_str_by_key("double_quoted_escape_backslash")
+    {
+        println!(
+            "double_quoted_escape_backslash = {}",
+            double_quoted_escape_backslash
+        );
+        // double_quoted_escape_backslash = \
+    }
+    // "\""
+    if let Some(double_quoted_escape_double_quotation) =
+        doc.get_str_by_key("double_quoted_escape_double_quotation")
+    {
+        println!(
+            "double_quoted_escape_double_quotation = {}",
+            double_quoted_escape_double_quotation
+        );
+        // double_quoted_escape_double_quotation = \
+    }
     // "., ={}[]'\"\\!?"
     if let Some(double_quoted_punctuation) = doc.get_str_by_key("double_quoted_punctuation") {
         println!("double_quoted_punctuation = {}", double_quoted_punctuation);
         // double_quoted_punctuation = ., ={}[]'"\!?
+    }
+    // """Hello,
+    // world!!"""
+    if let Some(triple_double_quoted_letter) = doc.get_str_by_key("triple_double_quoted_letter") {
+        println!(
+            "triple_double_quoted_letter = {}",
+            triple_double_quoted_letter
+        );
+        // triple_double_quoted_letter = Hello,
+        // world!!
     }
 
     // Read a boolean.
@@ -96,15 +131,18 @@ fn main() {
 
 ## TODO
 
-* [ ] String
-  * [x] Parsing a literal string containing dots. Example: `3.14`.  
+* [ ] Literal
+  * [x] Parsing a literal containing dots. Example: `3.14`.  
       ドットを含むリテラル文字列の解析。例： `3.14`。
-  * [x] Double quoted string.
-  * [ ] Triple double quoted string.
-  * [ ] Single quoted string.
-  * [ ] Triple single quoted string.
-  * [x] Double quoted punctuation.
-  * [ ] Triple double quoted punctuation.
-  * [ ] Single quoted punctuation.
-  * [ ] Triple single quoted punctuation.
-  * [ ] `""#`, `"",` is Difficult.
+  * [ ] Numbers...
+* [ ] String
+  * [x] `"abc"` - Basic strings.
+    * [x] Plain.
+    * [x] `\` Escape.
+  * [ ] `"""abc"""` - Multi-line basic strings.
+    * [x] Plain.
+    * [ ] Ending backslash to automatically trim.
+  * [ ] `'abc'` - Literal strings.
+    * [ ] Plain.
+  * [ ] `'''abc'''` - multi-line literal strings.
+    * [ ] Plain.
