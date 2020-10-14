@@ -6,6 +6,7 @@ pub mod literal_string;
 pub mod single_quoted_string;
 
 use crate::model::{
+    layer110::token::Token,
     layer210::{Comment, DoubleQuotedString, LiteralString, SingleQuotedString},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
@@ -63,6 +64,7 @@ pub struct LiteralStringP {
 pub enum PResult {
     /// End of syntax.
     End,
+    // EndCarryOver(Token),
     Ongoing,
     /// Error.
     Err(LogTable),
