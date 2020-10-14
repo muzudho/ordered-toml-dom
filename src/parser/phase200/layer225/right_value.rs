@@ -141,7 +141,7 @@ impl RightValueP {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                         let p = self.literal_string_p.as_mut().unwrap();
-                        match p.parse(token) {
+                        match p.parse(look_ahead_token, token) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.buffer = Some(RightValue::LiteralString(child_m));
@@ -168,7 +168,7 @@ impl RightValueP {
             // `abc`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::LiteralString(child_m));
@@ -188,7 +188,7 @@ impl RightValueP {
             // `'abc'`.
             State::SingleQuotedString => {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::SingleQuotedString(child_m));

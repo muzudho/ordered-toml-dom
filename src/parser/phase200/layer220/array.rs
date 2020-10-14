@@ -268,7 +268,7 @@ impl ArrayP {
             // `'C:\temp'`.
             State::SingleQuotedString => {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
-                match p.parse(token) {
+                match p.parse(look_ahead_token, token) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {

@@ -25,7 +25,7 @@ impl LiteralStringP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, token: &Token) -> PResult {
+    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match token.type_ {
             TokenType::EndOfLine => {
                 // End of syntax.
