@@ -76,43 +76,43 @@ fn main() {
         // apple = pie
     }
     // ""
-    if let Some(double_quoted_empty) = doc.get_str_by_key("double_quoted_empty") {
-        println!("double_quoted_empty = {}", double_quoted_empty);
-        // double_quoted_empty =
+    if let Some(basic_strings_empty) = doc.get_str_by_key("basic_strings_empty") {
+        println!("basic_strings_empty = {}", basic_strings_empty);
+        // basic_strings_empty =
     }
     // "\\"
-    if let Some(double_quoted_escape_backslash) =
-        doc.get_str_by_key("double_quoted_escape_backslash")
+    if let Some(basic_strings_escape_backslash) =
+        doc.get_str_by_key("basic_strings_escape_backslash")
     {
         println!(
-            "double_quoted_escape_backslash = {}",
-            double_quoted_escape_backslash
+            "basic_strings_escape_backslash = {}",
+            basic_strings_escape_backslash
         );
-        // double_quoted_escape_backslash = \
+        // basic_strings_escape_backslash = \
     }
     // "\""
-    if let Some(double_quoted_escape_double_quotation) =
-        doc.get_str_by_key("double_quoted_escape_double_quotation")
+    if let Some(basic_strings_escape_double_quotation) =
+        doc.get_str_by_key("basic_strings_escape_double_quotation")
     {
         println!(
-            "double_quoted_escape_double_quotation = {}",
-            double_quoted_escape_double_quotation
+            "basic_strings_escape_double_quotation = {}",
+            basic_strings_escape_double_quotation
         );
-        // double_quoted_escape_double_quotation = \
+        // basic_strings_escape_double_quotation = \
     }
     // "., ={}[]'\"\\!?"
-    if let Some(double_quoted_punctuation) = doc.get_str_by_key("double_quoted_punctuation") {
-        println!("double_quoted_punctuation = {}", double_quoted_punctuation);
-        // double_quoted_punctuation = ., ={}[]'"\!?
+    if let Some(basic_strings_punctuation) = doc.get_str_by_key("basic_strings_punctuation") {
+        println!("basic_strings_punctuation = {}", basic_strings_punctuation);
+        // basic_strings_punctuation = ., ={}[]'"\!?
     }
     // """Hello,
     // world!!"""
-    if let Some(triple_double_quoted_letter) = doc.get_str_by_key("triple_double_quoted_letter") {
+    if let Some(multiline_basic_strings_letter) = doc.get_str_by_key("multiline_basic_strings_letter") {
         println!(
-            "triple_double_quoted_letter = {}",
-            triple_double_quoted_letter
+            "multiline_basic_strings_letter = {}",
+            multiline_basic_strings_letter
         );
-        // triple_double_quoted_letter = Hello,
+        // multiline_basic_strings_letter = Hello,
         // world!!
     }
 

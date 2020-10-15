@@ -35,6 +35,9 @@ pub enum State {
     MultiLineAfterBackslash,
     MultiLineEnd1,
     MultiLineEnd2,
+    // Trim start.
+    // 行頭の空白の除去。
+    MultiLineTrimStart,
     // After `\`.
     // `\` の後。
     SingleLineAfterBackslash,
@@ -60,9 +63,11 @@ impl DoubleQuotedStringP {
     pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
         match self.state {
             State::End => {
+                println!("test.b.1.");
                 return error(&mut self.log(), token, "double_quoted_string.rs.66.");
             }
             State::First => {
+                println!("test..first.");
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
@@ -96,26 +101,32 @@ impl DoubleQuotedStringP {
                 }
             }
             State::BeforeMultiLine => {
+                println!("test..before-multiline.");
                 self.state = State::MultiLine;
             }
             State::MultiLine => {
+                println!("test..multiline.");
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
+                        println!("test.multiple.double-quotation.");
                         self.state = State::MultiLineEnd1;
                     }
                     TokenType::Backslash => {
                         // Escape sequence.
                         // エスケープ・シーケンス。
+                        println!("test..backslash.");
                         self.state = State::MultiLineAfterBackslash;
                     }
                     _ => {
+                        println!("test..multiline.otherwise.");
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
                     }
                 }
             }
             State::MultiLineEnd1 => {
+                println!("test..multiline-end1.");
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
@@ -127,6 +138,7 @@ impl DoubleQuotedStringP {
                 }
             }
             State::MultiLineEnd2 => {
+                println!("test..multiline-end2.");
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
@@ -141,13 +153,14 @@ impl DoubleQuotedStringP {
                 }
             }
             State::MultiLineAfterBackslash => {
+                println!("test..multiline-after-backslash.");
                 match token.type_ {
                     TokenType::EndOfLine => {
-                        // End of line.
-                        // 行の終わり。
-                        return error(&mut self.log(), token, "double_quoted_string.rs.59.");
+                        println!("test..end-of-line.");
+                        self.state = State::MultiLineTrimStart;
                     }
                     _ => {
+                        println!("test.3.");
                         // Escaped.
                         self.state = State::MultiLine;
                         let m = self.buffer.as_mut().unwrap();
@@ -155,7 +168,20 @@ impl DoubleQuotedStringP {
                     }
                 }
             }
+            State::MultiLineTrimStart => {
+                println!("test..multiline-trim-start.");
+                match token.type_ {
+                    TokenType::WhiteSpace => {} // Ignore it.
+                    _ => {
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&token);
+                        self.state = State::MultiLine;
+                    }
+                }
+                return error(&mut self.log(), token, "double_quoted_string.rs.198.");
+            }
             State::SingleLine => {
+                println!("test.b.9.");
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
@@ -176,6 +202,7 @@ impl DoubleQuotedStringP {
                 }
             }
             State::SingleLineAfterBackslash => {
+                println!("test.b.10.");
                 match token.type_ {
                     // `"`
                     TokenType::EndOfLine => {

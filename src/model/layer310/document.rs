@@ -96,21 +96,30 @@ impl Document {
     /// Right string of `left = "abc"`.  
     /// キー・バリューの右の文字列。  
     pub fn get_str_by_key(&self, key: &str) -> Option<&str> {
+        println!("test.d1.");
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            println!("test.d2.");
             if let KeyValue(key_value) = doc_elm {
+                println!("test.d3.");
                 if key_value.key == key {
+                    println!("test.d4.");
                     match &*key_value.value {
                         RightValue::DoubleQuotedString(literal_string) => {
+                            println!("test.d5.");
                             return Some(&literal_string.value);
                         }
                         RightValue::SingleQuotedString(literal_string) => {
+                            println!("test.d6.");
                             return Some(&literal_string.value);
                         }
-                        _ => {}
+                        _ => {
+                            println!("test.d7.");
+                        }
                     }
                 }
             }
         }
+        println!("test.d8.");
         None
     }
 
