@@ -7,25 +7,25 @@
 //! // work_number
 //! ```
 
-use crate::model::{layer110::token::Token, layer210::LiteralString};
+use crate::model::{layer110::token::Token, layer210::LiteralValue};
 use std::fmt;
 
-impl Default for LiteralString {
+impl Default for LiteralValue {
     fn default() -> Self {
-        LiteralString {
+        LiteralValue {
             value: String::new(),
         }
     }
 }
-impl LiteralString {
+impl LiteralValue {
     pub fn from_token(token: &Token) -> Self {
-        LiteralString {
+        LiteralValue {
             value: token.value.to_string(),
         }
     }
 
     pub fn from_str(text: &str) -> Self {
-        LiteralString {
+        LiteralValue {
             value: text.to_string(),
         }
     }
@@ -34,7 +34,7 @@ impl LiteralString {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for LiteralString {
+impl fmt::Debug for LiteralValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.value)
     }

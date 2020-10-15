@@ -3,14 +3,14 @@
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::LiteralString,
+    layer210::LiteralValue,
 };
 use crate::parser::phase200::layer210::{LiteralStringP, PResult};
 
 impl LiteralStringP {
-    pub fn flush(&mut self) -> Option<LiteralString> {
+    pub fn flush(&mut self) -> Option<LiteralValue> {
         if let Some(buffer) = &self.buffer {
-            let m = Some(LiteralString::from_str(buffer.value.trim_end()));
+            let m = Some(LiteralValue::from_str(buffer.value.trim_end()));
             self.buffer = None;
             return m;
         }
@@ -18,7 +18,7 @@ impl LiteralStringP {
     }
     pub fn new() -> Self {
         LiteralStringP {
-            buffer: Some(LiteralString::default()),
+            buffer: Some(LiteralValue::default()),
         }
     }
     /// # Arguments

@@ -9,7 +9,7 @@
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::LiteralString,
+    layer210::LiteralValue,
     layer220::Array,
 };
 use crate::parser::phase200::{
@@ -137,7 +137,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralString::from_token(token0));
+                        m.push_literal_string(&LiteralValue::from_token(token0));
                         self.state = State::AfterKeyWithoutDot;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
@@ -209,7 +209,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralString::from_token(token0));
+                        m.push_literal_string(&LiteralValue::from_token(token0));
                         self.state = State::AfterKeyWithoutDot;
                     }
                     TokenType::SingleQuotation => {

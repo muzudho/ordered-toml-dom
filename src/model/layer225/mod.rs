@@ -3,7 +3,7 @@ pub mod key_value;
 pub mod right_value;
 
 use crate::model::{
-    layer210::{DoubleQuotedString, LiteralString, SingleQuotedString},
+    layer210::{DoubleQuotedString, LiteralValue, SingleQuotedString},
     layer220::Array,
 };
 
@@ -29,7 +29,7 @@ pub enum RightValue {
     /// 再帰的。
     InlineTable(InlineTable),
     // No KeyValue.
-    LiteralString(LiteralString),
+    LiteralValue(LiteralValue),
     SingleQuotedString(SingleQuotedString),
 }
 

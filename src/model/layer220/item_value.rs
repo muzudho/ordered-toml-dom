@@ -11,7 +11,7 @@ impl fmt::Debug for ItemValue {
             ItemValue::DoubleQuotedString(m) => write!(f, "{:?}", m),
             ItemValue::InlineTable(m) => write!(f, "{:?}", m),
             ItemValue::KeyValue(m) => write!(f, "{:?}", m),
-            ItemValue::LiteralString(m) => write!(f, "{:?}", m),
+            ItemValue::LiteralValue(m) => write!(f, "{:?}", m),
             ItemValue::SingleQuotedString(m) => write!(f, "{:?}", m),
         }
     }

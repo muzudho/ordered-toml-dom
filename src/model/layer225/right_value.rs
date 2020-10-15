@@ -11,7 +11,7 @@ impl fmt::Debug for RightValue {
             RightValue::DoubleQuotedString(m) => write!(f, "{:?}", m),
             RightValue::InlineTable(m) => write!(f, "{:?}", m),
             // No KeyValue.
-            RightValue::LiteralString(m) => write!(f, "{:?}", m),
+            RightValue::LiteralValue(m) => write!(f, "{:?}", m),
             RightValue::SingleQuotedString(m) => write!(f, "{:?}", m),
         }
     }

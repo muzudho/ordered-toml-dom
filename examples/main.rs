@@ -50,7 +50,7 @@ fn main() {
                     RightValue::Array(m) => Log::info(&format!("{:?}", m)),
                     RightValue::DoubleQuotedString(m) => Log::info(&format!("{:?}", m)),
                     RightValue::InlineTable(m) => Log::info(&format!("{:?}", m)),
-                    RightValue::LiteralString(m) => Log::info(&format!("{:?}", m)),
+                    RightValue::LiteralValue(m) => Log::info(&format!("{:?}", m)),
                     RightValue::SingleQuotedString(m) => Log::info(&format!("{:?}", m)),
                 }
             }

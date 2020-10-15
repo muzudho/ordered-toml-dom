@@ -1,7 +1,7 @@
 //! Document model.  
 //! ドキュメント・モデル。  
 
-use crate::model::layer210::LiteralString;
+use crate::model::layer210::LiteralValue;
 use crate::model::layer225::RightValue;
 use crate::model::layer230::DocumentElement::KeyValue;
 use crate::model::{layer230::DocumentElement, layer310::Document};
@@ -42,12 +42,12 @@ impl Document {
 
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
-    pub fn get_literal_string_by_key(&self, key: &str) -> Option<&LiteralString> {
+    pub fn get_literal_string_by_key(&self, key: &str) -> Option<&LiteralValue> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key == key {
-                    if let RightValue::LiteralString(literal_string) = &*key_value.value {
-                        return Some(literal_string);
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        return Some(literal_value);
                     }
                 }
             }
@@ -61,8 +61,8 @@ impl Document {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key == key {
-                    if let RightValue::LiteralString(literal_string) = &*key_value.value {
-                        match literal_string.value.parse() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        match literal_value.value.parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
                         }
@@ -81,8 +81,8 @@ impl Document {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key == key {
-                    if let RightValue::LiteralString(literal_string) = &*key_value.value {
-                        match literal_string.value.parse() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        match literal_value.value.parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
                         }
@@ -100,11 +100,11 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key == key {
                     match &*key_value.value {
-                        RightValue::DoubleQuotedString(literal_string) => {
-                            return Some(&literal_string.value);
+                        RightValue::DoubleQuotedString(literal_value) => {
+                            return Some(&literal_value.value);
                         }
-                        RightValue::SingleQuotedString(literal_string) => {
-                            return Some(&literal_string.value);
+                        RightValue::SingleQuotedString(literal_value) => {
+                            return Some(&literal_value.value);
                         }
                         _ => {}
                     }
@@ -120,8 +120,8 @@ impl Document {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key == key {
-                    if let RightValue::LiteralString(literal_string) = &*key_value.value {
-                        match literal_string.value.parse() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        match literal_value.value.parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
                         }

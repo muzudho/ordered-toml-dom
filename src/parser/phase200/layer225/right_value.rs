@@ -24,7 +24,7 @@ pub enum State {
     DoubleQuotedString,
     First,
     SingleQuotedString,
-    LiteralString,
+    LiteralValue,
     End,
 }
 
@@ -149,12 +149,12 @@ impl RightValueP {
                     TokenType::WhiteSpace => {} //Ignored it.
                     TokenType::KeyWithoutDot | _ => {
                         self.literal_string_p = Some(LiteralStringP::new());
-                        self.state = State::LiteralString;
+                        self.state = State::LiteralValue;
                         let p = self.literal_string_p.as_mut().unwrap();
                         match p.parse(tokens) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
-                                    self.buffer = Some(RightValue::LiteralString(child_m));
+                                    self.buffer = Some(RightValue::LiteralValue(child_m));
                                     self.literal_string_p = None;
                                     self.state = State::End;
                                     return PResult::End;
@@ -176,12 +176,12 @@ impl RightValueP {
                 }
             }
             // `abc`.
-            State::LiteralString => {
+            State::LiteralValue => {
                 let p = self.literal_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::LiteralString(child_m));
+                            self.buffer = Some(RightValue::LiteralValue(child_m));
                             self.literal_string_p = None;
                             self.state = State::End;
                             return PResult::End;

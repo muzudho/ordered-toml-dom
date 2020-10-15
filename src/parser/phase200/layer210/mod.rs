@@ -2,11 +2,11 @@ pub mod comment;
 pub mod double_quoted_string;
 pub mod header_of_array_of_table;
 pub mod header_of_table;
-pub mod literal_string;
+pub mod literal_value;
 pub mod single_quoted_string;
 
 use crate::model::{
-    layer210::{Comment, DoubleQuotedString, LiteralString, SingleQuotedString},
+    layer210::{Comment, DoubleQuotedString, LiteralValue, SingleQuotedString},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::double_quoted_string::State as DoubleQuotedStringState;
@@ -55,7 +55,7 @@ pub struct HeaderPOfTable {
 /// Example: `abc`.  
 #[derive(Clone)]
 pub struct LiteralStringP {
-    buffer: Option<LiteralString>,
+    buffer: Option<LiteralValue>,
 }
 
 /// Result of syntax parser.  
