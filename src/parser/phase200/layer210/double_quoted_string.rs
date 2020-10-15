@@ -110,30 +110,7 @@ impl DoubleQuotedStringP {
                 match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
-                        let triple_double_quote = if let Some(token_2_ahead) = tokens.2 {
-                            match token_2_ahead.type_ {
-                                TokenType::DoubleQuotation => {
-                                    // Before triple double quoted string.
-                                    self.state = State::BeforeMultiLine;
-                                    if let Some(token_1_ahead) = tokens.1 {
-                                        match token_1_ahead.type_ {
-                                            TokenType::DoubleQuotation => {
-                                                // Triple double quote.
-                                                true
-                                            }
-                                            _ => false,
-                                        }
-                                    } else {
-                                        false
-                                    }
-                                }
-                                _ => false,
-                            }
-                        } else {
-                            false
-                        };
-
-                        if triple_double_quote {
+                        if check_triple_double_quotation(tokens) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
@@ -194,7 +171,12 @@ impl DoubleQuotedStringP {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `"`.
                     TokenType::DoubleQuotation => {
-                        self.state = State::MultiLineEnd1;
+                        if check_triple_double_quotation(tokens) {
+                            self.state = State::MultiLineEnd1;
+                        } else {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_token(&token0);
+                        }
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
@@ -243,6 +225,7 @@ impl DoubleQuotedStringP {
 
         PResult::Ongoing
     }
+
     /// Log.  
     /// ログ。  
     pub fn log(&self) -> Table {
@@ -251,5 +234,36 @@ impl DoubleQuotedStringP {
             t.str("value", &format!("{:?}", m));
         }
         t
+    }
+}
+
+/// # Arguments
+///
+/// * `tokens` - Tokens contains look ahead.  
+///             先読みを含むトークン。  
+/// # Returns
+///
+/// It's triple double quotation.  
+/// ３連一重引用符。  
+fn check_triple_double_quotation(tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> bool {
+    if let Some(token_2_ahead) = tokens.2 {
+        match token_2_ahead.type_ {
+            TokenType::DoubleQuotation => {
+                if let Some(token_1_ahead) = tokens.1 {
+                    match token_1_ahead.type_ {
+                        TokenType::DoubleQuotation => {
+                            // Triple double quote.
+                            true
+                        }
+                        _ => false,
+                    }
+                } else {
+                    false
+                }
+            }
+            _ => false,
+        }
+    } else {
+        false
     }
 }
