@@ -12,10 +12,19 @@ basic_strings_punctuation = "., ={}[]'\"\\!?"
 
 multiline_basic_strings_letter = """Hello,
 world!!"""
-multiline_basic_strings_punctuation = """., ={}[]'"\\
+multiline_basic_strings_punctuation = """., ={}[]"'""\\
 !?"""
 multiline_basic_strings_trim_start = """\
   The quick brown \
   fox jumps over \
   the lazy dog.\
   """
+
+literal_strings_empty = ''
+literal_strings_letter = 'Hello, world!!'
+literal_strings_punctuation = '., ={}[]"\!?'
+
+multiline_literal_strings_letter = '''Hello,
+world!!'''
+multiline_literal_strings_punctuation = '''., ={}[]'"\
+!?'''

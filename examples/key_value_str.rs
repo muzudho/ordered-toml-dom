@@ -138,7 +138,7 @@ fn test_multiline_basic_strings_punctuation(doc: &Document, has_error: &mut bool
     let key = "multiline_basic_strings_punctuation";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value
-            != "., ={}[]'\"\\
+            != "., ={}[]\"'\"\"\\
 !?"
         {
             Log::error_t(
