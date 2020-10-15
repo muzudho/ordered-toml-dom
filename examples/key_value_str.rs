@@ -23,6 +23,7 @@ fn main() {
     let mut has_error = false;
 
     // Test.
+    /*
     test_apple(&doc, &mut has_error);
     test_basic_strings_letter(&doc, &mut has_error);
     test_multiline_basic_strings_letter(&doc, &mut has_error);
@@ -30,9 +31,12 @@ fn main() {
     test_multiline_literal_strings_letter(&doc, &mut has_error);
     test_basic_strings_punctuation(&doc, &mut has_error);
     test_multiline_basic_strings_punctuation(&doc, &mut has_error);
+    */
     test_multiline_basic_strings_trim_start(&doc, &mut has_error);
+    /*
     test_literal_strings_punctuation(&doc, &mut has_error);
     test_multiline_literal_strings_punctuation(&doc, &mut has_error);
+    */
 
     // Error handling.
     if has_error {
@@ -153,7 +157,6 @@ fn test_multiline_basic_strings_punctuation(doc: &Document, has_error: &mut bool
 }
 fn test_multiline_basic_strings_trim_start(doc: &Document, has_error: &mut bool) {
     println!("test.a1.");
-    // Test.
     let key = "multiline_basic_strings_trim_start";
     if let Some(right_value) = doc.get_str_by_key(key) {
         println!("test.6.");
@@ -165,7 +168,7 @@ fn test_multiline_basic_strings_trim_start(doc: &Document, has_error: &mut bool)
             );
         }
     } else {
-        println!("test.a2.");
+        println!("test.a2.error.");
         *has_error = true;
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }

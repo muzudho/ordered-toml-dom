@@ -142,12 +142,14 @@ impl DoubleQuotedStringP {
                 match token.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
+                        println!("test..multiline-end2.1.");
                         // End of syntax.
                         // 構文の終わり。
                         self.state = State::End;
                         return PResult::End;
                     }
                     _ => {
+                        println!("test..multiline-end2.2.error. token=|{:?}|", token);
                         return error(&mut self.log(), token, "double_quoted_string.rs.136.");
                     }
                 }
@@ -171,14 +173,21 @@ impl DoubleQuotedStringP {
             State::MultiLineTrimStart => {
                 println!("test..multiline-trim-start.");
                 match token.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpace => {
+                        println!("test..multiline-trim-start.1.");
+                    } // Ignore it.
+                    // `"`.
+                    TokenType::DoubleQuotation => {
+                        println!("test..multiline-trim-start.2.");
+                        self.state = State::MultiLineEnd1;
+                    }
                     _ => {
+                        println!("test..multiline-trim-start.3.");
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token);
                         self.state = State::MultiLine;
                     }
                 }
-                return error(&mut self.log(), token, "double_quoted_string.rs.198.");
             }
             State::SingleLine => {
                 println!("test.b.9.");

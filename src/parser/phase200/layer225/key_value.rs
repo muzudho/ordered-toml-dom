@@ -54,6 +54,7 @@ impl KeyValueP {
         match self.state {
             // After key.
             State::First => {
+                println!("test.e1.");
                 match token.type_ {
                     TokenType::WhiteSpace => {} //Ignored it.
                     // `=`.
@@ -65,15 +66,19 @@ impl KeyValueP {
             }
             // After `=`.
             State::AfterEquals => {
+                println!("test.e2.");
                 self.right_value_p = Some(RightValueP::default());
                 self.state = State::RightValue;
             }
             // After `=`.
             State::RightValue => {
+                println!("test.right-value.");
                 let p = self.right_value_p.as_mut().unwrap();
                 match p.parse(look_ahead_token, token) {
                     PResult::End => {
+                        println!("test.e4.");
                         if let Some(child_m) = p.flush() {
+                            println!("test.e5.");
                             self.buffer = Some(KeyValue::new(&self.key, &child_m));
                             self.right_value_p = None;
                             self.state = State::End;
@@ -83,9 +88,12 @@ impl KeyValueP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "key_value.rs.88.")
+                        println!("test.e6.error. token=|{:?}|", token);
+                        return error_via(&mut table, &mut self.log(), token, "key_value.rs.88.");
                     }
-                    PResult::Ongoing => {}
+                    PResult::Ongoing => {
+                        println!("test.right-value.ongoing.");
+                    }
                 }
             }
             State::End => return error(&mut self.log(), token, "key_value.rs.93."),
