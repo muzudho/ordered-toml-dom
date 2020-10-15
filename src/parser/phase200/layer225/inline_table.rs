@@ -39,49 +39,59 @@ impl InlineTableP {
         self.buffer = None;
         m
     }
+    /// # Arguments
+    ///
+    /// * `tokens` - Tokens contains look ahead.  
+    ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
-    ///                             結果。
-    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
+    ///               結果。
+    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
+        let token0 = tokens.0.unwrap();
         match self.state {
             // After `{`.
             State::First => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `apple.banana`
                     TokenType::KeyWithoutDot => {
-                        self.key_value_p = Some(Box::new(KeyValueP::new(&token)));
+                        self.key_value_p = Some(Box::new(KeyValueP::new(&token0)));
                         self.state = State::KeyValue;
                     }
                     TokenType::RightCurlyBracket => {
                         // Empty inline-table.
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), token, "inline_table.rs.63."),
+                    _ => return error(&mut self.log(), tokens, "inline_table.rs.63."),
                 }
             }
             // `apple.banana`.
             State::KeyValue => {
                 let p = self.key_value_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer.as_mut().unwrap().push_key_value(&child_m);
                             self.key_value_p = None;
                             self.state = State::AfterKeyValue;
                         } else {
-                            return error(&mut self.log(), token, "inline_table.rs.76.");
+                            return error(&mut self.log(), tokens, "inline_table.rs.76.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "inline_table.rs.80.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            tokens,
+                            "inline_table.rs.80.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
             }
             // After `banana = 3`.
-            State::AfterKeyValue => match token.type_ {
+            State::AfterKeyValue => match token0.type_ {
                 TokenType::WhiteSpace => {} // Ignore it.
                 // `,`
                 TokenType::Comma => {
@@ -91,7 +101,7 @@ impl InlineTableP {
                 TokenType::RightCurlyBracket => {
                     return PResult::End;
                 }
-                _ => return error(&mut self.log(), token, "inline_table.rs.96."),
+                _ => return error(&mut self.log(), tokens, "inline_table.rs.96."),
             },
         }
         PResult::Ongoing

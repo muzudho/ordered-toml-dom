@@ -46,21 +46,26 @@ impl KeyValueP {
         m
     }
 
+    /// # Arguments
+    ///
+    /// * `tokens` - Tokens contains look ahead.  
+    ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
+    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
+        let token0 = tokens.0.unwrap();
         match self.state {
             // After key.
             State::First => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::WhiteSpace => {} //Ignored it.
                     // `=`.
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
                     }
-                    _ => return error(&mut self.log(), token, "key_value.rs.65."),
+                    _ => return error(&mut self.log(), tokens, "key_value.rs.65."),
                 }
             }
             // After `=`.
@@ -71,7 +76,7 @@ impl KeyValueP {
             // After `=`.
             State::RightValue => {
                 let p = self.right_value_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(KeyValue::new(&self.key, &child_m));
@@ -79,16 +84,16 @@ impl KeyValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), token, "key_value.rs.84.");
+                            return error(&mut self.log(), tokens, "key_value.rs.84.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "key_value.rs.88.");
+                        return error_via(&mut table, &mut self.log(), tokens, "key_value.rs.88.");
                     }
                     PResult::Ongoing => {}
                 }
             }
-            State::End => return error(&mut self.log(), token, "key_value.rs.93."),
+            State::End => return error(&mut self.log(), tokens, "key_value.rs.93."),
         }
         PResult::Ongoing
     }

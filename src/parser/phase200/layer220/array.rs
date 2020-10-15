@@ -64,15 +64,20 @@ impl ArrayP {
         self.buffer = None;
         m
     }
+    /// # Arguments
+    ///
+    /// * `tokens` - Tokens contains look ahead.  
+    ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
-    ///                             結果。
-    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
+    ///               結果。
+    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
+        let token0 = tokens.0.unwrap();
         match self.state {
             // After `]`.
             State::AfterArray => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `,`.
                     TokenType::Comma => {
@@ -83,12 +88,12 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), token, "array.rs.93."),
+                    _ => return error(&mut self.log(), tokens, "array.rs.93."),
                 }
             }
             // After `[],`.
             State::AfterCommaBehindArray => {
-                match token.type_ {
+                match token0.type_ {
                     // `[`.
                     TokenType::LeftSquareBracket => {
                         self.array_p = Some(Box::new(ArrayP::default()));
@@ -100,12 +105,12 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), token, "array.rs.130."),
+                    _ => return error(&mut self.log(), tokens, "array.rs.130."),
                 }
             }
             // `"a",` の次。
             State::AfterCommaBefindQuotedString => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::DoubleQuotation => {
                         self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
                         self.state = State::DoubleQuotedString;
@@ -120,19 +125,19 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), token, "array.rs.176."),
+                    _ => return error(&mut self.log(), tokens, "array.rs.176."),
                 }
             }
             // After `literal,`.
             State::AfterCommaBehindKeyWithoutDot => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::KeyWithoutDot => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralString::from_token(token));
+                        m.push_literal_string(&LiteralString::from_token(token0));
                         self.state = State::AfterKeyWithoutDot;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
@@ -141,12 +146,12 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), token, "array.rs.218."),
+                    _ => return error(&mut self.log(), tokens, "array.rs.218."),
                 }
             }
             // After `"`.
             State::AfterDoubleQuotedString => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
                         self.state = State::AfterCommaBefindQuotedString;
@@ -155,13 +160,13 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), token, "array.rs.245."),
+                    _ => return error(&mut self.log(), tokens, "array.rs.245."),
                 }
             }
             // `[array]`.
             State::Array => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -176,14 +181,14 @@ impl ArrayP {
                         self.state = State::AfterArray;
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "array.rs.283.");
+                        return error_via(&mut table, &mut self.log(), tokens, "array.rs.283.");
                     }
                     PResult::Ongoing => {}
                 }
             }
             // After `[`.
             State::First => {
-                match token.type_ {
+                match token0.type_ {
                     // `]`. Empty array.
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -204,7 +209,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralString::from_token(token));
+                        m.push_literal_string(&LiteralString::from_token(token0));
                         self.state = State::AfterKeyWithoutDot;
                     }
                     TokenType::SingleQuotation => {
@@ -212,10 +217,10 @@ impl ArrayP {
                         self.state = State::SingleQuotedString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
-                    _ => return error(&mut self.log(), token, "array.rs.358."),
+                    _ => return error(&mut self.log(), tokens, "array.rs.358."),
                 }
             }
-            State::AfterKeyWithoutDot => match token.type_ {
+            State::AfterKeyWithoutDot => match token0.type_ {
                 TokenType::Comma => {
                     self.state = State::AfterCommaBehindKeyWithoutDot;
                 }
@@ -223,11 +228,11 @@ impl ArrayP {
                     self.state = State::End;
                     return PResult::End;
                 }
-                _ => return error(&mut self.log(), token, "array.rs.383."),
+                _ => return error(&mut self.log(), tokens, "array.rs.383."),
             },
             // After `'`.
             State::AfterSingleQuotedString => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
                         self.state = State::AfterCommaBefindQuotedString;
@@ -236,13 +241,13 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), token, "array.rs.410."),
+                    _ => return error(&mut self.log(), tokens, "array.rs.410."),
                 }
             }
             // "dog".
             State::DoubleQuotedString => {
                 let p = self.double_quoted_string_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -253,22 +258,22 @@ impl ArrayP {
                             self.double_quoted_string_p = None;
                             self.state = State::AfterDoubleQuotedString;
                         } else {
-                            return error(&mut self.log(), token, "array.rs.439.");
+                            return error(&mut self.log(), tokens, "array.rs.439.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "array.rs.448.");
+                        return error_via(&mut table, &mut self.log(), tokens, "array.rs.448.");
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return error(&mut self.log(), token, "array.rs.466.");
+                return error(&mut self.log(), tokens, "array.rs.466.");
             }
             // `'C:\temp'`.
             State::SingleQuotedString => {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -279,11 +284,11 @@ impl ArrayP {
                             self.single_quoted_string_p = None;
                             self.state = State::AfterSingleQuotedString;
                         } else {
-                            return error(&mut self.log(), token, "array.rs.493.");
+                            return error(&mut self.log(), tokens, "array.rs.493.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "array.rs.502.");
+                        return error_via(&mut table, &mut self.log(), tokens, "array.rs.502.");
                     }
                     PResult::Ongoing => {}
                 }

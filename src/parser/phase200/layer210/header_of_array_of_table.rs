@@ -19,12 +19,17 @@ impl HeaderPOfArrayOfTable {
             buffer: Some(HeaderOfArrayOfTable::default()),
         }
     }
+    /// # Arguments
+    ///
+    /// * `tokens` - Tokens contains look ahead.  
+    ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, _look_ahead_token: Option<&Token>, token: &Token) -> PResult {
-        match token.type_ {
+    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
+        let token0 = tokens.0.unwrap();
+        match token0.type_ {
             TokenType::DoubleQuotation => {
                 // End of syntax.
                 // 構文の終わり。
@@ -32,7 +37,7 @@ impl HeaderPOfArrayOfTable {
             }
             _ => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&token);
+                m.push_token(&token0);
             }
         }
         PResult::Ongoing

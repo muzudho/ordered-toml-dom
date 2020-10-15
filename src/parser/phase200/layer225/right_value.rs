@@ -48,16 +48,21 @@ impl RightValueP {
         m
     }
 
+    /// # Arguments
+    ///
+    /// * `tokens` - Tokens contains look ahead.  
+    ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
-    ///                             結果。
-    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
+    ///               結果。
+    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
+        let token0 = tokens.0.unwrap();
         match self.state {
             // After `{`.
             State::AfterLeftCurlyBracket => {
                 let p = self.inline_table_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::InlineTable(child_m));
@@ -65,11 +70,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), token, "right_value.rs.68.");
+                            return error(&mut self.log(), tokens, "right_value.rs.68.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "right_value.rs.72.")
+                        return error_via(&mut table, &mut self.log(), tokens, "right_value.rs.72.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -77,7 +82,7 @@ impl RightValueP {
             // After `[`.
             State::AfterLeftSquareBracket => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::Array(child_m));
@@ -85,11 +90,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), token, "right_value.rs.88.");
+                            return error(&mut self.log(), tokens, "right_value.rs.88.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "right_value.rs.92.")
+                        return error_via(&mut table, &mut self.log(), tokens, "right_value.rs.92.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -97,7 +102,7 @@ impl RightValueP {
             // `"abc"`.
             State::DoubleQuotedString => {
                 let p = self.double_quoted_string_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::DoubleQuotedString(child_m));
@@ -105,17 +110,22 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), token, "right_value.rs.108.");
+                            return error(&mut self.log(), tokens, "right_value.rs.108.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "right_value.rs.112.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            tokens,
+                            "right_value.rs.112.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::First => {
-                match token.type_ {
+                match token0.type_ {
                     // `"`.
                     TokenType::DoubleQuotation => {
                         self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
@@ -141,7 +151,7 @@ impl RightValueP {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                         let p = self.literal_string_p.as_mut().unwrap();
-                        match p.parse(look_ahead_token, token) {
+                        match p.parse(tokens) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.buffer = Some(RightValue::LiteralString(child_m));
@@ -149,14 +159,14 @@ impl RightValueP {
                                     self.state = State::End;
                                     return PResult::End;
                                 } else {
-                                    return error(&mut self.log(), token, "right_value.rs.152.");
+                                    return error(&mut self.log(), tokens, "right_value.rs.152.");
                                 }
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    token,
+                                    tokens,
                                     "right_value.rs.156.",
                                 )
                             }
@@ -168,7 +178,7 @@ impl RightValueP {
             // `abc`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::LiteralString(child_m));
@@ -176,11 +186,16 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), token, "right_value.rs.174.");
+                            return error(&mut self.log(), tokens, "right_value.rs.174.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "right_value.rs.178.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            tokens,
+                            "right_value.rs.178.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
@@ -188,7 +203,7 @@ impl RightValueP {
             // `'abc'`.
             State::SingleQuotedString => {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
-                match p.parse(look_ahead_token, token) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::SingleQuotedString(child_m));
@@ -196,17 +211,22 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), token, "right_value.rs.194.");
+                            return error(&mut self.log(), tokens, "right_value.rs.194.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), token, "right_value.rs.198.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            tokens,
+                            "right_value.rs.198.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return error(&mut self.log(), token, "right_value.rs.204.");
+                return error(&mut self.log(), tokens, "right_value.rs.204.");
             }
         }
         PResult::Ongoing

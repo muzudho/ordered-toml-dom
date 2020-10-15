@@ -56,21 +56,26 @@ impl DoubleQuotedStringP {
             state: State::First,
         }
     }
+    /// # Arguments
+    ///
+    /// * `tokens` - Tokens contains look ahead.  
+    ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
-    ///                             結果。
-    pub fn parse(&mut self, look_ahead_token: Option<&Token>, token: &Token) -> PResult {
+    ///               結果。
+    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
+        let token0 = tokens.0.unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), token, "double_quoted_string.rs.66.");
+                return error(&mut self.log(), tokens, "double_quoted_string.rs.66.");
             }
             State::First => {
-                match token.type_ {
+                match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
-                        if let Some(look_ahead_token) = look_ahead_token {
-                            match look_ahead_token.type_ {
+                        if let Some(token_1_ahead) = tokens.1 {
+                            match token_1_ahead.type_ {
                                 TokenType::DoubleQuotation => {
                                     // Before triple double quoted string.
                                     self.state = State::BeforeMultiLine;
@@ -83,7 +88,7 @@ impl DoubleQuotedStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), token, "double_quoted_string.rs.112.");
+                            return error(&mut self.log(), tokens, "double_quoted_string.rs.112.");
                         }
                     }
                     TokenType::Backslash => {
@@ -93,7 +98,7 @@ impl DoubleQuotedStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token);
+                        m.push_token(&token0);
                         self.state = State::SingleLine;
                     }
                 }
@@ -102,7 +107,7 @@ impl DoubleQuotedStringP {
                 self.state = State::MultiLine;
             }
             State::MultiLine => {
-                match token.type_ {
+                match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
                         self.state = State::MultiLineEnd1;
@@ -114,23 +119,23 @@ impl DoubleQuotedStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token);
+                        m.push_token(&token0);
                     }
                 }
             }
             State::MultiLineEnd1 => {
-                match token.type_ {
+                match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), token, "double_quoted_string.rs.124.");
+                        return error(&mut self.log(), tokens, "double_quoted_string.rs.124.");
                     }
                 }
             }
             State::MultiLineEnd2 => {
-                match token.type_ {
+                match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
                         // End of syntax.
@@ -139,12 +144,12 @@ impl DoubleQuotedStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), token, "double_quoted_string.rs.136.");
+                        return error(&mut self.log(), tokens, "double_quoted_string.rs.136.");
                     }
                 }
             }
             State::MultiLineAfterBackslash => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::EndOfLine => {
                         self.state = State::MultiLineTrimStart;
                     }
@@ -152,12 +157,12 @@ impl DoubleQuotedStringP {
                         // Escaped.
                         self.state = State::MultiLine;
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token);
+                        m.push_token(&token0);
                     }
                 }
             }
             State::MultiLineTrimStart => {
-                match token.type_ {
+                match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `"`.
                     TokenType::DoubleQuotation => {
@@ -165,13 +170,13 @@ impl DoubleQuotedStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token);
+                        m.push_token(&token0);
                         self.state = State::MultiLine;
                     }
                 }
             }
             State::SingleLine => {
-                match token.type_ {
+                match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
                         // End of syntax.
@@ -186,23 +191,23 @@ impl DoubleQuotedStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token);
+                        m.push_token(&token0);
                     }
                 }
             }
             State::SingleLineAfterBackslash => {
-                match token.type_ {
+                match token0.type_ {
                     // `"`
                     TokenType::EndOfLine => {
                         // End of line.
                         // 行の終わり。
-                        return error(&mut self.log(), token, "double_quoted_string.rs.59.");
+                        return error(&mut self.log(), tokens, "double_quoted_string.rs.59.");
                     }
                     _ => {
                         // Escaped.
                         self.state = State::SingleLine;
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token);
+                        m.push_token(&token0);
                     }
                 }
             }

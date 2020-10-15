@@ -23,7 +23,6 @@ fn main() {
     let mut has_error = false;
 
     // Test.
-    /*
     test_apple(&doc, &mut has_error);
     test_basic_strings_letter(&doc, &mut has_error);
     test_multiline_basic_strings_letter(&doc, &mut has_error);
@@ -31,12 +30,9 @@ fn main() {
     test_multiline_literal_strings_letter(&doc, &mut has_error);
     test_basic_strings_punctuation(&doc, &mut has_error);
     test_multiline_basic_strings_punctuation(&doc, &mut has_error);
-    */
     test_multiline_basic_strings_trim_start(&doc, &mut has_error);
-    /*
     test_literal_strings_punctuation(&doc, &mut has_error);
     test_multiline_literal_strings_punctuation(&doc, &mut has_error);
-    */
 
     // Error handling.
     if has_error {
