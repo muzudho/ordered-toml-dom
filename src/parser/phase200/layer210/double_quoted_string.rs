@@ -110,7 +110,35 @@ impl DoubleQuotedStringP {
                 match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
-                        self.state = State::MultiLineEnd1;
+                        let triple_double_quote = if let Some(token_2_ahead) = tokens.2 {
+                            match token_2_ahead.type_ {
+                                TokenType::DoubleQuotation => {
+                                    // Before triple double quoted string.
+                                    self.state = State::BeforeMultiLine;
+                                    if let Some(token_1_ahead) = tokens.1 {
+                                        match token_1_ahead.type_ {
+                                            TokenType::DoubleQuotation => {
+                                                // Triple double quote.
+                                                true
+                                            }
+                                            _ => false,
+                                        }
+                                    } else {
+                                        false
+                                    }
+                                }
+                                _ => false,
+                            }
+                        } else {
+                            false
+                        };
+
+                        if triple_double_quote {
+                            self.state = State::MultiLineEnd1;
+                        } else {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_token(&token0);
+                        }
                     }
                     TokenType::Backslash => {
                         // Escape sequence.
