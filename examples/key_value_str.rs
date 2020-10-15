@@ -156,23 +156,18 @@ fn test_multiline_basic_strings_punctuation(doc: &Document, has_error: &mut bool
     }
 }
 fn test_multiline_basic_strings_trim_start(doc: &Document, has_error: &mut bool) {
-    println!("test.a1.");
     let key = "multiline_basic_strings_trim_start";
     if let Some(right_value) = doc.get_str_by_key(key) {
-        println!("test.6.");
         if right_value != "The quick brown fox jumps over the lazy dog." {
-            println!("test.7.");
             Log::error_t(
                 &format!("Test: {}", key),
                 Table::default().str(key, &format!("{:?}", right_value)),
             );
         }
     } else {
-        println!("test.a2.error.");
         *has_error = true;
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
-    println!("test.a3.");
 }
 fn test_literal_strings_punctuation(doc: &Document, has_error: &mut bool) {
     let key = "literal_strings_punctuation";
