@@ -7,76 +7,14 @@ extern crate tomboy_toml_dom;
 
 mod modules;
 
-use crate::modules::log_ext::LogExt;
-use casual_logger::{Log, Table};
 use tomboy_toml_dom::Toml;
 
 fn main() {
-    // Configuration a log.
-    Log::set_file_name("exa-key-value-number");
-    Log::remove_old_logs();
-
     // Read a Toml file.
-    let toml_file = "./resource/key-value-number.toml";
-    let doc = Toml::from_file(toml_file);
-
-    let mut has_error = false;
+    let doc = Toml::from_file("./resource/key-value-number.toml");
 
     // Test.
-    let key = "int_max";
-    if let Some(number) = doc.get_i128_by_key(key) {
-        if number != 2147483647 {
-            Log::error_t(
-                &format!("Test: {}", key),
-                Table::default().str(key, &format!("{:?}", number)),
-            );
-        }
-    } else {
-        has_error = true;
-        Log::error_t(
-            &format!("Test: |{}| is not found.", key),
-            Table::default().str(key, ""),
-        );
-    }
-
-    // Test.
-    let key = "int_min";
-    if let Some(number) = doc.get_i128_by_key(key) {
-        if number != -2147483647 {
-            Log::error_t(
-                &format!("Test: {}", key),
-                Table::default().str(key, &format!("{:?}", number)),
-            );
-        }
-    } else {
-        has_error = true;
-        Log::error_t(
-            &format!("Test: |{}| is not found.", key),
-            Table::default().str(key, ""),
-        );
-    }
-
-    // Test.
-    let key = "pi_1";
-    if let Some(number) = doc.get_f64_by_key(key) {
-        if number != 3.14 {
-            Log::error_t(
-                &format!("Test: {}", key),
-                Table::default().str(key, &format!("{:?}", number)),
-            );
-        }
-    } else {
-        has_error = true;
-        Log::error_t(
-            &format!("Test: |{}| is not found.", key),
-            Table::default().str(key, ""),
-        );
-    }
-
-    // Error handling.
-    if has_error {
-        Log::info_toml_document(toml_file, &doc);
-    }
-
-    Log::flush();
+    assert_eq!(doc.get_i128_by_key("int_max"), Some(2147483647));
+    assert_eq!(doc.get_i128_by_key("int_min"), Some(-2147483648));
+    assert_eq!(doc.get_f64_by_key("pi_1"), Some(3.14));
 }
