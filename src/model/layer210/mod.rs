@@ -1,7 +1,7 @@
-pub mod basic_strings;
+pub mod basic_string;
 pub mod comment;
+pub mod literal_string;
 pub mod literal_value;
-pub mod single_quoted_string;
 
 /// It has one string.  
 /// １つの文字列を持ちます。  

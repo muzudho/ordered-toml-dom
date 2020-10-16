@@ -1,4 +1,4 @@
-pub mod basic_strings_p;
+pub mod basic_string_p;
 pub mod comment_p;
 pub mod header_of_array_of_table;
 pub mod header_of_table;
@@ -9,7 +9,7 @@ use crate::model::{
     layer210::{Comment, DoubleQuotedString, LiteralString, LiteralValue},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
-use crate::parser::phase200::layer210::basic_strings_p::State as DoubleQuotedStringState;
+use crate::parser::phase200::layer210::basic_string_p::State as DoubleQuotedStringState;
 use casual_logger::Table as LogTable;
 
 /// Comment parser.  
