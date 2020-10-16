@@ -43,9 +43,9 @@ pub struct KeyValueP {
 pub struct RightValueP {
     array_p: Option<ArrayP>,
     buffer: Option<RightValue>,
-    double_quoted_string_p: Option<BasicStringP>,
+    basic_string_p: Option<BasicStringP>,
     inline_table_p: Option<InlineTableP>,
     literal_value_p: Option<LiteralValueP>,
-    single_quoted_string_p: Option<LiteralStringP>,
+    literal_string_p: Option<LiteralStringP>,
     state: RightValueState,
 }

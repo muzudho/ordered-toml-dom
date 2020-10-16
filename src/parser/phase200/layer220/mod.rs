@@ -24,7 +24,7 @@ pub struct ArrayP {
     buffer: Option<Array>,
     /// Recursive.
     array_p: Option<Box<ArrayP>>,
-    double_quoted_string_p: Option<Box<BasicStringP>>,
-    single_quoted_string_p: Option<Box<LiteralStringP>>,
+    basic_string_p: Option<Box<BasicStringP>>,
+    literal_string_p: Option<Box<LiteralStringP>>,
     state: ArrayState,
 }

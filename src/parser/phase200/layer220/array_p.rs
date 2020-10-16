@@ -52,8 +52,8 @@ impl Default for ArrayP {
         ArrayP {
             buffer: None,
             array_p: None,
-            double_quoted_string_p: None,
-            single_quoted_string_p: None,
+            basic_string_p: None,
+            literal_string_p: None,
             state: State::First,
         }
     }
@@ -112,11 +112,11 @@ impl ArrayP {
             State::AfterCommaBefindQuotedString => {
                 match token0.type_ {
                     TokenType::DoubleQuotation => {
-                        self.double_quoted_string_p = Some(Box::new(BasicStringP::new()));
+                        self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(Box::new(LiteralStringP::new()));
+                        self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
@@ -200,7 +200,7 @@ impl ArrayP {
                         self.state = State::Array;
                     }
                     TokenType::DoubleQuotation => {
-                        self.double_quoted_string_p = Some(Box::new(BasicStringP::new()));
+                        self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
                     TokenType::KeyWithoutDot => {
@@ -213,7 +213,7 @@ impl ArrayP {
                         self.state = State::AfterKeyWithoutDot;
                     }
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(Box::new(LiteralStringP::new()));
+                        self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
@@ -246,7 +246,7 @@ impl ArrayP {
             }
             // "dog".
             State::DoubleQuotedString => {
-                let p = self.double_quoted_string_p.as_mut().unwrap();
+                let p = self.basic_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
@@ -255,7 +255,7 @@ impl ArrayP {
                             }
                             let m = self.buffer.as_mut().unwrap();
                             m.push_double_quote_string(&child_m);
-                            self.double_quoted_string_p = None;
+                            self.basic_string_p = None;
                             self.state = State::AfterDoubleQuotedString;
                         } else {
                             return error(&mut self.log(), tokens, "array.rs.439.");
@@ -272,7 +272,7 @@ impl ArrayP {
             }
             // `'C:\temp'`.
             State::LiteralString => {
-                let p = self.single_quoted_string_p.as_mut().unwrap();
+                let p = self.literal_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
@@ -281,7 +281,7 @@ impl ArrayP {
                             }
                             let m = self.buffer.as_mut().unwrap();
                             m.push_single_quote_string(&child_m);
-                            self.single_quoted_string_p = None;
+                            self.literal_string_p = None;
                             self.state = State::AfterSingleQuotedString;
                         } else {
                             return error(&mut self.log(), tokens, "array.rs.493.");
@@ -304,11 +304,11 @@ impl ArrayP {
             .str("state", &format!("{:?}", self.state))
             .clone();
 
-        if let Some(p) = &self.double_quoted_string_p {
-            t.sub_t("double_quoted_string_p", &p.log());
+        if let Some(p) = &self.basic_string_p {
+            t.sub_t("basic_string_p", &p.log());
         }
-        if let Some(p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string_p", &p.log());
+        if let Some(p) = &self.literal_string_p {
+            t.sub_t("literal_string_p", &p.log());
         }
         if let Some(p) = &self.array_p {
             t.sub_t("array_p", &p.log());

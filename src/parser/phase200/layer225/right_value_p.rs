@@ -33,10 +33,10 @@ impl Default for RightValueP {
         RightValueP {
             array_p: None,
             buffer: None,
-            double_quoted_string_p: None,
+            basic_string_p: None,
             inline_table_p: None,
             literal_value_p: None,
-            single_quoted_string_p: None,
+            literal_string_p: None,
             state: State::First,
         }
     }
@@ -101,12 +101,12 @@ impl RightValueP {
             }
             // `"abc"`.
             State::BasicString => {
-                let p = self.double_quoted_string_p.as_mut().unwrap();
+                let p = self.basic_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::BasicString(child_m));
-                            self.double_quoted_string_p = None;
+                            self.basic_string_p = None;
                             self.state = State::End;
                             return PResult::End;
                         } else {
@@ -128,7 +128,7 @@ impl RightValueP {
                 match token0.type_ {
                     // `"`.
                     TokenType::DoubleQuotation => {
-                        self.double_quoted_string_p = Some(BasicStringP::new());
+                        self.basic_string_p = Some(BasicStringP::new());
                         self.state = State::BasicString;
                     }
                     // `{`.
@@ -143,7 +143,7 @@ impl RightValueP {
                     }
                     // `'`.
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(LiteralStringP::new());
+                        self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
@@ -202,12 +202,12 @@ impl RightValueP {
             }
             // `'abc'`.
             State::LiteralString => {
-                let p = self.single_quoted_string_p.as_mut().unwrap();
+                let p = self.literal_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::LiteralString(child_m));
-                            self.single_quoted_string_p = None;
+                            self.literal_string_p = None;
                             self.state = State::End;
                             return PResult::End;
                         } else {
@@ -239,14 +239,14 @@ impl RightValueP {
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", &self.buffer))
             .clone();
-        if let Some(double_quoted_string_p) = &self.double_quoted_string_p {
-            t.sub_t("basic_strings", &double_quoted_string_p.log());
+        if let Some(basic_string_p) = &self.basic_string_p {
+            t.sub_t("basic_string_p", &basic_string_p.log());
         }
         if let Some(inline_table_p) = &self.inline_table_p {
             t.sub_t("inline_table", &inline_table_p.log());
         }
-        if let Some(single_quoted_string_p) = &self.single_quoted_string_p {
-            t.sub_t("single_quoted_string", &single_quoted_string_p.log());
+        if let Some(literal_string_p) = &self.literal_string_p {
+            t.sub_t("single_quoted_string", &literal_string_p.log());
         }
         t
     }

@@ -4,27 +4,27 @@ apple = "pie"
 adult = true
 student = false
 
-basic_strings_empty = ""
-basic_strings_escape_backslash = "\\"
-basic_strings_escape_double_quotation = "\""
-basic_strings_letter = "Hello, world!!"
-basic_strings_punctuation = "., ={}[]'\"\\!?"
+basic_string_empty = ""
+basic_string_escape_backslash = "\\"
+basic_string_escape_double_quotation = "\""
+basic_string_letter = "Hello, world!!"
+basic_string_punctuation = "., ={}[]'\"\\!?"
 
-multiline_basic_strings_letter = """Hello,
+multiline_basic_string_letter = """Hello,
 world!!"""
-multiline_basic_strings_punctuation = """., ={}[]"'""\\
+multiline_basic_string_punctuation = """., ={}[]"'""\\
 !?"""
-multiline_basic_strings_trim_start = """\
+multiline_basic_string_trim_start = """\
   The quick brown \
   fox jumps over \
   the lazy dog.\
   """
 
-literal_strings_empty = ''
-literal_strings_letter = 'Hello, world!!'
-literal_strings_punctuation = '., ={}[]"\!?'
+literal_string_empty = ''
+literal_string_letter = 'Hello, world!!'
+literal_string_punctuation = '., ={}[]"\!?'
 
-multiline_literal_strings_letter = '''Hello,
+multiline_literal_string_letter = '''Hello,
 world!!'''
-multiline_literal_strings_punctuation = '''., ={}[]'"\
+multiline_literal_string_punctuation = '''., ={}[]'"\
 !?'''

@@ -24,15 +24,15 @@ fn main() {
 
     // Test.
     test_apple(&doc, &mut has_error);
-    test_basic_strings_letter(&doc, &mut has_error);
-    test_multiline_basic_strings_letter(&doc, &mut has_error);
-    test_literal_strings_letter(&doc, &mut has_error);
-    test_multiline_literal_strings_letter(&doc, &mut has_error);
-    test_basic_strings_punctuation(&doc, &mut has_error);
-    test_multiline_basic_strings_punctuation(&doc, &mut has_error);
-    test_multiline_basic_strings_trim_start(&doc, &mut has_error);
-    test_literal_strings_punctuation(&doc, &mut has_error);
-    test_multiline_literal_strings_punctuation(&doc, &mut has_error);
+    test_basic_string_letter(&doc, &mut has_error);
+    test_multiline_basic_string_letter(&doc, &mut has_error);
+    test_literal_string_letter(&doc, &mut has_error);
+    test_multiline_literal_string_letter(&doc, &mut has_error);
+    test_basic_string_punctuation(&doc, &mut has_error);
+    test_multiline_basic_string_punctuation(&doc, &mut has_error);
+    test_multiline_basic_string_trim_start(&doc, &mut has_error);
+    test_literal_string_punctuation(&doc, &mut has_error);
+    test_multiline_literal_string_punctuation(&doc, &mut has_error);
 
     // Error handling.
     if has_error {
@@ -57,8 +57,8 @@ fn test_apple(doc: &Document, has_error: &mut bool) {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_basic_strings_letter(doc: &Document, has_error: &mut bool) {
-    let key = "basic_strings_letter";
+fn test_basic_string_letter(doc: &Document, has_error: &mut bool) {
+    let key = "basic_string_letter";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value != "Hello, world!!" {
             Log::error_t(
@@ -71,8 +71,8 @@ fn test_basic_strings_letter(doc: &Document, has_error: &mut bool) {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_multiline_basic_strings_letter(doc: &Document, has_error: &mut bool) {
-    let key = "multiline_basic_strings_letter";
+fn test_multiline_basic_string_letter(doc: &Document, has_error: &mut bool) {
+    let key = "multiline_basic_string_letter";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value
             != "Hello,
@@ -88,8 +88,8 @@ fn test_multiline_basic_strings_letter(doc: &Document, has_error: &mut bool) {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_literal_strings_letter(doc: &Document, has_error: &mut bool) {
-    let key = "literal_strings_letter";
+fn test_literal_string_letter(doc: &Document, has_error: &mut bool) {
+    let key = "literal_string_letter";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value != "Hello, world!!" {
             Log::error_t(
@@ -102,8 +102,8 @@ fn test_literal_strings_letter(doc: &Document, has_error: &mut bool) {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_multiline_literal_strings_letter(doc: &Document, has_error: &mut bool) {
-    let key = "multiline_literal_strings_letter";
+fn test_multiline_literal_string_letter(doc: &Document, has_error: &mut bool) {
+    let key = "multiline_literal_string_letter";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value
             != "Hello,
@@ -119,9 +119,9 @@ fn test_multiline_literal_strings_letter(doc: &Document, has_error: &mut bool) {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_basic_strings_punctuation(doc: &Document, has_error: &mut bool) {
+fn test_basic_string_punctuation(doc: &Document, has_error: &mut bool) {
     // Test.
-    let key = "basic_strings_punctuation";
+    let key = "basic_string_punctuation";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value != "., ={}[]'\"\\!?" {
             Log::error_t(
@@ -134,8 +134,8 @@ fn test_basic_strings_punctuation(doc: &Document, has_error: &mut bool) {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_multiline_basic_strings_punctuation(doc: &Document, has_error: &mut bool) {
-    let key = "multiline_basic_strings_punctuation";
+fn test_multiline_basic_string_punctuation(doc: &Document, has_error: &mut bool) {
+    let key = "multiline_basic_string_punctuation";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value
             != "., ={}[]\"'\"\"\\
@@ -151,8 +151,8 @@ fn test_multiline_basic_strings_punctuation(doc: &Document, has_error: &mut bool
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_multiline_basic_strings_trim_start(doc: &Document, has_error: &mut bool) {
-    let key = "multiline_basic_strings_trim_start";
+fn test_multiline_basic_string_trim_start(doc: &Document, has_error: &mut bool) {
+    let key = "multiline_basic_string_trim_start";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value != "The quick brown fox jumps over the lazy dog." {
             Log::error_t(
@@ -165,8 +165,8 @@ fn test_multiline_basic_strings_trim_start(doc: &Document, has_error: &mut bool)
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_literal_strings_punctuation(doc: &Document, has_error: &mut bool) {
-    let key = "literal_strings_punctuation";
+fn test_literal_string_punctuation(doc: &Document, has_error: &mut bool) {
+    let key = "literal_string_punctuation";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value != "., ={}[]\"\\!?" {
             Log::error_t(
@@ -179,8 +179,8 @@ fn test_literal_strings_punctuation(doc: &Document, has_error: &mut bool) {
         Log::error_t(&format!("Test: {}", key), Table::default().str(key, ""));
     }
 }
-fn test_multiline_literal_strings_punctuation(doc: &Document, has_error: &mut bool) {
-    let key = "multiline_literal_strings_punctuation";
+fn test_multiline_literal_string_punctuation(doc: &Document, has_error: &mut bool) {
+    let key = "multiline_literal_string_punctuation";
     if let Some(right_value) = doc.get_str_by_key(key) {
         if right_value
             != "., ={}[]'\"\\

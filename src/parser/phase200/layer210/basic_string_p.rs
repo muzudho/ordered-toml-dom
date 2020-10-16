@@ -68,7 +68,7 @@ impl BasicStringP {
         let token0 = tokens.0.unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), tokens, "basic_strings.rs.66.");
+                return error(&mut self.log(), tokens, "basic_string_p.rs.66.");
             }
             State::First => {
                 match token0.type_ {
@@ -88,7 +88,7 @@ impl BasicStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), tokens, "basic_strings.rs.112.");
+                            return error(&mut self.log(), tokens, "basic_string_p.rs.112.");
                         }
                     }
                     TokenType::Backslash => {
@@ -135,7 +135,7 @@ impl BasicStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "basic_strings.rs.124.");
+                        return error(&mut self.log(), tokens, "basic_string_p.rs.124.");
                     }
                 }
             }
@@ -149,7 +149,7 @@ impl BasicStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "basic_strings.rs.136.");
+                        return error(&mut self.log(), tokens, "basic_string_p.rs.136.");
                     }
                 }
             }
@@ -211,7 +211,7 @@ impl BasicStringP {
                     TokenType::EndOfLine => {
                         // End of line.
                         // 行の終わり。
-                        return error(&mut self.log(), tokens, "basic_strings.rs.59.");
+                        return error(&mut self.log(), tokens, "basic_string_p.rs.59.");
                     }
                     _ => {
                         // Escaped.

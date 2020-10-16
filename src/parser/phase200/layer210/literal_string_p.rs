@@ -53,7 +53,7 @@ impl LiteralStringP {
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error(&mut self.log(), tokens, "basic_strings.rs.66.");
+                return error(&mut self.log(), tokens, "literal_string_p.rs.66.");
             }
             State::First => {
                 match token0.type_ {
@@ -73,7 +73,7 @@ impl LiteralStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), tokens, "basic_strings.rs.112.");
+                            return error(&mut self.log(), tokens, "literal_string_p.rs.112.");
                         }
                     }
                     _ => {
@@ -107,7 +107,7 @@ impl LiteralStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "basic_strings.rs.124.");
+                        return error(&mut self.log(), tokens, "literal_string_p.rs.124.");
                     }
                 }
             }
@@ -121,7 +121,7 @@ impl LiteralStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "basic_strings.rs.136.");
+                        return error(&mut self.log(), tokens, "literal_string_p.rs.136.");
                     }
                 }
             }
