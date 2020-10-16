@@ -8,7 +8,7 @@
 //! ```
 
 use crate::model::{
-    layer210::{DoubleQuotedString, LiteralString, LiteralValue},
+    layer210::{BasicString, LiteralString, LiteralValue},
     layer220::{Array, ItemValue},
 };
 use std::fmt;
@@ -25,8 +25,8 @@ impl Array {
     pub fn push_single_quote_string(&mut self, m: &LiteralString) {
         self.items.push(ItemValue::LiteralString(m.clone()));
     }
-    pub fn push_double_quote_string(&mut self, m: &DoubleQuotedString) {
-        self.items.push(ItemValue::DoubleQuotedString(m.clone()));
+    pub fn push_double_quote_string(&mut self, m: &BasicString) {
+        self.items.push(ItemValue::BasicString(m.clone()));
     }
     pub fn push_array(&mut self, m: &Array) {
         self.items.push(ItemValue::Array(m.clone()));

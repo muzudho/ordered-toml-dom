@@ -2,7 +2,7 @@ pub mod array;
 pub mod item_value;
 
 use crate::model::{
-    layer210::{DoubleQuotedString, LiteralString, LiteralValue},
+    layer210::{BasicString, LiteralString, LiteralValue},
     layer225::{InlineTable, KeyValue},
 };
 
@@ -20,7 +20,7 @@ pub enum ItemValue {
     /// Recursive.
     /// 再帰的。
     Array(Array),
-    DoubleQuotedString(DoubleQuotedString),
+    BasicString(BasicString),
     /// Recursive.
     /// 再帰的。
     InlineTable(InlineTable),

@@ -21,7 +21,7 @@ use casual_logger::Table as LogTable;
 pub enum State {
     AfterLeftCurlyBracket,
     AfterLeftSquareBracket,
-    DoubleQuotedString,
+    BasicString,
     First,
     LiteralString,
     LiteralValue,
@@ -100,12 +100,12 @@ impl RightValueP {
                 }
             }
             // `"abc"`.
-            State::DoubleQuotedString => {
+            State::BasicString => {
                 let p = self.double_quoted_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::DoubleQuotedString(child_m));
+                            self.buffer = Some(RightValue::BasicString(child_m));
                             self.double_quoted_string_p = None;
                             self.state = State::End;
                             return PResult::End;
@@ -129,7 +129,7 @@ impl RightValueP {
                     // `"`.
                     TokenType::DoubleQuotation => {
                         self.double_quoted_string_p = Some(BasicStringP::new());
-                        self.state = State::DoubleQuotedString;
+                        self.state = State::BasicString;
                     }
                     // `{`.
                     TokenType::LeftCurlyBracket => {

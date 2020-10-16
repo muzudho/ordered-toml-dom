@@ -7,22 +7,22 @@
 //! // "ハロー"
 //! ```
 
-use crate::model::{layer110::token::Token, layer210::DoubleQuotedString};
+use crate::model::{layer110::token::Token, layer210::BasicString};
 use std::fmt;
 
-impl Default for DoubleQuotedString {
+impl Default for BasicString {
     fn default() -> Self {
-        DoubleQuotedString {
+        BasicString {
             value: String::new(),
         }
     }
 }
-impl DoubleQuotedString {
+impl BasicString {
     pub fn push_token(&mut self, token: &Token) {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for DoubleQuotedString {
+impl fmt::Debug for BasicString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "\"{}\"", self.value)
     }

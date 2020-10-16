@@ -13,7 +13,7 @@ pub struct Comment {
 /// It has one string.  
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
-pub struct DoubleQuotedString {
+pub struct BasicString {
     pub value: String,
 }
 

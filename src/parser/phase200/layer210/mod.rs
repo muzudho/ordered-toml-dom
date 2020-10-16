@@ -6,11 +6,11 @@ pub mod literal_string_p;
 pub mod literal_value_p;
 
 use crate::model::{
-    layer210::{Comment, DoubleQuotedString, LiteralString, LiteralValue},
+    layer210::{BasicString, Comment, LiteralString, LiteralValue},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
-    basic_string_p::State as DoubleQuotedStringState, literal_string_p::State as LiteralStringState,
+    basic_string_p::State as BasicStringState, literal_string_p::State as LiteralStringState,
 };
 use casual_logger::Table as LogTable;
 
@@ -29,8 +29,8 @@ pub struct CommentP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct BasicStringP {
-    buffer: Option<DoubleQuotedString>,
-    state: DoubleQuotedStringState,
+    buffer: Option<BasicString>,
+    state: BasicStringState,
 }
 
 /// Header of array of table syntax parser.  

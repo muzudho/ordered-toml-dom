@@ -100,7 +100,7 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key == key {
                     match &*key_value.value {
-                        RightValue::DoubleQuotedString(literal_value) => {
+                        RightValue::BasicString(literal_value) => {
                             return Some(&literal_value.value);
                         }
                         RightValue::LiteralString(literal_value) => {

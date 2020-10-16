@@ -3,7 +3,7 @@ pub mod key_value;
 pub mod right_value;
 
 use crate::model::{
-    layer210::{DoubleQuotedString, LiteralString, LiteralValue},
+    layer210::{BasicString, LiteralString, LiteralValue},
     layer220::Array,
 };
 
@@ -24,7 +24,7 @@ pub enum RightValue {
     /// Recursive.
     /// 再帰的。
     Array(Array),
-    DoubleQuotedString(DoubleQuotedString),
+    BasicString(BasicString),
     /// Recursive.
     /// 再帰的。
     InlineTable(InlineTable),

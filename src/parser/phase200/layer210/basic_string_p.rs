@@ -12,7 +12,7 @@
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::DoubleQuotedString,
+    layer210::BasicString,
 };
 use crate::parser::phase200::{
     error,
@@ -45,14 +45,14 @@ pub enum State {
 }
 
 impl BasicStringP {
-    pub fn flush(&mut self) -> Option<DoubleQuotedString> {
+    pub fn flush(&mut self) -> Option<BasicString> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
         BasicStringP {
-            buffer: Some(DoubleQuotedString::default()),
+            buffer: Some(BasicString::default()),
             state: State::First,
         }
     }
