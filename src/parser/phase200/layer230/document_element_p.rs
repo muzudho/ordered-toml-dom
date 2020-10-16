@@ -2,7 +2,7 @@
 //! `縦幅のある行` 構文パーサー。  
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer230::DocumentElement,
 };
 use crate::parser::phase200::{

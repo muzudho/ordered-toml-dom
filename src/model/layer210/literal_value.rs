@@ -7,7 +7,7 @@
 //! // work_number
 //! ```
 
-use crate::model::{layer110::token::Token, layer210::LiteralValue};
+use crate::model::{layer110::Token, layer210::LiteralValue};
 use std::fmt;
 
 impl Default for LiteralValue {

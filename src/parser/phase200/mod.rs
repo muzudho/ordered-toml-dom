@@ -7,7 +7,7 @@ pub mod layer225;
 pub mod layer230;
 pub mod layer310;
 
-use crate::model::layer110::token::Token;
+use crate::model::layer110::Token;
 use crate::parser::phase200::layer210::PResult;
 use crate::parser::phase200::layer220::usize_to_i128;
 use crate::util::random_name;

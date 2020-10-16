@@ -8,7 +8,7 @@
 //! ```
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer210::LiteralValue,
     layer220::Array,
 };
@@ -189,16 +189,7 @@ impl ArrayP {
             // After `[`.
             State::First => {
                 match token0.type_ {
-                    // `]`. Empty array.
-                    TokenType::RightSquareBracket => {
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    // `[`. Recursive.
-                    TokenType::LeftSquareBracket => {
-                        self.array_p = Some(Box::new(ArrayP::default()));
-                        self.state = State::Array;
-                    }
+                    // "
                     TokenType::DoubleQuotation => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
@@ -212,6 +203,17 @@ impl ArrayP {
                         m.push_literal_string(&LiteralValue::from_token(token0));
                         self.state = State::AfterKeyWithoutDot;
                     }
+                    // `[`. Recursive.
+                    TokenType::LeftSquareBracket => {
+                        self.array_p = Some(Box::new(ArrayP::default()));
+                        self.state = State::Array;
+                    }
+                    // `]`. Empty array.
+                    TokenType::RightSquareBracket => {
+                        self.state = State::End;
+                        return PResult::End;
+                    }
+                    // '
                     TokenType::SingleQuotation => {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;

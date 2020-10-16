@@ -2,7 +2,7 @@
 //! キー値モデル。  
 
 use crate::model::{
-    layer110::token::Token,
+    layer110::Token,
     layer225::{KeyValue, RightValue},
 };
 use std::fmt;

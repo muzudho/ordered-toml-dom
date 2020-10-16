@@ -11,7 +11,7 @@
 //! ```
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer210::BasicString,
 };
 use crate::parser::phase200::{

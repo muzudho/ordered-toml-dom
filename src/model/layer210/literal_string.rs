@@ -7,7 +7,7 @@
 //! // 'ハロー'
 //! ```
 
-use crate::model::{layer110::token::Token, layer210::LiteralString};
+use crate::model::{layer110::Token, layer210::LiteralString};
 use std::fmt;
 
 impl Default for LiteralString {

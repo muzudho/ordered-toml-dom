@@ -2,7 +2,7 @@
 //! 単一引用符文字列構文パーサー。  
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer210::LiteralString,
 };
 use crate::parser::phase200::{

@@ -8,7 +8,7 @@
 //! ```
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer225::KeyValue,
 };
 use crate::parser::phase200::{

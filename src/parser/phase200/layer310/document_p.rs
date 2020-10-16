@@ -2,7 +2,7 @@
 //! ドキュメント構文解析器。  
 
 use crate::model::{
-    layer110::token::{Token, TokenLine},
+    layer110::{Token, TokenLine},
     layer310::Document,
 };
 use crate::parser::phase200::{

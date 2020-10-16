@@ -7,7 +7,7 @@
 //! // [name.name.name]
 //! ```
 
-use crate::model::{layer110::token::Token, layer230::HeaderOfTable};
+use crate::model::{layer110::Token, layer230::HeaderOfTable};
 use std::fmt;
 
 impl Default for HeaderOfTable {

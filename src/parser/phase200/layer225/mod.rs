@@ -3,7 +3,7 @@ pub mod key_value_p;
 pub mod right_value_p;
 
 use crate::model::{
-    layer110::token::Token,
+    layer110::Token,
     layer225::{InlineTable, KeyValue, RightValue},
 };
 use crate::parser::phase200::{

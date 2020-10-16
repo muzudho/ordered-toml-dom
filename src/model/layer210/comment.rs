@@ -7,7 +7,7 @@
 //! // # Toml's comment（トムルのコメント）
 //! ```
 
-use crate::model::{layer110::token::Token, layer210::Comment};
+use crate::model::{layer110::Token, layer210::Comment};
 use std::fmt;
 
 impl Default for Comment {

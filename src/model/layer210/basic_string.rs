@@ -7,7 +7,7 @@
 //! // "ハロー"
 //! ```
 
-use crate::model::{layer110::token::Token, layer210::BasicString};
+use crate::model::{layer110::Token, layer210::BasicString};
 use std::fmt;
 
 impl Default for BasicString {

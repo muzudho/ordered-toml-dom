@@ -2,7 +2,7 @@
 //! テーブルの配列構文パーサー。  
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer230::HeaderOfArrayOfTable,
 };
 use crate::parser::phase200::layer210::{HeaderPOfArrayOfTable, PResult};

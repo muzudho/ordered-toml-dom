@@ -2,7 +2,7 @@
 //! キー値構文パーサー。  
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer225::RightValue,
 };
 use crate::parser::phase200::{

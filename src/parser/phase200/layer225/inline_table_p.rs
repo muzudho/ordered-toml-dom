@@ -2,7 +2,7 @@
 //! インライン・テーブル構文パーサー。  
 
 use crate::model::{
-    layer110::token::{Token, TokenType},
+    layer110::{Token, TokenType},
     layer225::InlineTable,
 };
 use crate::parser::phase200::{
