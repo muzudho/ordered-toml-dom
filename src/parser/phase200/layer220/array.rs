@@ -14,7 +14,7 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     error, error_via,
-    layer210::{DoubleQuotedStringP, PResult, SingleQuotedStringP},
+    layer210::{DoubleQuotedStringP, LiteralStringP, PResult},
     layer220::ArrayP,
 };
 use casual_logger::Table;
@@ -116,7 +116,7 @@ impl ArrayP {
                         self.state = State::DoubleQuotedString;
                     }
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
+                        self.single_quoted_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
@@ -213,7 +213,7 @@ impl ArrayP {
                         self.state = State::AfterKeyWithoutDot;
                     }
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
+                        self.single_quoted_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.

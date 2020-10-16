@@ -7,7 +7,7 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     error, error_via,
-    layer210::{DoubleQuotedStringP, LiteralValueP, PResult, SingleQuotedStringP},
+    layer210::{DoubleQuotedStringP, LiteralStringP, LiteralValueP, PResult},
     layer220::ArrayP,
     layer225::{InlineTableP, RightValueP},
 };
@@ -143,7 +143,7 @@ impl RightValueP {
                     }
                     // `'`.
                     TokenType::SingleQuotation => {
-                        self.single_quoted_string_p = Some(SingleQuotedStringP::new());
+                        self.single_quoted_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} //Ignored it.

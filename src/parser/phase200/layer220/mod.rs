@@ -2,7 +2,7 @@ pub mod array;
 
 use crate::model::layer220::Array;
 use crate::parser::phase200::{
-    layer210::{DoubleQuotedStringP, SingleQuotedStringP},
+    layer210::{DoubleQuotedStringP, LiteralStringP},
     layer220::array::State as ArrayState,
 };
 use std::convert::TryInto;
@@ -25,6 +25,6 @@ pub struct ArrayP {
     /// Recursive.
     array_p: Option<Box<ArrayP>>,
     double_quoted_string_p: Option<Box<DoubleQuotedStringP>>,
-    single_quoted_string_p: Option<Box<SingleQuotedStringP>>,
+    single_quoted_string_p: Option<Box<LiteralStringP>>,
     state: ArrayState,
 }

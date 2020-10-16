@@ -5,17 +5,17 @@ use crate::model::{
     layer110::token::{Token, TokenType},
     layer210::LiteralString,
 };
-use crate::parser::phase200::layer210::{PResult, SingleQuotedStringP};
+use crate::parser::phase200::layer210::{LiteralStringP, PResult};
 use casual_logger::Table;
 
-impl SingleQuotedStringP {
+impl LiteralStringP {
     pub fn flush(&mut self) -> Option<LiteralString> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        SingleQuotedStringP {
+        LiteralStringP {
             buffer: Some(LiteralString::default()),
         }
     }

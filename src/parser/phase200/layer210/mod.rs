@@ -1,9 +1,9 @@
-pub mod comment;
+pub mod comment_p;
 pub mod double_quoted_string;
 pub mod header_of_array_of_table;
 pub mod header_of_table;
-pub mod literal_value;
-pub mod single_quoted_string;
+pub mod literal_string_p;
+pub mod literal_value_p;
 
 use crate::model::{
     layer210::{Comment, DoubleQuotedString, LiteralString, LiteralValue},
@@ -74,6 +74,6 @@ pub enum PResult {
 ///
 /// Example: `'value'`.  
 #[derive(Clone)]
-pub struct SingleQuotedStringP {
+pub struct LiteralStringP {
     buffer: Option<LiteralString>,
 }
