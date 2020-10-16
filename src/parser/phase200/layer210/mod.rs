@@ -9,7 +9,9 @@ use crate::model::{
     layer210::{Comment, DoubleQuotedString, LiteralString, LiteralValue},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
-use crate::parser::phase200::layer210::basic_string_p::State as DoubleQuotedStringState;
+use crate::parser::phase200::layer210::{
+    basic_string_p::State as DoubleQuotedStringState, literal_string_p::State as LiteralStringState,
+};
 use casual_logger::Table as LogTable;
 
 /// Comment parser.  
@@ -76,4 +78,5 @@ pub enum PResult {
 #[derive(Clone)]
 pub struct LiteralStringP {
     buffer: Option<LiteralString>,
+    state: LiteralStringState,
 }
