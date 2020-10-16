@@ -16,15 +16,19 @@ fn main() {
 
     // Read a number.
     // 数値読取。
-    test_age(&doc);
-    test_weight(&doc);
+    assert_eq!(doc.get_i128_by_key("age"), Some(40));
+    assert_eq!(doc.get_f64_by_key("weight"), Some(93.5));
 
     // WIP. Read a string.
     // 作業中。 文字列読取。
-    test_apple(&doc);
+    assert_eq!(doc.get_str_by_key("apple"), Some("pie"));
 
-    test_basic_string_empty(&doc);
-    test_basic_string_escape_backslash(&doc);
+    assert_eq!(doc.get_str_by_key("basic_string_empty"), Some(""));
+    assert_eq!(
+        doc.get_str_by_key("basic_string_escape_backslash"),
+        Some("\\")
+    );
+
     test_basic_string_escape_double_quotation(&doc);
     test_basic_string_punctuation(&doc);
 
@@ -43,71 +47,25 @@ fn main() {
     test_boolean_false(&doc);
 }
 
-fn test_age(doc: &Document) {
-    if let Some(age) = doc.get_i128_by_key("age") {
-        println!("age = {}", age);
-        // age = 40
-    }
-}
-fn test_weight(doc: &Document) {
-    if let Some(age) = doc.get_f64_by_key("weight") {
-        println!("weight = {}", age);
-        // weight = 93.5
-    }
-}
-fn test_apple(doc: &Document) {
-    // "pie"
-    if let Some(apple) = doc.get_str_by_key("apple") {
-        println!("apple = {}", apple);
-        // apple = pie
-    }
-}
-fn test_basic_string_empty(doc: &Document) {
-    // ""
-    if let Some(basic_string_empty) = doc.get_str_by_key("basic_string_empty") {
-        println!("basic_string_empty = {}", basic_string_empty);
-        // basic_string_empty =
-    }
-}
-fn test_basic_string_escape_backslash(doc: &Document) {
-    // "\\"
-    if let Some(basic_string_escape_backslash) = doc.get_str_by_key("basic_string_escape_backslash")
-    {
-        println!(
-            "basic_string_escape_backslash = {}",
-            basic_string_escape_backslash
-        );
-        // basic_string_escape_backslash = \
-    }
-}
 fn test_basic_string_escape_double_quotation(doc: &Document) {
     // "\""
-    if let Some(basic_string_escape_double_quotation) =
-        doc.get_str_by_key("basic_string_escape_double_quotation")
-    {
-        println!(
-            "basic_string_escape_double_quotation = {}",
-            basic_string_escape_double_quotation
-        );
+    if let Some(actual) = doc.get_str_by_key("basic_string_escape_double_quotation") {
+        println!("basic_string_escape_double_quotation = {}", actual);
         // basic_string_escape_double_quotation = \
     }
 }
 fn test_basic_string_punctuation(doc: &Document) {
     // "., ={}[]'\"\\!?"
-    if let Some(basic_string_punctuation) = doc.get_str_by_key("basic_string_punctuation") {
-        println!("basic_string_punctuation = {}", basic_string_punctuation);
+    if let Some(actual) = doc.get_str_by_key("basic_string_punctuation") {
+        println!("basic_string_punctuation = {}", actual);
         // basic_string_punctuation = ., ={}[]'"\!?
     }
 }
 fn test_multiline_basic_string_letter(doc: &Document) {
     // """Hello,
     // world!!"""
-    if let Some(multiline_basic_string_letter) = doc.get_str_by_key("multiline_basic_string_letter")
-    {
-        println!(
-            "multiline_basic_string_letter = {}",
-            multiline_basic_string_letter
-        );
+    if let Some(actual) = doc.get_str_by_key("multiline_basic_string_letter") {
+        println!("multiline_basic_string_letter = {}", actual);
         // multiline_basic_string_letter = Hello,
         // world!!
     }
@@ -115,13 +73,8 @@ fn test_multiline_basic_string_letter(doc: &Document) {
 fn test_multiline_basic_string_punctuation(doc: &Document) {
     // """., ={}[]"'""\\
     // !?"""
-    if let Some(multiline_basic_string_punctuation) =
-        doc.get_str_by_key("multiline_basic_string_punctuation")
-    {
-        println!(
-            "multiline_basic_string_punctuation = {}",
-            multiline_basic_string_punctuation
-        );
+    if let Some(actual) = doc.get_str_by_key("multiline_basic_string_punctuation") {
+        println!("multiline_basic_string_punctuation = {}", actual);
         // multiline_basic_string_punctuation = ., ={}[]"'""\
         // !?
     }
@@ -132,53 +85,43 @@ fn test_multiline_basic_string_trim_start(doc: &Document) {
     //   fox jumps over \
     //   the lazy dog.\
     //   """
-    if let Some(multiline_basic_string_trim_start) =
-        doc.get_str_by_key("multiline_basic_string_trim_start")
-    {
-        println!(
-            "multiline_basic_string_trim_start = {}",
-            multiline_basic_string_trim_start
-        );
+    if let Some(actual) = doc.get_str_by_key("multiline_basic_string_trim_start") {
+        println!("multiline_basic_string_trim_start = {}", actual);
         // multiline_basic_string_trim_start =
     }
 }
 fn test_literal_string_empty(doc: &Document) {
     // ""
-    if let Some(literal_string_empty) = doc.get_str_by_key("literal_string_empty") {
-        println!("literal_string_empty = {}", literal_string_empty);
+    if let Some(actual) = doc.get_str_by_key("literal_string_empty") {
+        println!("literal_string_empty = {}", actual);
         // literal_string_empty =
     }
 }
 fn test_literal_string_letter(doc: &Document) {
     // ""
-    if let Some(literal_string_letter) = doc.get_str_by_key("literal_string_letter") {
-        println!("literal_string_letter = {}", literal_string_letter);
+    if let Some(actual) = doc.get_str_by_key("literal_string_letter") {
+        println!("literal_string_letter = {}", actual);
         // literal_string_letter =
     }
 }
 fn test_multiline_literal_string_letter(doc: &Document) {
     // '''Hello,
     // world!!'''
-    if let Some(multiline_literal_string_letter) =
-        doc.get_str_by_key("multiline_literal_string_letter")
-    {
-        println!(
-            "multiline_literal_string_letter = {}",
-            multiline_literal_string_letter
-        );
+    if let Some(actual) = doc.get_str_by_key("multiline_literal_string_letter") {
+        println!("multiline_literal_string_letter = {}", actual);
         // multiline_literal_string_letter = Hello,
         // world!!
     }
 }
 fn test_boolean_true(doc: &Document) {
-    if let Some(adult) = doc.get_bool_by_key("adult") {
-        println!("adult = {}", adult);
+    if let Some(actual) = doc.get_bool_by_key("adult") {
+        println!("adult = {}", actual);
         // adult = true
     }
 }
 fn test_boolean_false(doc: &Document) {
-    if let Some(student) = doc.get_bool_by_key("student") {
-        println!("student = {}", student);
+    if let Some(actual) = doc.get_bool_by_key("student") {
+        println!("student = {}", actual);
         // student = false
     }
 }
