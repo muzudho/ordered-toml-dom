@@ -7,7 +7,7 @@ use crate::model::{
     layer225::{InlineTable, KeyValue, RightValue},
 };
 use crate::parser::phase200::{
-    layer210::{DoubleQuotedStringP, LiteralStringP, SingleQuotedStringP},
+    layer210::{DoubleQuotedStringP, LiteralValueP, SingleQuotedStringP},
     layer220::ArrayP,
     layer225::{
         inline_table::State as InlineTableState, key_value::State as KeyValueState,
@@ -45,7 +45,7 @@ pub struct RightValueP {
     buffer: Option<RightValue>,
     double_quoted_string_p: Option<DoubleQuotedStringP>,
     inline_table_p: Option<InlineTableP>,
-    literal_string_p: Option<LiteralStringP>,
+    literal_value_p: Option<LiteralValueP>,
     single_quoted_string_p: Option<SingleQuotedStringP>,
     state: RightValueState,
 }

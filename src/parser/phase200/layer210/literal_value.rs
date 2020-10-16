@@ -5,9 +5,9 @@ use crate::model::{
     layer110::token::{Token, TokenType},
     layer210::LiteralValue,
 };
-use crate::parser::phase200::layer210::{LiteralStringP, PResult};
+use crate::parser::phase200::layer210::{LiteralValueP, PResult};
 
-impl LiteralStringP {
+impl LiteralValueP {
     pub fn flush(&mut self) -> Option<LiteralValue> {
         if let Some(buffer) = &self.buffer {
             let m = Some(LiteralValue::from_str(buffer.value.trim_end()));
@@ -17,7 +17,7 @@ impl LiteralStringP {
         None
     }
     pub fn new() -> Self {
-        LiteralStringP {
+        LiteralValueP {
             buffer: Some(LiteralValue::default()),
         }
     }

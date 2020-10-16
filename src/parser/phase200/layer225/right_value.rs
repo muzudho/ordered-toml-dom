@@ -7,7 +7,7 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     error, error_via,
-    layer210::{DoubleQuotedStringP, LiteralStringP, PResult, SingleQuotedStringP},
+    layer210::{DoubleQuotedStringP, LiteralValueP, PResult, SingleQuotedStringP},
     layer220::ArrayP,
     layer225::{InlineTableP, RightValueP},
 };
@@ -35,7 +35,7 @@ impl Default for RightValueP {
             buffer: None,
             double_quoted_string_p: None,
             inline_table_p: None,
-            literal_string_p: None,
+            literal_value_p: None,
             single_quoted_string_p: None,
             state: State::First,
         }
@@ -148,14 +148,14 @@ impl RightValueP {
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
                     TokenType::KeyWithoutDot | _ => {
-                        self.literal_string_p = Some(LiteralStringP::new());
+                        self.literal_value_p = Some(LiteralValueP::new());
                         self.state = State::LiteralValue;
-                        let p = self.literal_string_p.as_mut().unwrap();
+                        let p = self.literal_value_p.as_mut().unwrap();
                         match p.parse(tokens) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.buffer = Some(RightValue::LiteralValue(child_m));
-                                    self.literal_string_p = None;
+                                    self.literal_value_p = None;
                                     self.state = State::End;
                                     return PResult::End;
                                 } else {
@@ -177,12 +177,12 @@ impl RightValueP {
             }
             // `abc`.
             State::LiteralValue => {
-                let p = self.literal_string_p.as_mut().unwrap();
+                let p = self.literal_value_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::LiteralValue(child_m));
-                            self.literal_string_p = None;
+                            self.literal_value_p = None;
                             self.state = State::End;
                             return PResult::End;
                         } else {

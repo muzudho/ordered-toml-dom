@@ -54,7 +54,7 @@ pub struct HeaderPOfTable {
 ///
 /// Example: `abc`.  
 #[derive(Clone)]
-pub struct LiteralStringP {
+pub struct LiteralValueP {
     buffer: Option<LiteralValue>,
 }
 
