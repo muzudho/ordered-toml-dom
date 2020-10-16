@@ -59,7 +59,7 @@ impl RightValueP {
     pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
         let token0 = tokens.0.unwrap();
         match self.state {
-            // After `{`.
+            // After {.
             State::AfterLeftCurlyBracket => {
                 let p = self.inline_table_p.as_mut().unwrap();
                 match p.parse(tokens) {
@@ -79,7 +79,7 @@ impl RightValueP {
                     PResult::Ongoing => {}
                 }
             }
-            // After `[`.
+            // After [.
             State::AfterLeftSquareBracket => {
                 let p = self.array_p.as_mut().unwrap();
                 match p.parse(tokens) {
@@ -99,7 +99,7 @@ impl RightValueP {
                     PResult::Ongoing => {}
                 }
             }
-            // `"abc"`.
+            // "abc"
             State::BasicString => {
                 let p = self.basic_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
@@ -126,7 +126,7 @@ impl RightValueP {
             }
             State::First => {
                 match token0.type_ {
-                    // `"`.
+                    // "
                     TokenType::DoubleQuotation => {
                         self.basic_string_p = Some(BasicStringP::new());
                         self.state = State::BasicString;

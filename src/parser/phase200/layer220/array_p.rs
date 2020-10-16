@@ -32,13 +32,13 @@ pub enum State {
     /// After `[ "a",`.
     AfterCommaBefindString,
     /// After `[ true,`.
-    AfterCommaBehindKeyWithoutDot,
+    AfterCommaBehindLiteralValue,
     /// After " or '.
     AfterString,
     /// After `[`.
     First,
     /// `[ true` , か ] を待ちます。
-    AfterKeyWithoutDot,
+    LiteralValue,
     /// After `[`.
     Array,
     DoubleQuotedString,
@@ -99,7 +99,7 @@ impl ArrayP {
                         self.state = State::Array;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
-                    // `]`.
+                    // ]
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
@@ -130,7 +130,7 @@ impl ArrayP {
                 }
             }
             // After `literal,`.
-            State::AfterCommaBehindKeyWithoutDot => {
+            State::AfterCommaBehindLiteralValue => {
                 match token0.type_ {
                     TokenType::KeyWithoutDot => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
@@ -139,7 +139,7 @@ impl ArrayP {
                         }
                         let m = self.buffer.as_mut().unwrap();
                         m.push_literal_string(&LiteralValue::from_token(token0));
-                        self.state = State::AfterKeyWithoutDot;
+                        self.state = State::LiteralValue;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `]`.
@@ -202,7 +202,7 @@ impl ArrayP {
                         }
                         let m = self.buffer.as_mut().unwrap();
                         m.push_literal_string(&LiteralValue::from_token(token0));
-                        self.state = State::AfterKeyWithoutDot;
+                        self.state = State::LiteralValue;
                     }
                     // `[`. Recursive.
                     TokenType::LeftSquareBracket => {
@@ -223,9 +223,9 @@ impl ArrayP {
                     _ => return error(&mut self.log(), tokens, "array.rs.358."),
                 }
             }
-            State::AfterKeyWithoutDot => match token0.type_ {
+            State::LiteralValue => match token0.type_ {
                 TokenType::Comma => {
-                    self.state = State::AfterCommaBehindKeyWithoutDot;
+                    self.state = State::AfterCommaBehindLiteralValue;
                 }
                 TokenType::RightSquareBracket => {
                     self.state = State::End;
