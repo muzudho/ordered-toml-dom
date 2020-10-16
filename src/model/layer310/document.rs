@@ -103,7 +103,7 @@ impl Document {
                         RightValue::DoubleQuotedString(literal_value) => {
                             return Some(&literal_value.value);
                         }
-                        RightValue::SingleQuotedString(literal_value) => {
+                        RightValue::LiteralString(literal_value) => {
                             return Some(&literal_value.value);
                         }
                         _ => {}

@@ -3,20 +3,20 @@
 
 use crate::model::{
     layer110::token::{Token, TokenType},
-    layer210::SingleQuotedString,
+    layer210::LiteralString,
 };
 use crate::parser::phase200::layer210::{PResult, SingleQuotedStringP};
 use casual_logger::Table;
 
 impl SingleQuotedStringP {
-    pub fn flush(&mut self) -> Option<SingleQuotedString> {
+    pub fn flush(&mut self) -> Option<LiteralString> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
         SingleQuotedStringP {
-            buffer: Some(SingleQuotedString::default()),
+            buffer: Some(LiteralString::default()),
         }
     }
     /// # Arguments

@@ -27,6 +27,6 @@ pub struct LiteralValue {
 /// It has one string.  
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
-pub struct SingleQuotedString {
+pub struct LiteralString {
     pub value: String,
 }

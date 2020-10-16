@@ -23,7 +23,7 @@ pub enum State {
     AfterLeftSquareBracket,
     DoubleQuotedString,
     First,
-    SingleQuotedString,
+    LiteralString,
     LiteralValue,
     End,
 }
@@ -144,7 +144,7 @@ impl RightValueP {
                     // `'`.
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_p = Some(SingleQuotedStringP::new());
-                        self.state = State::SingleQuotedString;
+                        self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
                     TokenType::KeyWithoutDot | _ => {
@@ -201,12 +201,12 @@ impl RightValueP {
                 }
             }
             // `'abc'`.
-            State::SingleQuotedString => {
+            State::LiteralString => {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::SingleQuotedString(child_m));
+                            self.buffer = Some(RightValue::LiteralString(child_m));
                             self.single_quoted_string_p = None;
                             self.state = State::End;
                             return PResult::End;

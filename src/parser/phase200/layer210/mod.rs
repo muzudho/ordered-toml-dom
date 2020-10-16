@@ -6,7 +6,7 @@ pub mod literal_value;
 pub mod single_quoted_string;
 
 use crate::model::{
-    layer210::{Comment, DoubleQuotedString, LiteralValue, SingleQuotedString},
+    layer210::{Comment, DoubleQuotedString, LiteralString, LiteralValue},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::double_quoted_string::State as DoubleQuotedStringState;
@@ -75,5 +75,5 @@ pub enum PResult {
 /// Example: `'value'`.  
 #[derive(Clone)]
 pub struct SingleQuotedStringP {
-    buffer: Option<SingleQuotedString>,
+    buffer: Option<LiteralString>,
 }

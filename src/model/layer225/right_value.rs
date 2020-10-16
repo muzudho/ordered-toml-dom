@@ -12,7 +12,7 @@ impl fmt::Debug for RightValue {
             RightValue::InlineTable(m) => write!(f, "{:?}", m),
             // No KeyValue.
             RightValue::LiteralValue(m) => write!(f, "{:?}", m),
-            RightValue::SingleQuotedString(m) => write!(f, "{:?}", m),
+            RightValue::LiteralString(m) => write!(f, "{:?}", m),
         }
     }
 }

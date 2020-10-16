@@ -44,7 +44,7 @@ pub enum State {
     Array,
     DoubleQuotedString,
     End,
-    SingleQuotedString,
+    LiteralString,
 }
 
 impl Default for ArrayP {
@@ -117,7 +117,7 @@ impl ArrayP {
                     }
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
-                        self.state = State::SingleQuotedString;
+                        self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `]`.
@@ -214,7 +214,7 @@ impl ArrayP {
                     }
                     TokenType::SingleQuotation => {
                         self.single_quoted_string_p = Some(Box::new(SingleQuotedStringP::new()));
-                        self.state = State::SingleQuotedString;
+                        self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
                     _ => return error(&mut self.log(), tokens, "array.rs.358."),
@@ -271,7 +271,7 @@ impl ArrayP {
                 return error(&mut self.log(), tokens, "array.rs.466.");
             }
             // `'C:\temp'`.
-            State::SingleQuotedString => {
+            State::LiteralString => {
                 let p = self.single_quoted_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {

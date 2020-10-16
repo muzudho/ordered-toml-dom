@@ -3,7 +3,7 @@ pub mod key_value;
 pub mod right_value;
 
 use crate::model::{
-    layer210::{DoubleQuotedString, LiteralValue, SingleQuotedString},
+    layer210::{DoubleQuotedString, LiteralString, LiteralValue},
     layer220::Array,
 };
 
@@ -30,7 +30,7 @@ pub enum RightValue {
     InlineTable(InlineTable),
     // No KeyValue.
     LiteralValue(LiteralValue),
-    SingleQuotedString(SingleQuotedString),
+    LiteralString(LiteralString),
 }
 
 /// It has multiple key-values.  
