@@ -1,5 +1,5 @@
+pub mod basic_strings;
 pub mod comment;
-pub mod double_quoted_string;
 pub mod literal_value;
 pub mod single_quoted_string;
 

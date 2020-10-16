@@ -68,7 +68,7 @@ impl DoubleQuotedStringP {
         let token0 = tokens.0.unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), tokens, "double_quoted_string.rs.66.");
+                return error(&mut self.log(), tokens, "basic_strings.rs.66.");
             }
             State::First => {
                 match token0.type_ {
@@ -88,7 +88,7 @@ impl DoubleQuotedStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), tokens, "double_quoted_string.rs.112.");
+                            return error(&mut self.log(), tokens, "basic_strings.rs.112.");
                         }
                     }
                     TokenType::Backslash => {
@@ -135,7 +135,7 @@ impl DoubleQuotedStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "double_quoted_string.rs.124.");
+                        return error(&mut self.log(), tokens, "basic_strings.rs.124.");
                     }
                 }
             }
@@ -149,7 +149,7 @@ impl DoubleQuotedStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "double_quoted_string.rs.136.");
+                        return error(&mut self.log(), tokens, "basic_strings.rs.136.");
                     }
                 }
             }
@@ -211,7 +211,7 @@ impl DoubleQuotedStringP {
                     TokenType::EndOfLine => {
                         // End of line.
                         // 行の終わり。
-                        return error(&mut self.log(), tokens, "double_quoted_string.rs.59.");
+                        return error(&mut self.log(), tokens, "basic_strings.rs.59.");
                     }
                     _ => {
                         // Escaped.
