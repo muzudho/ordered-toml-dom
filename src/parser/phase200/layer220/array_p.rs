@@ -30,14 +30,13 @@ pub enum State {
     /// After `[],`.
     AfterCommaBehindArray,
     /// After `[ "a",`.
-    AfterCommaBefindQuotedString,
+    AfterCommaBefindString,
     /// After `[ true,`.
     AfterCommaBehindKeyWithoutDot,
-    /// After `[` or `,`.
-    AfterDoubleQuotedString,
+    /// After " or '.
+    AfterString,
     /// After `[`.
     First,
-    AfterSingleQuotedString,
     /// `[ true` , か ] を待ちます。
     AfterKeyWithoutDot,
     /// After `[`.
@@ -79,11 +78,11 @@ impl ArrayP {
             State::AfterArray => {
                 match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
-                    // `,`.
+                    // ,
                     TokenType::Comma => {
                         self.state = State::AfterCommaBehindArray;
                     }
-                    // `]`.
+                    // ]
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
@@ -94,7 +93,7 @@ impl ArrayP {
             // After `[],`.
             State::AfterCommaBehindArray => {
                 match token0.type_ {
-                    // `[`.
+                    // [
                     TokenType::LeftSquareBracket => {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
@@ -108,19 +107,21 @@ impl ArrayP {
                     _ => return error(&mut self.log(), tokens, "array.rs.130."),
                 }
             }
-            // `"a",` の次。
-            State::AfterCommaBefindQuotedString => {
+            // ", ` の次。
+            State::AfterCommaBefindString => {
                 match token0.type_ {
+                    // "
                     TokenType::DoubleQuotation => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
+                    // '
                     TokenType::SingleQuotation => {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} // Ignore it.
-                    // `]`.
+                    // ]
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
@@ -149,12 +150,12 @@ impl ArrayP {
                     _ => return error(&mut self.log(), tokens, "array.rs.218."),
                 }
             }
-            // After `"`.
-            State::AfterDoubleQuotedString => {
+            // After " or '.
+            State::AfterString => {
                 match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     TokenType::Comma => {
-                        self.state = State::AfterCommaBefindQuotedString;
+                        self.state = State::AfterCommaBefindString;
                     }
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -232,20 +233,6 @@ impl ArrayP {
                 }
                 _ => return error(&mut self.log(), tokens, "array.rs.383."),
             },
-            // After `'`.
-            State::AfterSingleQuotedString => {
-                match token0.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
-                    TokenType::Comma => {
-                        self.state = State::AfterCommaBefindQuotedString;
-                    }
-                    TokenType::RightSquareBracket => {
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    _ => return error(&mut self.log(), tokens, "array.rs.410."),
-                }
-            }
             // "dog".
             State::DoubleQuotedString => {
                 let p = self.basic_string_p.as_mut().unwrap();
@@ -258,7 +245,7 @@ impl ArrayP {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_double_quote_string(&child_m);
                             self.basic_string_p = None;
-                            self.state = State::AfterDoubleQuotedString;
+                            self.state = State::AfterString;
                         } else {
                             return error(&mut self.log(), tokens, "array.rs.439.");
                         }
@@ -284,7 +271,7 @@ impl ArrayP {
                             let m = self.buffer.as_mut().unwrap();
                             m.push_single_quote_string(&child_m);
                             self.literal_string_p = None;
-                            self.state = State::AfterSingleQuotedString;
+                            self.state = State::AfterString;
                         } else {
                             return error(&mut self.log(), tokens, "array.rs.493.");
                         }
