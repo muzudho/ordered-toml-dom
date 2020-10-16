@@ -32,7 +32,6 @@ pub enum State {
     KeyValueSyntax,
     /// `[name]`
     Table,
-    Unimplemented,
 }
 
 impl Default for DocumentElementP {
@@ -156,14 +155,14 @@ impl DocumentElementP {
                     self.state = State::Finished;
                     return PResult::End;
                 }
-                // `[`
-                TokenType::LeftSquareBracket => {
-                    self.state = State::AfterLeftSquareBracket;
-                }
                 // `abc`
                 TokenType::KeyWithoutDot => {
                     self.key_value_p = Some(KeyValueP::new(&token0));
                     self.state = State::KeyValueSyntax;
+                }
+                // `[`
+                TokenType::LeftSquareBracket => {
+                    self.state = State::AfterLeftSquareBracket;
                 }
                 // `#`
                 TokenType::Sharp => {
@@ -172,7 +171,7 @@ impl DocumentElementP {
                 }
                 TokenType::WhiteSpace => {} // Ignored it.
                 _ => {
-                    self.state = State::Unimplemented;
+                    return error(&mut self.log(), tokens, "document_element.rs.246.");
                 }
             },
             State::Finished => {
@@ -204,9 +203,6 @@ impl DocumentElementP {
             }
             State::Table => {
                 return self.parse_header_of_table(tokens);
-            }
-            State::Unimplemented => {
-                return error(&mut self.log(), tokens, "document_element.rs.246.");
             }
         }
 

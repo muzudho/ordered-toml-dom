@@ -1,0 +1,5 @@
+# This file is a test.
+# このファイルはテスト用です。
+
+basic_string_and_comment = "B" # Comment 2.
+literal_string_and_comment = 'A' # Comment 1.

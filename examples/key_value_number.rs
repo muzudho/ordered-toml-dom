@@ -16,5 +16,4 @@ fn main() {
     // Test.
     assert_eq!(doc.get_i128_by_key("int_max"), Some(2147483647));
     assert_eq!(doc.get_i128_by_key("int_min"), Some(-2147483648));
-    assert_eq!(doc.get_f64_by_key("pi_1"), Some(3.14));
 }
