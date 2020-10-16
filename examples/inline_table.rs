@@ -5,11 +5,11 @@
 
 extern crate tomboy_toml_dom;
 
-use tomboy_toml_dom::Toml;
+// use tomboy_toml_dom::Toml;
 
 fn main() {
     // Read a Toml file.
-    let doc = Toml::from_file("./resource/inline-table.toml");
+    // let doc = Toml::from_file("./resource/inline-table.toml");
 
     // TODO
     /*

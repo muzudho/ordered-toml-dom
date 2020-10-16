@@ -10,8 +10,7 @@ use tomboy_toml_dom::Toml;
 fn main() {
     // Read a toml.
     // Toml読取。
-    let toml_file = "./resource/example.toml";
-    let doc = Toml::from_file(toml_file);
+    let doc = Toml::from_file("./resource/example.toml");
 
     // Read a number.
     // 数値読取。
@@ -22,6 +21,10 @@ fn main() {
     // 作業中。 文字列読取。
     assert_eq!(doc.get_str_by_key("apple"), Some("pie"));
 
+    assert_eq!(
+        doc.get_str_by_key("basic_string_letter"),
+        Some("Hello, world!!")
+    );
     assert_eq!(doc.get_str_by_key("basic_string_empty"), Some(""));
     assert_eq!(
         doc.get_str_by_key("basic_string_escape_backslash"),
@@ -62,10 +65,21 @@ world!!"
         Some("Hello, world!!")
     );
     assert_eq!(
+        doc.get_str_by_key("literal_string_punctuation"),
+        Some("., ={}[]\"\\!?")
+    );
+    assert_eq!(
         doc.get_str_by_key("multiline_literal_string_letter"),
         Some(
             "Hello,
 world!!"
+        )
+    );
+    assert_eq!(
+        doc.get_str_by_key("multiline_literal_string_punctuation"),
+        Some(
+            "., ={}[]'\"\\
+!?"
         )
     );
 
