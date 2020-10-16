@@ -1,17 +1,17 @@
-pub mod inline_table;
-pub mod key_value;
-pub mod right_value;
+pub mod inline_table_p;
+pub mod key_value_p;
+pub mod right_value_p;
 
 use crate::model::{
     layer110::token::Token,
     layer225::{InlineTable, KeyValue, RightValue},
 };
 use crate::parser::phase200::{
-    layer210::{DoubleQuotedStringP, LiteralStringP, LiteralValueP},
+    layer210::{BasicStringP, LiteralStringP, LiteralValueP},
     layer220::ArrayP,
     layer225::{
-        inline_table::State as InlineTableState, key_value::State as KeyValueState,
-        right_value::State as RightValueState,
+        inline_table_p::State as InlineTableState, key_value_p::State as KeyValueState,
+        right_value_p::State as RightValueState,
     },
 };
 
@@ -43,7 +43,7 @@ pub struct KeyValueP {
 pub struct RightValueP {
     array_p: Option<ArrayP>,
     buffer: Option<RightValue>,
-    double_quoted_string_p: Option<DoubleQuotedStringP>,
+    double_quoted_string_p: Option<BasicStringP>,
     inline_table_p: Option<InlineTableP>,
     literal_value_p: Option<LiteralValueP>,
     single_quoted_string_p: Option<LiteralStringP>,

@@ -14,7 +14,7 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     error, error_via,
-    layer210::{DoubleQuotedStringP, LiteralStringP, PResult},
+    layer210::{BasicStringP, LiteralStringP, PResult},
     layer220::ArrayP,
 };
 use casual_logger::Table;
@@ -112,7 +112,7 @@ impl ArrayP {
             State::AfterCommaBefindQuotedString => {
                 match token0.type_ {
                     TokenType::DoubleQuotation => {
-                        self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
+                        self.double_quoted_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
                     TokenType::SingleQuotation => {
@@ -200,7 +200,7 @@ impl ArrayP {
                         self.state = State::Array;
                     }
                     TokenType::DoubleQuotation => {
-                        self.double_quoted_string_p = Some(Box::new(DoubleQuotedStringP::new()));
+                        self.double_quoted_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
                     TokenType::KeyWithoutDot => {

@@ -16,7 +16,7 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     error,
-    layer210::{DoubleQuotedStringP, PResult},
+    layer210::{BasicStringP, PResult},
 };
 use casual_logger::Table;
 
@@ -44,14 +44,14 @@ pub enum State {
     SingleLine,
 }
 
-impl DoubleQuotedStringP {
+impl BasicStringP {
     pub fn flush(&mut self) -> Option<DoubleQuotedString> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
     }
     pub fn new() -> Self {
-        DoubleQuotedStringP {
+        BasicStringP {
             buffer: Some(DoubleQuotedString::default()),
             state: State::First,
         }

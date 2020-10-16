@@ -1,10 +1,10 @@
-pub mod document_element;
+pub mod document_element_p;
 
 use crate::model::layer230::DocumentElement;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable},
     layer225::KeyValueP,
-    layer230::document_element::State as DocumentElementState,
+    layer230::document_element_p::State as DocumentElementState,
 };
 
 /// Broad-line syntax parser.  

@@ -7,7 +7,7 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     error, error_via,
-    layer210::{DoubleQuotedStringP, LiteralStringP, LiteralValueP, PResult},
+    layer210::{BasicStringP, LiteralStringP, LiteralValueP, PResult},
     layer220::ArrayP,
     layer225::{InlineTableP, RightValueP},
 };
@@ -128,7 +128,7 @@ impl RightValueP {
                 match token0.type_ {
                     // `"`.
                     TokenType::DoubleQuotation => {
-                        self.double_quoted_string_p = Some(DoubleQuotedStringP::new());
+                        self.double_quoted_string_p = Some(BasicStringP::new());
                         self.state = State::DoubleQuotedString;
                     }
                     // `{`.

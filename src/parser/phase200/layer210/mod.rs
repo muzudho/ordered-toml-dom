@@ -1,7 +1,7 @@
 pub mod basic_string_p;
 pub mod comment_p;
-pub mod header_of_array_of_table;
-pub mod header_of_table;
+pub mod header_p_of_array_of_table;
+pub mod header_p_of_table;
 pub mod literal_string_p;
 pub mod literal_value_p;
 
@@ -26,7 +26,7 @@ pub struct CommentP {
 ///
 /// Example: `"value"`.  
 #[derive(Clone)]
-pub struct DoubleQuotedStringP {
+pub struct BasicStringP {
     buffer: Option<DoubleQuotedString>,
     state: DoubleQuotedStringState,
 }
