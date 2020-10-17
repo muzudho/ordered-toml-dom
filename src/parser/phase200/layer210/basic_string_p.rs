@@ -69,18 +69,22 @@ impl BasicStringP {
         let token0 = tokens.0.unwrap();
         match self.state {
             State::BeforeMultiLine => {
+                // print!("trace.8.");
                 self.state = State::MultiLine;
             }
             State::End => {
                 return error(&mut self.log(), tokens, "basic_string_p.rs.66.");
             }
             State::First => {
+                // print!("trace.4.");
                 match token0.type_ {
                     // `"`
                     TokenType::DoubleQuotation => {
+                        // print!("trace.5.");
                         if let Some(token_1_ahead) = tokens.1 {
                             match token_1_ahead.type_ {
                                 TokenType::DoubleQuotation => {
+                                    //print!("trace.7.");
                                     // Before triple double quoted string.
                                     self.state = State::BeforeMultiLine;
                                 }
@@ -96,6 +100,7 @@ impl BasicStringP {
                         }
                     }
                     TokenType::Backslash => {
+                        // print!("trace.6.");
                         // Escape sequence.
                         // エスケープ・シーケンス。
                         self.state = State::SingleLineAfterBackslash;
@@ -111,6 +116,7 @@ impl BasicStringP {
                 match token0.type_ {
                     // "
                     TokenType::DoubleQuotation => {
+                        // print!("trace.10.");
                         if check_triple_double_quotation(tokens) {
                             self.state = State::MultiLineEnd1;
                         } else {
@@ -125,15 +131,18 @@ impl BasicStringP {
                         if let Some(token_1_ahead) = tokens.1 {
                             match token_1_ahead.type_ {
                                 TokenType::AlphabetCharacter => {
+                                    // print!("[trace1 ahead={:?}]", token_1_ahead);
                                     // Backslash.
                                     let m = self.buffer.as_mut().unwrap();
                                     m.push_token(&token0);
                                     self.state = State::MultiLineAfterBackslashEscaped;
                                 }
                                 TokenType::Backslash => {
+                                    // print!("[trace2 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
                                     self.state = State::MultiLineAfterBackslashEscaped;
                                 }
                                 TokenType::EndOfLine => {
+                                    // print!("[trace3 EndOfLIne]");
                                     self.state = State::MultiLineAfterBackslashNotEscaped;
                                 }
                                 _ => {
@@ -149,6 +158,7 @@ impl BasicStringP {
                         }
                     }
                     _ => {
+                        // print!("trace.12.");
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token0);
                     }
@@ -180,6 +190,7 @@ impl BasicStringP {
                 }
             }
             State::MultiLineAfterBackslashEscaped => {
+                // println!("[trace196 token0=|{:?}|]", token0);
                 // Escaped.
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token0);
@@ -191,7 +202,7 @@ impl BasicStringP {
             State::MultiLineTrimStart => {
                 match token0.type_ {
                     TokenType::WhiteSpaceString => {} // Ignore it.
-                    // `"`.
+                    // "
                     TokenType::DoubleQuotation => {
                         if check_triple_double_quotation(tokens) {
                             self.state = State::MultiLineEnd1;

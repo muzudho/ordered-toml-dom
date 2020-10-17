@@ -91,6 +91,7 @@ impl LexicalParser {
         let column_number = i + 1;
         match self.state {
             State::AlphabetCharacter => {
+                // print!("[trace101 AlbetChar={:?}]", ch0);
                 self.flush(column_number);
                 self.buf.push(*ch0);
                 self.state = State::First;
@@ -114,10 +115,12 @@ impl LexicalParser {
                 match ch0 {
                     // A ～ Z, a ～ z.
                     'A'..='Z' | 'a'..='z' => {
+                        // print!("[trace105 albet={:?}]", ch0);
                         self.buf_token_type = TokenType::AlphabetString;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
+                                    // print!("trace.106.");
                                     self.state = State::AlphabetString;
                                 }
                                 _ => {}
@@ -126,13 +129,17 @@ impl LexicalParser {
                     }
                     // \
                     '\\' => {
+                        // print!("[trace104 bs={:?}]", ch0);
                         self.buf_token_type = TokenType::Backslash;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
+                                    // print!("[trace103 ahead={:?}]", ch1);
                                     self.state = State::AlphabetCharacter;
                                 }
-                                _ => {}
+                                _ => {
+                                    // print!("[trace102 ahead={:?}]", ch1);
+                                }
                             }
                         }
                     }
