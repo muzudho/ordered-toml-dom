@@ -8,6 +8,7 @@ use std::fmt;
 #[derive(Debug)]
 enum LineMachineState {
     Alphabets,
+    Numerals,
     KeyExceptAlphabet,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
@@ -66,6 +67,19 @@ impl LexicalParser {
                             self.flush(initial_column_number);
                             self.initial(*ch);
                             initial_column_number = column_number;
+                        }
+                    }
+                    LineMachineState::Numerals => {
+                        match ch {
+                            '0'..='9' => {
+                                // Numeral.
+                                self.buf.push(*ch);
+                            }
+                            _ => {
+                                self.flush(initial_column_number);
+                                self.initial(*ch);
+                                initial_column_number = column_number;
+                            }
                         }
                     }
                     LineMachineState::WhiteSpace => {
@@ -156,6 +170,7 @@ impl LexicalParser {
             }
             '0'..='9' => {
                 self.buf_token_type = TokenType::Numeral;
+                self.state = Some(LineMachineState::Numerals);
             }
             // +
             '+' => {
