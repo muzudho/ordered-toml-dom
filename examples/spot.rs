@@ -11,7 +11,8 @@ fn main() {
     // Read a toml.
     // Toml読取。
     let doc = Toml::from_file("./resource/spot.toml");
-    println!("doc=|{:?}|", doc);
+    println!("display=|{}|", doc);
+    println!("debug=|{:?}|", doc);
 
     assert_eq!(
         doc.get_str_by_key("z"),

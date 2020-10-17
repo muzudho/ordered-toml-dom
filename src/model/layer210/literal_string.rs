@@ -22,8 +22,13 @@ impl LiteralString {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for LiteralString {
+impl fmt::Display for LiteralString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "'{}'", self.value)
+    }
+}
+impl fmt::Debug for LiteralString {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "'{:?}'", self.value)
     }
 }

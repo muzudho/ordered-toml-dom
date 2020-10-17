@@ -15,6 +15,11 @@ impl KeyValue {
         }
     }
 }
+impl fmt::Display for KeyValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}={}", self.key, self.value)
+    }
+}
 impl fmt::Debug for KeyValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}={:?}", self.key, self.value)

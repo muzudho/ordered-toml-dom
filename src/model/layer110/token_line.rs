@@ -18,6 +18,15 @@ impl TokenLine {
         }
     }
 }
+impl fmt::Display for TokenLine {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{}", token));
+        }
+        write!(f, "{}", buf)
+    }
+}
 impl fmt::Debug for TokenLine {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();

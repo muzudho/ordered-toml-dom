@@ -22,8 +22,13 @@ impl HeaderOfArrayOfTable {
         self.value.push_str(&token.value);
     }
 }
-impl fmt::Debug for HeaderOfArrayOfTable {
+impl fmt::Display for HeaderOfArrayOfTable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[[{}]]", self.value)
+    }
+}
+impl fmt::Debug for HeaderOfArrayOfTable {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[[{:?}]]", self.value)
     }
 }

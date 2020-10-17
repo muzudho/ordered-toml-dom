@@ -22,14 +22,25 @@ impl DocumentElement {
         DocumentElement::HeaderOfTable(m.clone())
     }
 }
+impl fmt::Display for DocumentElement {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            DocumentElement::HeaderOfArrayOfTable(m) => write!(f, "{}", m),
+            DocumentElement::Comment(m) => write!(f, "{}", m),
+            DocumentElement::EmptyLine => write!(f, ""),
+            DocumentElement::KeyValue(m) => write!(f, "{}", m),
+            DocumentElement::HeaderOfTable(m) => write!(f, "{}", m),
+        }
+    }
+}
 impl fmt::Debug for DocumentElement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            DocumentElement::HeaderOfArrayOfTable(m) => write!(f, "{}", format!("{:?}", m)),
-            DocumentElement::Comment(m) => write!(f, "{}", format!("{:?}", m)),
+            DocumentElement::HeaderOfArrayOfTable(m) => write!(f, "{:?}", m),
+            DocumentElement::Comment(m) => write!(f, "{:?}", m),
             DocumentElement::EmptyLine => write!(f, ""),
-            DocumentElement::KeyValue(m) => write!(f, "{}", format!("{:?}", m)),
-            DocumentElement::HeaderOfTable(m) => write!(f, "{}", format!("{:?}", m)),
+            DocumentElement::KeyValue(m) => write!(f, "{:?}", m),
+            DocumentElement::HeaderOfTable(m) => write!(f, "{:?}", m),
         }
     }
 }

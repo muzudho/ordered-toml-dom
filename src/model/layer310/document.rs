@@ -155,6 +155,19 @@ impl Document {
         self.elements.push(m.clone());
     }
 }
+impl fmt::Display for Document {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut buf = String::new();
+        for elem in &self.elements {
+            buf.push_str(&format!(
+                "{}
+",
+                elem
+            ));
+        }
+        write!(f, "{}", buf)
+    }
+}
 impl fmt::Debug for Document {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
