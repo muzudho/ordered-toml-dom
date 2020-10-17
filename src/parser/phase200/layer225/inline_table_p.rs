@@ -55,8 +55,8 @@ impl InlineTableP {
                 match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `apple.banana`
-                    TokenType::Alphabet
-                    | TokenType::Numeral
+                    TokenType::AlphabetString
+                    | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         self.key_value_p = Some(Box::new(KeyValueP::new()));

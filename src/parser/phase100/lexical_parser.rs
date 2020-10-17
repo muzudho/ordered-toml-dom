@@ -32,6 +32,16 @@ impl LexicalParser {
             buf: String::new(),
         }
     }
+    /// Flush.
+    fn flush(&mut self, column_number: usize) {
+        if !self.buf.is_empty() {
+            self.product
+                .tokens
+                .push(Token::new(column_number, &self.buf, self.buf_token_type));
+            self.buf.clear();
+            self.state = None;
+        }
+    }
     pub fn product(&self) -> &TokenLine {
         &self.product
     }
@@ -111,17 +121,6 @@ impl LexicalParser {
             TokenType::EndOfLine,
         ));
     }
-    /// Flush.
-    fn flush(&mut self, column_number: usize) {
-        if !self.buf.is_empty() {
-            self.product
-                .tokens
-                .push(Token::new(column_number, &self.buf, self.buf_token_type));
-            // Log::info_t("Flush", Table::default().str("buf", &self.buf));
-            self.buf.clear();
-            self.state = None;
-        }
-    }
     /// Character at first.  
     /// 最初の文字。  
     fn initial(&mut self, ch: char) {
@@ -129,7 +128,7 @@ impl LexicalParser {
         match ch {
             // A ～ Z, a ～ z.
             'A'..='Z' | 'a'..='z' => {
-                self.buf_token_type = TokenType::Alphabet;
+                self.buf_token_type = TokenType::AlphabetString;
                 self.state = Some(LineMachineState::Alphabets);
             }
             // \
@@ -169,7 +168,7 @@ impl LexicalParser {
                 self.buf_token_type = TokenType::LeftSquareBracket;
             }
             '0'..='9' => {
-                self.buf_token_type = TokenType::Numeral;
+                self.buf_token_type = TokenType::NumeralString;
                 self.state = Some(LineMachineState::Numerals);
             }
             // +

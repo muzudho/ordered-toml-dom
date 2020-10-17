@@ -87,8 +87,8 @@ impl KeyValueP {
             State::First => {
                 match token0.type_ {
                     TokenType::WhiteSpace => {} //Ignored it.
-                    TokenType::Alphabet
-                    | TokenType::Numeral
+                    TokenType::AlphabetString
+                    | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         let p = self.key_p.as_mut().unwrap();

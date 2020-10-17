@@ -132,8 +132,8 @@ impl ArrayP {
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
                 match token0.type_ {
-                    TokenType::Alphabet
-                    | TokenType::Numeral
+                    TokenType::AlphabetString
+                    | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
@@ -198,8 +198,8 @@ impl ArrayP {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
-                    TokenType::Alphabet
-                    | TokenType::Numeral
+                    TokenType::AlphabetString
+                    | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
