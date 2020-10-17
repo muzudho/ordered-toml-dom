@@ -32,7 +32,8 @@ pub enum State {
     MultiLine,
     // After `\`.
     // `\` の後。
-    MultiLineAfterBackslash,
+    MultiLineAfterBackslashEOL,
+    MultiLineAfterBackslashOtherwise,
     MultiLineEnd1,
     MultiLineEnd2,
     // Trim start.
@@ -67,6 +68,9 @@ impl BasicStringP {
     pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
         let token0 = tokens.0.unwrap();
         match self.state {
+            State::BeforeMultiLine => {
+                self.state = State::MultiLine;
+            }
             State::End => {
                 return error(&mut self.log(), tokens, "basic_string_p.rs.66.");
             }
@@ -103,12 +107,9 @@ impl BasicStringP {
                     }
                 }
             }
-            State::BeforeMultiLine => {
-                self.state = State::MultiLine;
-            }
             State::MultiLine => {
                 match token0.type_ {
-                    // `"`
+                    // "
                     TokenType::DoubleQuotation => {
                         if check_triple_double_quotation(tokens) {
                             self.state = State::MultiLineEnd1;
@@ -117,10 +118,24 @@ impl BasicStringP {
                             m.push_token(&token0);
                         }
                     }
+                    // \
                     TokenType::Backslash => {
                         // Escape sequence.
                         // エスケープ・シーケンス。
-                        self.state = State::MultiLineAfterBackslash;
+                        if let Some(token_1_ahead) = tokens.1 {
+                            match token_1_ahead.type_ {
+                                TokenType::EndOfLine => {
+                                    self.state = State::MultiLineAfterBackslashEOL;
+                                }
+                                _ => {
+                                    self.state = State::MultiLineAfterBackslashOtherwise;
+                                    let m = self.buffer.as_mut().unwrap();
+                                    m.push_token(&token0);
+                                }
+                            }
+                        } else {
+                            return error(&mut self.log(), tokens, "basic_string_p.rs.112.");
+                        }
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
@@ -153,18 +168,14 @@ impl BasicStringP {
                     }
                 }
             }
-            State::MultiLineAfterBackslash => {
-                match token0.type_ {
-                    TokenType::EndOfLine => {
-                        self.state = State::MultiLineTrimStart;
-                    }
-                    _ => {
-                        // Escaped.
-                        self.state = State::MultiLine;
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
-                    }
-                }
+            State::MultiLineAfterBackslashEOL => {
+                self.state = State::MultiLineTrimStart;
+            }
+            State::MultiLineAfterBackslashOtherwise => {
+                let m = self.buffer.as_mut().unwrap();
+                m.push_token(&token0);
+                // Escaped.
+                self.state = State::MultiLine;
             }
             State::MultiLineTrimStart => {
                 match token0.type_ {
