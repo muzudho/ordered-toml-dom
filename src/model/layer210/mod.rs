@@ -10,7 +10,7 @@ use crate::model::layer110::Token;
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct Comment {
-    pub value: String,
+    pub tokens: Vec<Token>,
 }
 
 /// It has one string.  
