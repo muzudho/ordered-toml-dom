@@ -157,7 +157,7 @@ impl DocumentElementP {
                 }
                 // `abc`
                 TokenType::KeyWithoutDot => {
-                    self.key_value_p = Some(KeyValueP::new(&token0));
+                    self.key_value_p = Some(KeyValueP::new());
                     self.state = State::KeyValueSyntax;
                 }
                 // `[`

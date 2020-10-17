@@ -99,40 +99,52 @@ impl LexicalParser {
     fn initial(&mut self, ch: char) {
         self.buf.push(ch);
         match ch {
+            // Whitespace.
             '\t' | ' ' => {
                 self.buf_token_type = TokenType::WhiteSpace;
                 self.state = Some(LineMachineState::WhiteSpace);
             }
+            // \
             '\\' => {
                 self.buf_token_type = TokenType::Backslash;
             }
+            // ,
             ',' => {
                 self.buf_token_type = TokenType::Comma;
             }
+            // .
             '.' => {
                 self.buf_token_type = TokenType::Dot;
             }
+            // "
             '"' => {
                 self.buf_token_type = TokenType::DoubleQuotation;
             }
+            // =
             '=' => {
                 self.buf_token_type = TokenType::Equals;
             }
+            // {
             '{' => {
                 self.buf_token_type = TokenType::LeftCurlyBracket;
             }
+            // [
             '[' => {
                 self.buf_token_type = TokenType::LeftSquareBracket;
             }
+            // }
             '}' => {
                 self.buf_token_type = TokenType::RightCurlyBracket;
             }
+            // ]
             ']' => {
                 self.buf_token_type = TokenType::RightSquareBracket;
             }
+            // #
             '#' => {
                 self.buf_token_type = TokenType::Sharp;
             }
+            // '
             '\'' => {
                 self.buf_token_type = TokenType::SingleQuotation;
             }

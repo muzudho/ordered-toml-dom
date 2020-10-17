@@ -13,7 +13,7 @@ use crate::model::{
 };
 use crate::parser::phase200::{
     error, error_via,
-    layer210::PResult,
+    layer210::{KeyP, PResult},
     layer225::{KeyValueP, RightValueP},
 };
 use casual_logger::Table as LogTable;
@@ -22,19 +22,20 @@ use casual_logger::Table as LogTable;
 /// 構文状態遷移。  
 #[derive(Debug)]
 pub enum State {
+    AfterEquals,
     // After key.
     // キーの後。
-    First,
-    AfterEquals,
-    RightValue,
+    BeforeEqual,
     End,
+    First,
+    RightValue,
 }
 
 impl KeyValueP {
-    pub fn new(key: &Token) -> Self {
+    pub fn new() -> Self {
         KeyValueP {
             buffer: None,
-            key: key.clone(),
+            key_p: None,
             right_value_p: None,
             state: State::First,
         }
@@ -57,8 +58,13 @@ impl KeyValueP {
     pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
         let token0 = tokens.0.unwrap();
         match self.state {
+            // After `=`.
+            State::AfterEquals => {
+                self.right_value_p = Some(RightValueP::default());
+                self.state = State::RightValue;
+            }
             // After key.
-            State::First => {
+            State::BeforeEqual => {
                 match token0.type_ {
                     TokenType::WhiteSpace => {} //Ignored it.
                     // `=`.
@@ -68,18 +74,31 @@ impl KeyValueP {
                     _ => return error(&mut self.log(), tokens, "key_value.rs.65."),
                 }
             }
-            // After `=`.
-            State::AfterEquals => {
-                self.right_value_p = Some(RightValueP::default());
-                self.state = State::RightValue;
+            State::First => {
+                match token0.type_ {
+                    TokenType::WhiteSpace => {} //Ignored it.
+                    // `=`.
+                    TokenType::KeyWithoutDot => {
+                        self.key_p = Some(KeyP::default());
+                        self.state = State::BeforeEqual;
+                    }
+                    _ => return error(&mut self.log(), tokens, "key_value.rs.65."),
+                }
             }
             // After `=`.
             State::RightValue => {
+                let p = self.key_p.as_mut().unwrap();
+                let key = if let Some(key) = p.flush() {
+                    key
+                } else {
+                    return error(&mut self.log(), tokens, "key_value.rs.82.");
+                };
+
                 let p = self.right_value_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            self.buffer = Some(KeyValue::new(&self.key, &child_m));
+                        if let Some(child_m_value) = p.flush() {
+                            self.buffer = Some(KeyValue::new(&key, &child_m_value));
                             self.right_value_p = None;
                             self.state = State::End;
                             return PResult::End;

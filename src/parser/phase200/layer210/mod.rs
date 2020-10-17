@@ -2,11 +2,12 @@ pub mod basic_string_p;
 pub mod comment_p;
 pub mod header_p_of_array_of_table;
 pub mod header_p_of_table;
+pub mod key_p;
 pub mod literal_string_p;
 pub mod literal_value_p;
 
 use crate::model::{
-    layer210::{BasicString, Comment, LiteralString, LiteralValue},
+    layer210::{BasicString, Comment, Key, LiteralString, LiteralValue},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
@@ -49,6 +50,15 @@ pub struct HeaderPOfArrayOfTable {
 #[derive(Clone)]
 pub struct HeaderPOfTable {
     buffer: Option<HeaderOfTable>,
+}
+
+/// Key parser.  
+/// キー・パーサー。  
+///
+/// Example: `abc`.  
+#[derive(Clone)]
+pub struct KeyP {
+    buffer: Option<Key>,
 }
 
 /// Literal string syntax parser.  

@@ -56,7 +56,7 @@ impl InlineTableP {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `apple.banana`
                     TokenType::KeyWithoutDot => {
-                        self.key_value_p = Some(Box::new(KeyValueP::new(&token0)));
+                        self.key_value_p = Some(Box::new(KeyValueP::new()));
                         self.state = State::KeyValue;
                     }
                     TokenType::RightCurlyBracket => {

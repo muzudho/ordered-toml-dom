@@ -3,7 +3,7 @@ pub mod key_value;
 pub mod right_value;
 
 use crate::model::{
-    layer210::{BasicString, LiteralString, LiteralValue},
+    layer210::{BasicString, Key, LiteralString, LiteralValue},
     layer220::Array,
 };
 
@@ -11,7 +11,7 @@ use crate::model::{
 /// キーと値を持ちます。  
 #[derive(Clone)]
 pub struct KeyValue {
-    pub key: String,
+    pub key: Box<Key>,
     /// Recursive.
     /// 再帰的。
     pub value: Box<RightValue>,
