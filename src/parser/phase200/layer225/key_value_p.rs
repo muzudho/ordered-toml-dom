@@ -43,10 +43,15 @@ impl KeyValueP {
     }
 
     pub fn flush(&mut self) -> Option<KeyValue> {
-        let m = Some(KeyValue::new(
-            &self.key_buffer.as_ref().unwrap(),
-            &self.right_value_buffer.as_ref().unwrap(),
-        ));
+        let m = if let Some(key) = &self.key_buffer {
+            if let Some(right_value) = &self.right_value_buffer {
+                Some(KeyValue::new(&key, &right_value))
+            } else {
+                panic!("key_value_p.rs.53.")
+            }
+        } else {
+            panic!("key_value_p.rs.56.")
+        };
         self.key_buffer = None;
         self.right_value_buffer = None;
         m
