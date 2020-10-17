@@ -162,6 +162,7 @@ world!!"
     * [x] Plain.
   * [ ] `'''abc'''` - multi-line literal string.
     * [x] Plain.
+    * [ ] The first newline is trimmed in raw string.
   * [ ] DateTime
     * [ ]  UTC
       * [x] `1979-05-27T07:32:00-08:00`.
