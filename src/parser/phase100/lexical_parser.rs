@@ -1,15 +1,13 @@
 //! Divide into words.  
 //! 単語に分けます。  
 use crate::model::layer110::{Token, TokenLine, TokenType};
-use crate::RE_KEY_EXCEPT_ALPHABET;
-use casual_logger::Log;
 use std::fmt;
 
 #[derive(Debug)]
-enum LineMachineState {
+enum State {
     Alphabets,
+    First,
     Numerals,
-    KeyExceptAlphabet,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
     WhiteSpace,
@@ -18,7 +16,7 @@ enum LineMachineState {
 /// Lexical parser.  
 /// 字句解析器。  
 pub struct LexicalParser {
-    state: Option<LineMachineState>,
+    state: State,
     product: TokenLine,
     buf_token_type: TokenType,
     buf: String,
@@ -26,7 +24,7 @@ pub struct LexicalParser {
 impl LexicalParser {
     pub fn new(row_number: usize) -> Self {
         LexicalParser {
-            state: None,
+            state: State::First,
             product: TokenLine::new(row_number),
             buf_token_type: TokenType::WhiteSpace,
             buf: String::new(),
@@ -39,7 +37,7 @@ impl LexicalParser {
                 .tokens
                 .push(Token::new(column_number, &self.buf, self.buf_token_type));
             self.buf.clear();
-            self.state = None;
+            self.state = State::First;
         }
     }
     pub fn product(&self) -> &TokenLine {
@@ -50,66 +48,51 @@ impl LexicalParser {
         let mut initial_column_number = 0;
         for (i, ch) in ch_vec.iter().enumerate() {
             let column_number = i + 1;
-            if let Some(state) = &self.state {
-                match state {
-                    LineMachineState::Alphabets => {
-                        match ch {
-                            'A'..='Z' | 'a'..='z' => {
-                                // Alphabet.
-                                self.buf.push(*ch);
-                            }
-                            _ => {
-                                self.flush(initial_column_number);
-                                self.initial(*ch);
-                                initial_column_number = column_number;
-                            }
-                        }
-                    }
-                    LineMachineState::KeyExceptAlphabet => {
-                        let matched = match RE_KEY_EXCEPT_ALPHABET.lock() {
-                            Ok(re_key) => re_key.is_match(&ch.to_string()),
-                            Err(why) => panic!(Log::fatal(&format!("{}", why))),
-                        };
-                        if matched {
-                            // A key.
+            match self.state {
+                State::Alphabets => {
+                    match ch {
+                        'A'..='Z' | 'a'..='z' => {
+                            // Alphabet.
                             self.buf.push(*ch);
-                        } else {
+                        }
+                        _ => {
                             self.flush(initial_column_number);
                             self.initial(*ch);
                             initial_column_number = column_number;
                         }
                     }
-                    LineMachineState::Numerals => {
-                        match ch {
-                            '0'..='9' => {
-                                // Numeral.
-                                self.buf.push(*ch);
-                            }
-                            _ => {
-                                self.flush(initial_column_number);
-                                self.initial(*ch);
-                                initial_column_number = column_number;
-                            }
+                }
+                State::First => {
+                    self.flush(initial_column_number);
+                    self.initial(*ch);
+                    initial_column_number = column_number;
+                }
+                State::Numerals => {
+                    match ch {
+                        '0'..='9' => {
+                            // Numeral.
+                            self.buf.push(*ch);
                         }
-                    }
-                    LineMachineState::WhiteSpace => {
-                        // 最初に出てくる文字まで飛ばします。
-                        match ch {
-                            '\t' | ' ' => {
-                                self.buf.push(*ch);
-                            }
-                            _ => {
-                                self.flush(initial_column_number);
-                                self.initial(*ch);
-                                initial_column_number = column_number;
-                            }
+                        _ => {
+                            self.flush(initial_column_number);
+                            self.initial(*ch);
+                            initial_column_number = column_number;
                         }
                     }
                 }
-            } else {
-                self.flush(initial_column_number);
-                self.initial(*ch);
-                initial_column_number = column_number;
+                State::WhiteSpace => {
+                    // 最初に出てくる文字まで飛ばします。
+                    match ch {
+                        '\t' | ' ' => {
+                            self.buf.push(*ch);
+                        }
+                        _ => {
+                            self.flush(initial_column_number);
+                            self.initial(*ch);
+                            initial_column_number = column_number;
+                        }
+                    }
+                }
             }
         }
         // Log::info("End of line.");
@@ -129,7 +112,7 @@ impl LexicalParser {
             // A ～ Z, a ～ z.
             'A'..='Z' | 'a'..='z' => {
                 self.buf_token_type = TokenType::AlphabetString;
-                self.state = Some(LineMachineState::Alphabets);
+                self.state = State::Alphabets;
             }
             // \
             '\\' => {
@@ -169,7 +152,7 @@ impl LexicalParser {
             }
             '0'..='9' => {
                 self.buf_token_type = TokenType::NumeralString;
-                self.state = Some(LineMachineState::Numerals);
+                self.state = State::Numerals;
             }
             // +
             '+' => {
@@ -198,7 +181,7 @@ impl LexicalParser {
             // Whitespace.
             '\t' | ' ' => {
                 self.buf_token_type = TokenType::WhiteSpace;
-                self.state = Some(LineMachineState::WhiteSpace);
+                self.state = State::WhiteSpace;
             }
             _ => {
                 self.buf_token_type = TokenType::Unknown;
