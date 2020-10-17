@@ -152,7 +152,7 @@ impl RightValueP {
                     | TokenType::Hyphen
                     | TokenType::Underscore
                     | _ => {
-                        self.literal_value_p = Some(LiteralValueP::new());
+                        self.literal_value_p = Some(LiteralValueP::default());
                         self.state = State::LiteralValue;
                         let p = self.literal_value_p.as_mut().unwrap();
                         match p.parse(tokens) {

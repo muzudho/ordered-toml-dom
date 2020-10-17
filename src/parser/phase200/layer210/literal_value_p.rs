@@ -1,25 +1,31 @@
-//! Literal string syntax parser.  
-//! リテラル文字列構文パーサー。  
+//! Litera value parser.  
+//! リテラル値パーサー。  
 
 use crate::model::{
     layer110::{Token, TokenType},
     layer210::LiteralValue,
 };
-use crate::parser::phase200::layer210::{LiteralValueP, PResult};
+use crate::parser::phase200::{
+    error,
+    layer210::{LiteralValueP, PResult},
+};
+use casual_logger::Table as LogTable;
 
+impl Default for LiteralValueP {
+    fn default() -> Self {
+        LiteralValueP {
+            buffer: Some(LiteralValue::default()),
+        }
+    }
+}
 impl LiteralValueP {
     pub fn flush(&mut self) -> Option<LiteralValue> {
         if let Some(buffer) = &self.buffer {
-            let m = Some(LiteralValue::from_str(buffer.value.trim_end()));
+            let m = Some(LiteralValue::from_str(buffer.value.trim_end())); // TODO トリム要らないのでは。
             self.buffer = None;
             return m;
         }
         None
-    }
-    pub fn new() -> Self {
-        LiteralValueP {
-            buffer: Some(LiteralValue::default()),
-        }
     }
     /// # Arguments
     ///
@@ -32,27 +38,43 @@ impl LiteralValueP {
     pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
         let token0 = tokens.0.unwrap();
         match token0.type_ {
-            TokenType::EndOfLine => {
-                // End of syntax.
-                // 構文の終わり。
-                return PResult::End;
-            }
-            _ => {
+            TokenType::Alphabet
+            | TokenType::Colon
+            | TokenType::Dot
+            | TokenType::Hyphen
+            | TokenType::Numeral
+            | TokenType::Plus
+            | TokenType::Underscore => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token0);
+
+                // Look-ahead.
+                // 先読み。
+                if let Some(token1) = tokens.1 {
+                    match token1.type_ {
+                        TokenType::Alphabet
+                        | TokenType::Colon
+                        | TokenType::Dot
+                        | TokenType::Hyphen
+                        | TokenType::Numeral
+                        | TokenType::Plus
+                        | TokenType::Underscore => PResult::Ongoing,
+                        _ => PResult::End,
+                    }
+                } else {
+                    PResult::End
+                }
             }
+            _ => return error(&mut self.log(), tokens, "literal_value_p.rs.38."),
         }
-        PResult::Ongoing
     }
-    /*
-    /// Log.
-    /// ログ。
-    pub fn log(&self) -> Table {
-        let mut t = Table::default().clone();
-        if let Some(m) = &self.buffer {
-            t.str("value", &format!("{:?}", m));
-        }
+
+    /// Log.  
+    /// ログ。  
+    pub fn log(&self) -> LogTable {
+        let t = LogTable::default()
+            .str("buffer", &format!("{:?}", &self.buffer))
+            .clone();
         t
     }
-    */
 }
