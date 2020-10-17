@@ -46,57 +46,33 @@ impl LexicalParser {
     pub fn parse_line(&mut self, line: &str) {
         let ch_vec: Vec<char> = line.chars().collect();
         let mut initial_column_number = 0;
+        let mut j = 0;
+        let mut chars: (Option<&char>, Option<&char>) = (None, None);
         for (i, ch) in ch_vec.iter().enumerate() {
-            let column_number = i + 1;
-            match self.state {
-                State::Alphabets => {
-                    match ch {
-                        'A'..='Z' | 'a'..='z' => {
-                            // Alphabet.
-                            self.buf.push(*ch);
-                        }
-                        _ => {
-                            self.flush(initial_column_number);
-                            self.initial(*ch);
-                            initial_column_number = column_number;
-                        }
-                    }
-                }
-                State::First => {
-                    self.flush(initial_column_number);
-                    self.initial(*ch);
-                    initial_column_number = column_number;
-                }
-                State::Numerals => {
-                    match ch {
-                        '0'..='9' => {
-                            // Numeral.
-                            self.buf.push(*ch);
-                        }
-                        _ => {
-                            self.flush(initial_column_number);
-                            self.initial(*ch);
-                            initial_column_number = column_number;
-                        }
-                    }
-                }
-                State::WhiteSpace => {
-                    // 最初に出てくる文字まで飛ばします。
-                    match ch {
-                        '\t' | ' ' => {
-                            self.buf.push(*ch);
-                        }
-                        _ => {
-                            self.flush(initial_column_number);
-                            self.initial(*ch);
-                            initial_column_number = column_number;
-                        }
-                    }
-                }
+            // Shift.
+            // The current char is the look-ahead char, and the previous look-ahead char is the current char.
+            // ずらします。
+            // 現在の文字は先読み文字、前回の先読み文字は今回の文字です。
+            chars.0 = chars.1;
+            chars.1 = Some(ch);
+            if let Some(_) = chars.0 {
+                self.one_delay_loop(i - 1, chars, &mut initial_column_number);
             }
+            j = i;
         }
+
+        // Last 1 char.
+        // 最後の１文字。
+        chars.0 = chars.1;
+        chars.1 = None;
+        if let Some(_) = chars.0 {
+            self.one_delay_loop(j, chars, &mut initial_column_number);
+        }
+
         // Log::info("End of line.");
         self.flush(initial_column_number);
+        // Append an end of line.
+        // 行末を追加します。
         self.product.tokens.push(Token::new(
             ch_vec.len(),
             "
@@ -104,9 +80,61 @@ impl LexicalParser {
             TokenType::EndOfLine,
         ));
     }
+    fn one_delay_loop(
+        &mut self,
+        i: usize,
+        chars: (Option<&char>, Option<&char>),
+        initial_column_number: &mut usize,
+    ) {
+        let ch0 = chars.0.unwrap();
+        let column_number = i + 1;
+        match self.state {
+            State::Alphabets => {
+                match ch0 {
+                    'A'..='Z' | 'a'..='z' => {
+                        // Alphabet.
+                        self.buf.push(*ch0);
+                    }
+                    _ => {
+                        self.initial(*initial_column_number, *ch0);
+                        *initial_column_number = column_number;
+                    }
+                }
+            }
+            State::First => {
+                self.initial(*initial_column_number, *ch0);
+                *initial_column_number = column_number;
+            }
+            State::Numerals => {
+                match ch0 {
+                    '0'..='9' => {
+                        // Numeral.
+                        self.buf.push(*ch0);
+                    }
+                    _ => {
+                        self.initial(*initial_column_number, *ch0);
+                        *initial_column_number = column_number;
+                    }
+                }
+            }
+            State::WhiteSpace => {
+                // 最初に出てくる文字まで飛ばします。
+                match ch0 {
+                    '\t' | ' ' => {
+                        self.buf.push(*ch0);
+                    }
+                    _ => {
+                        self.initial(*initial_column_number, *ch0);
+                        *initial_column_number = column_number;
+                    }
+                }
+            }
+        }
+    }
     /// Character at first.  
     /// 最初の文字。  
-    fn initial(&mut self, ch: char) {
+    fn initial(&mut self, column_number: usize, ch: char) {
+        self.flush(column_number);
         self.buf.push(ch);
         match ch {
             // A ～ Z, a ～ z.
