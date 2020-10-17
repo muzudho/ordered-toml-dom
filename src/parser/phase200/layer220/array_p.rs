@@ -132,7 +132,7 @@ impl ArrayP {
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
                 match token0.type_ {
-                    TokenType::KeyWithoutDot => {
+                    TokenType::KeyWithoutDotNumeral | TokenType::Numeral => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
@@ -195,7 +195,7 @@ impl ArrayP {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
-                    TokenType::KeyWithoutDot => {
+                    TokenType::KeyWithoutDotNumeral | TokenType::Numeral => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());

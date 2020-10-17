@@ -38,7 +38,7 @@ impl KeyP {
     pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
         let token0 = tokens.0.unwrap();
         match token0.type_ {
-            TokenType::KeyWithoutDot => {
+            TokenType::KeyWithoutDotNumeral | TokenType::Numeral => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token0);
                 return PResult::End;

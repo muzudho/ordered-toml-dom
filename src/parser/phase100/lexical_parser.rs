@@ -148,6 +148,9 @@ impl LexicalParser {
             '\'' => {
                 self.buf_token_type = TokenType::SingleQuotation;
             }
+            '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
+                self.buf_token_type = TokenType::Numeral;
+            }
             _ => {
                 let matched = match RE_KEY.lock() {
                     Ok(re_key) => re_key.is_match(&ch.to_string()),
@@ -155,7 +158,7 @@ impl LexicalParser {
                 };
                 if matched {
                     // A key.
-                    self.buf_token_type = TokenType::KeyWithoutDot;
+                    self.buf_token_type = TokenType::KeyWithoutDotNumeral;
                     self.state = Some(LineMachineState::Key);
                 } else {
                     self.buf_token_type = TokenType::Otherwise;

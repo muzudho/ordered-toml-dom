@@ -156,7 +156,7 @@ impl DocumentElementP {
                     return PResult::End;
                 }
                 // `abc`
-                TokenType::KeyWithoutDot => {
+                TokenType::KeyWithoutDotNumeral | TokenType::Numeral => {
                     self.key_value_p = Some(KeyValueP::new());
                     match self.key_value_p.as_mut().unwrap().parse(tokens) {
                         PResult::End => {

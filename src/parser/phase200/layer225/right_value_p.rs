@@ -147,7 +147,7 @@ impl RightValueP {
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
-                    TokenType::KeyWithoutDot | _ => {
+                    TokenType::KeyWithoutDotNumeral | TokenType::Numeral | _ => {
                         self.literal_value_p = Some(LiteralValueP::new());
                         self.state = State::LiteralValue;
                         let p = self.literal_value_p.as_mut().unwrap();

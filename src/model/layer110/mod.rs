@@ -18,7 +18,8 @@ pub enum TokenType {
     EndOfLine,
     Equals,
     /// キーに使える文字で構成した単語。ドットは含まない。
-    KeyWithoutDot,
+    /// Numeral, Alphabet, Underscore, Hyphen に分けるか？
+    KeyWithoutDotNumeral,
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
     Otherwise,
@@ -26,6 +27,8 @@ pub enum TokenType {
     LeftCurlyBracket,
     /// [  
     LeftSquareBracket,
+    /// 0 ～ 9.
+    Numeral,
     /// }  
     RightCurlyBracket,
     /// ]  
