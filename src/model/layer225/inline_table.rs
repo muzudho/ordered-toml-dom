@@ -26,7 +26,7 @@ impl fmt::Display for InlineTable {
         for item in &self.items {
             buf.push_str(&format!("{},", item))
         }
-        write!(f, "{{ {} }}", buf)
+        write!(f, "{}", buf)
     }
 }
 impl fmt::Debug for InlineTable {
@@ -35,6 +35,6 @@ impl fmt::Debug for InlineTable {
         for item in &self.items {
             buf.push_str(&format!("{:?},", item))
         }
-        write!(f, "{{ {:?} }}", buf)
+        write!(f, "{{ {} }}", buf)
     }
 }

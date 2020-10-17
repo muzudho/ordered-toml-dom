@@ -81,7 +81,7 @@ impl Toml {
                                         },
                                     )
                                     .str("line", &format!("{}", line))
-                                    .str("token_line", &format!("{:?}", lexical_p))
+                                    .str("token_line", &format!("{}", lexical_p))
                                     .sub_t("table", &table)
                                     .sub_t("document_p", &document_p.log())
                                     .clone(),

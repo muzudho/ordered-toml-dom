@@ -30,19 +30,19 @@ fn error(
     if let Some(token) = tokens.0 {
         table
             .int("token0_column_number", usize_to_i128(token.column_number))
-            .str("token0", &format!("{:?}", token));
+            .str("token0", &format!("{}", token));
     }
 
     if let Some(token) = tokens.1 {
         table
             .int("token1_column_number", usize_to_i128(token.column_number))
-            .str("token1", &format!("{:?}", token));
+            .str("token1", &format!("{}", token));
     }
 
     if let Some(token) = tokens.2 {
         table
             .int("token2_column_number", usize_to_i128(token.column_number))
-            .str("token2", &format!("{:?}", token));
+            .str("token2", &format!("{}", token));
     }
 
     PResult::Err(table.clone())
@@ -66,19 +66,19 @@ fn error_via(
     if let Some(token) = tokens.0 {
         this_table
             .int("token0_column_number", usize_to_i128(token.column_number))
-            .str("token0", &format!("{:?}", token));
+            .str("token0", &format!("{}", token));
     }
 
     if let Some(token) = tokens.1 {
         this_table
             .int("token1_column_number", usize_to_i128(token.column_number))
-            .str("token1", &format!("{:?}", token));
+            .str("token1", &format!("{}", token));
     }
 
     if let Some(token) = tokens.2 {
         this_table
             .int("token2_column_number", usize_to_i128(token.column_number))
-            .str("token2", &format!("{:?}", token));
+            .str("token2", &format!("{}", token));
     }
 
     PResult::Err(escalated_table1.sub_t(&random_name(), this_table).clone())

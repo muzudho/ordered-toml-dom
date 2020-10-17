@@ -20,6 +20,7 @@ fn main() {
             "
 a\tb
 "
+            .to_string()
         )
     );
 }

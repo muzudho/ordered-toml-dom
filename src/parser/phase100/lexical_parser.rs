@@ -252,6 +252,11 @@ impl LexicalParser {
         }
     }
 }
+impl fmt::Display for LexicalParser {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.product)
+    }
+}
 impl fmt::Debug for LexicalParser {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}", self.product)

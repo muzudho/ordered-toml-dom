@@ -44,7 +44,7 @@ impl CommentP {
     pub fn log(&self) -> Table {
         let mut t = Table::default().str("Parse", "CommentP").clone();
         if let Some(m) = &self.buffer {
-            t.str("buffer", &format!("{:?}", m));
+            t.str("buffer", &format!("{}", m));
         }
         t
     }

@@ -22,24 +22,27 @@ fn main() {
 
     // WIP. Read a string.
     // 作業中。 文字列読取。
-    assert_eq!(doc.get_str_by_key("apple"), Some("pie"));
+    assert_eq!(doc.get_str_by_key("apple"), Some("pie".to_string()));
 
     assert_eq!(
         doc.get_str_by_key("basic_string_letter"),
-        Some("Hello, world!!")
+        Some("Hello, world!!".to_string())
     );
-    assert_eq!(doc.get_str_by_key("basic_string_empty"), Some(""));
+    assert_eq!(
+        doc.get_str_by_key("basic_string_empty"),
+        Some("".to_string())
+    );
     assert_eq!(
         doc.get_str_by_key("basic_string_escape_backslash"),
-        Some("\\")
+        Some("\\".to_string())
     );
     assert_eq!(
         doc.get_str_by_key("basic_string_escape_double_quotation"),
-        Some("\"")
+        Some("\"".to_string())
     );
     assert_eq!(
         doc.get_str_by_key("basic_string_punctuation"),
-        Some("., ={}[]'\"\\!?")
+        Some("., ={}[]'\"\\!?".to_string())
     );
     // TODO assert_eq!(doc.get_str_by_key("basic_string_tab"), Some("a\tb"));
 
@@ -48,6 +51,7 @@ fn main() {
         Some(
             "Hello,
 world!!"
+                .to_string()
         )
     );
 
@@ -56,11 +60,12 @@ world!!"
         Some(
             "., ={}[]\"'\"\"\\
 !?"
+            .to_string()
         )
     );
     assert_eq!(
         doc.get_str_by_key("multiline_basic_string_trim_start"),
-        Some("The quick brown fox jumps over the lazy dog.")
+        Some("The quick brown fox jumps over the lazy dog.".to_string())
     );
     assert_eq!(
         doc.get_str_by_key("multiline_basic_string_escape_double_quotation"),
@@ -68,6 +73,7 @@ world!!"
             "
 \\
 "
+            .to_string()
         )
     );
     /* TODO
@@ -76,25 +82,29 @@ world!!"
             Some(
                 "
     a\tb
-    "
+    ".to_string()
             )
         );
         */
 
-    assert_eq!(doc.get_str_by_key("literal_string_empty"), Some(""));
+    assert_eq!(
+        doc.get_str_by_key("literal_string_empty"),
+        Some("".to_string())
+    );
     assert_eq!(
         doc.get_str_by_key("literal_string_letter"),
-        Some("Hello, world!!")
+        Some("Hello, world!!".to_string())
     );
     assert_eq!(
         doc.get_str_by_key("literal_string_punctuation"),
-        Some("., ={}[]\"\\!?")
+        Some("., ={}[]\"\\!?".to_string())
     );
     assert_eq!(
         doc.get_str_by_key("multiline_literal_string_letter"),
         Some(
             "Hello,
 world!!"
+                .to_string()
         )
     );
     assert_eq!(
@@ -102,6 +112,7 @@ world!!"
         Some(
             "., ={}[]'\"\\
 !?"
+            .to_string()
         )
     );
 

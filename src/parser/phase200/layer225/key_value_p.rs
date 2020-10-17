@@ -146,10 +146,10 @@ impl KeyValueP {
     /// ログ。  
     pub fn log(&self) -> LogTable {
         let mut t = LogTable::default()
-            .str("key_buffer", &format!("{:?}", &self.key_buffer))
+            .str("key_buffer", &format!("{:?}", self.key_buffer))
             .str(
                 "right_value_buffer",
-                &format!("{:?}", &self.right_value_buffer),
+                &format!("{:?}", self.right_value_buffer),
             )
             .str("state", &format!("{:?}", self.state))
             .clone();

@@ -29,13 +29,13 @@ fn main() {
             DocumentElement::HeaderOfArrayOfTable(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
-                    Table::default().str("HeaderOfArrayOfTable", &format!("{:?}", m)),
+                    Table::default().str("HeaderOfArrayOfTable", &format!("{}", m)),
                 );
             }
             DocumentElement::Comment(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
-                    Table::default().str("Comment", &format!("{:?}", m)),
+                    Table::default().str("Comment", &format!("{}", m)),
                 );
             }
             DocumentElement::EmptyLine => {
@@ -44,20 +44,20 @@ fn main() {
             DocumentElement::KeyValue(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
-                    Table::default().str("KeyValue", &format!("{:?}", m)),
+                    Table::default().str("KeyValue", &format!("{}", m)),
                 );
                 match *m.value {
-                    RightValue::Array(m) => Log::info(&format!("{:?}", m)),
-                    RightValue::BasicString(m) => Log::info(&format!("{:?}", m)),
-                    RightValue::InlineTable(m) => Log::info(&format!("{:?}", m)),
-                    RightValue::LiteralValue(m) => Log::info(&format!("{:?}", m)),
-                    RightValue::LiteralString(m) => Log::info(&format!("{:?}", m)),
+                    RightValue::Array(m) => Log::info(&format!("{}", m)),
+                    RightValue::BasicString(m) => Log::info(&format!("{}", m)),
+                    RightValue::InlineTable(m) => Log::info(&format!("{}", m)),
+                    RightValue::LiteralValue(m) => Log::info(&format!("{}", m)),
+                    RightValue::LiteralString(m) => Log::info(&format!("{}", m)),
                 }
             }
             DocumentElement::HeaderOfTable(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
-                    Table::default().str("Table", &format!("{:?}", m)),
+                    Table::default().str("Table", &format!("{}", m)),
                 );
             }
         }

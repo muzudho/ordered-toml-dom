@@ -4,6 +4,8 @@ pub mod key;
 pub mod literal_string;
 pub mod literal_value;
 
+use crate::model::layer110::Token;
+
 /// It has one string.  
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
@@ -15,7 +17,7 @@ pub struct Comment {
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct BasicString {
-    pub value: String,
+    pub tokens: Vec<Token>,
 }
 
 /// Key.  

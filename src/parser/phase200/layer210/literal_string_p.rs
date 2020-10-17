@@ -150,7 +150,7 @@ impl LiteralStringP {
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
-            t.str("value", &format!("{:?}", m));
+            t.str("value", &format!("{}", m));
         }
         t
     }

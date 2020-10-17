@@ -27,7 +27,7 @@ fn main() {
     // Test.
     let key = "mix_array_3";
     if let Some(elem) = doc.get_right_value_by_key(key) {
-        Log::info_t("Test.1.", Table::default().str(key, &format!("{:?}", elem)));
+        Log::info_t("Test.1.", Table::default().str(key, &format!("{}", elem)));
     } else {
         has_error = true;
         Log::error_t("Test.1.", Table::default().str(key, ""));

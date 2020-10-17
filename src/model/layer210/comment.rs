@@ -24,7 +24,7 @@ impl Comment {
 }
 impl fmt::Display for Comment {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "#{}", self.value)
+        write!(f, "{}", self.value)
     }
 }
 impl fmt::Debug for Comment {

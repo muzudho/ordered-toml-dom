@@ -242,7 +242,7 @@ impl RightValueP {
     pub fn log(&self) -> LogTable {
         let mut t = LogTable::default()
             .str("state", &format!("{:?}", self.state))
-            .str("buffer", &format!("{:?}", &self.buffer))
+            .str("buffer", &format!("{:?}", self.buffer))
             .clone();
         if let Some(basic_string_p) = &self.basic_string_p {
             t.sub_t("basic_string_p", &basic_string_p.log());
