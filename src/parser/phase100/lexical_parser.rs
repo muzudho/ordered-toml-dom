@@ -5,6 +5,7 @@ use std::fmt;
 
 #[derive(Debug)]
 enum State {
+    AlphabetCharacter,
     AlphabetString,
     First,
     NumeralString,
@@ -89,6 +90,11 @@ impl LexicalParser {
         let ch0 = chars.0.unwrap();
         let column_number = i + 1;
         match self.state {
+            State::AlphabetCharacter => {
+                self.flush(column_number);
+                self.buf.push(*ch0);
+                self.state = State::First;
+            }
             State::AlphabetString => {
                 self.flush(column_number);
                 self.buf.push(*ch0);
@@ -114,15 +120,21 @@ impl LexicalParser {
                                 'A'..='Z' | 'a'..='z' => {
                                     self.state = State::AlphabetString;
                                 }
-                                _ => {
-                                    self.state = State::First;
-                                }
+                                _ => {}
                             }
                         }
                     }
                     // \
                     '\\' => {
                         self.buf_token_type = TokenType::Backslash;
+                        if let Some(ch1) = chars.1 {
+                            match ch1 {
+                                'A'..='Z' | 'a'..='z' => {
+                                    self.state = State::AlphabetCharacter;
+                                }
+                                _ => {}
+                            }
+                        }
                     }
                     // :
                     ':' => {
@@ -163,9 +175,7 @@ impl LexicalParser {
                                 '0'..='9' => {
                                     self.state = State::NumeralString;
                                 }
-                                _ => {
-                                    self.state = State::First;
-                                }
+                                _ => {}
                             }
                         }
                     }
@@ -201,9 +211,7 @@ impl LexicalParser {
                                 '\t' | ' ' => {
                                     self.state = State::WhiteSpaceString;
                                 }
-                                _ => {
-                                    self.state = State::First;
-                                }
+                                _ => {}
                             }
                         }
                     }
