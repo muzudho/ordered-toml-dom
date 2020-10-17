@@ -158,6 +158,21 @@ impl DocumentElementP {
                 // `abc`
                 TokenType::KeyWithoutDot => {
                     self.key_value_p = Some(KeyValueP::new());
+                    match self.key_value_p.as_mut().unwrap().parse(tokens) {
+                        PResult::End => {
+                            // 1トークンでは終わらないから。
+                            return error(&mut self.log(), tokens, "document_element.rs.164.");
+                        }
+                        PResult::Err(mut table) => {
+                            return error_via(
+                                &mut table,
+                                &mut self.log(),
+                                tokens,
+                                "document_element.rs.171.",
+                            )
+                        }
+                        PResult::Ongoing => {}
+                    }
                     self.state = State::KeyValueSyntax;
                 }
                 // `[`

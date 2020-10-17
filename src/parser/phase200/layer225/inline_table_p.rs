@@ -58,6 +58,21 @@ impl InlineTableP {
                     TokenType::KeyWithoutDot => {
                         self.key_value_p = Some(Box::new(KeyValueP::new()));
                         self.state = State::KeyValue;
+                        match self.key_value_p.as_mut().unwrap().parse(tokens) {
+                            PResult::End => {
+                                // 1トークンでは終わらないから。
+                                return error(&mut self.log(), tokens, "inline_table.rs.64.");
+                            }
+                            PResult::Err(mut table) => {
+                                return error_via(
+                                    &mut table,
+                                    &mut self.log(),
+                                    tokens,
+                                    "inline_table.rs.71.",
+                                )
+                            }
+                            PResult::Ongoing => {}
+                        }
                     }
                     TokenType::RightCurlyBracket => {
                         // Empty inline-table.
