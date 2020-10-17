@@ -1,9 +1,9 @@
 age = 40
+int_max = 2147483647
+int_min = -2147483648
 weight = 93.5
-apple = "pie"
-adult = true
-student = false
 
+apple = "pie"
 basic_string_empty = ""
 basic_string_escape_backslash = "\\"
 basic_string_escape_double_quotation = "\""
@@ -28,3 +28,8 @@ multiline_literal_string_letter = '''Hello,
 world!!'''
 multiline_literal_string_punctuation = '''., ={}[]'"\
 !?'''
+
+adult = true
+student = false
+
+dob = 1979-05-27T07:32:00-08:00

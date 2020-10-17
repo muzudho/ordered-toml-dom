@@ -23,7 +23,6 @@ Take a look at the repository.
 cargo run --example comment
 cargo run --example example
 cargo run --example inline_table
-cargo run --example key_value_number
 cargo run --example key_value_wip
 cargo run --example main
 cargo run --example mix_array
@@ -46,6 +45,7 @@ You can think that you can't do anything that isn't written here.
 
 extern crate tomboy_toml_dom;
 
+use chrono::prelude::{DateTime, Utc};
 use tomboy_toml_dom::Toml;
 
 fn main() {
@@ -56,6 +56,8 @@ fn main() {
     // Read a number.
     // 数値読取。
     assert_eq!(doc.get_i128_by_key("age"), Some(40));
+    assert_eq!(doc.get_i128_by_key("int_max"), Some(2147483647));
+    assert_eq!(doc.get_i128_by_key("int_min"), Some(-2147483648));
     assert_eq!(doc.get_f64_by_key("weight"), Some(93.5));
 
     // WIP. Read a string.
@@ -128,6 +130,17 @@ world!!"
     // 論理値読取。
     assert_eq!(doc.get_bool_by_key("adult"), Some(true));
     assert_eq!(doc.get_bool_by_key("student"), Some(false));
+
+    // DateTime.
+    // 日付と時刻。
+    assert_eq!(
+        doc.get_datetime_utc_by_key("dob"),
+        Some(
+            "1979-05-27T07:32:00-08:00"
+                .parse::<DateTime<Utc>>()
+                .unwrap()
+        )
+    );
 }
 ```
 
@@ -148,3 +161,6 @@ world!!"
     * [x] Plain.
   * [ ] `'''abc'''` - multi-line literal string.
     * [x] Plain.
+  * [ ] DateTime
+    * [ ]  UTC
+      * [x] `1979-05-27T07:32:00-08:00`.
