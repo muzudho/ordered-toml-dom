@@ -32,8 +32,8 @@ pub enum State {
     MultiLine,
     // After `\`.
     // `\` の後。
-    MultiLineAfterBackslashEOL,
-    MultiLineAfterBackslashOtherwise,
+    MultiLineAfterBackslashNotEscaped,
+    MultiLineAfterBackslashEscaped,
     MultiLineEnd1,
     MultiLineEnd2,
     // Trim start.
@@ -124,13 +124,23 @@ impl BasicStringP {
                         // エスケープ・シーケンス。
                         if let Some(token_1_ahead) = tokens.1 {
                             match token_1_ahead.type_ {
-                                TokenType::EndOfLine => {
-                                    self.state = State::MultiLineAfterBackslashEOL;
-                                }
-                                _ => {
-                                    self.state = State::MultiLineAfterBackslashOtherwise;
+                                TokenType::AlphabetCharacter => {
                                     let m = self.buffer.as_mut().unwrap();
                                     m.push_token(&token0);
+                                    self.state = State::MultiLineAfterBackslashEscaped;
+                                }
+                                TokenType::Backslash => {
+                                    self.state = State::MultiLineAfterBackslashEscaped;
+                                }
+                                TokenType::EndOfLine => {
+                                    self.state = State::MultiLineAfterBackslashNotEscaped;
+                                }
+                                _ => {
+                                    return error(
+                                        &mut self.log(),
+                                        tokens,
+                                        "basic_string_p.rs.136.",
+                                    );
                                 }
                             }
                         } else {
@@ -168,14 +178,14 @@ impl BasicStringP {
                     }
                 }
             }
-            State::MultiLineAfterBackslashEOL => {
-                self.state = State::MultiLineTrimStart;
-            }
-            State::MultiLineAfterBackslashOtherwise => {
+            State::MultiLineAfterBackslashEscaped => {
+                // Escaped.
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token0);
-                // Escaped.
                 self.state = State::MultiLine;
+            }
+            State::MultiLineAfterBackslashNotEscaped => {
+                self.state = State::MultiLineTrimStart;
             }
             State::MultiLineTrimStart => {
                 match token0.type_ {
