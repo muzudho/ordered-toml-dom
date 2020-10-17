@@ -11,6 +11,8 @@ pub enum TokenType {
     Backslash,
     /// }  
     CloseCurlyBracket,
+    /// :  
+    Colon,
     /// ,  
     Comma,
     /// .  

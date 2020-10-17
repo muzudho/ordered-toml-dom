@@ -108,6 +108,10 @@ impl LexicalParser {
             '\\' => {
                 self.buf_token_type = TokenType::Backslash;
             }
+            // :
+            ':' => {
+                self.buf_token_type = TokenType::Colon;
+            }
             // ,
             ',' => {
                 self.buf_token_type = TokenType::Comma;
