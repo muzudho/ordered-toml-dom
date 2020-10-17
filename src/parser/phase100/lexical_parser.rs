@@ -1,13 +1,14 @@
 //! Divide into words.  
 //! 単語に分けます。  
 use crate::model::layer110::{Token, TokenLine, TokenType};
-use crate::RE_KEY;
+use crate::RE_KEY_EXCEPT_ALPHABET;
 use casual_logger::Log;
 use std::fmt;
 
 #[derive(Debug)]
 enum LineMachineState {
-    Key,
+    Alphabets,
+    KeyExceptAlphabet,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
     WhiteSpace,
@@ -40,6 +41,33 @@ impl LexicalParser {
             let column_number = i + 1;
             if let Some(state) = &self.state {
                 match state {
+                    LineMachineState::Alphabets => {
+                        match ch {
+                            'A'..='Z' | 'a'..='z' => {
+                                // Alphabet.
+                                self.buf.push(*ch);
+                            }
+                            _ => {
+                                self.flush(initial_column_number);
+                                self.initial(*ch);
+                                initial_column_number = column_number;
+                            }
+                        }
+                    }
+                    LineMachineState::KeyExceptAlphabet => {
+                        let matched = match RE_KEY_EXCEPT_ALPHABET.lock() {
+                            Ok(re_key) => re_key.is_match(&ch.to_string()),
+                            Err(why) => panic!(Log::fatal(&format!("{}", why))),
+                        };
+                        if matched {
+                            // A key.
+                            self.buf.push(*ch);
+                        } else {
+                            self.flush(initial_column_number);
+                            self.initial(*ch);
+                            initial_column_number = column_number;
+                        }
+                    }
                     LineMachineState::WhiteSpace => {
                         // 最初に出てくる文字まで飛ばします。
                         match ch {
@@ -51,20 +79,6 @@ impl LexicalParser {
                                 self.initial(*ch);
                                 initial_column_number = column_number;
                             }
-                        }
-                    }
-                    LineMachineState::Key => {
-                        let matched = match RE_KEY.lock() {
-                            Ok(re_key) => re_key.is_match(&ch.to_string()),
-                            Err(why) => panic!(Log::fatal(&format!("{}", why))),
-                        };
-                        if matched {
-                            // A key.
-                            self.buf.push(*ch);
-                        } else {
-                            self.flush(initial_column_number);
-                            self.initial(*ch);
-                            initial_column_number = column_number;
                         }
                     }
                 }
@@ -102,7 +116,7 @@ impl LexicalParser {
             // A ～ Z, a ～ z.
             'A'..='Z' | 'a'..='z' => {
                 self.buf_token_type = TokenType::Alphabet;
-                self.state = Some(LineMachineState::Key);
+                self.state = Some(LineMachineState::Alphabets);
             }
             // \
             '\\' => {

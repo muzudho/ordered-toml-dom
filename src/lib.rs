@@ -40,6 +40,7 @@ lazy_static! {
     /// Without dot.
     /// ドットは含みません。
     static ref RE_KEY: Mutex<Regex> = Mutex::new(Regex::new(r"[A-Za-z0-9_-]$").unwrap());
+    static ref RE_KEY_EXCEPT_ALPHABET: Mutex<Regex> = Mutex::new(Regex::new(r"[0-9_-]$").unwrap());
     static ref RE_ALPHABET: Mutex<Regex> = Mutex::new(Regex::new(r"[A-Za-z]$").unwrap());
 }
 
