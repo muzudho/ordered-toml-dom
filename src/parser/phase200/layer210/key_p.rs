@@ -44,11 +44,23 @@ impl KeyP {
             | TokenType::Underscore => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token0);
-                return PResult::End;
+
+                // Look-ahead.
+                // 先読み。
+                if let Some(token1) = tokens.1 {
+                    match token1.type_ {
+                        TokenType::Alphabet
+                        | TokenType::Numeral
+                        | TokenType::Hyphen
+                        | TokenType::Underscore => PResult::Ongoing,
+                        _ => PResult::End,
+                    }
+                } else {
+                    PResult::End
+                }
             }
             _ => return error(&mut self.log(), tokens, "key.rs.38."),
         }
-        // PResult::Ongoing
     }
 
     /// Log.  
