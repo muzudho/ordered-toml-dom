@@ -16,13 +16,16 @@ pub enum TokenType {
     /// "  
     DoubleQuotation,
     EndOfLine,
+    /// =  
     Equals,
+    /// -  
+    Hyphen,
     /// キーに使える文字で構成した単語。ドットは含まない。
     /// Numeral, Alphabet, Underscore, Hyphen に分けるか？
-    KeyWithoutDotNumeral,
+    KeyWithoutDotNumeralHyphen,
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
-    OtherwiseExceptNumeral,
+    OtherwiseExceptNumeralHyphen,
     /// {  
     LeftCurlyBracket,
     /// [  

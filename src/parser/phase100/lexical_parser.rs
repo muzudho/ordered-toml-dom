@@ -119,6 +119,10 @@ impl LexicalParser {
             '=' => {
                 self.buf_token_type = TokenType::Equals;
             }
+            // -
+            '-' => {
+                self.buf_token_type = TokenType::Hyphen;
+            }
             // {
             '{' => {
                 self.buf_token_type = TokenType::LeftCurlyBracket;
@@ -158,10 +162,10 @@ impl LexicalParser {
                 };
                 if matched {
                     // A key.
-                    self.buf_token_type = TokenType::KeyWithoutDotNumeral;
+                    self.buf_token_type = TokenType::KeyWithoutDotNumeralHyphen;
                     self.state = Some(LineMachineState::Key);
                 } else {
-                    self.buf_token_type = TokenType::OtherwiseExceptNumeral;
+                    self.buf_token_type = TokenType::OtherwiseExceptNumeralHyphen;
                 }
             }
         }
