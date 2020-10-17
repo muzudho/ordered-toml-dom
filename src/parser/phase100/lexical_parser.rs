@@ -99,11 +99,6 @@ impl LexicalParser {
     fn initial(&mut self, ch: char) {
         self.buf.push(ch);
         match ch {
-            // Whitespace.
-            '\t' | ' ' => {
-                self.buf_token_type = TokenType::WhiteSpace;
-                self.state = Some(LineMachineState::WhiteSpace);
-            }
             // \
             '\\' => {
                 self.buf_token_type = TokenType::Backslash;
@@ -132,6 +127,9 @@ impl LexicalParser {
             '[' => {
                 self.buf_token_type = TokenType::LeftSquareBracket;
             }
+            '0'..='9' => {
+                self.buf_token_type = TokenType::Numeral;
+            }
             // }
             '}' => {
                 self.buf_token_type = TokenType::RightCurlyBracket;
@@ -148,8 +146,10 @@ impl LexicalParser {
             '\'' => {
                 self.buf_token_type = TokenType::SingleQuotation;
             }
-            '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-                self.buf_token_type = TokenType::Numeral;
+            // Whitespace.
+            '\t' | ' ' => {
+                self.buf_token_type = TokenType::WhiteSpace;
+                self.state = Some(LineMachineState::WhiteSpace);
             }
             _ => {
                 let matched = match RE_KEY.lock() {
