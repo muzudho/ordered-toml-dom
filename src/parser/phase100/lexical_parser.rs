@@ -173,7 +173,7 @@ impl LexicalParser {
                 self.state = Some(LineMachineState::WhiteSpace);
             }
             _ => {
-                self.buf_token_type = TokenType::OtherwiseExceptNumeralHyphenUnderscore;
+                self.buf_token_type = TokenType::Unknown;
             }
         }
     }
