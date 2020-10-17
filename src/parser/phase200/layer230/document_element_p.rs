@@ -156,7 +156,10 @@ impl DocumentElementP {
                     return PResult::End;
                 }
                 // `abc`
-                TokenType::KeyWithoutDotNumeralHyphen | TokenType::Numeral | TokenType::Hyphen => {
+                TokenType::KeyWithoutDotNumeralHyphenUnderscore
+                | TokenType::Numeral
+                | TokenType::Hyphen
+                | TokenType::Underscore => {
                     self.key_value_p = Some(KeyValueP::new());
                     match self.key_value_p.as_mut().unwrap().parse(tokens) {
                         PResult::End => {

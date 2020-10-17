@@ -22,10 +22,10 @@ pub enum TokenType {
     Hyphen,
     /// キーに使える文字で構成した単語。ドットは含まない。
     /// Numeral, Alphabet, Underscore, Hyphen に分けるか？
-    KeyWithoutDotNumeralHyphen,
+    KeyWithoutDotNumeralHyphenUnderscore,
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
-    OtherwiseExceptNumeralHyphen,
+    OtherwiseExceptNumeralHyphenUnderscore,
     /// {  
     LeftCurlyBracket,
     /// [  
@@ -40,6 +40,8 @@ pub enum TokenType {
     Sharp,
     /// '  
     SingleQuotation,
+    /// _  
+    Underscore,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
     WhiteSpace,

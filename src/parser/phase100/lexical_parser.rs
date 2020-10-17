@@ -150,6 +150,10 @@ impl LexicalParser {
             '\'' => {
                 self.buf_token_type = TokenType::SingleQuotation;
             }
+            // _
+            '_' => {
+                self.buf_token_type = TokenType::Underscore;
+            }
             // Whitespace.
             '\t' | ' ' => {
                 self.buf_token_type = TokenType::WhiteSpace;
@@ -162,10 +166,10 @@ impl LexicalParser {
                 };
                 if matched {
                     // A key.
-                    self.buf_token_type = TokenType::KeyWithoutDotNumeralHyphen;
+                    self.buf_token_type = TokenType::KeyWithoutDotNumeralHyphenUnderscore;
                     self.state = Some(LineMachineState::Key);
                 } else {
-                    self.buf_token_type = TokenType::OtherwiseExceptNumeralHyphen;
+                    self.buf_token_type = TokenType::OtherwiseExceptNumeralHyphenUnderscore;
                 }
             }
         }
