@@ -38,5 +38,5 @@ pub struct LiteralString {
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct LiteralValue {
-    pub value: String,
+    pub tokens: Vec<Token>,
 }

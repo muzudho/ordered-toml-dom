@@ -12,35 +12,35 @@ use std::fmt;
 
 impl Default for LiteralValue {
     fn default() -> Self {
-        LiteralValue {
-            value: String::new(),
-        }
+        LiteralValue { tokens: Vec::new() }
     }
 }
 impl LiteralValue {
     pub fn from_token(token: &Token) -> Self {
-        LiteralValue {
-            value: token.value.to_string(),
-        }
-    }
-
-    pub fn from_str(text: &str) -> Self {
-        LiteralValue {
-            value: text.to_string(),
-        }
+        let mut m = LiteralValue::default();
+        m.tokens.push(token.clone());
+        m
     }
 
     pub fn push_token(&mut self, token: &Token) {
-        self.value.push_str(&token.value);
+        self.tokens.push(token.clone());
     }
 }
 impl fmt::Display for LiteralValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{}", token));
+        }
+        write!(f, "{}", buf)
     }
 }
 impl fmt::Debug for LiteralValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{:?}", token));
+        }
+        write!(f, "{}", buf)
     }
 }

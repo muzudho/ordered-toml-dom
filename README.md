@@ -26,6 +26,7 @@ cargo run --example inline_table
 cargo run --example key_value_wip
 cargo run --example main
 cargo run --example mix_array
+cargo run --example spot
 cargo run --example table
 cargo run --example toml-io-en-a-quick-tour-of-toml-v100rc3
 ```

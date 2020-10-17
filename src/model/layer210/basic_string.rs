@@ -35,6 +35,6 @@ impl fmt::Debug for BasicString {
         for token in &self.tokens {
             buf.push_str(&format!("{:?}", token.value));
         }
-        write!(f, "\"{}\"", buf)
+        write!(f, "{}", buf)
     }
 }

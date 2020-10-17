@@ -63,8 +63,8 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if &format!("{}", key_value.key) == key {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match literal_value.value.parse() {
-                            Ok(n) => return Some(n),
+                        match &format!("{}", literal_value).parse() {
+                            Ok(n) => return Some(*n),
                             Err(_) => return None,
                         }
                     }
@@ -83,8 +83,8 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if &format!("{}", key_value.key) == key {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match literal_value.value.parse() {
-                            Ok(n) => return Some(n),
+                        match &format!("{}", literal_value).parse() {
+                            Ok(n) => return Some(*n),
                             Err(_) => return None,
                         }
                     }
@@ -122,8 +122,8 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if &format!("{}", key_value.key) == key {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match literal_value.value.parse() {
-                            Ok(n) => return Some(n),
+                        match &format!("{}", literal_value).parse() {
+                            Ok(n) => return Some(*n),
                             Err(_) => return None,
                         }
                     }
@@ -140,8 +140,8 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if &format!("{}", key_value.key) == key {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match literal_value.value.parse() {
-                            Ok(n) => return Some(n),
+                        match &format!("{}", literal_value).parse() {
+                            Ok(n) => return Some(*n),
                             Err(_) => return None,
                         }
                     }

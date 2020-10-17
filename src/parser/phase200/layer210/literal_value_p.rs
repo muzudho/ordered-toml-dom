@@ -20,8 +20,8 @@ impl Default for LiteralValueP {
 }
 impl LiteralValueP {
     pub fn flush(&mut self) -> Option<LiteralValue> {
-        if let Some(buffer) = &self.buffer {
-            let m = Some(LiteralValue::from_str(buffer.value.trim_end())); // TODO トリム要らないのでは。
+        if let Some(literal_value) = &self.buffer {
+            let m = Some(literal_value.clone()); // TODO トリム要らないのでは。
             self.buffer = None;
             return m;
         }
