@@ -22,7 +22,7 @@ pub enum TokenType {
     KeyWithoutDotNumeral,
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
-    Otherwise,
+    OtherwiseExceptNumeral,
     /// {  
     LeftCurlyBracket,
     /// [  

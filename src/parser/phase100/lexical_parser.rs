@@ -161,7 +161,7 @@ impl LexicalParser {
                     self.buf_token_type = TokenType::KeyWithoutDotNumeral;
                     self.state = Some(LineMachineState::Key);
                 } else {
-                    self.buf_token_type = TokenType::Otherwise;
+                    self.buf_token_type = TokenType::OtherwiseExceptNumeral;
                 }
             }
         }
