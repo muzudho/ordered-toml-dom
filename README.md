@@ -155,6 +155,9 @@ world!!"
   * [x] `"abc"` - Basic string.
     * [x] Plain.
     * [x] `\` Escape.
+    * [ ] `\r` caridge return.
+    * [ ] `\n` line feed.
+    * [ ] `\t` tab.
   * [ ] `"""abc"""` - Multi-line basic string.
     * [x] Plain.
     * [x] Ending backslash to automatically trim.

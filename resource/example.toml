@@ -9,6 +9,7 @@ basic_string_escape_backslash = "\\"
 basic_string_escape_double_quotation = "\""
 basic_string_letter = "Hello, world!!"
 basic_string_punctuation = "., ={}[]'\"\\!?"
+basic_string_tab = "a\tb"
 
 multiline_basic_string_letter = """Hello,
 world!!"""

@@ -17,12 +17,15 @@ fn main() {
 
     assert_eq!(doc.get_str_by_key("str1"), Some("I'm a string."));
     assert_eq!(doc.get_str_by_key("str2"), Some("You can \"quote\" me."));
+
     /*
+    // TODO
     assert_eq!(
         doc.get_str_by_key("str3"),
         Some("Name\tJos\u{00E9}\nLoc\tSF.")
     );
     */
+
     assert_eq!(
         doc.get_str_by_key("str4"),
         Some(
