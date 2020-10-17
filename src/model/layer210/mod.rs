@@ -24,7 +24,7 @@ pub struct BasicString {
 /// キー。  
 #[derive(Clone)]
 pub struct Key {
-    pub value: String,
+    pub tokens: Vec<Token>,
 }
 
 /// It has one string.  

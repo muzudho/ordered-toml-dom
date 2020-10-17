@@ -20,8 +20,8 @@ impl Default for KeyP {
 }
 impl KeyP {
     pub fn flush(&mut self) -> Option<Key> {
-        if let Some(buffer) = &self.buffer {
-            let m = Some(Key::from_str(buffer.value.trim_end())); // TODO トリム要らないのでは。
+        if let Some(key) = &self.buffer {
+            let m = Some(key.clone());
             self.buffer = None;
             return m;
         }

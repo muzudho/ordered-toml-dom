@@ -12,35 +12,35 @@ use std::fmt;
 
 impl Default for Key {
     fn default() -> Self {
-        Key {
-            value: String::new(),
-        }
+        Key { tokens: Vec::new() }
     }
 }
 impl Key {
     pub fn from_token(token: &Token) -> Self {
-        Key {
-            value: token.value.to_string(),
-        }
-    }
-
-    pub fn from_str(text: &str) -> Self {
-        Key {
-            value: text.to_string(),
-        }
+        let mut m = Key::default();
+        m.push_token(token);
+        m
     }
 
     pub fn push_token(&mut self, token: &Token) {
-        self.value.push_str(&token.value);
+        self.tokens.push(token.clone());
     }
 }
 impl fmt::Display for Key {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{}", token.value));
+        }
+        write!(f, "{}", buf)
     }
 }
 impl fmt::Debug for Key {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{:?}", token.value));
+        }
+        write!(f, "{}", buf)
     }
 }
