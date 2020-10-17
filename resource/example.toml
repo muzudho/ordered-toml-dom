@@ -20,6 +20,9 @@ multiline_basic_string_trim_start = """\
   fox jumps over \
   the lazy dog.\
   """
+multiline_basic_string_escape_double_quotation = """
+\\
+"""
 multiline_basic_string_tab = """
 a\tb
 """

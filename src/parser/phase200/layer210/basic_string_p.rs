@@ -125,6 +125,7 @@ impl BasicStringP {
                         if let Some(token_1_ahead) = tokens.1 {
                             match token_1_ahead.type_ {
                                 TokenType::AlphabetCharacter => {
+                                    // Backslash.
                                     let m = self.buffer.as_mut().unwrap();
                                     m.push_token(&token0);
                                     self.state = State::MultiLineAfterBackslashEscaped;

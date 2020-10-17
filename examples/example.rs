@@ -62,16 +62,22 @@ world!!"
         doc.get_str_by_key("multiline_basic_string_trim_start"),
         Some("The quick brown fox jumps over the lazy dog.")
     );
-    /*
-        assert_eq!(
-            doc.get_str_by_key("multiline_basic_string_tab"),
-            Some(
-                "
-    a\tb
-    "
-            )
-        );
-        */
+    assert_eq!(
+        doc.get_str_by_key("multiline_basic_string_escape_double_quotation"),
+        Some(
+            "
+\\
+"
+        )
+    );
+    assert_eq!(
+        doc.get_str_by_key("multiline_basic_string_tab"),
+        Some(
+            "
+a\tb
+"
+        )
+    );
 
     assert_eq!(doc.get_str_by_key("literal_string_empty"), Some(""));
     assert_eq!(
