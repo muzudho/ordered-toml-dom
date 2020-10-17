@@ -34,16 +34,21 @@ pub enum State {
 impl KeyValueP {
     pub fn new() -> Self {
         KeyValueP {
-            buffer: None,
-            key_p: None,
+            key_buffer: None,
+            right_value_buffer: None,
+            key_p: Some(KeyP::default()),
             right_value_p: None,
             state: State::First,
         }
     }
 
     pub fn flush(&mut self) -> Option<KeyValue> {
-        let m = self.buffer.clone();
-        self.buffer = None;
+        let m = Some(KeyValue::new(
+            &self.key_buffer.as_ref().unwrap(),
+            &self.right_value_buffer.as_ref().unwrap(),
+        ));
+        self.key_buffer = None;
+        self.right_value_buffer = None;
         m
     }
 
@@ -79,26 +84,38 @@ impl KeyValueP {
                     TokenType::WhiteSpace => {} //Ignored it.
                     // `=`.
                     TokenType::KeyWithoutDot => {
-                        self.key_p = Some(KeyP::default());
-                        self.state = State::BeforeEqual;
+                        let p = self.key_p.as_mut().unwrap();
+                        match p.parse(tokens) {
+                            PResult::End => {
+                                if let Some(child_m) = p.flush() {
+                                    self.key_buffer = Some(child_m);
+                                    self.key_p = None;
+                                    self.state = State::BeforeEqual;
+                                } else {
+                                    return error(&mut self.log(), tokens, "key_value.rs.84.");
+                                }
+                            }
+                            PResult::Err(mut table) => {
+                                return error_via(
+                                    &mut table,
+                                    &mut self.log(),
+                                    tokens,
+                                    "key_value.rs.84.",
+                                );
+                            }
+                            PResult::Ongoing => {}
+                        }
                     }
                     _ => return error(&mut self.log(), tokens, "key_value.rs.65."),
                 }
             }
             // After `=`.
             State::RightValue => {
-                let p = self.key_p.as_mut().unwrap();
-                let key = if let Some(key) = p.flush() {
-                    key
-                } else {
-                    return error(&mut self.log(), tokens, "key_value.rs.82.");
-                };
-
                 let p = self.right_value_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
-                        if let Some(child_m_value) = p.flush() {
-                            self.buffer = Some(KeyValue::new(&key, &child_m_value));
+                        if let Some(child_m) = p.flush() {
+                            self.right_value_buffer = Some(child_m);
                             self.right_value_p = None;
                             self.state = State::End;
                             return PResult::End;
@@ -121,7 +138,11 @@ impl KeyValueP {
     /// ログ。  
     pub fn log(&self) -> LogTable {
         let mut t = LogTable::default()
-            .str("buffer", &format!("{:?}", &self.buffer))
+            .str("key_buffer", &format!("{:?}", &self.key_buffer))
+            .str(
+                "right_value_buffer",
+                &format!("{:?}", &self.right_value_buffer),
+            )
             .str("state", &format!("{:?}", self.state))
             .clone();
         if let Some(right_value_p) = &self.right_value_p {
