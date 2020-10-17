@@ -147,7 +147,8 @@ impl RightValueP {
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpace => {} //Ignored it.
-                    TokenType::AlphabetString
+                    TokenType::AlphabetCharacter
+                    | TokenType::AlphabetString
                     | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore

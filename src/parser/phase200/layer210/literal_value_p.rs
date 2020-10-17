@@ -38,7 +38,8 @@ impl LiteralValueP {
     pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
         let token0 = tokens.0.unwrap();
         match token0.type_ {
-            TokenType::AlphabetString
+            TokenType::AlphabetCharacter
+            | TokenType::AlphabetString
             | TokenType::Colon
             | TokenType::Dot
             | TokenType::Hyphen
@@ -52,7 +53,8 @@ impl LiteralValueP {
                 // 先読み。
                 if let Some(token1) = tokens.1 {
                     match token1.type_ {
-                        TokenType::AlphabetString
+                        TokenType::AlphabetCharacter
+                        | TokenType::AlphabetString
                         | TokenType::Colon
                         | TokenType::Dot
                         | TokenType::Hyphen

@@ -156,7 +156,8 @@ impl DocumentElementP {
                     return PResult::End;
                 }
                 // `abc`
-                TokenType::AlphabetString
+                TokenType::AlphabetCharacter
+                | TokenType::AlphabetString
                 | TokenType::NumeralString
                 | TokenType::Hyphen
                 | TokenType::Underscore => {
