@@ -139,6 +139,10 @@ impl LexicalParser {
             '0'..='9' => {
                 self.buf_token_type = TokenType::Numeral;
             }
+            // +
+            '+' => {
+                self.buf_token_type = TokenType::Plus;
+            }
             // }
             '}' => {
                 self.buf_token_type = TokenType::RightCurlyBracket;

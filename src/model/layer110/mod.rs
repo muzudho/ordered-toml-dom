@@ -29,8 +29,10 @@ pub enum TokenType {
     LeftCurlyBracket,
     /// [  
     LeftSquareBracket,
-    /// 0 ～ 9.
+    /// 0 ～ 9.  
     Numeral,
+    /// +  
+    Plus,
     /// }  
     RightCurlyBracket,
     /// ]  
