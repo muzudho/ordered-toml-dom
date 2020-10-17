@@ -12,23 +12,29 @@ use std::fmt;
 
 impl Default for LiteralString {
     fn default() -> Self {
-        LiteralString {
-            value: String::new(),
-        }
+        LiteralString { tokens: Vec::new() }
     }
 }
 impl LiteralString {
     pub fn push_token(&mut self, token: &Token) {
-        self.value.push_str(&token.value);
+        self.tokens.push(token.clone());
     }
 }
 impl fmt::Display for LiteralString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{}", token.value));
+        }
+        write!(f, "{}", buf)
     }
 }
 impl fmt::Debug for LiteralString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "'{:?}'", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{:?}", token.value));
+        }
+        write!(f, "{}", buf)
     }
 }

@@ -104,8 +104,8 @@ impl Document {
                         RightValue::BasicString(basic_string) => {
                             return Some(format!("{}", basic_string));
                         }
-                        RightValue::LiteralString(literal_value) => {
-                            return Some(literal_value.value.clone());
+                        RightValue::LiteralString(literal_string) => {
+                            return Some(format!("{}", literal_string));
                         }
                         _ => {}
                     }

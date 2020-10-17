@@ -31,7 +31,7 @@ pub struct Key {
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct LiteralString {
-    pub value: String,
+    pub tokens: Vec<Token>,
 }
 
 /// It has one string.  
