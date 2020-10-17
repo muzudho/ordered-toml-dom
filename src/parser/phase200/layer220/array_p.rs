@@ -132,7 +132,7 @@ impl ArrayP {
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
                 match token0.type_ {
-                    TokenType::KeyWithoutDotNumeralHyphenUnderscore
+                    TokenType::Alphabet
                     | TokenType::Numeral
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
@@ -198,7 +198,7 @@ impl ArrayP {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
-                    TokenType::KeyWithoutDotNumeralHyphenUnderscore
+                    TokenType::Alphabet
                     | TokenType::Numeral
                     | TokenType::Hyphen
                     | TokenType::Underscore => {

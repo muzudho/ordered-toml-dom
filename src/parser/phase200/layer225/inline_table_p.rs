@@ -55,7 +55,7 @@ impl InlineTableP {
                 match token0.type_ {
                     TokenType::WhiteSpace => {} // Ignore it.
                     // `apple.banana`
-                    TokenType::KeyWithoutDotNumeralHyphenUnderscore
+                    TokenType::Alphabet
                     | TokenType::Numeral
                     | TokenType::Hyphen
                     | TokenType::Underscore => {

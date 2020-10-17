@@ -5,6 +5,8 @@ pub mod token_line;
 /// トークンの種類。  
 #[derive(Clone, Copy, Debug)]
 pub enum TokenType {
+    /// A ～ Z, a ～ z.
+    Alphabet,
     /// \  
     Backslash,
     /// }  
@@ -20,9 +22,6 @@ pub enum TokenType {
     Equals,
     /// -  
     Hyphen,
-    /// キーに使える文字で構成した単語。ドットは含まない。
-    /// Numeral, Alphabet, Underscore, Hyphen に分けるか？
-    KeyWithoutDotNumeralHyphenUnderscore,
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
     OtherwiseExceptNumeralHyphenUnderscore,

@@ -1,6 +1,7 @@
 //! Divide into words.  
 //! 単語に分けます。  
 use crate::model::layer110::{Token, TokenLine, TokenType};
+use crate::RE_ALPHABET;
 use crate::RE_KEY;
 use casual_logger::Log;
 use std::fmt;
@@ -160,13 +161,13 @@ impl LexicalParser {
                 self.state = Some(LineMachineState::WhiteSpace);
             }
             _ => {
-                let matched = match RE_KEY.lock() {
+                let matched = match RE_ALPHABET.lock() {
                     Ok(re_key) => re_key.is_match(&ch.to_string()),
                     Err(why) => panic!(Log::fatal(&format!("{}", why))),
                 };
                 if matched {
                     // A key.
-                    self.buf_token_type = TokenType::KeyWithoutDotNumeralHyphenUnderscore;
+                    self.buf_token_type = TokenType::Alphabet;
                     self.state = Some(LineMachineState::Key);
                 } else {
                     self.buf_token_type = TokenType::OtherwiseExceptNumeralHyphenUnderscore;

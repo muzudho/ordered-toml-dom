@@ -156,7 +156,7 @@ impl DocumentElementP {
                     return PResult::End;
                 }
                 // `abc`
-                TokenType::KeyWithoutDotNumeralHyphenUnderscore
+                TokenType::Alphabet
                 | TokenType::Numeral
                 | TokenType::Hyphen
                 | TokenType::Underscore => {
