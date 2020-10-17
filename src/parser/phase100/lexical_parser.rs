@@ -5,12 +5,12 @@ use std::fmt;
 
 #[derive(Debug)]
 enum State {
-    Alphabets,
+    AlphabetString,
     First,
-    Numerals,
+    NumeralString,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
-    WhiteSpaces,
+    WhiteSpaceString,
 }
 
 /// Lexical parser.  
@@ -26,7 +26,7 @@ impl LexicalParser {
         LexicalParser {
             state: State::First,
             product: TokenLine::new(row_number),
-            buf_token_type: TokenType::WhiteSpace,
+            buf_token_type: TokenType::WhiteSpaceString,
             buf: String::new(),
         }
     }
@@ -89,7 +89,7 @@ impl LexicalParser {
         let ch0 = chars.0.unwrap();
         let column_number = i + 1;
         match self.state {
-            State::Alphabets => {
+            State::AlphabetString => {
                 self.flush(column_number);
                 self.buf.push(*ch0);
                 if let Some(ch1) = chars.1 {
@@ -112,7 +112,7 @@ impl LexicalParser {
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
-                                    self.state = State::Alphabets;
+                                    self.state = State::AlphabetString;
                                 }
                                 _ => {
                                     self.state = State::First;
@@ -161,7 +161,7 @@ impl LexicalParser {
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 '0'..='9' => {
-                                    self.state = State::Numerals;
+                                    self.state = State::NumeralString;
                                 }
                                 _ => {
                                     self.state = State::First;
@@ -195,11 +195,11 @@ impl LexicalParser {
                     }
                     // Whitespace.
                     '\t' | ' ' => {
-                        self.buf_token_type = TokenType::WhiteSpace;
+                        self.buf_token_type = TokenType::WhiteSpaceString;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 '\t' | ' ' => {
-                                    self.state = State::WhiteSpaces;
+                                    self.state = State::WhiteSpaceString;
                                 }
                                 _ => {
                                     self.state = State::First;
@@ -212,7 +212,7 @@ impl LexicalParser {
                     }
                 }
             }
-            State::Numerals => {
+            State::NumeralString => {
                 self.buf.push(*ch0);
                 if let Some(ch1) = chars.1 {
                     match ch1 {
@@ -223,7 +223,7 @@ impl LexicalParser {
                     }
                 }
             }
-            State::WhiteSpaces => {
+            State::WhiteSpaceString => {
                 self.buf.push(*ch0);
                 if let Some(ch1) = chars.1 {
                     match ch1 {

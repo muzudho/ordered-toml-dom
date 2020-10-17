@@ -72,7 +72,7 @@ impl DocumentElementP {
                 return error(&mut self.log(), tokens, "document_element.rs.74.");
             }
             State::AfterKeyValue => match token0.type_ {
-                TokenType::WhiteSpace => {} // Ignore it.
+                TokenType::WhiteSpaceString => {} // Ignore it.
                 // `,`
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
@@ -188,7 +188,7 @@ impl DocumentElementP {
                     self.comment_p = Some(CommentP::new());
                     self.state = State::CommentSyntax;
                 }
-                TokenType::WhiteSpace => {} // Ignored it.
+                TokenType::WhiteSpaceString => {} // Ignored it.
                 _ => {
                     return error(&mut self.log(), tokens, "document_element.rs.246.");
                 }

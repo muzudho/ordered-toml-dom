@@ -77,7 +77,7 @@ impl ArrayP {
             // After `]`.
             State::AfterArray => {
                 match token0.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     // ,
                     TokenType::Comma => {
                         self.state = State::AfterCommaBehindArray;
@@ -98,7 +98,7 @@ impl ArrayP {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     // ]
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -120,7 +120,7 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     // ]
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -145,7 +145,7 @@ impl ArrayP {
                         m.push_literal_string(&LiteralValue::from_token(token0));
                         self.state = State::LiteralValue;
                     }
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     // `]`.
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -157,7 +157,7 @@ impl ArrayP {
             // After " or '.
             State::AfterString => {
                 match token0.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     TokenType::Comma => {
                         self.state = State::AfterCommaBefindString;
                     }
@@ -227,7 +227,7 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     _ => return error(&mut self.log(), tokens, "array.rs.358."),
                 }
             }

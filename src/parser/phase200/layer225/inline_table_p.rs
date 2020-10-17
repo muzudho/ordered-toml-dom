@@ -53,7 +53,7 @@ impl InlineTableP {
             // After `{`.
             State::First => {
                 match token0.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     // `apple.banana`
                     TokenType::AlphabetCharacter
                     | TokenType::AlphabetString
@@ -111,7 +111,7 @@ impl InlineTableP {
             }
             // After `banana = 3`.
             State::AfterKeyValue => match token0.type_ {
-                TokenType::WhiteSpace => {} // Ignore it.
+                TokenType::WhiteSpaceString => {} // Ignore it.
                 // `,`
                 TokenType::Comma => {
                     self.state = State::First;

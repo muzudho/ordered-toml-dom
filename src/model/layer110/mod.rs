@@ -47,9 +47,9 @@ pub enum TokenType {
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
     Unknown,
-    /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
-    /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
-    WhiteSpace,
+    /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20). Multiple digits.  
+    /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。 複数桁です。  
+    WhiteSpaceString,
 }
 
 /// A row of tokens.  

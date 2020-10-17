@@ -168,7 +168,7 @@ impl BasicStringP {
             }
             State::MultiLineTrimStart => {
                 match token0.type_ {
-                    TokenType::WhiteSpace => {} // Ignore it.
+                    TokenType::WhiteSpaceString => {} // Ignore it.
                     // `"`.
                     TokenType::DoubleQuotation => {
                         if check_triple_double_quotation(tokens) {

@@ -76,7 +76,7 @@ impl KeyValueP {
             // After key.
             State::BeforeEqual => {
                 match token0.type_ {
-                    TokenType::WhiteSpace => {} //Ignored it.
+                    TokenType::WhiteSpaceString => {} //Ignored it.
                     // `=`.
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
@@ -86,7 +86,7 @@ impl KeyValueP {
             }
             State::First => {
                 match token0.type_ {
-                    TokenType::WhiteSpace => {} //Ignored it.
+                    TokenType::WhiteSpaceString => {} //Ignored it.
                     TokenType::AlphabetCharacter
                     | TokenType::AlphabetString
                     | TokenType::NumeralString
