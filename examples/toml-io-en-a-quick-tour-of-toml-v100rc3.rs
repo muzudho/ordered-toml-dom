@@ -64,18 +64,16 @@ Violets are blue"
         doc.get_string_by_key("re"),
         Some("\\d{2} apps is t[wo]o many".to_string())
     );
-    /*
-        assert_eq!(
-            doc.get_string_by_key("lines"),
-            Some(
-                "
-    The first newline is
-    trimmed in raw strings.
-    All other whitespace
-    is preserved.".to_string()
-            )
-        );
-        */
+    assert_eq!(
+        doc.get_string_by_key("lines"),
+        Some(
+            "The first newline is
+trimmed in raw strings.
+All other whitespace
+is preserved."
+                .to_string()
+        )
+    );
     assert_eq!(doc.get_i128_by_key("int1"), Some(99));
     assert_eq!(doc.get_i128_by_key("int2"), Some(42));
     assert_eq!(doc.get_i128_by_key("int3"), Some(0));

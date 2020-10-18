@@ -15,7 +15,8 @@ use casual_logger::Table;
 /// 構文状態遷移。  
 #[derive(Debug, Clone)]
 pub enum State {
-    BeforeMultiLine,
+    BeforeMultiLine1,
+    BeforeMultiLine2,
     End,
     // After double quotation.
     // 二重引用符の後。
@@ -49,7 +50,25 @@ impl LiteralStringP {
     pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
         let token0 = tokens.0.unwrap();
         match self.state {
-            State::BeforeMultiLine => {
+            State::BeforeMultiLine1 => {
+                // Skip 3rd single quotation.
+                // Look-ahead.
+                // 先読み。
+                if let Some(token_1_ahead) = tokens.1 {
+                    match token_1_ahead.type_ {
+                        TokenType::EndOfLine => {
+                            self.state = State::BeforeMultiLine2;
+                        }
+                        _ => {
+                            self.state = State::MultiLine;
+                        }
+                    }
+                } else {
+                    return error(&mut self.log(), tokens, "literal_string_p.rs.67.");
+                }
+            }
+            State::BeforeMultiLine2 => {
+                // Skip first end-of-line.
                 self.state = State::MultiLine;
             }
             State::End => {
@@ -59,11 +78,13 @@ impl LiteralStringP {
                 match token0.type_ {
                     // `'`
                     TokenType::SingleQuotation => {
+                        // Look-ahead.
+                        // 先読み。
                         if let Some(token_1_ahead) = tokens.1 {
                             match token_1_ahead.type_ {
                                 TokenType::SingleQuotation => {
                                     // Before triple sinble quoted string.
-                                    self.state = State::BeforeMultiLine;
+                                    self.state = State::BeforeMultiLine1;
                                 }
                                 _ => {
                                     // End of syntax. Empty string.
