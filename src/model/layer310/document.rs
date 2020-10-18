@@ -28,7 +28,7 @@ impl Document {
                 DocumentElement::EmptyLine => {}
                 DocumentElement::KeyValue(m) => {
                     // println!("m.key={}", m.key); // In development.
-                    if &format!("{}", m.key) == key {
+                    if format!("{}", m.key) == key.to_string() {
                         // println!("HIT m.key={}", m.key);// In development.
                         return Some(elem);
                     }
@@ -46,7 +46,7 @@ impl Document {
     pub fn get_literal_string_by_key(&self, key: &str) -> Option<&LiteralValue> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
-                if &format!("{}", key_value.key) == key {
+                if format!("{}", key_value.key) == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
                         return Some(literal_value);
                     }
@@ -61,10 +61,10 @@ impl Document {
     pub fn get_i128_by_key(&self, key: &str) -> Option<i128> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
-                if &format!("{}", key_value.key) == key {
+                if format!("{}", key_value.key) == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match &format!("{}", literal_value).parse() {
-                            Ok(n) => return Some(*n),
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
                             Err(_) => return None,
                         }
                     }
@@ -81,10 +81,10 @@ impl Document {
     pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
-                if &format!("{}", key_value.key) == key {
+                if format!("{}", key_value.key) == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match &format!("{}", literal_value).parse() {
-                            Ok(n) => return Some(*n),
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
                             Err(_) => return None,
                         }
                     }
@@ -99,13 +99,13 @@ impl Document {
     pub fn get_str_by_key(&self, key: &str) -> Option<String> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
-                if &format!("{}", key_value.key) == key {
+                if format!("{}", key_value.key) == key.to_string() {
                     match &*key_value.value {
                         RightValue::BasicString(basic_string) => {
-                            return Some(format!("{}", basic_string));
+                            return Some(format!("{}", basic_string).to_string());
                         }
                         RightValue::LiteralString(literal_string) => {
-                            return Some(format!("{}", literal_string));
+                            return Some(format!("{}", literal_string).to_string());
                         }
                         _ => {}
                     }
@@ -120,10 +120,10 @@ impl Document {
     pub fn get_bool_by_key(&self, key: &str) -> Option<bool> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
-                if &format!("{}", key_value.key) == key {
+                if format!("{}", key_value.key) == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match &format!("{}", literal_value).parse() {
-                            Ok(n) => return Some(*n),
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
                             Err(_) => return None,
                         }
                     }
@@ -138,10 +138,10 @@ impl Document {
     pub fn get_datetime_utc_by_key(&self, key: &str) -> Option<DateTime<Utc>> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
-                if &format!("{}", key_value.key) == key {
+                if format!("{}", key_value.key) == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match &format!("{}", literal_value).parse() {
-                            Ok(n) => return Some(*n),
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
                             Err(_) => return None,
                         }
                     }
