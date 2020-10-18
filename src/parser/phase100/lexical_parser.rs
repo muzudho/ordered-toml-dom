@@ -136,7 +136,7 @@ impl LexicalParser {
                     }
                     // \
                     '\\' => {
-                        // print!("[trace104 bs={:?}]", ch0);
+                        print!("[trace104 bs={:?}]", ch0);
                         self.buffer_string_token_type = TokenType::Backslash;
                         self.flush();
                         if let Some(ch1) = chars.1 {
