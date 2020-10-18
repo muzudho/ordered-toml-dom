@@ -88,6 +88,8 @@ impl EscapeSequenceP {
                                     "\n",
                                     TokenType::AlphabetCharacter, // TODO EscapeSequence
                                 ));
+                                self.state = State::End;
+                                return PResult::End;
                             }
                             "r" => {
                                 self.buffer = Some(Token::new(
@@ -95,6 +97,8 @@ impl EscapeSequenceP {
                                     "\r",
                                     TokenType::AlphabetCharacter, // TODO EscapeSequence
                                 ));
+                                self.state = State::End;
+                                return PResult::End;
                             }
                             "t" => {
                                 self.buffer = Some(Token::new(
@@ -102,6 +106,8 @@ impl EscapeSequenceP {
                                     "\t",
                                     TokenType::AlphabetCharacter, // TODO EscapeSequence
                                 ));
+                                self.state = State::End;
+                                return PResult::End;
                             }
                             _ => {
                                 return error(&mut self.log(), tokens, "escape_sequence_p.rs.206.");
@@ -114,6 +120,8 @@ impl EscapeSequenceP {
                             "\\",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
                         ));
+                        self.state = State::End;
+                        return PResult::End;
                     }
                     // "
                     TokenType::DoubleQuotation => {
@@ -122,12 +130,13 @@ impl EscapeSequenceP {
                             "\"",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
                         ));
+                        self.state = State::End;
+                        return PResult::End;
                     }
                     _ => {
                         return error(&mut self.log(), tokens, "escape_sequence_p.rs.212.");
                     }
                 }
-                self.state = State::First;
             }
         }
 
