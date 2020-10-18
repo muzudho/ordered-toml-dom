@@ -33,7 +33,7 @@ pub enum State {
     // After `\`.
     // `\` の後。
     MultiLineAfterBackslashNotEscaped,
-    MultiLineAfterBackslashEscaped,
+    MultiLineAfterEscapeCharacter,
     MultiLineEnd1,
     MultiLineEnd2,
     // Trim start.
@@ -133,13 +133,11 @@ impl BasicStringP {
                                 TokenType::AlphabetCharacter => {
                                     // print!("[trace1 ahead={:?}]", token_1_ahead);
                                     // Backslash.
-                                    let m = self.buffer.as_mut().unwrap();
-                                    m.push_token(&token0);
-                                    self.state = State::MultiLineAfterBackslashEscaped;
+                                    self.state = State::MultiLineAfterEscapeCharacter;
                                 }
                                 TokenType::Backslash => {
                                     // print!("[trace2 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
-                                    self.state = State::MultiLineAfterBackslashEscaped;
+                                    self.state = State::MultiLineAfterEscapeCharacter;
                                 }
                                 TokenType::EndOfLine => {
                                     // print!("[trace3 EndOfLIne]");
@@ -189,14 +187,56 @@ impl BasicStringP {
                     }
                 }
             }
-            State::MultiLineAfterBackslashEscaped => {
-                // println!("[trace196 token0=|{:?}|]", token0);
+            State::MultiLineAfterEscapeCharacter => {
+                // println!("[trace196={:?}]", token0);
                 // Escaped.
-                let m = self.buffer.as_mut().unwrap();
-                m.push_token(&token0);
+                match token0.type_ {
+                    // `"`
+                    TokenType::AlphabetCharacter => {
+                        let m = self.buffer.as_mut().unwrap();
+                        match token0.to_string().as_str() {
+                            "n" => {
+                                m.push_token(&Token::new(
+                                    token0.column_number,
+                                    "\n",
+                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
+                                ));
+                            }
+                            "r" => {
+                                m.push_token(&Token::new(
+                                    token0.column_number,
+                                    "\r",
+                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
+                                ));
+                            }
+                            "t" => {
+                                m.push_token(&Token::new(
+                                    token0.column_number,
+                                    "\t",
+                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
+                                ));
+                            }
+                            _ => {
+                                return error(&mut self.log(), tokens, "basic_string_p.rs.206.");
+                            }
+                        }
+                    }
+                    TokenType::Backslash => {
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&Token::new(
+                            token0.column_number,
+                            "\\",
+                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        ));
+                    }
+                    _ => {
+                        return error(&mut self.log(), tokens, "basic_string_p.rs.212.");
+                    }
+                }
                 self.state = State::MultiLine;
             }
             State::MultiLineAfterBackslashNotEscaped => {
+                // println!("[trace199={:?}]", token0);
                 self.state = State::MultiLineTrimStart;
             }
             State::MultiLineTrimStart => {
