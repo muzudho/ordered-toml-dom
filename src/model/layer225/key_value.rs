@@ -15,7 +15,7 @@ impl KeyValue {
         }
     }
     pub fn to_debug_string(&self) -> String {
-        format!("{}", self)
+        format!("{:?}", self)
     }
     pub fn to_string(&self) -> String {
         format!("{}", self)
