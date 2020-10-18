@@ -81,39 +81,22 @@ impl EscapeSequenceP {
                     // `"`
                     TokenType::AlphabetCharacter => {
                         // TODO 汎用的に書けないか？
-                        match token0.to_string().as_str() {
-                            "n" => {
-                                // println!("[trace286 改行]");
-                                self.buffer = Some(Token::new(
-                                    token0.column_number,
-                                    "\n",
-                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
-                                ));
-                                self.state = State::End;
-                                return PResult::End;
-                            }
-                            "r" => {
-                                self.buffer = Some(Token::new(
-                                    token0.column_number,
-                                    "\r",
-                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
-                                ));
-                                self.state = State::End;
-                                return PResult::End;
-                            }
-                            "t" => {
-                                self.buffer = Some(Token::new(
-                                    token0.column_number,
-                                    "\t",
-                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
-                                ));
-                                self.state = State::End;
-                                return PResult::End;
-                            }
+                        // https://doc.rust-lang.org/reference/tokens.html
+                        let code = match token0.to_string().as_str() {
+                            "n" => "\n",
+                            "r" => "\r",
+                            "t" => "\t",
                             _ => {
-                                return error(&mut self.log(), tokens, "escape_sequence_p.rs.206.");
+                                return error(&mut self.log(), tokens, "escape_sequence_p.rs.206.")
                             }
-                        }
+                        };
+                        self.buffer = Some(Token::new(
+                            token0.column_number,
+                            code,
+                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        ));
+                        self.state = State::End;
+                        return PResult::End;
                     }
                     TokenType::Backslash => {
                         self.buffer = Some(Token::new(
