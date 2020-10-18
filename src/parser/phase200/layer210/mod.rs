@@ -1,5 +1,6 @@
 pub mod basic_string_p;
 pub mod comment_p;
+pub mod escape_sequence_p;
 pub mod header_p_of_array_of_table;
 pub mod header_p_of_table;
 pub mod key_p;
@@ -7,11 +8,12 @@ pub mod literal_string_p;
 pub mod literal_value_p;
 
 use crate::model::{
-    layer210::{BasicString, Comment, Key, LiteralString, LiteralValue},
+    layer210::{BasicString, Comment, EscapeSequence, Key, LiteralString, LiteralValue},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
-    basic_string_p::State as BasicStringState, literal_string_p::State as LiteralStringState,
+    basic_string_p::State as BasicStringState, escape_sequence_p::State as EscapeSequenceState,
+    literal_string_p::State as LiteralStringState,
 };
 use casual_logger::Table as LogTable;
 
@@ -32,6 +34,16 @@ pub struct CommentP {
 pub struct BasicStringP {
     buffer: Option<BasicString>,
     state: BasicStringState,
+}
+
+/// Escape sequence parser.  
+/// エスケープ・シーケンス・パーサー。  
+///
+/// Example: `"value"`.  
+#[derive(Clone)]
+pub struct EscapeSequenceP {
+    buffer: Option<EscapeSequence>,
+    state: EscapeSequenceState,
 }
 
 /// Header of array of table syntax parser.  
