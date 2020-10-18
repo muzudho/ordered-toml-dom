@@ -22,7 +22,7 @@ impl fmt::Display for TokenLine {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for token in &self.tokens {
-            buf.push_str(&format!("{}", token));
+            buf.push_str(&token.to_string());
         }
         write!(f, "{}", buf)
     }
@@ -31,7 +31,7 @@ impl fmt::Debug for TokenLine {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for token in &self.tokens {
-            buf.push_str(&format!("{:?}", token));
+            buf.push_str(&token.to_debug_string());
         }
         write!(f, "{}", buf)
     }

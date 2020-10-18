@@ -267,11 +267,11 @@ impl DocumentElementP {
         let mut t = Table::default()
             .str("state", &format!("{:?}", self.state))
             .clone();
-        if let Some(comment_p) = &self.comment_p {
-            t.sub_t("comment_p", &comment_p.log());
+        if let Some(p) = &self.comment_p {
+            t.sub_t("comment_p", &p.log());
         }
-        if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value_p", &key_value_p.log());
+        if let Some(p) = &self.key_value_p {
+            t.sub_t("key_value_p", &p.log());
         }
         t
     }

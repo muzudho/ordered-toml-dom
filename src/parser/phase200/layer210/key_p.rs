@@ -68,9 +68,10 @@ impl KeyP {
     /// Log.  
     /// ログ。  
     pub fn log(&self) -> LogTable {
-        let t = LogTable::default()
-            .str("buffer", &format!("{:?}", self.buffer))
-            .clone();
+        let mut t = LogTable::default().clone();
+        if let Some(key) = &self.buffer {
+            t.str("buffer", &key.to_string());
+        }
         t
     }
 }

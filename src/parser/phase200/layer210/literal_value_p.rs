@@ -74,9 +74,10 @@ impl LiteralValueP {
     /// Log.  
     /// ログ。  
     pub fn log(&self) -> LogTable {
-        let t = LogTable::default()
-            .str("buffer", &format!("{:?}", self.buffer))
-            .clone();
+        let mut t = LogTable::default().clone();
+        if let Some(m) = &self.buffer {
+            t.str("buffer", &m.to_string());
+        }
         t
     }
 }

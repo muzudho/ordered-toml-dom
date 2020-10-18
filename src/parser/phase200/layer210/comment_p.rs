@@ -42,9 +42,9 @@ impl CommentP {
     /// Log.  
     /// ログ。  
     pub fn log(&self) -> Table {
-        let mut t = Table::default().str("Parse", "CommentP").clone();
+        let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
-            t.str("buffer", &format!("{}", m));
+            t.str("buffer", &m.to_string());
         }
         t
     }

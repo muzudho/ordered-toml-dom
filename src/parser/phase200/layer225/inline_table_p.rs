@@ -133,8 +133,8 @@ impl InlineTableP {
             .str("parser", "InlineTableP#parse")
             .str("state", &format!("{:?}", self.state))
             .clone();
-        if let Some(key_value_p) = &self.key_value_p {
-            t.sub_t("key_value", &key_value_p.log());
+        if let Some(p) = &self.key_value_p {
+            t.sub_t("key_value", &p.log());
         }
         t
     }

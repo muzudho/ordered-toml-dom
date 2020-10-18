@@ -244,14 +244,14 @@ impl RightValueP {
             .str("state", &format!("{:?}", self.state))
             .str("buffer", &format!("{:?}", self.buffer))
             .clone();
-        if let Some(basic_string_p) = &self.basic_string_p {
-            t.sub_t("basic_string_p", &basic_string_p.log());
+        if let Some(p) = &self.basic_string_p {
+            t.sub_t("basic_string_p", &p.log());
         }
-        if let Some(inline_table_p) = &self.inline_table_p {
-            t.sub_t("inline_table", &inline_table_p.log());
+        if let Some(p) = &self.inline_table_p {
+            t.sub_t("inline_table", &p.log());
         }
-        if let Some(literal_string_p) = &self.literal_string_p {
-            t.sub_t("single_quoted_string", &literal_string_p.log());
+        if let Some(p) = &self.literal_string_p {
+            t.sub_t("single_quoted_string", &p.log());
         }
         t
     }
