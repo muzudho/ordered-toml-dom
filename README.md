@@ -191,27 +191,23 @@ world!!"
 * [ ] String (Not str)
   * [x] `"abc"` - Basic string.
     * [x] Plain.
-    * [x] `\` Escape.
-    * [ ] `\r` caridge return.
-    * [ ] `\n` line feed.
-    * [ ] `\t` tab.
+    * [ ] Escape sequence.
   * [ ] `"""abc"""` - Multi-line basic string.
     * [x] Plain.
-    * [ ] `\r` caridge return.
-    * [ ] `\n` line feed.
-    * [x] `\t` tab.
+    * [ ] Escape sequence.
     * [x] Ending backslash to automatically trim.
   * [ ] `'abc'` - Literal string.
     * [x] Plain.
-    * [ ] `\r` caridge return.
-    * [ ] `\n` line feed.
-    * [ ] `\t` tab.
   * [ ] `'''abc'''` - multi-line literal string.
     * [x] Plain.
-    * [ ] `\r` caridge return.
-    * [ ] `\n` line feed.
-    * [ ] `\t` tab.
     * [ ] The first newline is trimmed in raw string.
-  * [ ] DateTime
+  * [ ] Escape sequence.
+    * [x] `\r` caridge return.
+    * [x] `\n` line feed.
+    * [x] `\t` tab.
+    * [x] `\\` tab.
+    * [x] `\"` tab.
+    * [ ] `\u0000` Unicode.
+* [ ] DateTime
     * [ ]  UTC
       * [x] `1979-05-27T07:32:00-08:00`.

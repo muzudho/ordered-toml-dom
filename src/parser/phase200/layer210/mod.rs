@@ -44,7 +44,7 @@ pub struct BasicStringP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct EscapeSequenceP {
-    buffer: Option<Token>,
+    buffer2: Option<Token>,
     state: EscapeSequenceState,
 }
 

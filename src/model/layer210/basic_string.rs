@@ -16,6 +16,9 @@ impl Default for BasicString {
     }
 }
 impl BasicString {
+    pub fn extend_tokens(&mut self, tokens: &Vec<Token>) {
+        self.tokens.extend(*tokens);
+    }
     pub fn push_token(&mut self, token: &Token) {
         self.tokens.push(token.clone());
     }

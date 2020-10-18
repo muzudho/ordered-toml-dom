@@ -24,15 +24,15 @@ pub enum State {
 impl Default for EscapeSequenceP {
     fn default() -> Self {
         EscapeSequenceP {
-            buffer: None,
+            buffer2: None,
             state: State::First,
         }
     }
 }
 impl EscapeSequenceP {
-    pub fn flush(&mut self) -> Option<Token> {
-        let m = self.buffer.clone();
-        self.buffer = None;
+    pub fn flush2(&mut self) -> Option<Token> {
+        let m = self.buffer2.clone();
+        self.buffer2 = None;
         m
     }
     /// # Arguments
@@ -86,11 +86,13 @@ impl EscapeSequenceP {
                             "n" => "\n",
                             "r" => "\r",
                             "t" => "\t",
+                            "u" => panic!("Unimplemented unicode 0000."), // TODO
+                            "U" => panic!("Unimplemented unicode 00000000."), // TODO
                             _ => {
                                 return error(&mut self.log(), tokens, "escape_sequence_p.rs.206.")
                             }
                         };
-                        self.buffer = Some(Token::new(
+                        self.buffer2 = Some(Token::new(
                             token0.column_number,
                             code,
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -99,7 +101,7 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     TokenType::Backslash => {
-                        self.buffer = Some(Token::new(
+                        self.buffer2 = Some(Token::new(
                             token0.column_number,
                             "\\",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -109,7 +111,7 @@ impl EscapeSequenceP {
                     }
                     // "
                     TokenType::DoubleQuotation => {
-                        self.buffer = Some(Token::new(
+                        self.buffer2 = Some(Token::new(
                             token0.column_number,
                             "\"",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -131,7 +133,7 @@ impl EscapeSequenceP {
     /// ログ。  
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
-        if let Some(m) = &self.buffer {
+        if let Some(m) = &self.buffer2 {
             t.str("value", &format!("{}", m));
         }
         t
