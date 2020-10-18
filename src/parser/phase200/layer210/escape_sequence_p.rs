@@ -62,7 +62,7 @@ impl EscapeSequenceP {
                         }
                         TokenType::EndOfLine => {
                             // 行末に \ があったケース。
-                            // print!("[trace3 EndOfLIne]");
+                            // println!("[trace3 行末にEOLがあったケース]");
                             self.state = State::End;
                             return PResult::End;
                         }
@@ -83,6 +83,7 @@ impl EscapeSequenceP {
                         // TODO 汎用的に書けないか？
                         match token0.to_string().as_str() {
                             "n" => {
+                                // println!("[trace286 改行]");
                                 self.buffer = Some(Token::new(
                                     token0.column_number,
                                     "\n",

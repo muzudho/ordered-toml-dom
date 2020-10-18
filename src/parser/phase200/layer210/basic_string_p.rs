@@ -128,10 +128,10 @@ impl BasicStringP {
                     // \
                     TokenType::Backslash => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
-                        self.state = State::MultiLineEscapeSequence;
                         match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
                             PResult::End => {
                                 // 行末の \ だったなら。
+                                // println!("[trace200 行末の \\ だったなら。]");
                                 self.state = State::MultiLineTrimStart;
                             }
                             PResult::Err(mut table) => {
@@ -142,7 +142,9 @@ impl BasicStringP {
                                     "basic_string_p.rs.139.",
                                 );
                             }
-                            PResult::Ongoing => {}
+                            PResult::Ongoing => {
+                                self.state = State::MultiLineEscapeSequence;
+                            }
                         }
                     }
                     _ => {
@@ -202,18 +204,28 @@ impl BasicStringP {
                 }
             }
             State::MultiLineTrimStart => {
+                // println!("[trace307 MultiLineTrimStart]");
                 match token0.type_ {
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::EndOfLine => {
+                        // println!("[trace312 EndOfLine]");
+                    } // Ignore it.
+                    TokenType::WhiteSpaceString => {
+                        // println!("[trace308 WhiteSpaceString]");
+                    } // Ignore it.
                     // "
                     TokenType::DoubleQuotation => {
                         if check_triple_double_quotation(tokens) {
+                            // println!("[trace309 check_triple_double_quotation]");
                             self.state = State::MultiLineEnd1;
                         } else {
+                            // println!("[trace310 DoubleQuotation]");
                             let m = self.buffer.as_mut().unwrap();
                             m.push_token(&token0);
+                            self.state = State::MultiLine; // (2020-10-18追加)
                         }
                     }
                     _ => {
+                        // println!("[trace311 Otherwise={:?}]", token0);
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&token0);
                         self.state = State::MultiLine;

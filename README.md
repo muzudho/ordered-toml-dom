@@ -118,16 +118,22 @@ world!!"
             .to_string()
         )
     );
-    /* TODO
-        assert_eq!(
-            doc.get_string_by_key("multiline_basic_string_tab"),
-            Some(
-                "
-    a\tb
-    ".to_string()
-            )
-        );
-        */
+    /*
+    // Fixed.
+    println!(
+        "debug|multiline_basic_string_tab|{}",
+        doc.get_debug_string_by_key("multiline_basic_string_tab")
+    );
+    */
+    assert_eq!(
+        doc.get_string_by_key("multiline_basic_string_tab"),
+        Some(
+            "
+a\tb
+"
+            .to_string()
+        )
+    );
 
     assert_eq!(
         doc.get_string_by_key("literal_string_empty"),
@@ -191,11 +197,20 @@ world!!"
     * [ ] `\t` tab.
   * [ ] `"""abc"""` - Multi-line basic string.
     * [x] Plain.
+    * [ ] `\r` caridge return.
+    * [ ] `\n` line feed.
+    * [x] `\t` tab.
     * [x] Ending backslash to automatically trim.
   * [ ] `'abc'` - Literal string.
     * [x] Plain.
+    * [ ] `\r` caridge return.
+    * [ ] `\n` line feed.
+    * [ ] `\t` tab.
   * [ ] `'''abc'''` - multi-line literal string.
     * [x] Plain.
+    * [ ] `\r` caridge return.
+    * [ ] `\n` line feed.
+    * [ ] `\t` tab.
     * [ ] The first newline is trimmed in raw string.
   * [ ] DateTime
     * [ ]  UTC
