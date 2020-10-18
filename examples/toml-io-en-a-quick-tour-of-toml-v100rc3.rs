@@ -15,53 +15,66 @@ fn main() {
     // Toml読取。
     let doc = Toml::from_file("./resource/toml-io-en-a-quick-tour-of-toml-v100rc3.toml");
 
-    assert_eq!(doc.get_str_by_key("str1"), Some("I'm a string."));
-    assert_eq!(doc.get_str_by_key("str2"), Some("You can \"quote\" me."));
+    assert_eq!(
+        doc.get_string_by_key("str1"),
+        Some("I'm a string.".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("str2"),
+        Some("You can \"quote\" me.".to_string())
+    );
 
     /*
     // TODO
     assert_eq!(
-        doc.get_str_by_key("str3"),
-        Some("Name\tJos\u{00E9}\nLoc\tSF.")
+        doc.get_string_by_key("str3"),
+        Some("Name\tJos\u{00E9}\nLoc\tSF.".to_string())
     );
     */
 
     assert_eq!(
-        doc.get_str_by_key("str4"),
+        doc.get_string_by_key("str4"),
         Some(
             "
 Roses are red
 Violets are blue"
+                .to_string()
         )
     );
     assert_eq!(
-        doc.get_str_by_key("str5"),
-        Some("The quick brown fox jumps over the lazy dog.")
+        doc.get_string_by_key("str5"),
+        Some("The quick brown fox jumps over the lazy dog.".to_string())
     );
 
     assert_eq!(
-        doc.get_str_by_key("path"),
-        Some("C:\\Users\\nodejs\\templates")
+        doc.get_string_by_key("path"),
+        Some("C:\\Users\\nodejs\\templates".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("path2"),
-        Some("\\\\User\\admin$\\system32")
+        doc.get_string_by_key("path2"),
+        Some("\\\\User\\admin$\\system32".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("quoted"),
-        Some("Tom \"Dubs\" Preston-Werner")
+        doc.get_string_by_key("quoted"),
+        Some("Tom \"Dubs\" Preston-Werner".to_string())
     );
-    assert_eq!(doc.get_str_by_key("regex"), Some("<\\i\\c*\\s*>"));
-    assert_eq!(doc.get_str_by_key("re"), Some("\\d{2} apps is t[wo]o many"));
+    assert_eq!(
+        doc.get_string_by_key("regex"),
+        Some("<\\i\\c*\\s*>".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("re"),
+        Some("\\d{2} apps is t[wo]o many".to_string())
+    );
     /*
         assert_eq!(
-            doc.get_str_by_key("lines"),
+            doc.get_string_by_key("lines"),
             Some(
                 "
     The first newline is
     trimmed in raw strings.
     All other whitespace
-    is preserved."
+    is preserved.".to_string()
             )
         );
         */

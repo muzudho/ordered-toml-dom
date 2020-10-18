@@ -22,32 +22,32 @@ fn main() {
 
     // WIP. Read a string.
     // 作業中。 文字列読取。
-    assert_eq!(doc.get_str_by_key("apple"), Some("pie".to_string()));
+    assert_eq!(doc.get_string_by_key("apple"), Some("pie".to_string()));
 
     assert_eq!(
-        doc.get_str_by_key("basic_string_letter"),
+        doc.get_string_by_key("basic_string_letter"),
         Some("Hello, world!!".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("basic_string_empty"),
+        doc.get_string_by_key("basic_string_empty"),
         Some("".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("basic_string_escape_backslash"),
+        doc.get_string_by_key("basic_string_escape_backslash"),
         Some("\\".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("basic_string_escape_double_quotation"),
+        doc.get_string_by_key("basic_string_escape_double_quotation"),
         Some("\"".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("basic_string_punctuation"),
+        doc.get_string_by_key("basic_string_punctuation"),
         Some("., ={}[]'\"\\!?".to_string())
     );
-    // TODO assert_eq!(doc.get_str_by_key("basic_string_tab"), Some("a\tb"));
+    // TODO assert_eq!(doc.get_string_by_key("basic_string_tab"), Some("a\tb"));
 
     assert_eq!(
-        doc.get_str_by_key("multiline_basic_string_letter"),
+        doc.get_string_by_key("multiline_basic_string_letter"),
         Some(
             "Hello,
 world!!"
@@ -56,7 +56,7 @@ world!!"
     );
 
     assert_eq!(
-        doc.get_str_by_key("multiline_basic_string_punctuation"),
+        doc.get_string_by_key("multiline_basic_string_punctuation"),
         Some(
             "., ={}[]\"'\"\"\\
 !?"
@@ -64,11 +64,11 @@ world!!"
         )
     );
     assert_eq!(
-        doc.get_str_by_key("multiline_basic_string_trim_start"),
+        doc.get_string_by_key("multiline_basic_string_trim_start"),
         Some("The quick brown fox jumps over the lazy dog.".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("multiline_basic_string_escape_double_quotation"),
+        doc.get_string_by_key("multiline_basic_string_escape_double_quotation"),
         Some(
             "
 \\
@@ -78,7 +78,7 @@ world!!"
     );
     /* TODO
         assert_eq!(
-            doc.get_str_by_key("multiline_basic_string_tab"),
+            doc.get_string_by_key("multiline_basic_string_tab"),
             Some(
                 "
     a\tb
@@ -88,19 +88,19 @@ world!!"
         */
 
     assert_eq!(
-        doc.get_str_by_key("literal_string_empty"),
+        doc.get_string_by_key("literal_string_empty"),
         Some("".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("literal_string_letter"),
+        doc.get_string_by_key("literal_string_letter"),
         Some("Hello, world!!".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("literal_string_punctuation"),
+        doc.get_string_by_key("literal_string_punctuation"),
         Some("., ={}[]\"\\!?".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("multiline_literal_string_letter"),
+        doc.get_string_by_key("multiline_literal_string_letter"),
         Some(
             "Hello,
 world!!"
@@ -108,7 +108,7 @@ world!!"
         )
     );
     assert_eq!(
-        doc.get_str_by_key("multiline_literal_string_punctuation"),
+        doc.get_string_by_key("multiline_literal_string_punctuation"),
         Some(
             "., ={}[]'\"\\
 !?"

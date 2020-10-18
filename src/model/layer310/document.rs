@@ -94,9 +94,17 @@ impl Document {
         None
     }
 
+    #[deprecated(
+        since = "0.1.10",
+        note = "Please use the tomboy_toml_dom::model::layer310::document::get_string_by_key() method instead"
+    )]
+    pub fn get_str_by_key(&self, _key: &str) -> Option<&str> {
+        panic!("Obsoleted. Please use the tomboy_toml_dom::model::layer310::document::get_string_by_key() method instead.")
+    }
+
     /// Right string of `left = "abc"`.  
     /// キー・バリューの右の文字列。  
-    pub fn get_str_by_key(&self, key: &str) -> Option<String> {
+    pub fn get_string_by_key(&self, key: &str) -> Option<String> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key.to_string() == key.to_string() {

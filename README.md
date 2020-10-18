@@ -64,67 +64,97 @@ fn main() {
 
     // WIP. Read a string.
     // 作業中。 文字列読取。
-    assert_eq!(doc.get_str_by_key("apple"), Some("pie"));
+    assert_eq!(doc.get_string_by_key("apple"), Some("pie".to_string()));
 
     assert_eq!(
-        doc.get_str_by_key("basic_string_letter"),
-        Some("Hello, world!!")
-    );
-    assert_eq!(doc.get_str_by_key("basic_string_empty"), Some(""));
-    assert_eq!(
-        doc.get_str_by_key("basic_string_escape_backslash"),
-        Some("\\")
+        doc.get_string_by_key("basic_string_letter"),
+        Some("Hello, world!!".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("basic_string_escape_double_quotation"),
-        Some("\"")
+        doc.get_string_by_key("basic_string_empty"),
+        Some("".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("basic_string_punctuation"),
-        Some("., ={}[]'\"\\!?")
+        doc.get_string_by_key("basic_string_escape_backslash"),
+        Some("\\".to_string())
     );
+    assert_eq!(
+        doc.get_string_by_key("basic_string_escape_double_quotation"),
+        Some("\"".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("basic_string_punctuation"),
+        Some("., ={}[]'\"\\!?".to_string())
+    );
+    // TODO assert_eq!(doc.get_string_by_key("basic_string_tab"), Some("a\tb"));
 
     assert_eq!(
-        doc.get_str_by_key("multiline_basic_string_letter"),
+        doc.get_string_by_key("multiline_basic_string_letter"),
         Some(
             "Hello,
 world!!"
+                .to_string()
         )
     );
 
     assert_eq!(
-        doc.get_str_by_key("multiline_basic_string_punctuation"),
+        doc.get_string_by_key("multiline_basic_string_punctuation"),
         Some(
             "., ={}[]\"'\"\"\\
 !?"
+            .to_string()
         )
     );
     assert_eq!(
-        doc.get_str_by_key("multiline_basic_string_trim_start"),
-        Some("The quick brown fox jumps over the lazy dog.")
+        doc.get_string_by_key("multiline_basic_string_trim_start"),
+        Some("The quick brown fox jumps over the lazy dog.".to_string())
     );
+    assert_eq!(
+        doc.get_string_by_key("multiline_basic_string_escape_double_quotation"),
+        Some(
+            "
+\\
+"
+            .to_string()
+        )
+    );
+    /* TODO
+        assert_eq!(
+            doc.get_string_by_key("multiline_basic_string_tab"),
+            Some(
+                "
+    a\tb
+    ".to_string()
+            )
+        );
+        */
 
-    assert_eq!(doc.get_str_by_key("literal_string_empty"), Some(""));
     assert_eq!(
-        doc.get_str_by_key("literal_string_letter"),
-        Some("Hello, world!!")
+        doc.get_string_by_key("literal_string_empty"),
+        Some("".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("literal_string_punctuation"),
-        Some("., ={}[]\"\\!?")
+        doc.get_string_by_key("literal_string_letter"),
+        Some("Hello, world!!".to_string())
     );
     assert_eq!(
-        doc.get_str_by_key("multiline_literal_string_letter"),
+        doc.get_string_by_key("literal_string_punctuation"),
+        Some("., ={}[]\"\\!?".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("multiline_literal_string_letter"),
         Some(
             "Hello,
 world!!"
+                .to_string()
         )
     );
     assert_eq!(
-        doc.get_str_by_key("multiline_literal_string_punctuation"),
+        doc.get_string_by_key("multiline_literal_string_punctuation"),
         Some(
             "., ={}[]'\"\\
 !?"
+            .to_string()
         )
     );
 
@@ -152,7 +182,7 @@ world!!"
   * [x] Parsing a literal containing dots. Example: `3.14`.  
       ドットを含むリテラル文字列の解析。例： `3.14`。
   * [ ] Numbers...
-* [ ] String
+* [ ] String (Not str)
   * [x] `"abc"` - Basic string.
     * [x] Plain.
     * [x] `\` Escape.
