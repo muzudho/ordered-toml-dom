@@ -18,10 +18,10 @@ pub enum State {
     End,
     // After double quotation.
     // 二重引用符の後。
-    MultiLine,
+    First,
     // After `\`.
     // `\` の後。
-    MultiLineAfterEscapeCharacter,
+    EscapedCharacter,
 }
 
 impl EscapeSequenceP {
@@ -33,7 +33,7 @@ impl EscapeSequenceP {
     pub fn new() -> Self {
         EscapeSequenceP {
             buffer: Some(EscapeSequence::default()),
-            state: State::MultiLine,
+            state: State::First,
         }
     }
     /// # Arguments
@@ -50,60 +50,38 @@ impl EscapeSequenceP {
             State::End => {
                 return error(&mut self.log(), tokens, "escape_sequence_p.rs.66.");
             }
-            State::MultiLine => {
-                match token0.type_ {
-                    // "
-                    TokenType::DoubleQuotation => {
-                        // print!("trace.10.");
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
-                    }
-                    // \
-                    TokenType::Backslash => {
-                        // Escape sequence.
-                        // エスケープ・シーケンス。
-                        if let Some(token_1_ahead) = tokens.1 {
-                            match token_1_ahead.type_ {
-                                TokenType::AlphabetCharacter => {
-                                    // print!("[trace1 ahead={:?}]", token_1_ahead);
-                                    // Backslash.
-                                    self.state = State::MultiLineAfterEscapeCharacter;
-                                }
-                                TokenType::Backslash => {
-                                    // print!("[trace2 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
-                                    self.state = State::MultiLineAfterEscapeCharacter;
-                                }
-                                TokenType::EndOfLine => {
-                                    // 行末に \ があったケース。
-                                    // print!("[trace3 EndOfLIne]");
-                                    self.state = State::End;
-                                }
-                                _ => {
-                                    return error(
-                                        &mut self.log(),
-                                        tokens,
-                                        "escape_sequence_p.rs.136.",
-                                    );
-                                }
-                            }
-                        } else {
-                            return error(&mut self.log(), tokens, "escape_sequence_p.rs.112.");
+            State::First => {
+                // Look-ahead.
+                // 先読み。
+                if let Some(token_1_ahead) = tokens.1 {
+                    match token_1_ahead.type_ {
+                        TokenType::AlphabetCharacter
+                        | TokenType::Backslash
+                        | TokenType::DoubleQuotation => {
+                            // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
+                            self.state = State::EscapedCharacter;
+                        }
+                        TokenType::EndOfLine => {
+                            // 行末に \ があったケース。
+                            // print!("[trace3 EndOfLIne]");
+                            self.state = State::End;
+                        }
+                        _ => {
+                            return error(&mut self.log(), tokens, "escape_sequence_p.rs.136.");
                         }
                     }
-                    _ => {
-                        // print!("trace.12.");
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
-                    }
+                } else {
+                    return error(&mut self.log(), tokens, "escape_sequence_p.rs.112.");
                 }
             }
-            State::MultiLineAfterEscapeCharacter => {
+            State::EscapedCharacter => {
                 // println!("[trace196={:?}]", token0);
                 // Escaped.
                 match token0.type_ {
                     // `"`
                     TokenType::AlphabetCharacter => {
                         let m = self.buffer.as_mut().unwrap();
+                        // TODO 汎用的に書けないか？
                         match token0.to_string().as_str() {
                             "n" => {
                                 m.push_token(&Token::new(
@@ -139,11 +117,20 @@ impl EscapeSequenceP {
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
                         ));
                     }
+                    // "
+                    TokenType::DoubleQuotation => {
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&Token::new(
+                            token0.column_number,
+                            "\"",
+                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        ));
+                    }
                     _ => {
                         return error(&mut self.log(), tokens, "escape_sequence_p.rs.212.");
                     }
                 }
-                self.state = State::MultiLine;
+                self.state = State::First;
             }
         }
 
