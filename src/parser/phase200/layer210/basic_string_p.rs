@@ -39,10 +39,10 @@ pub enum State {
     // Trim start.
     // 行頭の空白の除去。
     MultiLineTrimStart,
+    SingleLine,
     // After `\`.
     // `\` の後。
-    SingleLineAfterBackslash,
-    SingleLine,
+    SingleLineEscapeSequence,
 }
 
 impl BasicStringP {
@@ -100,11 +100,25 @@ impl BasicStringP {
                             return error(&mut self.log(), tokens, "basic_string_p.rs.112.");
                         }
                     }
+                    // \
                     TokenType::Backslash => {
-                        // print!("trace.6.");
-                        // Escape sequence.
-                        // エスケープ・シーケンス。
-                        self.state = State::SingleLineAfterBackslash;
+                        self.escape_sequence_p = Some(EscapeSequenceP::default());
+                        match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
+                            PResult::End => {
+                                return error(&mut self.log(), tokens, "basic_string_p.rs.108.");
+                            }
+                            PResult::Err(mut table) => {
+                                return error_via(
+                                    &mut table,
+                                    &mut self.log(),
+                                    tokens,
+                                    "basic_string_p.rs.115.",
+                                );
+                            }
+                            PResult::Ongoing => {
+                                self.state = State::SingleLineEscapeSequence;
+                            }
+                        }
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
@@ -241,10 +255,25 @@ impl BasicStringP {
                         self.state = State::End;
                         return PResult::End;
                     }
+                    // \
                     TokenType::Backslash => {
-                        // Escape sequence.
-                        // エスケープ・シーケンス。
-                        self.state = State::SingleLineAfterBackslash;
+                        self.escape_sequence_p = Some(EscapeSequenceP::default());
+                        match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
+                            PResult::End => {
+                                return error(&mut self.log(), tokens, "basic_string_p.rs.252.");
+                            }
+                            PResult::Err(mut table) => {
+                                return error_via(
+                                    &mut table,
+                                    &mut self.log(),
+                                    tokens,
+                                    "basic_string_p.rs.139.",
+                                );
+                            }
+                            PResult::Ongoing => {
+                                self.state = State::SingleLineEscapeSequence;
+                            }
+                        }
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
@@ -252,20 +281,28 @@ impl BasicStringP {
                     }
                 }
             }
-            State::SingleLineAfterBackslash => {
-                match token0.type_ {
-                    // `"`
-                    TokenType::EndOfLine => {
-                        // End of line.
-                        // 行の終わり。
-                        return error(&mut self.log(), tokens, "basic_string_p.rs.59.");
+            State::SingleLineEscapeSequence => {
+                let p = self.escape_sequence_p.as_mut().unwrap();
+                match p.parse(tokens) {
+                    PResult::End => {
+                        if let Some(escape_sequence_token) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_token(&escape_sequence_token);
+                            self.escape_sequence_p = None;
+                            self.state = State::SingleLine;
+                        } else {
+                            return error(&mut self.log(), tokens, "key_value.rs.84.");
+                        }
                     }
-                    _ => {
-                        // Escaped.
-                        self.state = State::SingleLine;
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
+                    PResult::Err(mut table) => {
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            tokens,
+                            "basic_string_p.rs.190.",
+                        );
                     }
+                    PResult::Ongoing => {}
                 }
             }
         }
