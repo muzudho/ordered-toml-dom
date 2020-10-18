@@ -19,6 +19,7 @@ enum State {
 pub struct LexicalParser {
     state: State,
     product: TokenLine,
+    buffer_string_token_column_number: usize,
     buffer_string_token_type: TokenType,
     buffer_string: String,
 }
@@ -27,15 +28,16 @@ impl LexicalParser {
         LexicalParser {
             state: State::First,
             product: TokenLine::new(row_number),
-            buffer_string_token_type: TokenType::WhiteSpaceString,
+            buffer_string_token_column_number: 0,
+            buffer_string_token_type: TokenType::Unknown,
             buffer_string: String::new(),
         }
     }
     /// Flush.
-    fn flush(&mut self, column_number: usize) {
+    fn flush(&mut self) {
         if !self.buffer_string.is_empty() {
             self.product.tokens.push(Token::new(
-                column_number,
+                self.buffer_string_token_column_number,
                 &self.buffer_string,
                 self.buffer_string_token_type,
             ));
@@ -48,7 +50,7 @@ impl LexicalParser {
     }
     pub fn parse_line(&mut self, line: &str) {
         let ch_vec: Vec<char> = line.chars().collect();
-        let mut column_number_of_token = 0;
+        self.buffer_string_token_column_number = 0;
         let mut j = 0;
         let mut chars: (Option<&char>, Option<&char>) = (None, None);
         for (i, ch) in ch_vec.iter().enumerate() {
@@ -59,7 +61,7 @@ impl LexicalParser {
             chars.0 = chars.1;
             chars.1 = Some(ch);
             if let Some(_) = chars.0 {
-                self.one_delay_loop(i - 1, chars, &mut column_number_of_token);
+                self.one_delay_loop(i - 1, chars);
             }
             j = i;
         }
@@ -69,11 +71,11 @@ impl LexicalParser {
         chars.0 = chars.1;
         chars.1 = None;
         if let Some(_) = chars.0 {
-            self.one_delay_loop(j, chars, &mut column_number_of_token);
+            self.one_delay_loop(j, chars);
         }
 
         // Log::info("End of line.");
-        self.flush(column_number_of_token);
+        self.flush();
         // Append an end of line.
         // 行末を追加します。
         self.product.tokens.push(Token::new(
@@ -83,42 +85,38 @@ impl LexicalParser {
             TokenType::EndOfLine,
         ));
     }
-    fn one_delay_loop(
-        &mut self,
-        i: usize,
-        chars: (Option<&char>, Option<&char>),
-        column_number_of_token: &mut usize,
-    ) {
+    fn one_delay_loop(&mut self, i: usize, chars: (Option<&char>, Option<&char>)) {
         let ch0 = chars.0.unwrap();
-        let column_number = i + 1;
         match self.state {
+            // `\` の次に連なる文字列は、先頭1文字でトークンを切ります。
             State::AlphabetCharacter => {
                 // print!("[trace101 AlbetChar={:?}]", ch0);
-                self.flush(column_number);
                 self.buffer_string.push(*ch0);
+                self.flush();
                 self.state = State::First;
             }
             State::AlphabetString => {
-                self.flush(column_number);
                 self.buffer_string.push(*ch0);
                 if let Some(ch1) = chars.1 {
                     match ch1 {
                         'A'..='Z' | 'a'..='z' => {}
                         _ => {
+                            self.flush();
                             self.state = State::First;
                         }
                     }
+                } else {
+                    self.flush();
+                    self.state = State::First;
                 }
             }
             State::First => {
-                self.flush(column_number);
+                self.buffer_string_token_column_number = i;
                 self.buffer_string.push(*ch0);
-                *column_number_of_token = column_number;
                 match ch0 {
                     // A ～ Z, a ～ z.
                     'A'..='Z' | 'a'..='z' => {
                         // print!("[trace105 albet={:?}]", ch0);
-                        self.buffer_string_token_type = TokenType::AlphabetCharacter;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
@@ -126,14 +124,21 @@ impl LexicalParser {
                                     self.state = State::AlphabetString;
                                     self.buffer_string_token_type = TokenType::AlphabetString;
                                 }
-                                _ => {}
+                                _ => {
+                                    self.buffer_string_token_type = TokenType::AlphabetCharacter;
+                                    self.flush();
+                                }
                             }
+                        } else {
+                            self.buffer_string_token_type = TokenType::AlphabetCharacter;
+                            self.flush();
                         }
                     }
                     // \
                     '\\' => {
                         // print!("[trace104 bs={:?}]", ch0);
                         self.buffer_string_token_type = TokenType::Backslash;
+                        self.flush();
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
@@ -149,34 +154,42 @@ impl LexicalParser {
                     // :
                     ':' => {
                         self.buffer_string_token_type = TokenType::Colon;
+                        self.flush();
                     }
                     // ,
                     ',' => {
                         self.buffer_string_token_type = TokenType::Comma;
+                        self.flush();
                     }
                     // .
                     '.' => {
                         self.buffer_string_token_type = TokenType::Dot;
+                        self.flush();
                     }
                     // "
                     '"' => {
                         self.buffer_string_token_type = TokenType::DoubleQuotation;
+                        self.flush();
                     }
                     // =
                     '=' => {
                         self.buffer_string_token_type = TokenType::Equals;
+                        self.flush();
                     }
                     // -
                     '-' => {
                         self.buffer_string_token_type = TokenType::Hyphen;
+                        self.flush();
                     }
                     // {
                     '{' => {
                         self.buffer_string_token_type = TokenType::LeftCurlyBracket;
+                        self.flush();
                     }
                     // [
                     '[' => {
                         self.buffer_string_token_type = TokenType::LeftSquareBracket;
+                        self.flush();
                     }
                     '0'..='9' => {
                         self.buffer_string_token_type = TokenType::NumeralString;
@@ -185,33 +198,41 @@ impl LexicalParser {
                                 '0'..='9' => {
                                     self.state = State::NumeralString;
                                 }
-                                _ => {}
+                                _ => {
+                                    self.flush();
+                                }
                             }
                         }
                     }
                     // +
                     '+' => {
                         self.buffer_string_token_type = TokenType::Plus;
+                        self.flush();
                     }
                     // }
                     '}' => {
                         self.buffer_string_token_type = TokenType::RightCurlyBracket;
+                        self.flush();
                     }
                     // ]
                     ']' => {
                         self.buffer_string_token_type = TokenType::RightSquareBracket;
+                        self.flush();
                     }
                     // #
                     '#' => {
                         self.buffer_string_token_type = TokenType::Sharp;
+                        self.flush();
                     }
                     // '
                     '\'' => {
                         self.buffer_string_token_type = TokenType::SingleQuotation;
+                        self.flush();
                     }
                     // _
                     '_' => {
                         self.buffer_string_token_type = TokenType::Underscore;
+                        self.flush();
                     }
                     // Whitespace.
                     '\t' | ' ' => {
@@ -221,12 +242,17 @@ impl LexicalParser {
                                 '\t' | ' ' => {
                                     self.state = State::WhiteSpaceString;
                                 }
-                                _ => {}
+                                _ => {
+                                    self.flush();
+                                }
                             }
+                        } else {
+                            self.flush();
                         }
                     }
                     _ => {
                         self.buffer_string_token_type = TokenType::Unknown;
+                        self.flush();
                     }
                 }
             }
@@ -236,6 +262,7 @@ impl LexicalParser {
                     match ch1 {
                         '0'..='9' => {}
                         _ => {
+                            self.flush();
                             self.state = State::First;
                         }
                     }
@@ -247,6 +274,7 @@ impl LexicalParser {
                     match ch1 {
                         '\t' | ' ' => {}
                         _ => {
+                            self.flush();
                             self.state = State::First;
                         }
                     }
