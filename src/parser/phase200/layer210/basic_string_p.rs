@@ -197,14 +197,9 @@ impl BasicStringP {
                 let p = self.escape_sequence_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
-                        if let Some(escape_sequence_token) = p.flush() {
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&escape_sequence_token);
-                            self.escape_sequence_p = None;
-                            self.state = State::MultiLine;
-                        } else {
-                            return error(&mut self.log(), tokens, "key_value.rs.84.");
-                        }
+                        self.buffer.as_mut().unwrap().extend_tokens(&p.flush());
+                        self.escape_sequence_p = None;
+                        self.state = State::MultiLine;
                     }
                     PResult::Err(mut table) => {
                         return error_via(
@@ -285,14 +280,9 @@ impl BasicStringP {
                 let p = self.escape_sequence_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
-                        if let Some(escape_sequence_token) = p.flush() {
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&escape_sequence_token);
-                            self.escape_sequence_p = None;
-                            self.state = State::SingleLine;
-                        } else {
-                            return error(&mut self.log(), tokens, "key_value.rs.84.");
-                        }
+                        self.buffer.as_mut().unwrap().extend_tokens(&p.flush());
+                        self.escape_sequence_p = None;
+                        self.state = State::SingleLine;
                     }
                     PResult::Err(mut table) => {
                         return error_via(

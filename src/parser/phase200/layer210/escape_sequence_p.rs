@@ -24,15 +24,15 @@ pub enum State {
 impl Default for EscapeSequenceP {
     fn default() -> Self {
         EscapeSequenceP {
-            buffer2: None,
+            buffer: Vec::new(),
             state: State::First,
         }
     }
 }
 impl EscapeSequenceP {
-    pub fn flush2(&mut self) -> Option<Token> {
-        let m = self.buffer2.clone();
-        self.buffer2 = None;
+    pub fn flush(&mut self) -> Vec<Token> {
+        let m = self.buffer.clone();
+        self.buffer.clear();
         m
     }
     /// # Arguments
@@ -92,7 +92,7 @@ impl EscapeSequenceP {
                                 return error(&mut self.log(), tokens, "escape_sequence_p.rs.206.")
                             }
                         };
-                        self.buffer2 = Some(Token::new(
+                        self.buffer.push(Token::new(
                             token0.column_number,
                             code,
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -101,7 +101,7 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     TokenType::Backslash => {
-                        self.buffer2 = Some(Token::new(
+                        self.buffer.push(Token::new(
                             token0.column_number,
                             "\\",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -111,7 +111,7 @@ impl EscapeSequenceP {
                     }
                     // "
                     TokenType::DoubleQuotation => {
-                        self.buffer2 = Some(Token::new(
+                        self.buffer.push(Token::new(
                             token0.column_number,
                             "\"",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -133,9 +133,13 @@ impl EscapeSequenceP {
     /// ログ。  
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
-        if let Some(m) = &self.buffer2 {
-            t.str("value", &format!("{}", m));
+
+        let mut buf = String::new();
+        for token in &self.buffer {
+            buf.push_str(&token.to_string());
         }
+
+        t.str("value", &buf);
         t
     }
 }
