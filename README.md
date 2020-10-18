@@ -23,7 +23,6 @@ Take a look at the repository.
 cargo run --example comment
 cargo run --example example
 cargo run --example inline_table
-cargo run --example key_value_wip
 cargo run --example main
 cargo run --example mix_array
 cargo run --example spot

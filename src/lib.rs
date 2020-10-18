@@ -18,7 +18,6 @@
 // extern crate lazy_static;
 extern crate chrono;
 extern crate rand;
-extern crate regex;
 
 pub mod model;
 mod parser;
@@ -30,21 +29,9 @@ use crate::parser::{
     phase200::{layer210::PResult, layer310::DocumentP},
 };
 use casual_logger::{ArrayOfTable, Log, Table};
-// use regex::Regex;
 use std::convert::TryInto;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-// use std::sync::Mutex;
-
-/*
-lazy_static! {
-    /// Without dot.
-    /// ドットは含みません。
-    // static ref RE_KEY: Mutex<Regex> = Mutex::new(Regex::new(r"[A-Za-z0-9_-]$").unwrap());
-    // static ref RE_KEY_EXCEPT_ALPHABET: Mutex<Regex> = Mutex::new(Regex::new(r"[0-9_-]$").unwrap());
-    // static ref RE_ALPHABET: Mutex<Regex> = Mutex::new(Regex::new(r"[A-Za-z]$").unwrap());
-}
-*/
 
 /// TOML.  
 /// トムル。  
