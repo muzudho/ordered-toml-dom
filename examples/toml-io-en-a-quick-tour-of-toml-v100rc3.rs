@@ -24,7 +24,7 @@ fn main() {
         Some("You can \"quote\" me.".to_string())
     );
 
-    // TODO `\u0000` Unicode.
+    // Fixed. `\u0000` Unicode.
     assert_eq!(
         doc.get_string_by_key("str3"),
         Some("Name\tJos\u{00E9}\nLoc\tSF.".to_string())

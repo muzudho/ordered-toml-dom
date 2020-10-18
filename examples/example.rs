@@ -44,7 +44,10 @@ fn main() {
         doc.get_string_by_key("basic_string_punctuation"),
         Some("., ={}[]'\"\\!?".to_string())
     );
-    // TODO assert_eq!(doc.get_string_by_key("basic_string_tab"), Some("a\tb"));
+    assert_eq!(
+        doc.get_string_by_key("basic_string_tab"),
+        Some("a\tb".to_string())
+    );
 
     assert_eq!(
         doc.get_string_by_key("multiline_basic_string_letter"),

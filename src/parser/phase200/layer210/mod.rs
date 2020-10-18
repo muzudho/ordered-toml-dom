@@ -46,6 +46,9 @@ pub struct BasicStringP {
 pub struct EscapeSequenceP {
     buffer: Vec<Token>,
     state: EscapeSequenceState,
+    unicode_number_buffer: String,
+    unicode_number_digits: usize,
+    unicode_digit_count: usize,
 }
 
 /// Header of array of table syntax parser.  

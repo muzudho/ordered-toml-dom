@@ -20,8 +20,7 @@ pub enum State {
     // After `\`.
     // `\` の後。
     EscapedCharacter,
-    Unicode4digit,
-    Unicode8digit,
+    UnicodeDigits,
 }
 
 impl Default for EscapeSequenceP {
@@ -29,6 +28,9 @@ impl Default for EscapeSequenceP {
         EscapeSequenceP {
             buffer: Vec::new(),
             state: State::First,
+            unicode_number_buffer: String::new(),
+            unicode_number_digits: 0,
+            unicode_digit_count: 0,
         }
     }
 }
@@ -91,10 +93,16 @@ impl EscapeSequenceP {
                             "r" => code = Some("\r"),
                             "t" => code = Some("\t"),
                             "u" => {
-                                self.state = State::Unicode4digit;
+                                self.state = State::UnicodeDigits;
+                                self.unicode_number_buffer = String::new();
+                                self.unicode_number_digits = 4;
+                                self.unicode_digit_count = 0;
                             }
                             "U" => {
-                                self.state = State::Unicode8digit;
+                                self.state = State::UnicodeDigits;
+                                self.unicode_number_buffer = String::new();
+                                self.unicode_number_digits = 8;
+                                self.unicode_digit_count = 0;
                             }
                             _ => {
                                 return error(&mut self.log(), tokens, "escape_sequence_p.rs.206.")
@@ -134,60 +142,43 @@ impl EscapeSequenceP {
                     }
                 }
             }
-            State::Unicode4digit => match token0.type_ {
-                TokenType::NumeralString => {
+            State::UnicodeDigits => match token0.type_ {
+                TokenType::NumeralString
+                | TokenType::AlphabetCharacter
+                | TokenType::AlphabetString => {
                     let s = token0.to_string();
-                    let (s1, s2) = if 4 < s.len() {
-                        (s[0..4].to_string(), s[4..].to_string())
+                    let rest = self.unicode_number_digits - self.unicode_digit_count;
+                    let (s1, s2) = if rest < s.len() {
+                        (s[0..rest].to_string(), s[rest..].to_string())
                     } else {
                         (s[0..].to_string(), "".to_string())
                     };
+                    let fill = s1.len();
 
-                    self.buffer.push(Token::new(
-                        token0.column_number,
-                        &from_u32(s1.parse().unwrap()).unwrap().to_string(),
-                        TokenType::AlphabetCharacter, // TODO EscapeSequence
-                    ));
+                    self.unicode_number_buffer.push_str(&s1);
+                    self.unicode_digit_count += fill;
+
+                    if self.unicode_number_digits <= self.unicode_digit_count {
+                        let hex = u32::from_str_radix(&self.unicode_number_buffer, 16).unwrap();
+                        self.buffer.push(Token::new(
+                            token0.column_number,
+                            &from_u32(hex).unwrap().to_string(),
+                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        ));
+                        self.state = State::End;
+                        return PResult::End;
+                    }
+
                     if 0 < s2.len() {
                         self.buffer.push(Token::new(
-                            token0.column_number + 4, // TODO だいたい4つうしろ？
+                            token0.column_number,
                             &s2.to_string(),
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
                         ));
                     }
-                    self.state = State::End;
-                    return PResult::End;
                 }
                 _ => {
-                    return error(&mut self.log(), tokens, "escape_sequence_p.rs.139.");
-                }
-            },
-            State::Unicode8digit => match token0.type_ {
-                TokenType::NumeralString => {
-                    let s = token0.to_string();
-                    let (s1, s2) = if 8 < s.len() {
-                        (s[0..8].to_string(), s[8..].to_string())
-                    } else {
-                        (s[0..].to_string(), "".to_string())
-                    };
-
-                    self.buffer.push(Token::new(
-                        token0.column_number,
-                        &from_u32(s1.parse().unwrap()).unwrap().to_string(),
-                        TokenType::AlphabetCharacter, // TODO EscapeSequence
-                    ));
-                    if 0 < s2.len() {
-                        self.buffer.push(Token::new(
-                            token0.column_number + 8, // TODO だいたい8つうしろ？
-                            &s2.to_string(),
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
-                        ));
-                    }
-                    self.state = State::End;
-                    return PResult::End;
-                }
-                _ => {
-                    return error(&mut self.log(), tokens, "escape_sequence_p.rs.139.");
+                    return error(&mut self.log(), tokens, "escape_sequence_p.rs.179.");
                 }
             },
         }

@@ -86,7 +86,10 @@ fn main() {
         doc.get_string_by_key("basic_string_punctuation"),
         Some("., ={}[]'\"\\!?".to_string())
     );
-    // TODO assert_eq!(doc.get_string_by_key("basic_string_tab"), Some("a\tb"));
+    assert_eq!(
+        doc.get_string_by_key("basic_string_tab"),
+        Some("a\tb".to_string())
+    );
 
     assert_eq!(
         doc.get_string_by_key("multiline_basic_string_letter"),
@@ -207,7 +210,8 @@ world!!"
     * [x] `\t` tab.
     * [x] `\\` tab.
     * [x] `\"` tab.
-    * [ ] `\u0000` Unicode.
+    * [x] `\u0000` Unicode.
+    * [ ] `\U00000000` Unicode.
 * [ ] DateTime
     * [ ]  UTC
       * [x] `1979-05-27T07:32:00-08:00`.
