@@ -8,13 +8,14 @@ pub mod literal_string_p;
 pub mod literal_value_p;
 
 use crate::model::{
-    layer210::{BasicString, Comment, EscapeSequence, Key, LiteralString, LiteralValue},
+    layer210::{BasicString, Comment, Key, LiteralString, LiteralValue},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, escape_sequence_p::State as EscapeSequenceState,
     literal_string_p::State as LiteralStringState,
 };
+use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
 
 /// Comment parser.  
@@ -32,6 +33,7 @@ pub struct CommentP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct BasicStringP {
+    escape_sequence_p: Option<EscapeSequenceP>,
     buffer: Option<BasicString>,
     state: BasicStringState,
 }
@@ -42,7 +44,7 @@ pub struct BasicStringP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct EscapeSequenceP {
-    buffer: Option<EscapeSequence>,
+    buffer: Option<Token>,
     state: EscapeSequenceState,
 }
 

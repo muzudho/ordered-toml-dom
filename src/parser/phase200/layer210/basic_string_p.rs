@@ -14,9 +14,10 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::BasicString,
 };
+use crate::parser::phase200::error_via;
 use crate::parser::phase200::{
     error,
-    layer210::{BasicStringP, PResult},
+    layer210::{BasicStringP, EscapeSequenceP, PResult},
 };
 use casual_logger::Table;
 
@@ -32,10 +33,9 @@ pub enum State {
     MultiLine,
     // After `\`.
     // `\` の後。
-    MultiLineAfterBackslashNotEscaped,
-    MultiLineAfterEscapeCharacter,
     MultiLineEnd1,
     MultiLineEnd2,
+    MultiLineEscapeSequence,
     // Trim start.
     // 行頭の空白の除去。
     MultiLineTrimStart,
@@ -53,6 +53,7 @@ impl BasicStringP {
     }
     pub fn new() -> Self {
         BasicStringP {
+            escape_sequence_p: None,
             buffer: Some(BasicString::default()),
             state: State::First,
         }
@@ -126,33 +127,22 @@ impl BasicStringP {
                     }
                     // \
                     TokenType::Backslash => {
-                        // Escape sequence.
-                        // エスケープ・シーケンス。
-                        if let Some(token_1_ahead) = tokens.1 {
-                            match token_1_ahead.type_ {
-                                TokenType::AlphabetCharacter => {
-                                    // print!("[trace1 ahead={:?}]", token_1_ahead);
-                                    // Backslash.
-                                    self.state = State::MultiLineAfterEscapeCharacter;
-                                }
-                                TokenType::Backslash => {
-                                    // print!("[trace2 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
-                                    self.state = State::MultiLineAfterEscapeCharacter;
-                                }
-                                TokenType::EndOfLine => {
-                                    // print!("[trace3 EndOfLIne]");
-                                    self.state = State::MultiLineAfterBackslashNotEscaped;
-                                }
-                                _ => {
-                                    return error(
-                                        &mut self.log(),
-                                        tokens,
-                                        "basic_string_p.rs.136.",
-                                    );
-                                }
+                        self.escape_sequence_p = Some(EscapeSequenceP::default());
+                        self.state = State::MultiLineEscapeSequence;
+                        match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
+                            PResult::End => {
+                                // 行末の \ だったなら。
+                                self.state = State::MultiLineTrimStart;
                             }
-                        } else {
-                            return error(&mut self.log(), tokens, "basic_string_p.rs.112.");
+                            PResult::Err(mut table) => {
+                                return error_via(
+                                    &mut table,
+                                    &mut self.log(),
+                                    tokens,
+                                    "basic_string_p.rs.139.",
+                                );
+                            }
+                            PResult::Ongoing => {}
                         }
                     }
                     _ => {
@@ -187,57 +177,29 @@ impl BasicStringP {
                     }
                 }
             }
-            State::MultiLineAfterEscapeCharacter => {
-                // println!("[trace196={:?}]", token0);
-                // Escaped.
-                match token0.type_ {
-                    // `"`
-                    TokenType::AlphabetCharacter => {
-                        let m = self.buffer.as_mut().unwrap();
-                        match token0.to_string().as_str() {
-                            "n" => {
-                                m.push_token(&Token::new(
-                                    token0.column_number,
-                                    "\n",
-                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
-                                ));
-                            }
-                            "r" => {
-                                m.push_token(&Token::new(
-                                    token0.column_number,
-                                    "\r",
-                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
-                                ));
-                            }
-                            "t" => {
-                                m.push_token(&Token::new(
-                                    token0.column_number,
-                                    "\t",
-                                    TokenType::AlphabetCharacter, // TODO EscapeSequence
-                                ));
-                            }
-                            _ => {
-                                return error(&mut self.log(), tokens, "basic_string_p.rs.206.");
-                            }
+            State::MultiLineEscapeSequence => {
+                let p = self.escape_sequence_p.as_mut().unwrap();
+                match p.parse(tokens) {
+                    PResult::End => {
+                        if let Some(escape_sequence_token) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_token(&escape_sequence_token);
+                            self.escape_sequence_p = None;
+                            self.state = State::MultiLine;
+                        } else {
+                            return error(&mut self.log(), tokens, "key_value.rs.84.");
                         }
                     }
-                    TokenType::Backslash => {
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::new(
-                            token0.column_number,
-                            "\\",
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
-                        ));
+                    PResult::Err(mut table) => {
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            tokens,
+                            "basic_string_p.rs.190.",
+                        );
                     }
-                    _ => {
-                        return error(&mut self.log(), tokens, "basic_string_p.rs.212.");
-                    }
+                    PResult::Ongoing => {}
                 }
-                self.state = State::MultiLine;
-            }
-            State::MultiLineAfterBackslashNotEscaped => {
-                // println!("[trace199={:?}]", token0);
-                self.state = State::MultiLineTrimStart;
             }
             State::MultiLineTrimStart => {
                 match token0.type_ {

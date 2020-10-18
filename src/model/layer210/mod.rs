@@ -1,6 +1,5 @@
 pub mod basic_string;
 pub mod comment;
-pub mod escape_sequence;
 pub mod key;
 pub mod literal_string;
 pub mod literal_value;
@@ -18,13 +17,6 @@ pub struct Comment {
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct BasicString {
-    pub tokens: Vec<Token>,
-}
-
-/// It has one string.  
-/// １つの文字列を持ちます。  
-#[derive(Clone)]
-pub struct EscapeSequence {
     pub tokens: Vec<Token>,
 }
 

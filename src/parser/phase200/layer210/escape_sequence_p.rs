@@ -1,10 +1,7 @@
 //! Escape sequence parser.  
 //! エスケープ・シーケンス・パーサー。  
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer210::EscapeSequence,
-};
+use crate::model::layer110::{Token, TokenType};
 use crate::parser::phase200::{
     error,
     layer210::{EscapeSequenceP, PResult},
@@ -24,17 +21,19 @@ pub enum State {
     EscapedCharacter,
 }
 
+impl Default for EscapeSequenceP {
+    fn default() -> Self {
+        EscapeSequenceP {
+            buffer: None,
+            state: State::First,
+        }
+    }
+}
 impl EscapeSequenceP {
-    pub fn flush(&mut self) -> Option<EscapeSequence> {
+    pub fn flush(&mut self) -> Option<Token> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
-    }
-    pub fn new() -> Self {
-        EscapeSequenceP {
-            buffer: Some(EscapeSequence::default()),
-            state: State::First,
-        }
     }
     /// # Arguments
     ///
@@ -65,6 +64,7 @@ impl EscapeSequenceP {
                             // 行末に \ があったケース。
                             // print!("[trace3 EndOfLIne]");
                             self.state = State::End;
+                            return PResult::End;
                         }
                         _ => {
                             return error(&mut self.log(), tokens, "escape_sequence_p.rs.136.");
@@ -80,25 +80,24 @@ impl EscapeSequenceP {
                 match token0.type_ {
                     // `"`
                     TokenType::AlphabetCharacter => {
-                        let m = self.buffer.as_mut().unwrap();
                         // TODO 汎用的に書けないか？
                         match token0.to_string().as_str() {
                             "n" => {
-                                m.push_token(&Token::new(
+                                self.buffer = Some(Token::new(
                                     token0.column_number,
                                     "\n",
                                     TokenType::AlphabetCharacter, // TODO EscapeSequence
                                 ));
                             }
                             "r" => {
-                                m.push_token(&Token::new(
+                                self.buffer = Some(Token::new(
                                     token0.column_number,
                                     "\r",
                                     TokenType::AlphabetCharacter, // TODO EscapeSequence
                                 ));
                             }
                             "t" => {
-                                m.push_token(&Token::new(
+                                self.buffer = Some(Token::new(
                                     token0.column_number,
                                     "\t",
                                     TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -110,8 +109,7 @@ impl EscapeSequenceP {
                         }
                     }
                     TokenType::Backslash => {
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::new(
+                        self.buffer = Some(Token::new(
                             token0.column_number,
                             "\\",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
@@ -119,8 +117,7 @@ impl EscapeSequenceP {
                     }
                     // "
                     TokenType::DoubleQuotation => {
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::new(
+                        self.buffer = Some(Token::new(
                             token0.column_number,
                             "\"",
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
