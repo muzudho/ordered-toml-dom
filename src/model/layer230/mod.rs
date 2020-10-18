@@ -7,7 +7,7 @@ use crate::model::{layer110::Token, layer210::Comment, layer225::KeyValue};
 /// WIP.  
 #[derive(Clone)]
 pub struct HeaderOfArrayOfTable {
-    pub value: String,
+    pub tokens: Vec<Token>,
 }
 
 /// Either a Empty-line, Comment, Key Value, Table or a Array-of-table.  
