@@ -5,13 +5,13 @@ use std::fmt;
 
 #[derive(Debug)]
 enum State {
-    AlphabetCharacter,
-    AlphabetString,
-    First,
-    NumeralString,
+    EscapeSequenceCharacter,
+    ContinuationOfAlphabetString,
+    ContinuationOfNumeralString,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
-    WhiteSpaceString,
+    ContinuationOfWhiteSpaceString,
+    First,
 }
 
 /// Lexical parser.  
@@ -42,7 +42,6 @@ impl LexicalParser {
                 self.buffer_string_token_type,
             ));
             self.buffer_string.clear();
-            self.state = State::First;
         }
     }
     pub fn product(&self) -> &TokenLine {
@@ -89,13 +88,15 @@ impl LexicalParser {
         let ch0 = chars.0.unwrap();
         match self.state {
             // `\` の次に連なる文字列は、先頭1文字でトークンを切ります。
-            State::AlphabetCharacter => {
+            State::EscapeSequenceCharacter => {
                 // print!("[trace101 AlbetChar={:?}]", ch0);
+                self.buffer_string_token_column_number = i;
+                self.buffer_string_token_type = TokenType::AlphabetCharacter;
                 self.buffer_string.push(*ch0);
                 self.flush();
                 self.state = State::First;
             }
-            State::AlphabetString => {
+            State::ContinuationOfAlphabetString => {
                 self.buffer_string.push(*ch0);
                 if let Some(ch1) = chars.1 {
                     match ch1 {
@@ -110,6 +111,30 @@ impl LexicalParser {
                     self.state = State::First;
                 }
             }
+            State::ContinuationOfNumeralString => {
+                self.buffer_string.push(*ch0);
+                if let Some(ch1) = chars.1 {
+                    match ch1 {
+                        '0'..='9' => {}
+                        _ => {
+                            self.flush();
+                            self.state = State::First;
+                        }
+                    }
+                }
+            }
+            State::ContinuationOfWhiteSpaceString => {
+                self.buffer_string.push(*ch0);
+                if let Some(ch1) = chars.1 {
+                    match ch1 {
+                        '\t' | ' ' => {}
+                        _ => {
+                            self.flush();
+                            self.state = State::First;
+                        }
+                    }
+                }
+            }
             State::First => {
                 self.buffer_string_token_column_number = i;
                 self.buffer_string.push(*ch0);
@@ -121,7 +146,7 @@ impl LexicalParser {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
                                     // print!("trace.106.");
-                                    self.state = State::AlphabetString;
+                                    self.state = State::ContinuationOfAlphabetString;
                                     self.buffer_string_token_type = TokenType::AlphabetString;
                                 }
                                 _ => {
@@ -136,14 +161,14 @@ impl LexicalParser {
                     }
                     // \
                     '\\' => {
-                        print!("[trace104 bs={:?}]", ch0);
+                        // print!("[trace104 bs={:?}]", ch0);
                         self.buffer_string_token_type = TokenType::Backslash;
                         self.flush();
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
                                     // print!("[trace103 ahead={:?}]", ch1);
-                                    self.state = State::AlphabetCharacter;
+                                    self.state = State::EscapeSequenceCharacter;
                                 }
                                 _ => {
                                     // print!("[trace102 ahead={:?}]", ch1);
@@ -196,7 +221,7 @@ impl LexicalParser {
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 '0'..='9' => {
-                                    self.state = State::NumeralString;
+                                    self.state = State::ContinuationOfNumeralString;
                                 }
                                 _ => {
                                     self.flush();
@@ -240,7 +265,7 @@ impl LexicalParser {
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 '\t' | ' ' => {
-                                    self.state = State::WhiteSpaceString;
+                                    self.state = State::ContinuationOfWhiteSpaceString;
                                 }
                                 _ => {
                                     self.flush();
@@ -253,30 +278,6 @@ impl LexicalParser {
                     _ => {
                         self.buffer_string_token_type = TokenType::Unknown;
                         self.flush();
-                    }
-                }
-            }
-            State::NumeralString => {
-                self.buffer_string.push(*ch0);
-                if let Some(ch1) = chars.1 {
-                    match ch1 {
-                        '0'..='9' => {}
-                        _ => {
-                            self.flush();
-                            self.state = State::First;
-                        }
-                    }
-                }
-            }
-            State::WhiteSpaceString => {
-                self.buffer_string.push(*ch0);
-                if let Some(ch1) = chars.1 {
-                    match ch1 {
-                        '\t' | ' ' => {}
-                        _ => {
-                            self.flush();
-                            self.state = State::First;
-                        }
                     }
                 }
             }
