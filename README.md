@@ -3,8 +3,8 @@
 For those who are struggling with Rust's cool syntax, our goal is to provide a TOML parser that's as easy as pointing to a menu and eating fast food.  
 Rustのイケてる構文に難儀している人のために、メニューを指差してファーストフードを食べるぐらい簡単な操作のTOMLパーサーを提供することを目標とします。  
 
-It's a tryal and error process. Specifications will change.  
-試行錯誤中です。 仕様はコロコロ変わるでしょう。  
+Unstable version. It's a tryal and error process. Specifications will change.  
+不安定版。 試行錯誤中です。 仕様はコロコロ変わるでしょう。  
 
 Tomboy is a pun.  
 トムボーイ（おてんば娘）は語呂合わせです。  

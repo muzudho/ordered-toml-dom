@@ -19,25 +19,27 @@ enum State {
 pub struct LexicalParser {
     state: State,
     product: TokenLine,
-    buf_token_type: TokenType,
-    buf: String,
+    buffer_string_token_type: TokenType,
+    buffer_string: String,
 }
 impl LexicalParser {
     pub fn new(row_number: usize) -> Self {
         LexicalParser {
             state: State::First,
             product: TokenLine::new(row_number),
-            buf_token_type: TokenType::WhiteSpaceString,
-            buf: String::new(),
+            buffer_string_token_type: TokenType::WhiteSpaceString,
+            buffer_string: String::new(),
         }
     }
     /// Flush.
     fn flush(&mut self, column_number: usize) {
-        if !self.buf.is_empty() {
-            self.product
-                .tokens
-                .push(Token::new(column_number, &self.buf, self.buf_token_type));
-            self.buf.clear();
+        if !self.buffer_string.is_empty() {
+            self.product.tokens.push(Token::new(
+                column_number,
+                &self.buffer_string,
+                self.buffer_string_token_type,
+            ));
+            self.buffer_string.clear();
             self.state = State::First;
         }
     }
@@ -93,12 +95,12 @@ impl LexicalParser {
             State::AlphabetCharacter => {
                 // print!("[trace101 AlbetChar={:?}]", ch0);
                 self.flush(column_number);
-                self.buf.push(*ch0);
+                self.buffer_string.push(*ch0);
                 self.state = State::First;
             }
             State::AlphabetString => {
                 self.flush(column_number);
-                self.buf.push(*ch0);
+                self.buffer_string.push(*ch0);
                 if let Some(ch1) = chars.1 {
                     match ch1 {
                         'A'..='Z' | 'a'..='z' => {}
@@ -110,18 +112,19 @@ impl LexicalParser {
             }
             State::First => {
                 self.flush(column_number);
-                self.buf.push(*ch0);
+                self.buffer_string.push(*ch0);
                 *column_number_of_token = column_number;
                 match ch0 {
                     // A ～ Z, a ～ z.
                     'A'..='Z' | 'a'..='z' => {
                         // print!("[trace105 albet={:?}]", ch0);
-                        self.buf_token_type = TokenType::AlphabetString;
+                        self.buffer_string_token_type = TokenType::AlphabetCharacter;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
                                     // print!("trace.106.");
                                     self.state = State::AlphabetString;
+                                    self.buffer_string_token_type = TokenType::AlphabetString;
                                 }
                                 _ => {}
                             }
@@ -130,7 +133,7 @@ impl LexicalParser {
                     // \
                     '\\' => {
                         // print!("[trace104 bs={:?}]", ch0);
-                        self.buf_token_type = TokenType::Backslash;
+                        self.buffer_string_token_type = TokenType::Backslash;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
@@ -145,38 +148,38 @@ impl LexicalParser {
                     }
                     // :
                     ':' => {
-                        self.buf_token_type = TokenType::Colon;
+                        self.buffer_string_token_type = TokenType::Colon;
                     }
                     // ,
                     ',' => {
-                        self.buf_token_type = TokenType::Comma;
+                        self.buffer_string_token_type = TokenType::Comma;
                     }
                     // .
                     '.' => {
-                        self.buf_token_type = TokenType::Dot;
+                        self.buffer_string_token_type = TokenType::Dot;
                     }
                     // "
                     '"' => {
-                        self.buf_token_type = TokenType::DoubleQuotation;
+                        self.buffer_string_token_type = TokenType::DoubleQuotation;
                     }
                     // =
                     '=' => {
-                        self.buf_token_type = TokenType::Equals;
+                        self.buffer_string_token_type = TokenType::Equals;
                     }
                     // -
                     '-' => {
-                        self.buf_token_type = TokenType::Hyphen;
+                        self.buffer_string_token_type = TokenType::Hyphen;
                     }
                     // {
                     '{' => {
-                        self.buf_token_type = TokenType::LeftCurlyBracket;
+                        self.buffer_string_token_type = TokenType::LeftCurlyBracket;
                     }
                     // [
                     '[' => {
-                        self.buf_token_type = TokenType::LeftSquareBracket;
+                        self.buffer_string_token_type = TokenType::LeftSquareBracket;
                     }
                     '0'..='9' => {
-                        self.buf_token_type = TokenType::NumeralString;
+                        self.buffer_string_token_type = TokenType::NumeralString;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 '0'..='9' => {
@@ -188,31 +191,31 @@ impl LexicalParser {
                     }
                     // +
                     '+' => {
-                        self.buf_token_type = TokenType::Plus;
+                        self.buffer_string_token_type = TokenType::Plus;
                     }
                     // }
                     '}' => {
-                        self.buf_token_type = TokenType::RightCurlyBracket;
+                        self.buffer_string_token_type = TokenType::RightCurlyBracket;
                     }
                     // ]
                     ']' => {
-                        self.buf_token_type = TokenType::RightSquareBracket;
+                        self.buffer_string_token_type = TokenType::RightSquareBracket;
                     }
                     // #
                     '#' => {
-                        self.buf_token_type = TokenType::Sharp;
+                        self.buffer_string_token_type = TokenType::Sharp;
                     }
                     // '
                     '\'' => {
-                        self.buf_token_type = TokenType::SingleQuotation;
+                        self.buffer_string_token_type = TokenType::SingleQuotation;
                     }
                     // _
                     '_' => {
-                        self.buf_token_type = TokenType::Underscore;
+                        self.buffer_string_token_type = TokenType::Underscore;
                     }
                     // Whitespace.
                     '\t' | ' ' => {
-                        self.buf_token_type = TokenType::WhiteSpaceString;
+                        self.buffer_string_token_type = TokenType::WhiteSpaceString;
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 '\t' | ' ' => {
@@ -223,12 +226,12 @@ impl LexicalParser {
                         }
                     }
                     _ => {
-                        self.buf_token_type = TokenType::Unknown;
+                        self.buffer_string_token_type = TokenType::Unknown;
                     }
                 }
             }
             State::NumeralString => {
-                self.buf.push(*ch0);
+                self.buffer_string.push(*ch0);
                 if let Some(ch1) = chars.1 {
                     match ch1 {
                         '0'..='9' => {}
@@ -239,7 +242,7 @@ impl LexicalParser {
                 }
             }
             State::WhiteSpaceString => {
-                self.buf.push(*ch0);
+                self.buffer_string.push(*ch0);
                 if let Some(ch1) = chars.1 {
                     match ch1 {
                         '\t' | ' ' => {}
