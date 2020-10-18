@@ -19,6 +19,12 @@ impl LiteralString {
     pub fn push_token(&mut self, token: &Token) {
         self.tokens.push(token.clone());
     }
+    pub fn to_debug_string(&self) -> String {
+        format!("{}", self)
+    }
+    pub fn to_string(&self) -> String {
+        format!("{}", self)
+    }
 }
 impl fmt::Display for LiteralString {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

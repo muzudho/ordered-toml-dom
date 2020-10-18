@@ -21,6 +21,12 @@ impl DocumentElement {
     pub fn from_header_of_table(m: &HeaderOfTable) -> Self {
         DocumentElement::HeaderOfTable(m.clone())
     }
+    pub fn to_debug_string(&self) -> String {
+        format!("{}", self)
+    }
+    pub fn to_string(&self) -> String {
+        format!("{}", self)
+    }
 }
 impl fmt::Display for DocumentElement {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

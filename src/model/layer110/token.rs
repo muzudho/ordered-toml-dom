@@ -12,6 +12,12 @@ impl Token {
             type_: type_,
         }
     }
+    pub fn to_debug_string(&self) -> String {
+        format!("{}", self)
+    }
+    pub fn to_string(&self) -> String {
+        format!("{}", self)
+    }
 }
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
