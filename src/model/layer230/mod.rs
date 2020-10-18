@@ -2,7 +2,7 @@ pub mod document_element;
 pub mod header_of_array_of_table;
 pub mod header_of_table;
 
-use crate::model::{layer210::Comment, layer225::KeyValue};
+use crate::model::{layer110::Token, layer210::Comment, layer225::KeyValue};
 
 /// WIP.  
 #[derive(Clone)]
@@ -24,5 +24,5 @@ pub enum DocumentElement {
 /// WIP.  
 #[derive(Clone)]
 pub struct HeaderOfTable {
-    pub value: String,
+    pub tokens: Vec<Token>,
 }

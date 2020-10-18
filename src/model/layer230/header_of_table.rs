@@ -12,23 +12,29 @@ use std::fmt;
 
 impl Default for HeaderOfTable {
     fn default() -> Self {
-        HeaderOfTable {
-            value: String::new(),
-        }
+        HeaderOfTable { tokens: Vec::new() }
     }
 }
 impl HeaderOfTable {
     pub fn push_token(&mut self, token: &Token) {
-        self.value.push_str(&token.value);
+        self.tokens.push(token.clone());
     }
 }
 impl fmt::Display for HeaderOfTable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{}", token.value));
+        }
+        write!(f, "{}", buf)
     }
 }
 impl fmt::Debug for HeaderOfTable {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{:?}]", self.value)
+        let mut buf = String::new();
+        for token in &self.tokens {
+            buf.push_str(&format!("{:?}", token.value));
+        }
+        write!(f, "{}", buf)
     }
 }

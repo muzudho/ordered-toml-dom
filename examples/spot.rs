@@ -14,5 +14,5 @@ fn main() {
     println!("display=|{}|", doc);
     println!("debug=|{:?}|", doc);
 
-    assert_eq!(doc.get_str_by_key("z"), Some("a\tb".to_string()));
+    assert_eq!(doc.get_str_by_key("z"), Some("abc\txyz".to_string()));
 }
