@@ -165,6 +165,17 @@ world!!"
             .to_string()
         )
     );
+    assert_eq!(
+        doc.get_string_by_key("multiline_literal_string_first_newline_is_trimmed"),
+        Some(
+            "The first newline is
+trimmed in raw strings.
+All other whitespace
+is preserved.
+"
+            .to_string()
+        )
+    );
 
     // Read a boolean.
     // 論理値読取。
@@ -202,7 +213,7 @@ world!!"
     * [x] Plain.
   * [ ] `'''abc'''` - multi-line literal string.
     * [x] Plain.
-    * [ ] The first newline is trimmed in raw string.
+    * [x] The first newline is trimmed in raw string.
   * [ ] Escape sequence.
     * [x] `\r` caridge return.
     * [x] `\n` line feed.

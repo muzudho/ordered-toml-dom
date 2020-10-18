@@ -70,8 +70,9 @@ Violets are blue"
             "The first newline is
 trimmed in raw strings.
 All other whitespace
-is preserved."
-                .to_string()
+is preserved.
+"
+            .to_string()
         )
     );
     assert_eq!(doc.get_i128_by_key("int1"), Some(99));

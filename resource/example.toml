@@ -35,6 +35,12 @@ multiline_literal_string_letter = '''Hello,
 world!!'''
 multiline_literal_string_punctuation = '''., ={}[]'"\
 !?'''
+multiline_literal_string_first_newline_is_trimmed = '''
+The first newline is
+trimmed in raw strings.
+All other whitespace
+is preserved.
+'''
 
 adult = true
 student = false
