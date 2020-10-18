@@ -43,9 +43,30 @@ impl LiteralValueP {
             | TokenType::Colon
             | TokenType::Dot
             | TokenType::Hyphen
-            | TokenType::NumeralString
             | TokenType::Plus
             | TokenType::Underscore => {
+                let m = self.buffer.as_mut().unwrap();
+                m.push_token(&token0);
+
+                // Look-ahead.
+                // 先読み。
+                if let Some(token1) = tokens.1 {
+                    match token1.type_ {
+                        TokenType::AlphabetCharacter
+                        | TokenType::AlphabetString
+                        | TokenType::Colon
+                        | TokenType::Dot
+                        | TokenType::Hyphen
+                        | TokenType::NumeralString
+                        | TokenType::Plus
+                        | TokenType::Underscore => PResult::Ongoing,
+                        _ => PResult::End,
+                    }
+                } else {
+                    PResult::End
+                }
+            }
+            TokenType::NumeralString => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token0);
 

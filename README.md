@@ -200,7 +200,14 @@ is preserved.
 * [ ] Literal
   * [x] Parsing a literal containing dots. Example: `3.14`.  
       ドットを含むリテラル文字列の解析。例： `3.14`。
-  * [ ] Numbers...
+  * [ ] Literal numbers...
+    * [ ] `0x` - hex.
+    * [ ] `0o` - oct.
+    * [ ] `0b` - binary.
+    * [ ] `_` - space.
+    * [ ] `nan` - Not a number.
+    * [ ] `+nan` - Not a number.
+    * [ ] `-nan` - Not a number.
 * [ ] String (Not str)
   * [x] `"abc"` - Basic string.
     * [x] Plain.
@@ -215,13 +222,13 @@ is preserved.
     * [x] Plain.
     * [x] The first newline is trimmed in raw string.
   * [ ] Escape sequence.
-    * [x] `\r` caridge return.
-    * [x] `\n` line feed.
-    * [x] `\t` tab.
-    * [x] `\\` tab.
-    * [x] `\"` tab.
-    * [x] `\u0000` Unicode.
-    * [ ] `\U00000000` Unicode.
+    * [x] `\r` - caridge return.
+    * [x] `\n` - line feed.
+    * [x] `\t` - tab.
+    * [x] `\\` - tab.
+    * [x] `\"` - tab.
+    * [x] `\u0000` - Unicode.
+    * [ ] `\U00000000` - Unicode.
 * [ ] DateTime
     * [ ]  UTC
       * [x] `1979-05-27T07:32:00-08:00`.
