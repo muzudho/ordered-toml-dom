@@ -122,6 +122,25 @@ impl Document {
         }
         None
     }
+    /// For this library developer.
+    pub fn get_debug_string_by_key(&self, key: &str) -> String {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    match &*key_value.value {
+                        RightValue::BasicString(basic_string) => {
+                            return basic_string.to_debug_string();
+                        }
+                        RightValue::LiteralString(literal_string) => {
+                            return literal_string.to_debug_string();
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
+        "".to_string()
+    }
 
     /// Right boolean of `left = true`.  
     /// キー・バリューの右の論理値。  
