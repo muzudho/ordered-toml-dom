@@ -97,7 +97,7 @@ impl Document {
     /// Right integer of `left = 1.2`.  
     /// キー・バリューの右の整数値。  
     pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
-        println!("[trace82]");
+        println!("[trace100 get_f64_by_key={}]", key);
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             println!("[trace84]");
             if let KeyValue(key_value) = doc_elm {

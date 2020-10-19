@@ -122,8 +122,8 @@ impl LiteralValueP {
                     _ => return error(&mut self.log(), &tokens, "literal_value_p.rs.38."),
                 };
 
-                // TODO 機能停止中。
-                let zero_x = false;
+                // TODO 機能停止中。これをコメントアウトすると float1 が見つからなくなる。
+                // let zero_x = false;
 
                 if zero_x {
                     // `0x` の `0` は無視します。

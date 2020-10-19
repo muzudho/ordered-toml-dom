@@ -38,7 +38,7 @@ impl HexStringP {
         let token0 = tokens.current.as_ref().unwrap();
 
         match token0.type_ {
-            TokenType::NumChar | TokenType::AbChar => {
+            TokenType::AbChar | TokenType::NumChar | TokenType::Underscore => {
                 let s = token0.to_string();
                 let expected_len = 1;
                 if s.len() != expected_len {
@@ -51,7 +51,7 @@ impl HexStringP {
                 // 次がHexの文字以外か？
                 let finished = if let Some(token1) = tokens.one_ahead.as_ref() {
                     match token1.type_ {
-                        TokenType::NumChar | TokenType::AbChar => {
+                        TokenType::AbChar | TokenType::NumChar | TokenType::Underscore => {
                             // 続行。
                             false
                         }
@@ -67,14 +67,15 @@ impl HexStringP {
                     || (self.expected_digits != 0
                         && self.expected_digits <= self.string_buffer.len())
                 {
-                    /*
+                    //*
                     println!(
-                        // "[trace56={}][self.expected_digits={}][self.string_buffer.len()={}]",
+                        "[trace56={} self.expected_digits={} self.string_buffer.len()={} tokens.one_ahead={}]",
                         self.string_buffer,
                         self.expected_digits,
-                        self.string_buffer.len()
+                        self.string_buffer.len(),
+                        if let Some(token1) = tokens.one_ahead.as_ref() {token1.to_string()}else{"".to_string()}
                     );
-                    */
+                    // */
                     self.buffer.push(Token::new(
                         token0.column_number,
                         &self.string_buffer,
