@@ -154,7 +154,7 @@ impl EscapeSequenceP {
                             // Filled.
                             // 満ちたなら。
                             let string_buffer = tokens_stringify(&p.flush());
-                            println!("[trace157={}]", string_buffer);
+                            // println!("[trace157={}]", string_buffer);
                             let hex = match u32::from_str_radix(&string_buffer, 16) {
                                 Ok(n) => n,
                                 Err(why) => panic!("{}", why),

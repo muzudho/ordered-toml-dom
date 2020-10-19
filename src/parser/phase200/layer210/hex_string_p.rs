@@ -7,7 +7,6 @@ use crate::parser::phase200::{
     layer210::{HexStringP, PResult},
 };
 use casual_logger::Table;
-use std::char::from_u32;
 
 impl Default for HexStringP {
     fn default() -> Self {
@@ -57,12 +56,14 @@ impl HexStringP {
                 // Filled.
                 // 満ちたなら。
                 if self.expected_digits <= self.string_buffer.len() {
+                    /*
                     println!(
-                        "[trace56={}][self.expected_digits={}][self.string_buffer.len()={}]",
+                        // "[trace56={}][self.expected_digits={}][self.string_buffer.len()={}]",
                         self.string_buffer,
                         self.expected_digits,
                         self.string_buffer.len()
                     );
+                    */
                     self.buffer.push(Token::new(
                         token0.column_number,
                         &self.string_buffer,
