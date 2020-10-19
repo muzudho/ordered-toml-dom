@@ -3,6 +3,7 @@ pub mod comment_p;
 pub mod escape_sequence_p;
 pub mod header_p_of_array_of_table;
 pub mod header_p_of_table;
+pub mod hex_string_p;
 pub mod key_p;
 pub mod literal_string_p;
 pub mod literal_value_p;
@@ -13,7 +14,7 @@ use crate::model::{
 };
 use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, escape_sequence_p::State as EscapeSequenceState,
-    literal_string_p::State as LiteralStringState,
+    hex_string_p::State as HexStringState, literal_string_p::State as LiteralStringState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -67,6 +68,19 @@ pub struct HeaderPOfArrayOfTable {
 #[derive(Clone)]
 pub struct HeaderPOfTable {
     buffer: Option<HeaderOfTable>,
+}
+
+/// Hex string parser.  
+/// 16進文字列パーサー。  
+///
+/// Example: `01Ab23cD`.  
+#[derive(Clone)]
+pub struct HexStringP {
+    buffer: Vec<Token>,
+    state: HexStringState,
+    hex_number_buffer: String,
+    hex_number_digits: usize,
+    hex_digit_count: usize,
 }
 
 /// Key parser.  
