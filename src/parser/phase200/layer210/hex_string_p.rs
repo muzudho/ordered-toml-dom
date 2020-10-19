@@ -25,8 +25,8 @@ impl Default for HexStringP {
         HexStringP {
             buffer: Vec::new(),
             state: State::First,
-            hex_number_buffer: String::new(),
-            hex_number_digits: 0,
+            string_buffer: String::new(),
+            max_digits: usize::MAX,
             hex_digit_count: 0,
         }
     }
@@ -55,8 +55,7 @@ impl HexStringP {
                 // TODO 汎用的に書けないか？
                 // https://doc.rust-lang.org/reference/tokens.html
                 self.state = State::Digits;
-                self.hex_number_buffer = String::new();
-                self.hex_number_digits = 4;
+                self.string_buffer = String::new();
                 self.hex_digit_count = 0;
             }
             State::Digits => match token0.type_ {
@@ -64,7 +63,7 @@ impl HexStringP {
                 | TokenType::AlphabetCharacter
                 | TokenType::AlphabetString => {
                     let s = token0.to_string();
-                    let rest = self.hex_number_digits - self.hex_digit_count;
+                    let rest = self.max_digits - self.hex_digit_count;
                     let (s1, s2) = if rest < s.len() {
                         (s[0..rest].to_string(), s[rest..].to_string())
                     } else {
@@ -72,11 +71,11 @@ impl HexStringP {
                     };
                     let fill = s1.len();
 
-                    self.hex_number_buffer.push_str(&s1);
+                    self.string_buffer.push_str(&s1);
                     self.hex_digit_count += fill;
 
-                    if self.hex_number_digits <= self.hex_digit_count {
-                        let hex = u32::from_str_radix(&self.hex_number_buffer, 16).unwrap();
+                    if self.max_digits <= self.hex_digit_count {
+                        let hex = u32::from_str_radix(&self.string_buffer, 16).unwrap();
                         self.buffer.push(Token::new(
                             token0.column_number,
                             &from_u32(hex).unwrap().to_string(),

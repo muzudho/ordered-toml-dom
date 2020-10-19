@@ -78,9 +78,9 @@ pub struct HeaderPOfTable {
 pub struct HexStringP {
     buffer: Vec<Token>,
     state: HexStringState,
-    hex_number_buffer: String,
-    /// 桁数の上限を設定したければこれ。
-    hex_number_digits: usize,
+    string_buffer: String,
+    /// 桁数の最大値を設定したければこれ。
+    max_digits: usize,
     /// 現在の桁数。
     hex_digit_count: usize,
 }
