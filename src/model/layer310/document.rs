@@ -34,16 +34,18 @@ impl Document {
                 }
                 DocumentElement::KeyValue(m) => {
                     if m.key.to_string() == key.to_string() {
+                        /*
                         println!(
-                            "[trace36 Hit m.key={} key={}]",
+                            // "[trace36 Hit m.key={} key={}]",
                             m.key.to_string(),
                             key.to_string()
                         ); // In development.
+                        */
                         return Some(elem);
                     } else {
                         /*
                         println!(
-                            "[trace44 Not found m.key={} key={}]",
+                            // "[trace44 Not found m.key={} key={}]",
                             m.key.to_string(),
                             key.to_string()
                         ); // In development.
@@ -97,22 +99,22 @@ impl Document {
     /// Right integer of `left = 1.2`.  
     /// キー・バリューの右の整数値。  
     pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
-        println!("[trace100 get_f64_by_key={}]", key);
+        // println!("[trace100 get_f64_by_key={}]", key);
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
-            println!("[trace84]");
+            // println!("[trace84]");
             if let KeyValue(key_value) = doc_elm {
-                println!("[trace86]");
+                // println!("[trace86]");
                 if key_value.key.to_string() == key.to_string() {
-                    println!("[trace88]");
+                    // println!("[trace88]");
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        println!("[trace90]");
+                        // println!("[trace90]");
                         match literal_value.to_string().parse() {
                             Ok(n) => {
-                                println!("[trace93]");
+                                // println!("[trace93]");
                                 return Some(n);
                             }
                             Err(why) => {
-                                println!("[trace97={}]", why);
+                                // println!("[trace97={}]", why);
                                 return None;
                             }
                         }

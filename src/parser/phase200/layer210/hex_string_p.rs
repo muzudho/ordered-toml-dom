@@ -67,9 +67,9 @@ impl HexStringP {
                     || (self.expected_digits != 0
                         && self.expected_digits <= self.string_buffer.len())
                 {
-                    //*
+                    /*
                     println!(
-                        "[trace56={} self.expected_digits={} self.string_buffer.len()={} tokens.one_ahead={}]",
+                        // "[trace56={} self.expected_digits={} self.string_buffer.len()={} tokens.one_ahead={}]",
                         self.string_buffer,
                         self.expected_digits,
                         self.string_buffer.len(),

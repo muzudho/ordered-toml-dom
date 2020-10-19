@@ -5,26 +5,13 @@
 
 extern crate tomboy_toml_dom;
 
-use casual_logger::{Level, Log, Table};
 use chrono::prelude::{DateTime, Utc};
 use tomboy_toml_dom::Toml;
 
 fn main() {
-    // Configuration a log.
-    Log::set_file_name("exa-example");
-    Log::set_level(Level::Debug);
-    Log::set_retention_days(-1);
-    Log::remove_old_logs();
-
     // Read a toml.
     // Toml読取。
     let doc = Toml::from_file("./resource/example.toml");
-    Log::info_t(
-        "Read.",
-        Table::default()
-            .str("Display", &format!("{}", doc))
-            .str("Debug", &format!("{:?}", doc)),
-    );
 
     // Read a number.
     // 数値読取。
