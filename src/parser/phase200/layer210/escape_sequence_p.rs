@@ -3,13 +3,11 @@
 
 use crate::model::layer110::token::tokens_stringify;
 use crate::model::layer110::{Token, TokenType};
-use crate::parser::phase200::error_via;
+use crate::parser::phase200::error2;
+use crate::parser::phase200::error_via2;
 use crate::parser::phase200::layer210::HexStringP;
+use crate::parser::phase200::layer210::{EscapeSequenceP, PResult};
 use crate::parser::phase200::LookAheadTokens;
-use crate::parser::phase200::{
-    error,
-    layer210::{EscapeSequenceP, PResult},
-};
 use casual_logger::Table;
 use std::char::from_u32;
 
@@ -56,15 +54,15 @@ impl EscapeSequenceP {
         tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
     ) -> PResult {
         let tokens = LookAheadTokens::from_old(tokens_old);
-        let token0 = tokens.current.unwrap();
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), tokens_old, "escape_sequence_p.rs.66.");
+                return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.66.");
             }
             State::First => {
                 // Look-ahead.
                 // 先読み。
-                if let Some(token_1_ahead) = tokens.one_ahead {
+                if let Some(token_1_ahead) = tokens.one_ahead.as_ref() {
                     match token_1_ahead.type_ {
                         TokenType::AlphabetCharacter
                         | TokenType::Backslash
@@ -79,11 +77,11 @@ impl EscapeSequenceP {
                             return PResult::End;
                         }
                         _ => {
-                            return error(&mut self.log(), tokens_old, "escape_sequence_p.rs.136.");
+                            return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.136.");
                         }
                     }
                 } else {
-                    return error(&mut self.log(), tokens_old, "escape_sequence_p.rs.112.");
+                    return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.112.");
                 }
             }
             State::EscapedCharacter => {
@@ -112,9 +110,9 @@ impl EscapeSequenceP {
                                     Some(HexStringP::default().set_expected_digits(8).clone());
                             }
                             _ => {
-                                return error(
+                                return error2(
                                     &mut self.log(),
-                                    tokens_old,
+                                    &tokens,
                                     "escape_sequence_p.rs.206.",
                                 )
                             }
@@ -149,7 +147,7 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens_old, "escape_sequence_p.rs.212.");
+                        return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.212.");
                     }
                 }
             }
@@ -175,10 +173,10 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens_old,
+                            &tokens,
                             "escape_sequence_p.rs.165.",
                         );
                     }
