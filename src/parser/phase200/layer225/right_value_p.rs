@@ -224,7 +224,7 @@ impl RightValueP {
             // `'abc'`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::LiteralString(child_m));

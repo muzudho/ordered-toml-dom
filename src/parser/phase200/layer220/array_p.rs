@@ -276,7 +276,7 @@ impl ArrayP {
             // `'C:\temp'`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {

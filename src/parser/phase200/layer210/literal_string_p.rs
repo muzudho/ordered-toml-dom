@@ -46,18 +46,14 @@ impl LiteralStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::BeforeMultiLine1 => {
                 // Skip 3rd single quotation.
                 // Look-ahead.
                 // 先読み。
-                if let Some(token_1_ahead) = tokens.one_ahead {
+                if let Some(token_1_ahead) = &tokens.one_ahead {
                     match token_1_ahead.type_ {
                         TokenType::EndOfLine => {
                             self.state = State::BeforeMultiLine2;
@@ -83,7 +79,7 @@ impl LiteralStringP {
                     TokenType::SingleQuotation => {
                         // Look-ahead.
                         // 先読み。
-                        if let Some(token_1_ahead) = tokens.one_ahead {
+                        if let Some(token_1_ahead) = &tokens.one_ahead {
                             match token_1_ahead.type_ {
                                 TokenType::SingleQuotation => {
                                     // Before triple sinble quoted string.
@@ -111,7 +107,7 @@ impl LiteralStringP {
                 match token0.type_ {
                     // `'`
                     TokenType::SingleQuotation => {
-                        if check_triple_single_quotation(tokens_old) {
+                        if check_triple_single_quotation(tokens.to_old()) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
