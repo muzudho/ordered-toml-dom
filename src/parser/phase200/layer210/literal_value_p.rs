@@ -58,7 +58,7 @@ impl LiteralValueP {
                 return error(&mut self.log(), &tokens, "literal_value.rs.57.");
             }
             State::First => {
-                let mut zero_x = match token0.type_ {
+                let zero_x = match token0.type_ {
                     TokenType::AlphabetCharacter
                     | TokenType::Colon
                     | TokenType::Dot
@@ -125,7 +125,7 @@ impl LiteralValueP {
                 };
 
                 // TODO 機能停止中。
-                zero_x = false;
+                let zero_x = false;
 
                 if zero_x {
                     // `0x` の `0` は無視します。
@@ -159,7 +159,7 @@ impl LiteralValueP {
                 // トークンの文字列の先頭が x のケースです。
                 // 例えば `0xDEADBEEF` の場合、 `xDEADBEEF` という文字列トークンです。
                 // println!("[trace160={}]", token0);
-                self.hex_string_p = Some(HexStringP::default().set_expected_digits(4).clone());
+                self.hex_string_p = Some(HexStringP::default().clone());
                 self.state = State::ZeroXString;
                 PResult::Ongoing
             }
@@ -170,17 +170,22 @@ impl LiteralValueP {
                         // Filled.
                         // 満ちたなら。
                         let string_buffer = tokens_stringify(&p.flush());
-                        // println!("[trace171={}]", string_buffer);
+                        println!("[trace173={}]", string_buffer);
                         let hex = match u32::from_str_radix(&string_buffer, 16) {
                             Ok(n) => n,
                             Err(why) => panic!("{}", why),
                         };
+                        println!("[trace178={}]", hex);
                         let m = self.buffer.as_mut().unwrap();
+                        println!("[trace180={}]", &hex.to_string());
                         m.push_token(&Token::new(
                             token0.column_number,
-                            &from_u32(hex).unwrap().to_string(),
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                            &hex.to_string(),
+                            TokenType::AlphabetCharacter, // Unicode.
                         ));
+
+                        println!("[trace187={}]", &m.to_string());
+                        println!("[trace188={:?}]", &m.to_string());
 
                         self.hex_string_p = None;
                         self.state = State::End;

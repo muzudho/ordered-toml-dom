@@ -44,14 +44,29 @@ impl HexStringP {
                 if s.len() != expected_len {
                     // 1文字を想定しているので、そうでなかったらエラー。
                     panic!("s.len()={} s=|{}|", s.len(), s);
-                    // return error(&mut self.log(), &tokens, "hex_string_p.rs.45.");
                 }
 
                 self.string_buffer.push_str(&s);
 
+                // 次がHexの文字以外か？
+                let finished = if let Some(token1) = tokens.one_ahead.as_ref() {
+                    match token1.type_ {
+                        TokenType::NumeralCharacter | TokenType::AlphabetCharacter => {
+                            // 続行。
+                            false
+                        }
+                        _ => true,
+                    }
+                } else {
+                    true
+                };
+
                 // Filled.
                 // 満ちたなら。
-                if self.expected_digits <= self.string_buffer.len() {
+                if
+                /* finished
+                || */
+                (self.expected_digits != 0 && self.expected_digits <= self.string_buffer.len()) {
                     /*
                     println!(
                         // "[trace56={}][self.expected_digits={}][self.string_buffer.len()={}]",

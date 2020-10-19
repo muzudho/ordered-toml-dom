@@ -14,5 +14,8 @@ fn main() {
     println!("display=|{}|", doc);
     println!("debug=|{:?}|", doc);
 
-    assert_eq!(doc.get_string_by_key("z"), Some("abc\txyz".to_string()));
+    // z = """abc\txyz"""
+    // assert_eq!(doc.get_string_by_key("z"), Some("abc\txyz".to_string()));
+    // float1 = +1.0
+    assert_eq!(doc.get_f64_by_key("float1"), Some(1.0));
 }
