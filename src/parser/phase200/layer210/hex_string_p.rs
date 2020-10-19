@@ -61,35 +61,37 @@ impl HexStringP {
                 | TokenType::AlphabetCharacter
                 | TokenType::AlphabetString => {
                     let s = token0.to_string();
-                    let rest = self.expected_digits - self.string_buffer.len();
-                    let (s1, s2) = if rest < s.len() {
-                        (s[0..rest].to_string(), s[rest..].to_string())
+                    let current_expected = self.expected_digits - self.string_buffer.len();
+                    let (addition, overflow) = if current_expected < s.len() {
+                        (
+                            s[0..current_expected].to_string(),
+                            s[current_expected..].to_string(),
+                        )
                     } else {
                         (s[0..].to_string(), "".to_string())
                     };
 
-                    self.string_buffer.push_str(&s1);
+                    self.string_buffer.push_str(&addition);
 
-                    let hex = u32::from_str_radix(&self.string_buffer, 16).unwrap();
-                    self.buffer.push(Token::new(
-                        token0.column_number,
-                        &from_u32(hex).unwrap().to_string(),
-                        TokenType::AlphabetCharacter, // TODO EscapeSequence
-                    ));
-
-                    // 残りのトークンが溢れている場合。
-                    if 0 < s2.len() {
+                    // Filled.
+                    // 満ちたなら。
+                    if self.expected_digits <= self.string_buffer.len() {
+                        let hex = u32::from_str_radix(&self.string_buffer, 16).unwrap();
                         self.buffer.push(Token::new(
                             token0.column_number,
-                            &s2.to_string(),
+                            &from_u32(hex).unwrap().to_string(),
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
                         ));
-                    }
-
-                    // 指定の桁数を作れた場合。
-                    if self.expected_digits == self.string_buffer.len() {
                         self.state = State::End;
                         return PResult::End;
+                    }
+
+                    if 0 < overflow.len() {
+                        self.buffer.push(Token::new(
+                            token0.column_number,
+                            &overflow.to_string(),
+                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        ));
                     }
                 }
                 _ => {
