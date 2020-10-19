@@ -47,10 +47,9 @@ pub struct BasicStringP {
 pub struct EscapeSequenceP {
     buffer: Vec<Token>,
     state: EscapeSequenceState,
-    unicode_number_buffer: String,
+    string_buffer: String,
     /// 桁数をぴったり指定したければこれ。でなければ 0。
     expected_digits: usize,
-    unicode_digit_count: usize,
 }
 
 /// Header of array of table syntax parser.  
