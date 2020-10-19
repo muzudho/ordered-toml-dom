@@ -37,7 +37,18 @@ impl DocumentP {
             // 現在のトークンは先読みトークン、前回の先読みトークンは今回のトークンです。
             tokens = (tokens.1, tokens.2, Some(token));
             if let Some(_) = tokens.0 {
-                self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc);
+                match self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc) {
+                    PResult::End => {}
+                    PResult::Err(mut table) => {
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &LookAheadTokens::from_tuple(tokens),
+                            "document.rs.43.",
+                        );
+                    }
+                    PResult::Ongoing => {}
+                }
             }
         }
 
@@ -83,7 +94,7 @@ impl DocumentP {
                 }
             }
             PResult::Err(mut table) => {
-                return error_via(&mut table, &mut self.log(), &tokens, "document.rs.43.");
+                return error_via(&mut table, &mut self.log(), &tokens, "document.rs.92.");
             }
             PResult::Ongoing => {}
         }
