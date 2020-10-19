@@ -93,7 +93,7 @@ impl RightValueP {
             // After [.
             State::AfterLeftSquareBracket => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::Array(child_m));

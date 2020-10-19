@@ -7,11 +7,7 @@
 //! // [ 1, 2, 3 ]
 //! ```
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer210::LiteralValue,
-    layer220::Array,
-};
+use crate::model::{layer110::TokenType, layer210::LiteralValue, layer220::Array};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
@@ -73,11 +69,7 @@ impl ArrayP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `]`.
@@ -177,7 +169,7 @@ impl ArrayP {
             // `[array]`.
             State::Array => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -250,7 +242,7 @@ impl ArrayP {
             // "dog".
             State::DoubleQuotedString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(&LookAheadTokens::from_old(tokens_old)) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
