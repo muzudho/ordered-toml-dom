@@ -60,7 +60,6 @@ impl LiteralValueP {
             State::First => {
                 let mut zero_x = match token0.type_ {
                     TokenType::AlphabetCharacter
-                    | TokenType::AlphabetString
                     | TokenType::Colon
                     | TokenType::Dot
                     | TokenType::Hyphen
@@ -86,8 +85,7 @@ impl LiteralValueP {
                                     // 先読み。
                                     if let Some(token1) = tokens.one_ahead.as_ref() {
                                         match token1.type_ {
-                                            TokenType::AlphabetCharacter
-                                            | TokenType::AlphabetString => {
+                                            TokenType::AlphabetCharacter => {
                                                 if let Some(ch1) = token1.to_string().chars().nth(0)
                                                 {
                                                     if ch1 == 'x' {
@@ -140,7 +138,6 @@ impl LiteralValueP {
                     if let Some(token1) = &tokens.one_ahead {
                         match token1.type_ {
                             TokenType::AlphabetCharacter
-                            | TokenType::AlphabetString
                             | TokenType::Colon
                             | TokenType::Dot
                             | TokenType::Hyphen

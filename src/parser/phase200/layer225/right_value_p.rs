@@ -157,7 +157,6 @@ impl RightValueP {
                     }
                     TokenType::WhiteSpaceString => {} //Ignored it.
                     TokenType::AlphabetCharacter
-                    | TokenType::AlphabetString
                     | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore

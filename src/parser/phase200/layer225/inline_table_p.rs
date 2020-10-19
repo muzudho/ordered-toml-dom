@@ -55,7 +55,6 @@ impl InlineTableP {
                     TokenType::WhiteSpaceString => {} // Ignore it.
                     // `apple.banana`
                     TokenType::AlphabetCharacter
-                    | TokenType::AlphabetString
                     | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {

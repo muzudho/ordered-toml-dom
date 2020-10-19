@@ -35,7 +35,6 @@ impl KeyP {
         let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
             TokenType::AlphabetCharacter
-            | TokenType::AlphabetString
             | TokenType::NumeralString
             | TokenType::Hyphen
             | TokenType::Underscore => {
@@ -47,7 +46,6 @@ impl KeyP {
                 if let Some(token1) = tokens.one_ahead.as_ref() {
                     match token1.type_ {
                         TokenType::AlphabetCharacter
-                        | TokenType::AlphabetString
                         | TokenType::NumeralString
                         | TokenType::Hyphen
                         | TokenType::Underscore => PResult::Ongoing,

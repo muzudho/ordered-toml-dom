@@ -87,7 +87,6 @@ impl KeyValueP {
                 match token0.type_ {
                     TokenType::WhiteSpaceString => {} //Ignored it.
                     TokenType::AlphabetCharacter
-                    | TokenType::AlphabetString
                     | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {

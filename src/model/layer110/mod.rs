@@ -7,8 +7,6 @@ pub mod token_line;
 pub enum TokenType {
     /// A ～ Z, a ～ z.  1 disit.  
     AlphabetCharacter,
-    /// A ～ Z, a ～ z.  Multiple disits.  
-    AlphabetString,
     /// \  
     Backslash,
     /// }  
@@ -42,6 +40,11 @@ pub enum TokenType {
     Sharp,
     /// '  
     SingleQuotation,
+    /// A ～ Z, a ～ z.  Multiple disits.   
+    /// 構文解析の結果。文字列トークン。  
+    SPAlphabetString,
+    /// 構文解析の結果。 `0x01aB23Cd` なら、 `01aB23Cd` の部分。
+    SPHexString,
     /// _  
     Underscore,
     /// Multi-byte character or more.  

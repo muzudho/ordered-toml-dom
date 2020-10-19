@@ -131,7 +131,6 @@ impl ArrayP {
             State::AfterCommaBehindLiteralValue => {
                 match token0.type_ {
                     TokenType::AlphabetCharacter
-                    | TokenType::AlphabetString
                     | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
@@ -198,7 +197,6 @@ impl ArrayP {
                         self.state = State::DoubleQuotedString;
                     }
                     TokenType::AlphabetCharacter
-                    | TokenType::AlphabetString
                     | TokenType::NumeralString
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
