@@ -5,9 +5,10 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer230::DocumentElement,
 };
+use crate::parser::phase200::error2;
+use crate::parser::phase200::error_via2;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
-    error, error_via,
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
     layer225::KeyValueP,
     layer230::DocumentElementP,
@@ -62,22 +63,26 @@ impl DocumentElementP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
-                return error(&mut self.log(), tokens, "document_element.rs.66.");
+                return error2(&mut self.log(), &tokens, "document_element.rs.66.");
             }
             State::AfterComment => {
-                return error(&mut self.log(), tokens, "document_element.rs.74.");
+                return error2(&mut self.log(), &tokens, "document_element.rs.74.");
             }
             State::AfterKeyValue => match token0.type_ {
                 TokenType::WhiteSpaceString => {} // Ignore it.
                 // `,`
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
-                    return error(&mut self.log(), tokens, "document_element.rs.84.");
+                    return error2(&mut self.log(), &tokens, "document_element.rs.84.");
                 }
             },
             State::AfterLeftSquareBracket => match token0.type_ {
@@ -89,16 +94,16 @@ impl DocumentElementP {
                 _ => {
                     self.header_p_of_table = Some(HeaderPOfTable::new());
                     self.state = State::Table;
-                    return self.parse_header_of_table(tokens);
+                    return self.parse_header_of_table(tokens_old);
                 }
             },
             State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
-                return error(&mut self.log(), tokens, "document_element.rs.106.");
+                return error2(&mut self.log(), &tokens, "document_element.rs.106.");
             }
             State::HeaderOfArrayOfTable => {
                 let p = self.header_p_of_array_of_table.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens_old) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_header_of_array_of_table(&m));
@@ -106,14 +111,14 @@ impl DocumentElementP {
                             self.state = State::AfterArrayOfTable;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), tokens, "document_element.rs.123.");
+                            return error2(&mut self.log(), &tokens, "document_element.rs.123.");
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens,
+                            &tokens,
                             "document_element.rs.132.",
                         );
                     }
@@ -122,7 +127,7 @@ impl DocumentElementP {
             }
             State::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
-                match p.parse(&LookAheadTokens::from_old(tokens)) {
+                match p.parse(&LookAheadTokens::from_old(tokens_old)) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_comment(&m));
@@ -130,14 +135,14 @@ impl DocumentElementP {
                             self.state = State::AfterComment;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), tokens, "document_element.rs.153.");
+                            return error2(&mut self.log(), &tokens, "document_element.rs.153.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens,
+                            &tokens,
                             "document_element.rs.162.",
                         );
                     }
@@ -163,16 +168,16 @@ impl DocumentElementP {
                 | TokenType::Hyphen
                 | TokenType::Underscore => {
                     self.key_value_p = Some(KeyValueP::new());
-                    match self.key_value_p.as_mut().unwrap().parse(tokens) {
+                    match self.key_value_p.as_mut().unwrap().parse(tokens_old) {
                         PResult::End => {
                             // 1トークンでは終わらないから。
-                            return error(&mut self.log(), tokens, "document_element.rs.164.");
+                            return error2(&mut self.log(), &tokens, "document_element.rs.164.");
                         }
                         PResult::Err(mut table) => {
-                            return error_via(
+                            return error_via2(
                                 &mut table,
                                 &mut self.log(),
-                                tokens,
+                                &tokens,
                                 "document_element.rs.171.",
                             )
                         }
@@ -191,15 +196,15 @@ impl DocumentElementP {
                 }
                 TokenType::WhiteSpaceString => {} // Ignored it.
                 _ => {
-                    return error(&mut self.log(), tokens, "document_element.rs.246.");
+                    return error2(&mut self.log(), &tokens, "document_element.rs.246.");
                 }
             },
             State::Finished => {
-                return error(&mut self.log(), tokens, "document_element.rs.205.");
+                return error2(&mut self.log(), &tokens, "document_element.rs.205.");
             }
             State::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens_old) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_key_value(&m));
@@ -207,14 +212,14 @@ impl DocumentElementP {
                             self.state = State::AfterKeyValue;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), tokens, "document_element.rs.222.");
+                            return error2(&mut self.log(), &tokens, "document_element.rs.222.");
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens,
+                            &tokens,
                             "document_element.rs.231.",
                         );
                     }
@@ -222,7 +227,7 @@ impl DocumentElementP {
                 }
             }
             State::Table => {
-                return self.parse_header_of_table(tokens);
+                return self.parse_header_of_table(tokens_old);
             }
         }
 
@@ -237,10 +242,11 @@ impl DocumentElementP {
     ///             先読みを含むトークン。  
     fn parse_header_of_table(
         &mut self,
-        tokens: (Option<&Token>, Option<&Token>, Option<&Token>),
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
     ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
         let p = self.header_p_of_table.as_mut().unwrap();
-        match p.parse(tokens) {
+        match p.parse(tokens_old) {
             PResult::End => {
                 if let Some(m) = p.flush() {
                     self.buffer = Some(DocumentElement::from_header_of_table(&m));
@@ -248,14 +254,14 @@ impl DocumentElementP {
                     self.state = State::AfterTable;
                     return PResult::End;
                 } else {
-                    return error(&mut self.log(), tokens, "document_element.rs.269.");
+                    return error2(&mut self.log(), &tokens, "document_element.rs.269.");
                 }
             } // Ignored it.
             PResult::Err(mut table) => {
-                return error_via(
+                return error_via2(
                     &mut table,
                     &mut self.log(),
-                    tokens,
+                    &tokens,
                     "document_element.rs.278.",
                 );
             }
