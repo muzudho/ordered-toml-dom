@@ -29,24 +29,25 @@ pub struct LookAheadTokens {
 ///             先読みを含むトークン。  
 fn error(
     table: &mut LogTable,
-    tokens: (Option<&Token>, Option<&Token>, Option<&Token>),
+    tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
     place_of_occurrence: &str,
 ) -> PResult {
     table.str("place_of_occurrence", place_of_occurrence);
+    let tokens = LookAheadTokens::from_old(tokens_old);
 
-    if let Some(token) = tokens.0 {
+    if let Some(token) = tokens.current {
         table
             .int("token0_column_number", usize_to_i128(token.column_number))
             .str("token0", &format!("{}", token));
     }
 
-    if let Some(token) = tokens.1 {
+    if let Some(token) = tokens.one_ahead {
         table
             .int("token1_column_number", usize_to_i128(token.column_number))
             .str("token1", &format!("{}", token));
     }
 
-    if let Some(token) = tokens.2 {
+    if let Some(token) = tokens.two_ahead {
         table
             .int("token2_column_number", usize_to_i128(token.column_number))
             .str("token2", &format!("{}", token));
@@ -65,24 +66,25 @@ fn error(
 fn error_via(
     escalated_table1: &mut LogTable,
     this_table: &mut LogTable,
-    tokens: (Option<&Token>, Option<&Token>, Option<&Token>),
+    tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
     place_of_occurrence: &str,
 ) -> PResult {
     this_table.str("via", place_of_occurrence);
+    let tokens = LookAheadTokens::from_old(tokens_old);
 
-    if let Some(token) = tokens.0 {
+    if let Some(token) = tokens.current {
         this_table
             .int("token0_column_number", usize_to_i128(token.column_number))
             .str("token0", &format!("{}", token));
     }
 
-    if let Some(token) = tokens.1 {
+    if let Some(token) = tokens.one_ahead {
         this_table
             .int("token1_column_number", usize_to_i128(token.column_number))
             .str("token1", &format!("{}", token));
     }
 
-    if let Some(token) = tokens.2 {
+    if let Some(token) = tokens.two_ahead {
         this_table
             .int("token2_column_number", usize_to_i128(token.column_number))
             .str("token2", &format!("{}", token));
