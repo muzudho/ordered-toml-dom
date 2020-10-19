@@ -11,7 +11,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer225::KeyValue,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
@@ -87,7 +87,7 @@ impl KeyValueP {
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
                     }
-                    _ => return error2(&mut self.log(), &tokens, "key_value.rs.65."),
+                    _ => return error(&mut self.log(), &tokens, "key_value.rs.65."),
                 }
             }
             State::First => {
@@ -106,7 +106,7 @@ impl KeyValueP {
                                     self.key_p = None;
                                     self.state = State::BeforeEqual;
                                 } else {
-                                    return error2(&mut self.log(), &tokens, "key_value.rs.84.");
+                                    return error(&mut self.log(), &tokens, "key_value.rs.84.");
                                 }
                             }
                             PResult::Err(mut table) => {
@@ -120,7 +120,7 @@ impl KeyValueP {
                             PResult::Ongoing => {}
                         }
                     }
-                    _ => return error2(&mut self.log(), &tokens, "key_value.rs.65."),
+                    _ => return error(&mut self.log(), &tokens, "key_value.rs.65."),
                 }
             }
             // After `=`.
@@ -134,7 +134,7 @@ impl KeyValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "key_value.rs.84.");
+                            return error(&mut self.log(), &tokens, "key_value.rs.84.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -143,7 +143,7 @@ impl KeyValueP {
                     PResult::Ongoing => {}
                 }
             }
-            State::End => return error2(&mut self.log(), &tokens, "key_value.rs.93."),
+            State::End => return error(&mut self.log(), &tokens, "key_value.rs.93."),
         }
         PResult::Ongoing
     }

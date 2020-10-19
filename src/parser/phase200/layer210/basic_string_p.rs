@@ -14,7 +14,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::BasicString,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{BasicStringP, EscapeSequenceP, PResult};
 use crate::parser::phase200::LookAheadTokens;
@@ -73,7 +73,7 @@ impl BasicStringP {
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error2(&mut self.log(), tokens, "basic_string_p.rs.66.");
+                return error(&mut self.log(), tokens, "basic_string_p.rs.66.");
             }
             State::First => {
                 // print!("trace.4.");
@@ -96,7 +96,7 @@ impl BasicStringP {
                                 }
                             }
                         } else {
-                            return error2(&mut self.log(), &tokens, "basic_string_p.rs.112.");
+                            return error(&mut self.log(), &tokens, "basic_string_p.rs.112.");
                         }
                     }
                     // \
@@ -104,7 +104,7 @@ impl BasicStringP {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
                         match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
                             PResult::End => {
-                                return error2(&mut self.log(), &tokens, "basic_string_p.rs.108.");
+                                return error(&mut self.log(), &tokens, "basic_string_p.rs.108.");
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
@@ -174,7 +174,7 @@ impl BasicStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error2(&mut self.log(), &tokens, "basic_string_p.rs.124.");
+                        return error(&mut self.log(), &tokens, "basic_string_p.rs.124.");
                     }
                 }
             }
@@ -188,7 +188,7 @@ impl BasicStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error2(&mut self.log(), &tokens, "basic_string_p.rs.136.");
+                        return error(&mut self.log(), &tokens, "basic_string_p.rs.136.");
                     }
                 }
             }
@@ -254,7 +254,7 @@ impl BasicStringP {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
                         match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
                             PResult::End => {
-                                return error2(&mut self.log(), &tokens, "basic_string_p.rs.252.");
+                                return error(&mut self.log(), &tokens, "basic_string_p.rs.252.");
                             }
                             PResult::Err(mut table) => {
                                 return error_via(

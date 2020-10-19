@@ -5,7 +5,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::Key,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{KeyP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table as LogTable;
@@ -64,7 +64,7 @@ impl KeyP {
                     PResult::End
                 }
             }
-            _ => return error2(&mut self.log(), &tokens, "key.rs.38."),
+            _ => return error(&mut self.log(), &tokens, "key.rs.38."),
         }
     }
 

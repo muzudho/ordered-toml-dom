@@ -3,7 +3,7 @@
 
 use crate::model::layer110::token::tokens_stringify;
 use crate::model::layer110::{Token, TokenType};
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::HexStringP;
 use crate::parser::phase200::layer210::{EscapeSequenceP, PResult};
@@ -53,7 +53,7 @@ impl EscapeSequenceP {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::End => {
-                return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.66.");
+                return error(&mut self.log(), &tokens, "escape_sequence_p.rs.66.");
             }
             State::First => {
                 // Look-ahead.
@@ -73,11 +73,11 @@ impl EscapeSequenceP {
                             return PResult::End;
                         }
                         _ => {
-                            return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.136.");
+                            return error(&mut self.log(), &tokens, "escape_sequence_p.rs.136.");
                         }
                     }
                 } else {
-                    return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.112.");
+                    return error(&mut self.log(), &tokens, "escape_sequence_p.rs.112.");
                 }
             }
             State::EscapedCharacter => {
@@ -106,11 +106,7 @@ impl EscapeSequenceP {
                                     Some(HexStringP::default().set_expected_digits(8).clone());
                             }
                             _ => {
-                                return error2(
-                                    &mut self.log(),
-                                    &tokens,
-                                    "escape_sequence_p.rs.206.",
-                                )
+                                return error(&mut self.log(), &tokens, "escape_sequence_p.rs.206.")
                             }
                         }
                         if let Some(code) = code {
@@ -143,7 +139,7 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     _ => {
-                        return error2(&mut self.log(), &tokens, "escape_sequence_p.rs.212.");
+                        return error(&mut self.log(), &tokens, "escape_sequence_p.rs.212.");
                     }
                 }
             }

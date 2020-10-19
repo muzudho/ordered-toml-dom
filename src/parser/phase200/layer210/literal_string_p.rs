@@ -5,7 +5,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::LiteralString,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{LiteralStringP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
@@ -67,7 +67,7 @@ impl LiteralStringP {
                         }
                     }
                 } else {
-                    return error2(&mut self.log(), &tokens, "literal_string_p.rs.67.");
+                    return error(&mut self.log(), &tokens, "literal_string_p.rs.67.");
                 }
             }
             State::BeforeMultiLine2 => {
@@ -75,7 +75,7 @@ impl LiteralStringP {
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error2(&mut self.log(), &tokens, "literal_string_p.rs.66.");
+                return error(&mut self.log(), &tokens, "literal_string_p.rs.66.");
             }
             State::First => {
                 match token0.type_ {
@@ -97,7 +97,7 @@ impl LiteralStringP {
                                 }
                             }
                         } else {
-                            return error2(&mut self.log(), &tokens, "literal_string_p.rs.112.");
+                            return error(&mut self.log(), &tokens, "literal_string_p.rs.112.");
                         }
                     }
                     _ => {
@@ -131,7 +131,7 @@ impl LiteralStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error2(&mut self.log(), &tokens, "literal_string_p.rs.124.");
+                        return error(&mut self.log(), &tokens, "literal_string_p.rs.124.");
                     }
                 }
             }
@@ -145,7 +145,7 @@ impl LiteralStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error2(&mut self.log(), &tokens, "literal_string_p.rs.136.");
+                        return error(&mut self.log(), &tokens, "literal_string_p.rs.136.");
                     }
                 }
             }

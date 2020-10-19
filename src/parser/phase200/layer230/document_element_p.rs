@@ -5,7 +5,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer230::DocumentElement,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
@@ -72,17 +72,17 @@ impl DocumentElementP {
         match self.state {
             State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
-                return error2(&mut self.log(), &tokens, "document_element.rs.66.");
+                return error(&mut self.log(), &tokens, "document_element.rs.66.");
             }
             State::AfterComment => {
-                return error2(&mut self.log(), &tokens, "document_element.rs.74.");
+                return error(&mut self.log(), &tokens, "document_element.rs.74.");
             }
             State::AfterKeyValue => match token0.type_ {
                 TokenType::WhiteSpaceString => {} // Ignore it.
                 // `,`
                 TokenType::EndOfLine => return PResult::End,
                 _ => {
-                    return error2(&mut self.log(), &tokens, "document_element.rs.84.");
+                    return error(&mut self.log(), &tokens, "document_element.rs.84.");
                 }
             },
             State::AfterLeftSquareBracket => match token0.type_ {
@@ -99,7 +99,7 @@ impl DocumentElementP {
             },
             State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
-                return error2(&mut self.log(), &tokens, "document_element.rs.106.");
+                return error(&mut self.log(), &tokens, "document_element.rs.106.");
             }
             State::HeaderOfArrayOfTable => {
                 let p = self.header_p_of_array_of_table.as_mut().unwrap();
@@ -111,7 +111,7 @@ impl DocumentElementP {
                             self.state = State::AfterArrayOfTable;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "document_element.rs.123.");
+                            return error(&mut self.log(), &tokens, "document_element.rs.123.");
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
@@ -135,7 +135,7 @@ impl DocumentElementP {
                             self.state = State::AfterComment;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "document_element.rs.153.");
+                            return error(&mut self.log(), &tokens, "document_element.rs.153.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -171,7 +171,7 @@ impl DocumentElementP {
                     match self.key_value_p.as_mut().unwrap().parse(tokens_old) {
                         PResult::End => {
                             // 1トークンでは終わらないから。
-                            return error2(&mut self.log(), &tokens, "document_element.rs.164.");
+                            return error(&mut self.log(), &tokens, "document_element.rs.164.");
                         }
                         PResult::Err(mut table) => {
                             return error_via(
@@ -196,11 +196,11 @@ impl DocumentElementP {
                 }
                 TokenType::WhiteSpaceString => {} // Ignored it.
                 _ => {
-                    return error2(&mut self.log(), &tokens, "document_element.rs.246.");
+                    return error(&mut self.log(), &tokens, "document_element.rs.246.");
                 }
             },
             State::Finished => {
-                return error2(&mut self.log(), &tokens, "document_element.rs.205.");
+                return error(&mut self.log(), &tokens, "document_element.rs.205.");
             }
             State::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
@@ -212,7 +212,7 @@ impl DocumentElementP {
                             self.state = State::AfterKeyValue;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "document_element.rs.222.");
+                            return error(&mut self.log(), &tokens, "document_element.rs.222.");
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
@@ -254,7 +254,7 @@ impl DocumentElementP {
                     self.state = State::AfterTable;
                     return PResult::End;
                 } else {
-                    return error2(&mut self.log(), &tokens, "document_element.rs.269.");
+                    return error(&mut self.log(), &tokens, "document_element.rs.269.");
                 }
             } // Ignored it.
             PResult::Err(mut table) => {

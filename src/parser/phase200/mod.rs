@@ -27,7 +27,7 @@ pub struct LookAheadTokens {
 ///
 /// * `tokens` - Tokens contains look ahead.  
 ///             先読みを含むトークン。  
-fn error2(table: &mut LogTable, tokens: &LookAheadTokens, place_of_occurrence: &str) -> PResult {
+fn error(table: &mut LogTable, tokens: &LookAheadTokens, place_of_occurrence: &str) -> PResult {
     table.str("place_of_occurrence", place_of_occurrence);
 
     if let Some(token) = &tokens.current {

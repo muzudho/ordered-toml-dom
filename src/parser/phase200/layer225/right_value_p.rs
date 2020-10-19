@@ -5,7 +5,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer225::RightValue,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
@@ -76,7 +76,7 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "right_value.rs.68.");
+                            return error(&mut self.log(), &tokens, "right_value.rs.68.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -101,7 +101,7 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "right_value.rs.88.");
+                            return error(&mut self.log(), &tokens, "right_value.rs.88.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -126,7 +126,7 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "right_value.rs.108.");
+                            return error(&mut self.log(), &tokens, "right_value.rs.108.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -180,7 +180,7 @@ impl RightValueP {
                                     self.state = State::End;
                                     return PResult::End;
                                 } else {
-                                    return error2(&mut self.log(), &tokens, "right_value.rs.152.");
+                                    return error(&mut self.log(), &tokens, "right_value.rs.152.");
                                 }
                             }
                             PResult::Err(mut table) => {
@@ -207,7 +207,7 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "right_value.rs.174.");
+                            return error(&mut self.log(), &tokens, "right_value.rs.174.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -232,7 +232,7 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error2(&mut self.log(), &tokens, "right_value.rs.194.");
+                            return error(&mut self.log(), &tokens, "right_value.rs.194.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -247,7 +247,7 @@ impl RightValueP {
                 }
             }
             State::End => {
-                return error2(&mut self.log(), &tokens, "right_value.rs.204.");
+                return error(&mut self.log(), &tokens, "right_value.rs.204.");
             }
         }
         PResult::Ongoing

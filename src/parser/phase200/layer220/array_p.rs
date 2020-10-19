@@ -12,7 +12,7 @@ use crate::model::{
     layer210::LiteralValue,
     layer220::Array,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
@@ -93,7 +93,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error2(&mut self.log(), &tokens, "array.rs.93."),
+                    _ => return error(&mut self.log(), &tokens, "array.rs.93."),
                 }
             }
             // After `[],`.
@@ -110,7 +110,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error2(&mut self.log(), &tokens, "array.rs.130."),
+                    _ => return error(&mut self.log(), &tokens, "array.rs.130."),
                 }
             }
             // ", ` の次。
@@ -132,7 +132,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error2(&mut self.log(), &tokens, "array.rs.176."),
+                    _ => return error(&mut self.log(), &tokens, "array.rs.176."),
                 }
             }
             // After `literal,`.
@@ -157,7 +157,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error2(&mut self.log(), &tokens, "array.rs.218."),
+                    _ => return error(&mut self.log(), &tokens, "array.rs.218."),
                 }
             }
             // After " or '.
@@ -171,7 +171,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error2(&mut self.log(), &tokens, "array.rs.245."),
+                    _ => return error(&mut self.log(), &tokens, "array.rs.245."),
                 }
             }
             // `[array]`.
@@ -234,7 +234,7 @@ impl ArrayP {
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpaceString => {} // Ignore it.
-                    _ => return error2(&mut self.log(), &tokens, "array.rs.358."),
+                    _ => return error(&mut self.log(), &tokens, "array.rs.358."),
                 }
             }
             State::LiteralValue => match token0.type_ {
@@ -245,7 +245,7 @@ impl ArrayP {
                     self.state = State::End;
                     return PResult::End;
                 }
-                _ => return error2(&mut self.log(), &tokens, "array.rs.383."),
+                _ => return error(&mut self.log(), &tokens, "array.rs.383."),
             },
             // "dog".
             State::DoubleQuotedString => {
@@ -261,7 +261,7 @@ impl ArrayP {
                             self.basic_string_p = None;
                             self.state = State::AfterString;
                         } else {
-                            return error2(&mut self.log(), &tokens, "array.rs.439.");
+                            return error(&mut self.log(), &tokens, "array.rs.439.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -271,7 +271,7 @@ impl ArrayP {
                 }
             }
             State::End => {
-                return error2(&mut self.log(), &tokens, "array.rs.466.");
+                return error(&mut self.log(), &tokens, "array.rs.466.");
             }
             // `'C:\temp'`.
             State::LiteralString => {
@@ -287,7 +287,7 @@ impl ArrayP {
                             self.literal_string_p = None;
                             self.state = State::AfterString;
                         } else {
-                            return error2(&mut self.log(), &tokens, "array.rs.493.");
+                            return error(&mut self.log(), &tokens, "array.rs.493.");
                         }
                     }
                     PResult::Err(mut table) => {

@@ -5,7 +5,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer225::InlineTable,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
@@ -71,7 +71,7 @@ impl InlineTableP {
                         match self.key_value_p.as_mut().unwrap().parse(tokens_old) {
                             PResult::End => {
                                 // 1トークンでは終わらないから。
-                                return error2(&mut self.log(), &tokens, "inline_table.rs.64.");
+                                return error(&mut self.log(), &tokens, "inline_table.rs.64.");
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
@@ -88,7 +88,7 @@ impl InlineTableP {
                         // Empty inline-table.
                         return PResult::End;
                     }
-                    _ => return error2(&mut self.log(), &tokens, "inline_table.rs.63."),
+                    _ => return error(&mut self.log(), &tokens, "inline_table.rs.63."),
                 }
             }
             // `apple.banana`.
@@ -101,7 +101,7 @@ impl InlineTableP {
                             self.key_value_p = None;
                             self.state = State::AfterKeyValue;
                         } else {
-                            return error2(&mut self.log(), &tokens, "inline_table.rs.76.");
+                            return error(&mut self.log(), &tokens, "inline_table.rs.76.");
                         }
                     }
                     PResult::Err(mut table) => {
@@ -126,7 +126,7 @@ impl InlineTableP {
                 TokenType::RightCurlyBracket => {
                     return PResult::End;
                 }
-                _ => return error2(&mut self.log(), &tokens, "inline_table.rs.96."),
+                _ => return error(&mut self.log(), &tokens, "inline_table.rs.96."),
             },
         }
         PResult::Ongoing

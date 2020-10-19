@@ -6,7 +6,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::LiteralValue,
 };
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::HexStringP;
 use crate::parser::phase200::layer210::{LiteralValueP, PResult};
@@ -59,7 +59,7 @@ impl LiteralValueP {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::End => {
-                return error2(&mut self.log(), &tokens, "literal_value.rs.57.");
+                return error(&mut self.log(), &tokens, "literal_value.rs.57.");
             }
             State::First => {
                 let mut zero_x = match token0.type_ {
@@ -127,7 +127,7 @@ impl LiteralValueP {
                             false
                         }
                     }
-                    _ => return error2(&mut self.log(), &tokens, "literal_value_p.rs.38."),
+                    _ => return error(&mut self.log(), &tokens, "literal_value_p.rs.38."),
                 };
 
                 // TODO 機能停止中。

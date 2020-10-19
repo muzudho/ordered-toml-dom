@@ -2,7 +2,7 @@
 //! 16進文字列パーサー。  
 
 use crate::model::layer110::{Token, TokenType};
-use crate::parser::phase200::error2;
+use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{HexStringP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
@@ -84,7 +84,7 @@ impl HexStringP {
                 }
             }
             _ => {
-                return error2(&mut self.log(), &tokens, "hex_string_p.rs.179.");
+                return error(&mut self.log(), &tokens, "hex_string_p.rs.179.");
             }
         }
 

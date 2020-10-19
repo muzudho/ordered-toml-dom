@@ -83,7 +83,7 @@ impl DocumentP {
                 } else {
                     // TODO 何も取得できないことがある？
                     /*
-                    return error2(&mut self.log(), &tokens, "document.rs.34.");
+                    return error(&mut self.log(), &tokens, "document.rs.34.");
                     */
                 }
             }
