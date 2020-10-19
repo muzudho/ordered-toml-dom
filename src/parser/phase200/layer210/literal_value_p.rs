@@ -6,12 +6,11 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::LiteralValue,
 };
-use crate::parser::phase200::error_via;
+use crate::parser::phase200::error2;
+use crate::parser::phase200::error_via2;
 use crate::parser::phase200::layer210::HexStringP;
-use crate::parser::phase200::{
-    error,
-    layer210::{LiteralValueP, PResult},
-};
+use crate::parser::phase200::layer210::{LiteralValueP, PResult};
+use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table as LogTable;
 use std::char::from_u32;
 
@@ -52,11 +51,15 @@ impl LiteralValueP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), tokens, "literal_value.rs.57.");
+                return error2(&mut self.log(), &tokens, "literal_value.rs.57.");
             }
             State::First => {
                 let mut zero_x = match token0.type_ {
@@ -85,7 +88,7 @@ impl LiteralValueP {
                                     // 0x ?
                                     // Look-ahead.
                                     // 先読み。
-                                    if let Some(token1) = tokens.1 {
+                                    if let Some(token1) = tokens.one_ahead.as_ref() {
                                         match token1.type_ {
                                             TokenType::AlphabetCharacter
                                             | TokenType::AlphabetString => {
@@ -124,7 +127,7 @@ impl LiteralValueP {
                             false
                         }
                     }
-                    _ => return error(&mut self.log(), tokens, "literal_value_p.rs.38."),
+                    _ => return error2(&mut self.log(), &tokens, "literal_value_p.rs.38."),
                 };
 
                 // TODO 機能停止中。
@@ -138,7 +141,7 @@ impl LiteralValueP {
                 } else {
                     // Look-ahead.
                     // 先読み。
-                    if let Some(token1) = tokens.1 {
+                    if let Some(token1) = tokens.one_ahead {
                         match token1.type_ {
                             TokenType::AlphabetCharacter
                             | TokenType::AlphabetString
@@ -169,7 +172,7 @@ impl LiteralValueP {
             }
             State::ZeroXString => {
                 let p = self.hex_string_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens_old) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
@@ -191,10 +194,10 @@ impl LiteralValueP {
                         return PResult::End;
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens,
+                            &tokens,
                             "literal_value_p.rs.173.",
                         );
                     }
