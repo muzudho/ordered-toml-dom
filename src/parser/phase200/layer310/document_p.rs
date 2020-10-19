@@ -34,9 +34,7 @@ impl DocumentP {
             // The current token is the look-ahead token, and the previous look-ahead token is the current token.
             // ずらします。
             // 現在のトークンは先読みトークン、前回の先読みトークンは今回のトークンです。
-            tokens.0 = tokens.1;
-            tokens.1 = tokens.2;
-            tokens.2 = Some(token);
+            tokens = (tokens.1, tokens.2, Some(token));
             if let Some(_) = tokens.0 {
                 self.one_delay_loop(tokens, doc);
             }
@@ -44,18 +42,14 @@ impl DocumentP {
 
         // Last 2 token.
         // 最後の２トークン。
-        tokens.0 = tokens.1;
-        tokens.1 = tokens.2;
-        tokens.2 = None;
+        tokens = (tokens.1, tokens.2, None);
         if let Some(_) = tokens.0 {
             self.one_delay_loop(tokens, doc);
         }
 
         // Last 1 token.
         // 最後の１トークン。
-        tokens.0 = tokens.1;
-        tokens.1 = tokens.2;
-        tokens.2 = None;
+        tokens = (tokens.1, tokens.2, None);
         if let Some(_) = tokens.0 {
             self.one_delay_loop(tokens, doc);
         }
