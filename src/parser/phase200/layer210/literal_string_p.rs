@@ -5,10 +5,9 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::LiteralString,
 };
-use crate::parser::phase200::{
-    error,
-    layer210::{LiteralStringP, PResult},
-};
+use crate::parser::phase200::error2;
+use crate::parser::phase200::layer210::{LiteralStringP, PResult};
+use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
 
 /// Syntax machine state.  
@@ -47,14 +46,18 @@ impl LiteralStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::BeforeMultiLine1 => {
                 // Skip 3rd single quotation.
                 // Look-ahead.
                 // 先読み。
-                if let Some(token_1_ahead) = tokens.1 {
+                if let Some(token_1_ahead) = tokens.one_ahead {
                     match token_1_ahead.type_ {
                         TokenType::EndOfLine => {
                             self.state = State::BeforeMultiLine2;
@@ -64,7 +67,7 @@ impl LiteralStringP {
                         }
                     }
                 } else {
-                    return error(&mut self.log(), tokens, "literal_string_p.rs.67.");
+                    return error2(&mut self.log(), &tokens, "literal_string_p.rs.67.");
                 }
             }
             State::BeforeMultiLine2 => {
@@ -72,7 +75,7 @@ impl LiteralStringP {
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error(&mut self.log(), tokens, "literal_string_p.rs.66.");
+                return error2(&mut self.log(), &tokens, "literal_string_p.rs.66.");
             }
             State::First => {
                 match token0.type_ {
@@ -80,7 +83,7 @@ impl LiteralStringP {
                     TokenType::SingleQuotation => {
                         // Look-ahead.
                         // 先読み。
-                        if let Some(token_1_ahead) = tokens.1 {
+                        if let Some(token_1_ahead) = tokens.one_ahead {
                             match token_1_ahead.type_ {
                                 TokenType::SingleQuotation => {
                                     // Before triple sinble quoted string.
@@ -94,7 +97,7 @@ impl LiteralStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), tokens, "literal_string_p.rs.112.");
+                            return error2(&mut self.log(), &tokens, "literal_string_p.rs.112.");
                         }
                     }
                     _ => {
@@ -108,7 +111,7 @@ impl LiteralStringP {
                 match token0.type_ {
                     // `'`
                     TokenType::SingleQuotation => {
-                        if check_triple_single_quotation(tokens) {
+                        if check_triple_single_quotation(tokens_old) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
@@ -128,7 +131,7 @@ impl LiteralStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "literal_string_p.rs.124.");
+                        return error2(&mut self.log(), &tokens, "literal_string_p.rs.124.");
                     }
                 }
             }
@@ -142,7 +145,7 @@ impl LiteralStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "literal_string_p.rs.136.");
+                        return error2(&mut self.log(), &tokens, "literal_string_p.rs.136.");
                     }
                 }
             }
