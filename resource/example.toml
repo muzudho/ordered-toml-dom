@@ -3,6 +3,11 @@ int_max = 2147483647
 int_min = -2147483648
 weight = 93.5
 
+# hexadecimal with prefix `0x`
+hex1 = 0xDEADBEEF
+hex2 = 0xdeadbeef
+hex3 = 0xdead_beef
+
 apple = "pie"
 basic_string_empty = ""
 basic_string_escape_backslash = "\\"

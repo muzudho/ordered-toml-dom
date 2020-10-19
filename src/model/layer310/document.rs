@@ -126,7 +126,7 @@ impl Document {
                                 // println!("[trace93]");
                                 return Some(n);
                             }
-                            Err(why) => {
+                            Err(_why) => {
                                 // println!("[trace97={}]", why);
                                 return None;
                             }

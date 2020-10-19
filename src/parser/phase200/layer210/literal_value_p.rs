@@ -12,7 +12,6 @@ use crate::parser::phase200::layer210::HexStringP;
 use crate::parser::phase200::layer210::{LiteralValueP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table as LogTable;
-use std::char::from_u32;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  

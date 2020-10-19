@@ -19,6 +19,9 @@ fn main() {
     assert_eq!(doc.get_i128_by_key("int_max"), Some(2147483647));
     assert_eq!(doc.get_i128_by_key("int_min"), Some(-2147483648));
     assert_eq!(doc.get_f64_by_key("weight"), Some(93.5));
+    assert_eq!(doc.get_i128_by_key("hex1"), Some(0xDEADBEEF));
+    assert_eq!(doc.get_i128_by_key("hex2"), Some(0xdeadbeef));
+    assert_eq!(doc.get_i128_by_key("hex3"), Some(0xdead_beef));
 
     // WIP. Read a string.
     // 作業中。 文字列読取。
