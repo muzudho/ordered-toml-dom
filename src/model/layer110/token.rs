@@ -33,3 +33,18 @@ impl fmt::Debug for Token {
         )
     }
 }
+
+pub fn tokens_stringify(tokens: &Vec<Token>) -> String {
+    let mut buf = String::new();
+    for token in tokens {
+        buf.push_str(&token.to_string());
+    }
+    buf
+}
+pub fn tokens_stringify_debug(tokens: &Vec<Token>) -> String {
+    let mut buf = String::new();
+    for token in tokens {
+        buf.push_str(&token.to_debug_string());
+    }
+    buf
+}

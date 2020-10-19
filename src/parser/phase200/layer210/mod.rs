@@ -45,11 +45,10 @@ pub struct BasicStringP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct EscapeSequenceP {
+    hex_string_p: Option<HexStringP>,
     buffer: Vec<Token>,
     state: EscapeSequenceState,
     string_buffer: String,
-    /// 桁数をぴったり指定したければこれ。でなければ 0。
-    expected_digits: usize,
 }
 
 /// Header of array of table syntax parser.  

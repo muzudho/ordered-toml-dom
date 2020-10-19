@@ -19,6 +19,10 @@ impl Default for HexStringP {
     }
 }
 impl HexStringP {
+    pub fn set_expected_digits(&mut self, val: usize) -> &mut Self {
+        self.expected_digits = val;
+        self
+    }
     pub fn flush(&mut self) -> Vec<Token> {
         let m = self.buffer.clone();
         self.buffer.clear();
@@ -53,11 +57,16 @@ impl HexStringP {
                 // Filled.
                 // 満ちたなら。
                 if self.expected_digits <= self.string_buffer.len() {
-                    let hex = u32::from_str_radix(&self.string_buffer, 16).unwrap();
+                    println!(
+                        "[trace56={}][self.expected_digits={}][self.string_buffer.len()={}]",
+                        self.string_buffer,
+                        self.expected_digits,
+                        self.string_buffer.len()
+                    );
                     self.buffer.push(Token::new(
                         token0.column_number,
-                        &from_u32(hex).unwrap().to_string(),
-                        TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        &self.string_buffer,
+                        TokenType::AlphabetString, // TODO Alphabet or Number String
                     ));
                     return PResult::End;
                 }
@@ -66,7 +75,7 @@ impl HexStringP {
                     self.buffer.push(Token::new(
                         token0.column_number,
                         &overflow.to_string(),
-                        TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        TokenType::AlphabetString, // TODO Alphabet or Number String
                     ));
                 }
             }
