@@ -6,6 +6,7 @@ use crate::model::{
     layer230::HeaderOfArrayOfTable,
 };
 use crate::parser::phase200::layer210::{HeaderPOfArrayOfTable, PResult};
+use crate::parser::phase200::LookAheadTokens;
 // use casual_logger::Table;
 
 impl HeaderPOfArrayOfTable {
@@ -27,8 +28,12 @@ impl HeaderPOfArrayOfTable {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
             TokenType::DoubleQuotation => {
                 // End of syntax.
