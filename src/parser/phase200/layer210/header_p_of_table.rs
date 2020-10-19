@@ -1,10 +1,7 @@
 //! Table syntax parser.  
 //! テーブル構文パーサー。  
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer230::HeaderOfTable,
-};
+use crate::model::{layer110::TokenType, layer230::HeaderOfTable};
 use crate::parser::phase200::layer210::{HeaderPOfTable, PResult};
 use crate::parser::phase200::LookAheadTokens;
 // use casual_logger::Table;
@@ -28,12 +25,8 @@ impl HeaderPOfTable {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
-        let token0 = tokens.current.unwrap();
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+        let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
             // `"`
             TokenType::DoubleQuotation => {
