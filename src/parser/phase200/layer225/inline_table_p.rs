@@ -61,7 +61,7 @@ impl InlineTableP {
                     | TokenType::Underscore => {
                         self.key_value_p = Some(Box::new(KeyValueP::new()));
                         self.state = State::KeyValue;
-                        match self.key_value_p.as_mut().unwrap().parse(tokens.to_old()) {
+                        match self.key_value_p.as_mut().unwrap().parse(tokens) {
                             PResult::End => {
                                 // 1トークンでは終わらないから。
                                 return error(&mut self.log(), &tokens, "inline_table.rs.64.");
@@ -87,7 +87,7 @@ impl InlineTableP {
             // `apple.banana`.
             State::KeyValue => {
                 let p = self.key_value_p.as_mut().unwrap();
-                match p.parse(tokens.to_old()) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer.as_mut().unwrap().push_key_value(&child_m);

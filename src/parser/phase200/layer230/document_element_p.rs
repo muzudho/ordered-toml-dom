@@ -168,7 +168,7 @@ impl DocumentElementP {
                 | TokenType::Hyphen
                 | TokenType::Underscore => {
                     self.key_value_p = Some(KeyValueP::new());
-                    match self.key_value_p.as_mut().unwrap().parse(tokens_old) {
+                    match self.key_value_p.as_mut().unwrap().parse(&tokens) {
                         PResult::End => {
                             // 1トークンでは終わらないから。
                             return error(&mut self.log(), &tokens, "document_element.rs.164.");
@@ -204,7 +204,7 @@ impl DocumentElementP {
             }
             State::KeyValueSyntax => {
                 let p = self.key_value_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_key_value(&m));
