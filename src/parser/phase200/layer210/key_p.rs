@@ -5,10 +5,9 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::Key,
 };
-use crate::parser::phase200::{
-    error,
-    layer210::{KeyP, PResult},
-};
+use crate::parser::phase200::error2;
+use crate::parser::phase200::layer210::{KeyP, PResult};
+use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table as LogTable;
 
 impl Default for KeyP {
@@ -35,8 +34,12 @@ impl KeyP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
             TokenType::AlphabetCharacter
             | TokenType::AlphabetString
@@ -48,7 +51,7 @@ impl KeyP {
 
                 // Look-ahead.
                 // 先読み。
-                if let Some(token1) = tokens.1 {
+                if let Some(token1) = tokens.one_ahead {
                     match token1.type_ {
                         TokenType::AlphabetCharacter
                         | TokenType::AlphabetString
@@ -61,7 +64,7 @@ impl KeyP {
                     PResult::End
                 }
             }
-            _ => return error(&mut self.log(), tokens, "key.rs.38."),
+            _ => return error2(&mut self.log(), &tokens, "key.rs.38."),
         }
     }
 
