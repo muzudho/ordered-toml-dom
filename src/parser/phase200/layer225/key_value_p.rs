@@ -11,8 +11,10 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer225::KeyValue,
 };
+use crate::parser::phase200::error2;
+use crate::parser::phase200::error_via2;
+use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
-    error, error_via,
     layer210::{KeyP, PResult},
     layer225::{KeyValueP, RightValueP},
 };
@@ -65,8 +67,12 @@ impl KeyValueP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `=`.
             State::AfterEquals => {
@@ -81,7 +87,7 @@ impl KeyValueP {
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
                     }
-                    _ => return error(&mut self.log(), tokens, "key_value.rs.65."),
+                    _ => return error2(&mut self.log(), &tokens, "key_value.rs.65."),
                 }
             }
             State::First => {
@@ -93,34 +99,34 @@ impl KeyValueP {
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         let p = self.key_p.as_mut().unwrap();
-                        match p.parse(tokens) {
+                        match p.parse(tokens_old) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.key_buffer = Some(child_m);
                                     self.key_p = None;
                                     self.state = State::BeforeEqual;
                                 } else {
-                                    return error(&mut self.log(), tokens, "key_value.rs.84.");
+                                    return error2(&mut self.log(), &tokens, "key_value.rs.84.");
                                 }
                             }
                             PResult::Err(mut table) => {
-                                return error_via(
+                                return error_via2(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens,
+                                    &tokens,
                                     "key_value.rs.84.",
                                 );
                             }
                             PResult::Ongoing => {}
                         }
                     }
-                    _ => return error(&mut self.log(), tokens, "key_value.rs.65."),
+                    _ => return error2(&mut self.log(), &tokens, "key_value.rs.65."),
                 }
             }
             // After `=`.
             State::RightValue => {
                 let p = self.right_value_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens_old) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.right_value_buffer = Some(child_m);
@@ -128,16 +134,21 @@ impl KeyValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), tokens, "key_value.rs.84.");
+                            return error2(&mut self.log(), &tokens, "key_value.rs.84.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), tokens, "key_value.rs.88.");
+                        return error_via2(
+                            &mut table,
+                            &mut self.log(),
+                            &tokens,
+                            "key_value.rs.88.",
+                        );
                     }
                     PResult::Ongoing => {}
                 }
             }
-            State::End => return error(&mut self.log(), tokens, "key_value.rs.93."),
+            State::End => return error2(&mut self.log(), &tokens, "key_value.rs.93."),
         }
         PResult::Ongoing
     }
