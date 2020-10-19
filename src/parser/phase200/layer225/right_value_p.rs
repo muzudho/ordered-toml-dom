@@ -172,7 +172,7 @@ impl RightValueP {
                         self.literal_value_p = Some(LiteralValueP::default());
                         self.state = State::LiteralValue;
                         let p = self.literal_value_p.as_mut().unwrap();
-                        match p.parse(tokens_old) {
+                        match p.parse(&tokens) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.buffer = Some(RightValue::LiteralValue(child_m));
@@ -199,7 +199,7 @@ impl RightValueP {
             // `abc`.
             State::LiteralValue => {
                 let p = self.literal_value_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::LiteralValue(child_m));

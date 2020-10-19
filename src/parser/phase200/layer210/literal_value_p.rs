@@ -51,11 +51,7 @@ impl LiteralValueP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::End => {
@@ -141,7 +137,7 @@ impl LiteralValueP {
                 } else {
                     // Look-ahead.
                     // 先読み。
-                    if let Some(token1) = tokens.one_ahead {
+                    if let Some(token1) = &tokens.one_ahead {
                         match token1.type_ {
                             TokenType::AlphabetCharacter
                             | TokenType::AlphabetString
