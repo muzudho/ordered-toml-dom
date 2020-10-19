@@ -49,11 +49,7 @@ impl EscapeSequenceP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::End => {
@@ -153,7 +149,7 @@ impl EscapeSequenceP {
             }
             State::UnicodeDigits => {
                 let p = self.hex_string_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(tokens.to_old()) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
