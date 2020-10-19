@@ -79,7 +79,9 @@ pub struct HexStringP {
     buffer: Vec<Token>,
     state: HexStringState,
     hex_number_buffer: String,
+    /// 桁数の上限を設定したければこれ。
     hex_number_digits: usize,
+    /// 現在の桁数。
     hex_digit_count: usize,
 }
 

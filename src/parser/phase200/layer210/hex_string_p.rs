@@ -17,10 +17,7 @@ pub enum State {
     // After double quotation.
     // 二重引用符の後。
     First,
-    // After `\`.
-    // `\` の後。
-    EscapedCharacter,
-    UnicodeDigits,
+    Digits,
 }
 
 impl Default for HexStringP {
@@ -55,92 +52,14 @@ impl HexStringP {
                 return error(&mut self.log(), tokens, "hex_string_p.rs.66.");
             }
             State::First => {
-                // Look-ahead.
-                // 先読み。
-                if let Some(token_1_ahead) = tokens.1 {
-                    match token_1_ahead.type_ {
-                        TokenType::AlphabetCharacter
-                        | TokenType::Backslash
-                        | TokenType::DoubleQuotation => {
-                            // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
-                            self.state = State::EscapedCharacter;
-                        }
-                        TokenType::EndOfLine => {
-                            // 行末に \ があったケース。
-                            // println!("[trace3 行末にEOLがあったケース]");
-                            self.state = State::End;
-                            return PResult::End;
-                        }
-                        _ => {
-                            return error(&mut self.log(), tokens, "hex_string_p.rs.136.");
-                        }
-                    }
-                } else {
-                    return error(&mut self.log(), tokens, "hex_string_p.rs.112.");
-                }
+                // TODO 汎用的に書けないか？
+                // https://doc.rust-lang.org/reference/tokens.html
+                self.state = State::Digits;
+                self.hex_number_buffer = String::new();
+                self.hex_number_digits = 4;
+                self.hex_digit_count = 0;
             }
-            State::EscapedCharacter => {
-                // println!("[trace196={:?}]", token0);
-                // Escaped.
-                match token0.type_ {
-                    // `"`
-                    TokenType::AlphabetCharacter => {
-                        // TODO 汎用的に書けないか？
-                        // https://doc.rust-lang.org/reference/tokens.html
-                        let mut code = None;
-                        match token0.to_string().as_str() {
-                            "n" => code = Some("\n"),
-                            "r" => code = Some("\r"),
-                            "t" => code = Some("\t"),
-                            "u" => {
-                                self.state = State::UnicodeDigits;
-                                self.hex_number_buffer = String::new();
-                                self.hex_number_digits = 4;
-                                self.hex_digit_count = 0;
-                            }
-                            "U" => {
-                                self.state = State::UnicodeDigits;
-                                self.hex_number_buffer = String::new();
-                                self.hex_number_digits = 8;
-                                self.hex_digit_count = 0;
-                            }
-                            _ => return error(&mut self.log(), tokens, "hex_string_p.rs.206."),
-                        }
-                        if let Some(code) = code {
-                            self.buffer.push(Token::new(
-                                token0.column_number,
-                                code,
-                                TokenType::AlphabetCharacter, // TODO EscapeSequence
-                            ));
-                            self.state = State::End;
-                            return PResult::End;
-                        }
-                    }
-                    TokenType::Backslash => {
-                        self.buffer.push(Token::new(
-                            token0.column_number,
-                            "\\",
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
-                        ));
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    // "
-                    TokenType::DoubleQuotation => {
-                        self.buffer.push(Token::new(
-                            token0.column_number,
-                            "\"",
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
-                        ));
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    _ => {
-                        return error(&mut self.log(), tokens, "hex_string_p.rs.212.");
-                    }
-                }
-            }
-            State::UnicodeDigits => match token0.type_ {
+            State::Digits => match token0.type_ {
                 TokenType::NumeralString
                 | TokenType::AlphabetCharacter
                 | TokenType::AlphabetString => {
