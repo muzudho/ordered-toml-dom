@@ -172,7 +172,7 @@ impl LiteralValueP {
             }
             State::ZeroXString => {
                 let p = self.hex_string_p.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。

@@ -145,7 +145,7 @@ impl EscapeSequenceP {
             }
             State::UnicodeDigits => {
                 let p = self.hex_string_p.as_mut().unwrap();
-                match p.parse(tokens.to_old()) {
+                match p.parse(tokens) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
