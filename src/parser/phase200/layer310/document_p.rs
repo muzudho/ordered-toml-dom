@@ -37,7 +37,7 @@ impl DocumentP {
             // 現在のトークンは先読みトークン、前回の先読みトークンは今回のトークンです。
             tokens = (tokens.1, tokens.2, Some(token));
             if let Some(_) = tokens.0 {
-                self.one_delay_loop(tokens, doc);
+                self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc);
             }
         }
 
@@ -45,14 +45,14 @@ impl DocumentP {
         // 最後の２トークン。
         tokens = (tokens.1, tokens.2, None);
         if let Some(_) = tokens.0 {
-            self.one_delay_loop(tokens, doc);
+            self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc);
         }
 
         // Last 1 token.
         // 最後の１トークン。
         tokens = (tokens.1, tokens.2, None);
         if let Some(_) = tokens.0 {
-            self.one_delay_loop(tokens, doc);
+            self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc);
         }
 
         PResult::Ongoing
@@ -65,12 +65,7 @@ impl DocumentP {
     ///
     /// * `tokens` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
-    fn one_delay_loop(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-        doc: &mut Document,
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    fn one_delay_loop(&mut self, tokens: &LookAheadTokens, doc: &mut Document) -> PResult {
         if let None = self.document_element_p {
             self.document_element_p = Some(DocumentElementP::default());
         }

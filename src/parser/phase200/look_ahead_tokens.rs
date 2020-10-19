@@ -5,7 +5,7 @@ use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::Token;
 
 impl LookAheadTokens {
-    pub fn from_old(tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> Self {
+    pub fn from_tuple(tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> Self {
         LookAheadTokens {
             current: if let Some(t) = tokens.0 {
                 Some(t.clone())
