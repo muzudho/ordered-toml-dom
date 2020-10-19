@@ -2,10 +2,9 @@
 //! 16進文字列パーサー。  
 
 use crate::model::layer110::{Token, TokenType};
-use crate::parser::phase200::{
-    error,
-    layer210::{HexStringP, PResult},
-};
+use crate::parser::phase200::error2;
+use crate::parser::phase200::layer210::{HexStringP, PResult};
+use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
 
 impl Default for HexStringP {
@@ -35,8 +34,12 @@ impl HexStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
 
         match token0.type_ {
             TokenType::NumeralString | TokenType::AlphabetCharacter | TokenType::AlphabetString => {
@@ -81,7 +84,7 @@ impl HexStringP {
                 }
             }
             _ => {
-                return error(&mut self.log(), tokens, "hex_string_p.rs.179.");
+                return error2(&mut self.log(), &tokens, "hex_string_p.rs.179.");
             }
         }
 
