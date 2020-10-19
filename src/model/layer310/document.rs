@@ -83,7 +83,20 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        match literal_value.to_string().parse() {
+                        let s = literal_value.to_string();
+
+                        // 16進数かも知れない。
+                        if s.starts_with("0x") {
+                            // 頭の `0x` と、アンダースコアは除去しないと変換できない。
+                            let s2 = &s[2..].replace("_", "");
+                            // println!("[trace91={}]", s2);
+                            match i128::from_str_radix(s2, 16) {
+                                Ok(n) => return Some(n),
+                                Err(why) => panic!("{}", why),
+                            };
+                        }
+
+                        match s.parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
                         }

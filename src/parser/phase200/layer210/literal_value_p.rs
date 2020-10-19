@@ -168,17 +168,10 @@ impl LiteralValueP {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
-                        let numeral_string = tokens_stringify(&p.flush());
-                        // println!("[trace173={}]", numeral_string);
-                        // 数値変換はしない。
-                        /*
-                        let hex = match u32::from_str_radix(&numeral_string, 16) {
-                            Ok(n) => n,
-                            Err(why) => panic!("{}", why),
-                        };
-                        // println!("[trace178={}]", hex);
-                        // println!("[trace180={}]", &hex.to_string());
-                        */
+
+                        // 数値変換はせず、頭に 0x を付けます。
+                        let numeral_string = &format!("0x{}", tokens_stringify(&p.flush()));
+
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
                             token0.column_number,
