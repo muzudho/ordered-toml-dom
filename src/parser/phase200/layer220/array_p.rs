@@ -12,6 +12,7 @@ use crate::model::{
     layer210::LiteralValue,
     layer220::Array,
 };
+use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error, error_via,
     layer210::{BasicStringP, LiteralStringP, PResult},
@@ -244,7 +245,7 @@ impl ArrayP {
             // "dog".
             State::DoubleQuotedString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(&LookAheadTokens::from_old(tokens)) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {

@@ -15,6 +15,7 @@ use crate::model::{
     layer210::BasicString,
 };
 use crate::parser::phase200::error_via;
+use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error,
     layer210::{BasicStringP, EscapeSequenceP, PResult},
@@ -66,15 +67,15 @@ impl BasicStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::BeforeMultiLine => {
                 // print!("trace.8.");
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error(&mut self.log(), tokens, "basic_string_p.rs.66.");
+                return error(&mut self.log(), tokens.to_old(), "basic_string_p.rs.66.");
             }
             State::First => {
                 // print!("trace.4.");
@@ -82,7 +83,7 @@ impl BasicStringP {
                     // `"`
                     TokenType::DoubleQuotation => {
                         // print!("trace.5.");
-                        if let Some(token_1_ahead) = tokens.1 {
+                        if let Some(token_1_ahead) = &tokens.one_ahead {
                             match token_1_ahead.type_ {
                                 TokenType::DoubleQuotation => {
                                     //print!("trace.7.");
@@ -97,21 +98,34 @@ impl BasicStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), tokens, "basic_string_p.rs.112.");
+                            return error(
+                                &mut self.log(),
+                                tokens.to_old(),
+                                "basic_string_p.rs.112.",
+                            );
                         }
                     }
                     // \
                     TokenType::Backslash => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
-                        match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
+                        match self
+                            .escape_sequence_p
+                            .as_mut()
+                            .unwrap()
+                            .parse(tokens.to_old())
+                        {
                             PResult::End => {
-                                return error(&mut self.log(), tokens, "basic_string_p.rs.108.");
+                                return error(
+                                    &mut self.log(),
+                                    tokens.to_old(),
+                                    "basic_string_p.rs.108.",
+                                );
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens,
+                                    tokens.to_old(),
                                     "basic_string_p.rs.115.",
                                 );
                             }
@@ -132,7 +146,7 @@ impl BasicStringP {
                     // "
                     TokenType::DoubleQuotation => {
                         // print!("trace.10.");
-                        if check_triple_double_quotation(tokens) {
+                        if check_triple_double_quotation(tokens.to_old()) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
@@ -142,7 +156,12 @@ impl BasicStringP {
                     // \
                     TokenType::Backslash => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
-                        match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
+                        match self
+                            .escape_sequence_p
+                            .as_mut()
+                            .unwrap()
+                            .parse(tokens.to_old())
+                        {
                             PResult::End => {
                                 // 行末の \ だったなら。
                                 // println!("[trace200 行末の \\ だったなら。]");
@@ -152,7 +171,7 @@ impl BasicStringP {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens,
+                                    tokens.to_old(),
                                     "basic_string_p.rs.139.",
                                 );
                             }
@@ -175,7 +194,7 @@ impl BasicStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "basic_string_p.rs.124.");
+                        return error(&mut self.log(), tokens.to_old(), "basic_string_p.rs.124.");
                     }
                 }
             }
@@ -189,13 +208,13 @@ impl BasicStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens, "basic_string_p.rs.136.");
+                        return error(&mut self.log(), tokens.to_old(), "basic_string_p.rs.136.");
                     }
                 }
             }
             State::MultiLineEscapeSequence => {
                 let p = self.escape_sequence_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens.to_old()) {
                     PResult::End => {
                         self.buffer.as_mut().unwrap().extend_tokens(&p.flush());
                         self.escape_sequence_p = None;
@@ -205,7 +224,7 @@ impl BasicStringP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            tokens,
+                            tokens.to_old(),
                             "basic_string_p.rs.190.",
                         );
                     }
@@ -223,7 +242,7 @@ impl BasicStringP {
                     } // Ignore it.
                     // "
                     TokenType::DoubleQuotation => {
-                        if check_triple_double_quotation(tokens) {
+                        if check_triple_double_quotation(tokens.to_old()) {
                             // println!("[trace309 check_triple_double_quotation]");
                             self.state = State::MultiLineEnd1;
                         } else {
@@ -253,15 +272,24 @@ impl BasicStringP {
                     // \
                     TokenType::Backslash => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
-                        match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
+                        match self
+                            .escape_sequence_p
+                            .as_mut()
+                            .unwrap()
+                            .parse(tokens.to_old())
+                        {
                             PResult::End => {
-                                return error(&mut self.log(), tokens, "basic_string_p.rs.252.");
+                                return error(
+                                    &mut self.log(),
+                                    tokens.to_old(),
+                                    "basic_string_p.rs.252.",
+                                );
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens,
+                                    tokens.to_old(),
                                     "basic_string_p.rs.139.",
                                 );
                             }
@@ -278,7 +306,7 @@ impl BasicStringP {
             }
             State::SingleLineEscapeSequence => {
                 let p = self.escape_sequence_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens.to_old()) {
                     PResult::End => {
                         self.buffer.as_mut().unwrap().extend_tokens(&p.flush());
                         self.escape_sequence_p = None;
@@ -288,7 +316,7 @@ impl BasicStringP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            tokens,
+                            tokens.to_old(),
                             "basic_string_p.rs.190.",
                         );
                     }

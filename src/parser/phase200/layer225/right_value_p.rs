@@ -5,6 +5,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer225::RightValue,
 };
+use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error, error_via,
     layer210::{BasicStringP, LiteralStringP, LiteralValueP, PResult},
@@ -102,7 +103,7 @@ impl RightValueP {
             // "abc"
             State::BasicString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(&LookAheadTokens::from_old(tokens)) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::BasicString(child_m));
