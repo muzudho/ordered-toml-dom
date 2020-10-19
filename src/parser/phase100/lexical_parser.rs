@@ -1,12 +1,11 @@
-//! Divide into words.  
-//! 単語に分けます。  
+//! Combines only consecutive whitespace into one.  
+//! 連続する空白のみを1つに結合します。  
 use crate::model::layer110::{Token, TokenLine, TokenType};
 use std::fmt;
 
 #[derive(Debug)]
 enum State {
     EscapeSequenceCharacter,
-    ContinuationOfAlphabetString,
     ContinuationOfNumeralString,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
@@ -96,21 +95,6 @@ impl LexicalParser {
                 self.flush();
                 self.state = State::First;
             }
-            State::ContinuationOfAlphabetString => {
-                self.buffer_string.push(*ch0);
-                if let Some(ch1) = chars.1 {
-                    match ch1 {
-                        'A'..='Z' | 'a'..='z' => {}
-                        _ => {
-                            self.flush();
-                            self.state = State::First;
-                        }
-                    }
-                } else {
-                    self.flush();
-                    self.state = State::First;
-                }
-            }
             State::ContinuationOfNumeralString => {
                 self.buffer_string.push(*ch0);
                 if let Some(ch1) = chars.1 {
@@ -142,22 +126,8 @@ impl LexicalParser {
                     // A ～ Z, a ～ z.
                     'A'..='Z' | 'a'..='z' => {
                         // print!("[trace105 albet={:?}]", ch0);
-                        if let Some(ch1) = chars.1 {
-                            match ch1 {
-                                'A'..='Z' | 'a'..='z' => {
-                                    // print!("trace.106.");
-                                    self.state = State::ContinuationOfAlphabetString;
-                                    self.buffer_string_token_type = TokenType::AlphabetString;
-                                }
-                                _ => {
-                                    self.buffer_string_token_type = TokenType::AlphabetCharacter;
-                                    self.flush();
-                                }
-                            }
-                        } else {
-                            self.buffer_string_token_type = TokenType::AlphabetCharacter;
-                            self.flush();
-                        }
+                        self.buffer_string_token_type = TokenType::AlphabetCharacter;
+                        self.flush();
                     }
                     // \
                     '\\' => {
