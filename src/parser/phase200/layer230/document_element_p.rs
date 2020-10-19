@@ -156,7 +156,7 @@ impl DocumentElementP {
                 }
                 // `abc`
                 TokenType::AlphabetCharacter
-                | TokenType::NumeralString
+                | TokenType::NumeralCharacter
                 | TokenType::Hyphen
                 | TokenType::Underscore => {
                     self.key_value_p = Some(KeyValueP::new());

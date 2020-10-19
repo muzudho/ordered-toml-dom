@@ -38,7 +38,7 @@ impl HexStringP {
         let token0 = tokens.current.as_ref().unwrap();
 
         match token0.type_ {
-            TokenType::NumeralString | TokenType::AlphabetCharacter => {
+            TokenType::NumeralCharacter | TokenType::AlphabetCharacter => {
                 let s = token0.to_string();
                 let current_expected = self.expected_digits - self.string_buffer.len();
                 let (addition, overflow) = if current_expected < s.len() {

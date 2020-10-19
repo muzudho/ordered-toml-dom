@@ -28,8 +28,8 @@ pub enum TokenType {
     LeftCurlyBracket,
     /// [  
     LeftSquareBracket,
-    /// 0 ～ 9. Multiple ditis.  
-    NumeralString,
+    /// 0 ～ 9. 1 disit.  
+    NumeralCharacter,
     /// +  
     Plus,
     /// }  

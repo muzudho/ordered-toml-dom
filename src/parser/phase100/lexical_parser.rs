@@ -6,7 +6,6 @@ use std::fmt;
 #[derive(Debug)]
 enum State {
     EscapeSequenceCharacter,
-    ContinuationOfNumeralString,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
     ContinuationOfWhiteSpaceString,
@@ -95,18 +94,6 @@ impl LexicalParser {
                 self.flush();
                 self.state = State::First;
             }
-            State::ContinuationOfNumeralString => {
-                self.buffer_string.push(*ch0);
-                if let Some(ch1) = chars.1 {
-                    match ch1 {
-                        '0'..='9' => {}
-                        _ => {
-                            self.flush();
-                            self.state = State::First;
-                        }
-                    }
-                }
-            }
             State::ContinuationOfWhiteSpaceString => {
                 self.buffer_string.push(*ch0);
                 if let Some(ch1) = chars.1 {
@@ -187,17 +174,8 @@ impl LexicalParser {
                         self.flush();
                     }
                     '0'..='9' => {
-                        self.buffer_string_token_type = TokenType::NumeralString;
-                        if let Some(ch1) = chars.1 {
-                            match ch1 {
-                                '0'..='9' => {
-                                    self.state = State::ContinuationOfNumeralString;
-                                }
-                                _ => {
-                                    self.flush();
-                                }
-                            }
-                        }
+                        self.buffer_string_token_type = TokenType::NumeralCharacter;
+                        self.flush();
                     }
                     // +
                     '+' => {

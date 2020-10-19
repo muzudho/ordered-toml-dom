@@ -69,7 +69,7 @@ impl LiteralValueP {
                         m.push_token(&token0);
                         false
                     }
-                    TokenType::NumeralString => {
+                    TokenType::NumeralCharacter => {
                         let length = if let Some(buffer) = &self.buffer {
                             buffer.to_string().len()
                         } else {
@@ -141,7 +141,7 @@ impl LiteralValueP {
                             | TokenType::Colon
                             | TokenType::Dot
                             | TokenType::Hyphen
-                            | TokenType::NumeralString
+                            | TokenType::NumeralCharacter
                             | TokenType::Plus
                             | TokenType::Underscore => PResult::Ongoing,
                             _ => {

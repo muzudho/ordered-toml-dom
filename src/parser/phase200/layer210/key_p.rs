@@ -35,7 +35,7 @@ impl KeyP {
         let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
             TokenType::AlphabetCharacter
-            | TokenType::NumeralString
+            | TokenType::NumeralCharacter
             | TokenType::Hyphen
             | TokenType::Underscore => {
                 let m = self.buffer.as_mut().unwrap();
@@ -46,7 +46,7 @@ impl KeyP {
                 if let Some(token1) = tokens.one_ahead.as_ref() {
                     match token1.type_ {
                         TokenType::AlphabetCharacter
-                        | TokenType::NumeralString
+                        | TokenType::NumeralCharacter
                         | TokenType::Hyphen
                         | TokenType::Underscore => PResult::Ongoing,
                         _ => PResult::End,
