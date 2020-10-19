@@ -103,7 +103,7 @@ impl DocumentElementP {
             }
             State::HeaderOfArrayOfTable => {
                 let p = self.header_p_of_array_of_table.as_mut().unwrap();
-                match p.parse(tokens_old) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_header_of_array_of_table(&m));
