@@ -5,6 +5,7 @@ use crate::model::{
     layer110::{Token, TokenLine},
     layer310::Document,
 };
+use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error_via,
     {layer210::PResult, layer230::DocumentElementP, layer310::DocumentP},
@@ -66,14 +67,15 @@ impl DocumentP {
     ///             先読みを含むトークン。  
     fn one_delay_loop(
         &mut self,
-        tokens: (Option<&Token>, Option<&Token>, Option<&Token>),
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
         doc: &mut Document,
     ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
         if let None = self.document_element_p {
             self.document_element_p = Some(DocumentElementP::default());
         }
         let p = self.document_element_p.as_mut().unwrap();
-        match p.parse(tokens) {
+        match p.parse(tokens_old) {
             PResult::End => {
                 if let Some(m) = p.flush() {
                     doc.push_element(&m);
@@ -86,7 +88,7 @@ impl DocumentP {
                 }
             }
             PResult::Err(mut table) => {
-                return error_via(&mut table, &mut self.log(), tokens, "document.rs.43.");
+                return error_via(&mut table, &mut self.log(), &tokens, "document.rs.43.");
             }
             PResult::Ongoing => {}
         }

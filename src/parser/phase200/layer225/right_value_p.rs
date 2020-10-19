@@ -6,7 +6,7 @@ use crate::model::{
     layer225::RightValue,
 };
 use crate::parser::phase200::error2;
-use crate::parser::phase200::error_via2;
+use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{BasicStringP, LiteralStringP, LiteralValueP, PResult},
@@ -80,7 +80,7 @@ impl RightValueP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -105,7 +105,7 @@ impl RightValueP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -130,7 +130,7 @@ impl RightValueP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -184,7 +184,7 @@ impl RightValueP {
                                 }
                             }
                             PResult::Err(mut table) => {
-                                return error_via2(
+                                return error_via(
                                     &mut table,
                                     &mut self.log(),
                                     &tokens,
@@ -211,7 +211,7 @@ impl RightValueP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -236,7 +236,7 @@ impl RightValueP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,

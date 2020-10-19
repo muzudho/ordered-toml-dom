@@ -15,7 +15,7 @@ use crate::model::{
     layer210::BasicString,
 };
 use crate::parser::phase200::error2;
-use crate::parser::phase200::error_via2;
+use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{BasicStringP, EscapeSequenceP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
@@ -107,7 +107,7 @@ impl BasicStringP {
                                 return error2(&mut self.log(), &tokens, "basic_string_p.rs.108.");
                             }
                             PResult::Err(mut table) => {
-                                return error_via2(
+                                return error_via(
                                     &mut table,
                                     &mut self.log(),
                                     &tokens,
@@ -148,7 +148,7 @@ impl BasicStringP {
                                 self.state = State::MultiLineTrimStart;
                             }
                             PResult::Err(mut table) => {
-                                return error_via2(
+                                return error_via(
                                     &mut table,
                                     &mut self.log(),
                                     &tokens,
@@ -201,7 +201,7 @@ impl BasicStringP {
                         self.state = State::MultiLine;
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -257,7 +257,7 @@ impl BasicStringP {
                                 return error2(&mut self.log(), &tokens, "basic_string_p.rs.252.");
                             }
                             PResult::Err(mut table) => {
-                                return error_via2(
+                                return error_via(
                                     &mut table,
                                     &mut self.log(),
                                     &tokens,
@@ -284,7 +284,7 @@ impl BasicStringP {
                         self.state = State::SingleLine;
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,

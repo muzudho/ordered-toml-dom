@@ -13,7 +13,7 @@ use crate::model::{
     layer220::Array,
 };
 use crate::parser::phase200::error2;
-use crate::parser::phase200::error_via2;
+use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{BasicStringP, LiteralStringP, PResult},
@@ -192,7 +192,7 @@ impl ArrayP {
                         self.state = State::AfterArray;
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(&mut table, &mut self.log(), &tokens, "array.rs.283.");
+                        return error_via(&mut table, &mut self.log(), &tokens, "array.rs.283.");
                     }
                     PResult::Ongoing => {}
                 }
@@ -265,7 +265,7 @@ impl ArrayP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(&mut table, &mut self.log(), &tokens, "array.rs.448.");
+                        return error_via(&mut table, &mut self.log(), &tokens, "array.rs.448.");
                     }
                     PResult::Ongoing => {}
                 }
@@ -291,7 +291,7 @@ impl ArrayP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(&mut table, &mut self.log(), &tokens, "array.rs.502.");
+                        return error_via(&mut table, &mut self.log(), &tokens, "array.rs.502.");
                     }
                     PResult::Ongoing => {}
                 }

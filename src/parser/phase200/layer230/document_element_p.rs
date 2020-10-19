@@ -6,7 +6,7 @@ use crate::model::{
     layer230::DocumentElement,
 };
 use crate::parser::phase200::error2;
-use crate::parser::phase200::error_via2;
+use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
@@ -115,7 +115,7 @@ impl DocumentElementP {
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -139,7 +139,7 @@ impl DocumentElementP {
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -174,7 +174,7 @@ impl DocumentElementP {
                             return error2(&mut self.log(), &tokens, "document_element.rs.164.");
                         }
                         PResult::Err(mut table) => {
-                            return error_via2(
+                            return error_via(
                                 &mut table,
                                 &mut self.log(),
                                 &tokens,
@@ -216,7 +216,7 @@ impl DocumentElementP {
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
-                        return error_via2(
+                        return error_via(
                             &mut table,
                             &mut self.log(),
                             &tokens,
@@ -258,7 +258,7 @@ impl DocumentElementP {
                 }
             } // Ignored it.
             PResult::Err(mut table) => {
-                return error_via2(
+                return error_via(
                     &mut table,
                     &mut self.log(),
                     &tokens,
