@@ -75,7 +75,7 @@ impl DocumentP {
             self.document_element_p = Some(DocumentElementP::default());
         }
         let p = self.document_element_p.as_mut().unwrap();
-        match p.parse(tokens_old) {
+        match p.parse(&tokens) {
             PResult::End => {
                 if let Some(m) = p.flush() {
                     doc.push_element(&m);

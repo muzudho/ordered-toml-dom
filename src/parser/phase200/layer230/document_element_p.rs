@@ -63,11 +63,7 @@ impl DocumentElementP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::AfterArrayOfTable => {
@@ -94,7 +90,7 @@ impl DocumentElementP {
                 _ => {
                     self.header_p_of_table = Some(HeaderPOfTable::new());
                     self.state = State::Table;
-                    return self.parse_header_of_table(tokens_old);
+                    return self.parse_header_of_table(tokens.to_old());
                 }
             },
             State::AfterTable => {
@@ -127,7 +123,7 @@ impl DocumentElementP {
             }
             State::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
-                match p.parse(&LookAheadTokens::from_old(tokens_old)) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_comment(&m));
@@ -227,7 +223,7 @@ impl DocumentElementP {
                 }
             }
             State::Table => {
-                return self.parse_header_of_table(tokens_old);
+                return self.parse_header_of_table(tokens.to_old());
             }
         }
 
