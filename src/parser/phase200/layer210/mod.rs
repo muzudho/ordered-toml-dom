@@ -14,7 +14,7 @@ use crate::model::{
 };
 use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, escape_sequence_p::State as EscapeSequenceState,
-    hex_string_p::State as HexStringState, literal_string_p::State as LiteralStringState,
+    literal_string_p::State as LiteralStringState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -77,7 +77,6 @@ pub struct HeaderPOfTable {
 #[derive(Clone)]
 pub struct HexStringP {
     buffer: Vec<Token>,
-    state: HexStringState,
     string_buffer: String,
     /// 桁数をぴったり指定したければこれ。でなければ 0。
     expected_digits: usize,
