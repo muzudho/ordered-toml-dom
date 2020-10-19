@@ -14,12 +14,10 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer210::BasicString,
 };
-use crate::parser::phase200::error_via;
+use crate::parser::phase200::error2;
+use crate::parser::phase200::error_via2;
+use crate::parser::phase200::layer210::{BasicStringP, EscapeSequenceP, PResult};
 use crate::parser::phase200::LookAheadTokens;
-use crate::parser::phase200::{
-    error,
-    layer210::{BasicStringP, EscapeSequenceP, PResult},
-};
 use casual_logger::Table;
 
 /// Syntax machine state.  
@@ -75,7 +73,7 @@ impl BasicStringP {
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error(&mut self.log(), tokens.to_old(), "basic_string_p.rs.66.");
+                return error2(&mut self.log(), tokens, "basic_string_p.rs.66.");
             }
             State::First => {
                 // print!("trace.4.");
@@ -98,11 +96,7 @@ impl BasicStringP {
                                 }
                             }
                         } else {
-                            return error(
-                                &mut self.log(),
-                                tokens.to_old(),
-                                "basic_string_p.rs.112.",
-                            );
+                            return error2(&mut self.log(), &tokens, "basic_string_p.rs.112.");
                         }
                     }
                     // \
@@ -110,17 +104,13 @@ impl BasicStringP {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
                         match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
                             PResult::End => {
-                                return error(
-                                    &mut self.log(),
-                                    tokens.to_old(),
-                                    "basic_string_p.rs.108.",
-                                );
+                                return error2(&mut self.log(), &tokens, "basic_string_p.rs.108.");
                             }
                             PResult::Err(mut table) => {
-                                return error_via(
+                                return error_via2(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens.to_old(),
+                                    &tokens,
                                     "basic_string_p.rs.115.",
                                 );
                             }
@@ -158,10 +148,10 @@ impl BasicStringP {
                                 self.state = State::MultiLineTrimStart;
                             }
                             PResult::Err(mut table) => {
-                                return error_via(
+                                return error_via2(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens.to_old(),
+                                    &tokens,
                                     "basic_string_p.rs.139.",
                                 );
                             }
@@ -184,7 +174,7 @@ impl BasicStringP {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens.to_old(), "basic_string_p.rs.124.");
+                        return error2(&mut self.log(), &tokens, "basic_string_p.rs.124.");
                     }
                 }
             }
@@ -198,7 +188,7 @@ impl BasicStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), tokens.to_old(), "basic_string_p.rs.136.");
+                        return error2(&mut self.log(), &tokens, "basic_string_p.rs.136.");
                     }
                 }
             }
@@ -211,10 +201,10 @@ impl BasicStringP {
                         self.state = State::MultiLine;
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens.to_old(),
+                            &tokens,
                             "basic_string_p.rs.190.",
                         );
                     }
@@ -264,17 +254,13 @@ impl BasicStringP {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
                         match self.escape_sequence_p.as_mut().unwrap().parse(tokens) {
                             PResult::End => {
-                                return error(
-                                    &mut self.log(),
-                                    tokens.to_old(),
-                                    "basic_string_p.rs.252.",
-                                );
+                                return error2(&mut self.log(), &tokens, "basic_string_p.rs.252.");
                             }
                             PResult::Err(mut table) => {
-                                return error_via(
+                                return error_via2(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens.to_old(),
+                                    &tokens,
                                     "basic_string_p.rs.139.",
                                 );
                             }
@@ -298,10 +284,10 @@ impl BasicStringP {
                         self.state = State::SingleLine;
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens.to_old(),
+                            &tokens,
                             "basic_string_p.rs.190.",
                         );
                     }
