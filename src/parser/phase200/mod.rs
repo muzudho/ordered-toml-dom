@@ -6,12 +6,19 @@ pub mod layer220;
 pub mod layer225;
 pub mod layer230;
 pub mod layer310;
+pub mod look_ahead_tokens;
 
 use crate::model::layer110::Token;
 use crate::parser::phase200::layer210::PResult;
 use crate::parser::phase200::layer220::usize_to_i128;
 use crate::util::random_name;
 use casual_logger::Table as LogTable;
+
+pub struct LookAheadTokens {
+    pub current: Option<Token>,
+    pub one_ahead: Option<Token>,
+    pub two_ahead: Option<Token>,
+}
 
 /// Error message.  
 /// エラー・メッセージ。  

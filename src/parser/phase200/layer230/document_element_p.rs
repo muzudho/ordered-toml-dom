@@ -5,6 +5,7 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer230::DocumentElement,
 };
+use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error, error_via,
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
@@ -121,7 +122,7 @@ impl DocumentElementP {
             }
             State::CommentSyntax => {
                 let p = self.comment_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(&LookAheadTokens::from_old(tokens)) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(DocumentElement::from_comment(&m));
