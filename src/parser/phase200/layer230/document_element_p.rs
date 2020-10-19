@@ -1,10 +1,7 @@
 //! Broad-line syntax parser.  
 //! `縦幅のある行` 構文パーサー。  
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer230::DocumentElement,
-};
+use crate::model::{layer110::TokenType, layer230::DocumentElement};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
@@ -90,7 +87,7 @@ impl DocumentElementP {
                 _ => {
                     self.header_p_of_table = Some(HeaderPOfTable::new());
                     self.state = State::Table;
-                    return self.parse_header_of_table(tokens.to_old());
+                    return self.parse_header_of_table(tokens);
                 }
             },
             State::AfterTable => {
@@ -223,7 +220,7 @@ impl DocumentElementP {
                 }
             }
             State::Table => {
-                return self.parse_header_of_table(tokens.to_old());
+                return self.parse_header_of_table(tokens);
             }
         }
 
@@ -236,11 +233,7 @@ impl DocumentElementP {
     ///
     /// * `tokens` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
-    fn parse_header_of_table(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    fn parse_header_of_table(&mut self, tokens: &LookAheadTokens) -> PResult {
         let p = self.header_p_of_table.as_mut().unwrap();
         match p.parse(&tokens) {
             PResult::End => {
