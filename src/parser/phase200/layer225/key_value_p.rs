@@ -119,7 +119,7 @@ impl KeyValueP {
             // After `=`.
             State::RightValue => {
                 let p = self.right_value_p.as_mut().unwrap();
-                match p.parse(tokens.to_old()) {
+                match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.right_value_buffer = Some(child_m);

@@ -1,10 +1,7 @@
 //! Key value syntax parser.  
 //! キー値構文パーサー。  
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer225::RightValue,
-};
+use crate::model::{layer110::TokenType, layer225::RightValue};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
@@ -58,11 +55,7 @@ impl RightValueP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After {.
@@ -118,7 +111,7 @@ impl RightValueP {
             // "abc"
             State::BasicString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(&LookAheadTokens::from_old(tokens_old)) {
+                match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(RightValue::BasicString(child_m));
