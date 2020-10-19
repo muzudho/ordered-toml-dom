@@ -12,9 +12,10 @@ use crate::model::{
     layer210::LiteralValue,
     layer220::Array,
 };
+use crate::parser::phase200::error2;
+use crate::parser::phase200::error_via2;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
-    error, error_via,
     layer210::{BasicStringP, LiteralStringP, PResult},
     layer220::ArrayP,
 };
@@ -72,8 +73,12 @@ impl ArrayP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `]`.
             State::AfterArray => {
@@ -88,7 +93,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), tokens, "array.rs.93."),
+                    _ => return error2(&mut self.log(), &tokens, "array.rs.93."),
                 }
             }
             // After `[],`.
@@ -105,7 +110,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), tokens, "array.rs.130."),
+                    _ => return error2(&mut self.log(), &tokens, "array.rs.130."),
                 }
             }
             // ", ` の次。
@@ -127,7 +132,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), tokens, "array.rs.176."),
+                    _ => return error2(&mut self.log(), &tokens, "array.rs.176."),
                 }
             }
             // After `literal,`.
@@ -152,7 +157,7 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), tokens, "array.rs.218."),
+                    _ => return error2(&mut self.log(), &tokens, "array.rs.218."),
                 }
             }
             // After " or '.
@@ -166,13 +171,13 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), tokens, "array.rs.245."),
+                    _ => return error2(&mut self.log(), &tokens, "array.rs.245."),
                 }
             }
             // `[array]`.
             State::Array => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens_old) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -187,7 +192,7 @@ impl ArrayP {
                         self.state = State::AfterArray;
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), tokens, "array.rs.283.");
+                        return error_via2(&mut table, &mut self.log(), &tokens, "array.rs.283.");
                     }
                     PResult::Ongoing => {}
                 }
@@ -229,7 +234,7 @@ impl ArrayP {
                         self.state = State::LiteralString;
                     }
                     TokenType::WhiteSpaceString => {} // Ignore it.
-                    _ => return error(&mut self.log(), tokens, "array.rs.358."),
+                    _ => return error2(&mut self.log(), &tokens, "array.rs.358."),
                 }
             }
             State::LiteralValue => match token0.type_ {
@@ -240,12 +245,12 @@ impl ArrayP {
                     self.state = State::End;
                     return PResult::End;
                 }
-                _ => return error(&mut self.log(), tokens, "array.rs.383."),
+                _ => return error2(&mut self.log(), &tokens, "array.rs.383."),
             },
             // "dog".
             State::DoubleQuotedString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(&LookAheadTokens::from_old(tokens)) {
+                match p.parse(&LookAheadTokens::from_old(tokens_old)) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -256,22 +261,22 @@ impl ArrayP {
                             self.basic_string_p = None;
                             self.state = State::AfterString;
                         } else {
-                            return error(&mut self.log(), tokens, "array.rs.439.");
+                            return error2(&mut self.log(), &tokens, "array.rs.439.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), tokens, "array.rs.448.");
+                        return error_via2(&mut table, &mut self.log(), &tokens, "array.rs.448.");
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return error(&mut self.log(), tokens, "array.rs.466.");
+                return error2(&mut self.log(), &tokens, "array.rs.466.");
             }
             // `'C:\temp'`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens_old) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -282,11 +287,11 @@ impl ArrayP {
                             self.literal_string_p = None;
                             self.state = State::AfterString;
                         } else {
-                            return error(&mut self.log(), tokens, "array.rs.493.");
+                            return error2(&mut self.log(), &tokens, "array.rs.493.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), tokens, "array.rs.502.");
+                        return error_via2(&mut table, &mut self.log(), &tokens, "array.rs.502.");
                     }
                     PResult::Ongoing => {}
                 }
