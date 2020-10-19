@@ -89,7 +89,7 @@ impl LexicalParser {
             State::EscapeSequenceCharacter => {
                 // print!("[trace101 AlbetChar={:?}]", ch0);
                 self.buffer_string_token_column_number = i;
-                self.buffer_string_token_type = TokenType::AlphabetCharacter;
+                self.buffer_string_token_type = TokenType::AbChar;
                 self.buffer_string.push(*ch0);
                 self.flush();
                 self.state = State::First;
@@ -113,7 +113,7 @@ impl LexicalParser {
                     // A ～ Z, a ～ z.
                     'A'..='Z' | 'a'..='z' => {
                         // print!("[trace105 albet={:?}]", ch0);
-                        self.buffer_string_token_type = TokenType::AlphabetCharacter;
+                        self.buffer_string_token_type = TokenType::AbChar;
                         self.flush();
                     }
                     // \
@@ -174,7 +174,7 @@ impl LexicalParser {
                         self.flush();
                     }
                     '0'..='9' => {
-                        self.buffer_string_token_type = TokenType::NumeralCharacter;
+                        self.buffer_string_token_type = TokenType::NumChar;
                         self.flush();
                     }
                     // +

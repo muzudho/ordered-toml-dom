@@ -19,22 +19,35 @@ impl Document {
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
     pub fn get_right_value_by_key(&self, key: &str) -> Option<&DocumentElement> {
+        println!("[trace22]");
         for elem in &self.elements {
             match elem {
                 DocumentElement::HeaderOfArrayOfTable(_) => {
                     // TODO
+                    println!("[trace27]");
                 }
-                DocumentElement::Comment(_) => {}
-                DocumentElement::EmptyLine => {}
+                DocumentElement::Comment(_) => {
+                    println!("[trace30]");
+                }
+                DocumentElement::EmptyLine => {
+                    println!("[trace33]");
+                }
                 DocumentElement::KeyValue(m) => {
-                    // println!("m.key={}", m.key); // In development.
+                    println!(
+                        "[trace36 m.key={} key={}]",
+                        m.key.to_string(),
+                        key.to_string()
+                    ); // In development.
                     if m.key.to_string() == key.to_string() {
-                        // println!("HIT m.key={}", m.key);// In development.
+                        println!("[trace38 HIT m.key={}]", m.key); // In development.
                         return Some(elem);
+                    } else {
+                        println!("[trace41 Not found]"); // In development.
                     }
                 }
                 DocumentElement::HeaderOfTable(_) => {
                     // TODO
+                    println!("[trace45]");
                 }
             }
         }
@@ -79,13 +92,24 @@ impl Document {
     /// Right integer of `left = 1.2`.  
     /// キー・バリューの右の整数値。  
     pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
+        println!("[trace82]");
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            println!("[trace84]");
             if let KeyValue(key_value) = doc_elm {
+                println!("[trace86]");
                 if key_value.key.to_string() == key.to_string() {
+                    println!("[trace88]");
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        println!("[trace90]");
                         match literal_value.to_string().parse() {
-                            Ok(n) => return Some(n),
-                            Err(_) => return None,
+                            Ok(n) => {
+                                println!("[trace93]");
+                                return Some(n);
+                            }
+                            Err(why) => {
+                                println!("[trace97={}]", why);
+                                return None;
+                            }
                         }
                     }
                 }

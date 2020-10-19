@@ -58,8 +58,9 @@ impl LiteralValueP {
                 return error(&mut self.log(), &tokens, "literal_value.rs.57.");
             }
             State::First => {
+                println!("[trace61 token0.type_={:?}]", &token0.type_);
                 let zero_x = match token0.type_ {
-                    TokenType::AlphabetCharacter
+                    TokenType::AbChar
                     | TokenType::Colon
                     | TokenType::Dot
                     | TokenType::Hyphen
@@ -69,30 +70,27 @@ impl LiteralValueP {
                         m.push_token(&token0);
                         false
                     }
-                    TokenType::NumeralCharacter => {
+                    TokenType::NumChar => {
                         let length = if let Some(buffer) = &self.buffer {
                             buffer.to_string().len()
                         } else {
                             0
                         };
-                        // println!("[trace80={}]", length);
+                        println!("[trace78 length={}]", length);
 
                         let base_number = if length == 0 {
                             if let Some(ch0) = token0.to_string().chars().nth(0) {
+                                println!("[trace82 ch0={}]", ch0);
                                 if ch0 == '0' {
                                     // 0x ?
                                     // Look-ahead.
                                     // 先読み。
                                     if let Some(token1) = tokens.one_ahead.as_ref() {
                                         match token1.type_ {
-                                            TokenType::AlphabetCharacter => {
-                                                if let Some(ch1) = token1.to_string().chars().nth(0)
-                                                {
-                                                    if ch1 == 'x' {
-                                                        16
-                                                    } else {
-                                                        0
-                                                    }
+                                            TokenType::AbChar => {
+                                                let ch1 = token1.to_string();
+                                                if ch1 == "x" {
+                                                    16
                                                 } else {
                                                     0
                                                 }
@@ -111,7 +109,7 @@ impl LiteralValueP {
                         } else {
                             0
                         };
-                        // println!("[trace81={}]", base_number);
+                        println!("[trace111 base_number={}]", base_number);
 
                         if base_number == 16 {
                             true
@@ -129,7 +127,7 @@ impl LiteralValueP {
 
                 if zero_x {
                     // `0x` の `0` は無視します。
-                    // println!("[trace132={}]", token0);
+                    println!("[trace129={}]", token0);
                     self.state = State::ZeroXPrefix1st;
                     PResult::Ongoing
                 } else {
@@ -137,11 +135,11 @@ impl LiteralValueP {
                     // 先読み。
                     if let Some(token1) = &tokens.one_ahead {
                         match token1.type_ {
-                            TokenType::AlphabetCharacter
+                            TokenType::AbChar
                             | TokenType::Colon
                             | TokenType::Dot
                             | TokenType::Hyphen
-                            | TokenType::NumeralCharacter
+                            | TokenType::NumChar
                             | TokenType::Plus
                             | TokenType::Underscore => PResult::Ongoing,
                             _ => {
@@ -158,30 +156,34 @@ impl LiteralValueP {
             State::ZeroXPrefix1st => {
                 // トークンの文字列の先頭が x のケースです。
                 // 例えば `0xDEADBEEF` の場合、 `xDEADBEEF` という文字列トークンです。
-                // println!("[trace160={}]", token0);
+                println!("[trace160={}]", token0);
                 self.hex_string_p = Some(HexStringP::default().clone());
                 self.state = State::ZeroXString;
                 PResult::Ongoing
             }
             State::ZeroXString => {
+                println!("[trace164={}]", token0);
                 let p = self.hex_string_p.as_mut().unwrap();
                 match p.parse(&tokens) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
-                        let string_buffer = tokens_stringify(&p.flush());
-                        println!("[trace173={}]", string_buffer);
-                        let hex = match u32::from_str_radix(&string_buffer, 16) {
+                        let numeral_string = tokens_stringify(&p.flush());
+                        println!("[trace173={}]", numeral_string);
+                        // 数値変換はしない。
+                        /*
+                        let hex = match u32::from_str_radix(&numeral_string, 16) {
                             Ok(n) => n,
                             Err(why) => panic!("{}", why),
                         };
                         println!("[trace178={}]", hex);
-                        let m = self.buffer.as_mut().unwrap();
                         println!("[trace180={}]", &hex.to_string());
+                        */
+                        let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
                             token0.column_number,
-                            &hex.to_string(),
-                            TokenType::AlphabetCharacter, // Unicode.
+                            &numeral_string,
+                            TokenType::SPHexString,
                         ));
 
                         println!("[trace187={}]", &m.to_string());

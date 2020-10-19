@@ -60,9 +60,7 @@ impl EscapeSequenceP {
                 // 先読み。
                 if let Some(token_1_ahead) = tokens.one_ahead.as_ref() {
                     match token_1_ahead.type_ {
-                        TokenType::AlphabetCharacter
-                        | TokenType::Backslash
-                        | TokenType::DoubleQuotation => {
+                        TokenType::AbChar | TokenType::Backslash | TokenType::DoubleQuotation => {
                             // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
                             self.state = State::EscapedCharacter;
                         }
@@ -85,7 +83,7 @@ impl EscapeSequenceP {
                 // Escaped.
                 match token0.type_ {
                     // `"`
-                    TokenType::AlphabetCharacter => {
+                    TokenType::AbChar => {
                         // TODO 汎用的に書けないか？
                         // https://doc.rust-lang.org/reference/tokens.html
                         let mut code = None;
@@ -113,7 +111,7 @@ impl EscapeSequenceP {
                             self.buffer.push(Token::new(
                                 token0.column_number,
                                 code,
-                                TokenType::AlphabetCharacter, // TODO EscapeSequence
+                                TokenType::AbChar, // TODO EscapeSequence
                             ));
                             self.state = State::End;
                             return PResult::End;
@@ -123,7 +121,7 @@ impl EscapeSequenceP {
                         self.buffer.push(Token::new(
                             token0.column_number,
                             "\\",
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                            TokenType::AbChar, // TODO EscapeSequence
                         ));
                         self.state = State::End;
                         return PResult::End;
@@ -133,7 +131,7 @@ impl EscapeSequenceP {
                         self.buffer.push(Token::new(
                             token0.column_number,
                             "\"",
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                            TokenType::AbChar, // TODO EscapeSequence
                         ));
                         self.state = State::End;
                         return PResult::End;
@@ -158,7 +156,7 @@ impl EscapeSequenceP {
                         self.buffer.push(Token::new(
                             token0.column_number,
                             &from_u32(hex).unwrap().to_string(),
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                            TokenType::AbChar, // TODO EscapeSequence
                         ));
                         self.state = State::End;
                         self.hex_string_p = None;

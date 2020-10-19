@@ -38,7 +38,7 @@ impl HexStringP {
         let token0 = tokens.current.as_ref().unwrap();
 
         match token0.type_ {
-            TokenType::NumeralCharacter | TokenType::AlphabetCharacter => {
+            TokenType::NumChar | TokenType::AbChar => {
                 let s = token0.to_string();
                 let expected_len = 1;
                 if s.len() != expected_len {
@@ -51,7 +51,7 @@ impl HexStringP {
                 // 次がHexの文字以外か？
                 let finished = if let Some(token1) = tokens.one_ahead.as_ref() {
                     match token1.type_ {
-                        TokenType::NumeralCharacter | TokenType::AlphabetCharacter => {
+                        TokenType::NumChar | TokenType::AbChar => {
                             // 続行。
                             false
                         }
@@ -63,10 +63,10 @@ impl HexStringP {
 
                 // Filled.
                 // 満ちたなら。
-                if
-                /* finished
-                || */
-                (self.expected_digits != 0 && self.expected_digits <= self.string_buffer.len()) {
+                if finished
+                    || (self.expected_digits != 0
+                        && self.expected_digits <= self.string_buffer.len())
+                {
                     /*
                     println!(
                         // "[trace56={}][self.expected_digits={}][self.string_buffer.len()={}]",

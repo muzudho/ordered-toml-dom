@@ -5,8 +5,8 @@ pub mod token_line;
 /// トークンの種類。  
 #[derive(Clone, Copy, Debug)]
 pub enum TokenType {
-    /// A ～ Z, a ～ z.  1 disit.  
-    AlphabetCharacter,
+    /// Alphabet character. A ～ Z, a ～ z.  1 disit.  
+    AbChar,
     /// \  
     Backslash,
     /// }  
@@ -28,8 +28,8 @@ pub enum TokenType {
     LeftCurlyBracket,
     /// [  
     LeftSquareBracket,
-    /// 0 ～ 9. 1 disit.  
-    NumeralCharacter,
+    /// Numeral character. 0 ～ 9. 1 disit.  
+    NumChar,
     /// +  
     Plus,
     /// }  

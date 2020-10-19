@@ -34,10 +34,7 @@ impl KeyP {
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
-            TokenType::AlphabetCharacter
-            | TokenType::NumeralCharacter
-            | TokenType::Hyphen
-            | TokenType::Underscore => {
+            TokenType::AbChar | TokenType::NumChar | TokenType::Hyphen | TokenType::Underscore => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&token0);
 
@@ -45,8 +42,8 @@ impl KeyP {
                 // 先読み。
                 if let Some(token1) = tokens.one_ahead.as_ref() {
                     match token1.type_ {
-                        TokenType::AlphabetCharacter
-                        | TokenType::NumeralCharacter
+                        TokenType::AbChar
+                        | TokenType::NumChar
                         | TokenType::Hyphen
                         | TokenType::Underscore => PResult::Ongoing,
                         _ => PResult::End,
