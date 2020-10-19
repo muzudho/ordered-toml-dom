@@ -40,17 +40,14 @@ impl HexStringP {
         match token0.type_ {
             TokenType::NumeralCharacter | TokenType::AlphabetCharacter => {
                 let s = token0.to_string();
-                let current_expected = self.expected_digits - self.string_buffer.len();
-                let (addition, overflow) = if current_expected < s.len() {
-                    (
-                        s[0..current_expected].to_string(),
-                        s[current_expected..].to_string(),
-                    )
-                } else {
-                    (s[0..].to_string(), "".to_string())
-                };
+                let expected_len = 1;
+                if s.len() != expected_len {
+                    // 1文字を想定しているので、そうでなかったらエラー。
+                    panic!("s.len()={} s=|{}|", s.len(), s);
+                    // return error(&mut self.log(), &tokens, "hex_string_p.rs.45.");
+                }
 
-                self.string_buffer.push_str(&addition);
+                self.string_buffer.push_str(&s);
 
                 // Filled.
                 // 満ちたなら。
@@ -71,14 +68,7 @@ impl HexStringP {
                     return PResult::End;
                 }
 
-                // TODO １文字ずつだから、オーバーフローしないのでは？
-                if 0 < overflow.len() {
-                    self.buffer.push(Token::new(
-                        token0.column_number,
-                        &overflow.to_string(),
-                        TokenType::SPAlphabetString,
-                    ));
-                }
+                // １文字ずつだから、オーバーフローしないはず。
             }
             _ => {
                 return error(&mut self.log(), &tokens, "hex_string_p.rs.179.");
