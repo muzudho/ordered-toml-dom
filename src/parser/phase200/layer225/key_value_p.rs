@@ -99,7 +99,7 @@ impl KeyValueP {
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         let p = self.key_p.as_mut().unwrap();
-                        match p.parse(tokens_old) {
+                        match p.parse(&tokens) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.key_buffer = Some(child_m);

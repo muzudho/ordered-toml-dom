@@ -1,10 +1,7 @@
 //! Key parser.  
 //! キー・パーサー。  
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer210::Key,
-};
+use crate::model::{layer110::TokenType, layer210::Key};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{KeyP, PResult};
 use crate::parser::phase200::LookAheadTokens;
@@ -34,11 +31,7 @@ impl KeyP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(
-        &mut self,
-        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
-    ) -> PResult {
-        let tokens = LookAheadTokens::from_old(tokens_old);
+    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
             TokenType::AlphabetCharacter
@@ -51,7 +44,7 @@ impl KeyP {
 
                 // Look-ahead.
                 // 先読み。
-                if let Some(token1) = tokens.one_ahead {
+                if let Some(token1) = tokens.one_ahead.as_ref() {
                     match token1.type_ {
                         TokenType::AlphabetCharacter
                         | TokenType::AlphabetString
