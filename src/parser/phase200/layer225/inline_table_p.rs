@@ -5,8 +5,10 @@ use crate::model::{
     layer110::{Token, TokenType},
     layer225::InlineTable,
 };
+use crate::parser::phase200::error2;
+use crate::parser::phase200::error_via2;
+use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
-    error, error_via,
     layer210::PResult,
     layer225::{InlineTableP, KeyValueP},
 };
@@ -47,8 +49,12 @@ impl InlineTableP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> PResult {
-        let token0 = tokens.0.unwrap();
+    pub fn parse(
+        &mut self,
+        tokens_old: (Option<&Token>, Option<&Token>, Option<&Token>),
+    ) -> PResult {
+        let tokens = LookAheadTokens::from_old(tokens_old);
+        let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `{`.
             State::First => {
@@ -62,16 +68,16 @@ impl InlineTableP {
                     | TokenType::Underscore => {
                         self.key_value_p = Some(Box::new(KeyValueP::new()));
                         self.state = State::KeyValue;
-                        match self.key_value_p.as_mut().unwrap().parse(tokens) {
+                        match self.key_value_p.as_mut().unwrap().parse(tokens_old) {
                             PResult::End => {
                                 // 1トークンでは終わらないから。
-                                return error(&mut self.log(), tokens, "inline_table.rs.64.");
+                                return error2(&mut self.log(), &tokens, "inline_table.rs.64.");
                             }
                             PResult::Err(mut table) => {
-                                return error_via(
+                                return error_via2(
                                     &mut table,
                                     &mut self.log(),
-                                    tokens,
+                                    &tokens,
                                     "inline_table.rs.71.",
                                 )
                             }
@@ -82,27 +88,27 @@ impl InlineTableP {
                         // Empty inline-table.
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), tokens, "inline_table.rs.63."),
+                    _ => return error2(&mut self.log(), &tokens, "inline_table.rs.63."),
                 }
             }
             // `apple.banana`.
             State::KeyValue => {
                 let p = self.key_value_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(tokens_old) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer.as_mut().unwrap().push_key_value(&child_m);
                             self.key_value_p = None;
                             self.state = State::AfterKeyValue;
                         } else {
-                            return error(&mut self.log(), tokens, "inline_table.rs.76.");
+                            return error2(&mut self.log(), &tokens, "inline_table.rs.76.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
+                        return error_via2(
                             &mut table,
                             &mut self.log(),
-                            tokens,
+                            &tokens,
                             "inline_table.rs.80.",
                         )
                     }
@@ -120,7 +126,7 @@ impl InlineTableP {
                 TokenType::RightCurlyBracket => {
                     return PResult::End;
                 }
-                _ => return error(&mut self.log(), tokens, "inline_table.rs.96."),
+                _ => return error2(&mut self.log(), &tokens, "inline_table.rs.96."),
             },
         }
         PResult::Ongoing
