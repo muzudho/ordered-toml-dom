@@ -48,7 +48,8 @@ pub struct EscapeSequenceP {
     buffer: Vec<Token>,
     state: EscapeSequenceState,
     unicode_number_buffer: String,
-    unicode_number_digits: usize,
+    /// 桁数をぴったり指定したければこれ。でなければ 0。
+    expected_digits: usize,
     unicode_digit_count: usize,
 }
 
@@ -79,10 +80,8 @@ pub struct HexStringP {
     buffer: Vec<Token>,
     state: HexStringState,
     string_buffer: String,
-    /// 桁数の最大値を設定したければこれ。
-    max_digits: usize,
-    /// 現在の桁数。
-    hex_digit_count: usize,
+    /// 桁数をぴったり指定したければこれ。でなければ 0。
+    expected_digits: usize,
 }
 
 /// Key parser.  

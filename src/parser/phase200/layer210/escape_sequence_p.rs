@@ -29,7 +29,7 @@ impl Default for EscapeSequenceP {
             buffer: Vec::new(),
             state: State::First,
             unicode_number_buffer: String::new(),
-            unicode_number_digits: 0,
+            expected_digits: 0,
             unicode_digit_count: 0,
         }
     }
@@ -95,13 +95,13 @@ impl EscapeSequenceP {
                             "u" => {
                                 self.state = State::UnicodeDigits;
                                 self.unicode_number_buffer = String::new();
-                                self.unicode_number_digits = 4;
+                                self.expected_digits = 4;
                                 self.unicode_digit_count = 0;
                             }
                             "U" => {
                                 self.state = State::UnicodeDigits;
                                 self.unicode_number_buffer = String::new();
-                                self.unicode_number_digits = 8;
+                                self.expected_digits = 8;
                                 self.unicode_digit_count = 0;
                             }
                             _ => {
@@ -147,7 +147,7 @@ impl EscapeSequenceP {
                 | TokenType::AlphabetCharacter
                 | TokenType::AlphabetString => {
                     let s = token0.to_string();
-                    let rest = self.unicode_number_digits - self.unicode_digit_count;
+                    let rest = self.expected_digits - self.unicode_digit_count;
                     let (s1, s2) = if rest < s.len() {
                         (s[0..rest].to_string(), s[rest..].to_string())
                     } else {
@@ -158,7 +158,7 @@ impl EscapeSequenceP {
                     self.unicode_number_buffer.push_str(&s1);
                     self.unicode_digit_count += fill;
 
-                    if self.unicode_number_digits <= self.unicode_digit_count {
+                    if self.expected_digits <= self.unicode_digit_count {
                         let hex = u32::from_str_radix(&self.unicode_number_buffer, 16).unwrap();
                         self.buffer.push(Token::new(
                             token0.column_number,

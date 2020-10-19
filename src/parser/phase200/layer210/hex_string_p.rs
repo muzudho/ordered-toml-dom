@@ -26,8 +26,7 @@ impl Default for HexStringP {
             buffer: Vec::new(),
             state: State::First,
             string_buffer: String::new(),
-            max_digits: usize::MAX,
-            hex_digit_count: 0,
+            expected_digits: 0,
         }
     }
 }
@@ -56,41 +55,41 @@ impl HexStringP {
                 // https://doc.rust-lang.org/reference/tokens.html
                 self.state = State::Digits;
                 self.string_buffer = String::new();
-                self.hex_digit_count = 0;
             }
             State::Digits => match token0.type_ {
                 TokenType::NumeralString
                 | TokenType::AlphabetCharacter
                 | TokenType::AlphabetString => {
                     let s = token0.to_string();
-                    let rest = self.max_digits - self.hex_digit_count;
+                    let rest = self.expected_digits - self.string_buffer.len();
                     let (s1, s2) = if rest < s.len() {
                         (s[0..rest].to_string(), s[rest..].to_string())
                     } else {
                         (s[0..].to_string(), "".to_string())
                     };
-                    let fill = s1.len();
 
                     self.string_buffer.push_str(&s1);
-                    self.hex_digit_count += fill;
 
-                    if self.max_digits <= self.hex_digit_count {
-                        let hex = u32::from_str_radix(&self.string_buffer, 16).unwrap();
-                        self.buffer.push(Token::new(
-                            token0.column_number,
-                            &from_u32(hex).unwrap().to_string(),
-                            TokenType::AlphabetCharacter, // TODO EscapeSequence
-                        ));
-                        self.state = State::End;
-                        return PResult::End;
-                    }
+                    let hex = u32::from_str_radix(&self.string_buffer, 16).unwrap();
+                    self.buffer.push(Token::new(
+                        token0.column_number,
+                        &from_u32(hex).unwrap().to_string(),
+                        TokenType::AlphabetCharacter, // TODO EscapeSequence
+                    ));
 
+                    // 残りのトークンが溢れている場合。
                     if 0 < s2.len() {
                         self.buffer.push(Token::new(
                             token0.column_number,
                             &s2.to_string(),
                             TokenType::AlphabetCharacter, // TODO EscapeSequence
                         ));
+                    }
+
+                    // 指定の桁数を作れた場合。
+                    if self.expected_digits == self.string_buffer.len() {
+                        self.state = State::End;
+                        return PResult::End;
                     }
                 }
                 _ => {
