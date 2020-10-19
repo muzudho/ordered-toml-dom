@@ -14,7 +14,7 @@ use crate::model::{
 };
 use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, escape_sequence_p::State as EscapeSequenceState,
-    literal_string_p::State as LiteralStringState,
+    literal_string_p::State as LiteralStringState, literal_value_p::State as LiteralValueState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -90,15 +90,6 @@ pub struct KeyP {
     buffer: Option<Key>,
 }
 
-/// Literal string syntax parser.  
-/// リテラル文字列構文パーサー。  
-///
-/// Example: `abc`.  
-#[derive(Clone)]
-pub struct LiteralValueP {
-    buffer: Option<LiteralValue>,
-}
-
 /// Result of syntax parser.  
 /// 構文パーサーの結果。  
 pub enum PResult {
@@ -110,7 +101,7 @@ pub enum PResult {
     Err(LogTable),
 }
 
-/// Single quoted string syntax parser.  
+/// Literal string syntax parser.  
 /// 単一引用符文字列構文パーサー。  
 ///
 /// Example: `'value'`.  
@@ -118,4 +109,15 @@ pub enum PResult {
 pub struct LiteralStringP {
     buffer: Option<LiteralString>,
     state: LiteralStringState,
+}
+
+/// Literal value syntax parser.  
+/// リテラル値構文パーサー。  
+///
+/// Example: `abc`.  
+#[derive(Clone)]
+pub struct LiteralValueP {
+    hex_string_p: Option<HexStringP>,
+    buffer: Option<LiteralValue>,
+    state: LiteralValueState,
 }

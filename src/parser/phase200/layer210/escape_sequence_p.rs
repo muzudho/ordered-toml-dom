@@ -144,44 +144,38 @@ impl EscapeSequenceP {
                     }
                 }
             }
-            State::UnicodeDigits => match token0.type_ {
-                TokenType::NumeralString
-                | TokenType::AlphabetCharacter
-                | TokenType::AlphabetString => {
-                    let p = self.hex_string_p.as_mut().unwrap();
-                    match p.parse(tokens) {
-                        PResult::End => {
-                            // Filled.
-                            // 満ちたなら。
-                            let string_buffer = tokens_stringify(&p.flush());
-                            // println!("[trace157={}]", string_buffer);
-                            let hex = match u32::from_str_radix(&string_buffer, 16) {
-                                Ok(n) => n,
-                                Err(why) => panic!("{}", why),
-                            };
-                            self.buffer.push(Token::new(
-                                token0.column_number,
-                                &from_u32(hex).unwrap().to_string(),
-                                TokenType::AlphabetCharacter, // TODO EscapeSequence
-                            ));
-                            self.state = State::End;
-                            return PResult::End;
-                        }
-                        PResult::Err(mut table) => {
-                            return error_via(
-                                &mut table,
-                                &mut self.log(),
-                                tokens,
-                                "escape_sequence_p.rs.165.",
-                            );
-                        }
-                        PResult::Ongoing => {}
+            State::UnicodeDigits => {
+                let p = self.hex_string_p.as_mut().unwrap();
+                match p.parse(tokens) {
+                    PResult::End => {
+                        // Filled.
+                        // 満ちたなら。
+                        let string_buffer = tokens_stringify(&p.flush());
+                        // println!("[trace157={}]", string_buffer);
+                        let hex = match u32::from_str_radix(&string_buffer, 16) {
+                            Ok(n) => n,
+                            Err(why) => panic!("{}", why),
+                        };
+                        self.buffer.push(Token::new(
+                            token0.column_number,
+                            &from_u32(hex).unwrap().to_string(),
+                            TokenType::AlphabetCharacter, // TODO EscapeSequence
+                        ));
+                        self.state = State::End;
+                        self.hex_string_p = None;
+                        return PResult::End;
                     }
+                    PResult::Err(mut table) => {
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            tokens,
+                            "escape_sequence_p.rs.165.",
+                        );
+                    }
+                    PResult::Ongoing => {}
                 }
-                _ => {
-                    return error(&mut self.log(), tokens, "escape_sequence_p.rs.179.");
-                }
-            },
+            }
         }
 
         PResult::Ongoing
