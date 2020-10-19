@@ -19,35 +19,40 @@ impl Document {
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
     pub fn get_right_value_by_key(&self, key: &str) -> Option<&DocumentElement> {
-        println!("[trace22]");
+        // println!("[trace22]");
         for elem in &self.elements {
             match elem {
                 DocumentElement::HeaderOfArrayOfTable(_) => {
                     // TODO
-                    println!("[trace27]");
+                    // println!("[trace27]");
                 }
                 DocumentElement::Comment(_) => {
-                    println!("[trace30]");
+                    // println!("[trace30]");
                 }
                 DocumentElement::EmptyLine => {
-                    println!("[trace33]");
+                    // println!("[trace33]");
                 }
                 DocumentElement::KeyValue(m) => {
-                    println!(
-                        "[trace36 m.key={} key={}]",
-                        m.key.to_string(),
-                        key.to_string()
-                    ); // In development.
                     if m.key.to_string() == key.to_string() {
-                        println!("[trace38 HIT m.key={}]", m.key); // In development.
+                        println!(
+                            "[trace36 Hit m.key={} key={}]",
+                            m.key.to_string(),
+                            key.to_string()
+                        ); // In development.
                         return Some(elem);
                     } else {
-                        println!("[trace41 Not found]"); // In development.
+                        /*
+                        println!(
+                            "[trace44 Not found m.key={} key={}]",
+                            m.key.to_string(),
+                            key.to_string()
+                        ); // In development.
+                        */
                     }
                 }
                 DocumentElement::HeaderOfTable(_) => {
                     // TODO
-                    println!("[trace45]");
+                    // println!("[trace45]");
                 }
             }
         }
