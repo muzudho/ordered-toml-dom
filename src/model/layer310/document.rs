@@ -131,7 +131,23 @@ impl Document {
                     // println!("[trace88]");
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
                         // println!("[trace90]");
-                        match literal_value.to_string().parse() {
+                        let s = literal_value.to_string();
+
+                        match s.as_str() {
+                            "nan" => {
+                                return Some(f64::NAN);
+                            }
+                            "+nan" => {
+                                return Some(f64::NAN);
+                            }
+                            "-nan" => {
+                                return Some(-f64::NAN);
+                            }
+                            _ => {}
+                        }
+
+                        // アンダースコアは除去しないと変換できない。
+                        match s.replace("_", "").parse() {
                             Ok(n) => {
                                 // println!("[trace93]");
                                 return Some(n);

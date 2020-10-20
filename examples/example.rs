@@ -25,6 +25,32 @@ fn main() {
     assert_eq!(doc.get_i128_by_key("oct1"), Some(0o01234567));
     assert_eq!(doc.get_i128_by_key("oct2"), Some(0o755));
     assert_eq!(doc.get_i128_by_key("bin1"), Some(0b11010110));
+    assert_eq!(doc.get_f64_by_key("float1"), Some(1.0));
+    assert_eq!(doc.get_f64_by_key("float2"), Some(3.1415));
+    assert_eq!(doc.get_f64_by_key("float3"), Some(-0.01));
+    assert_eq!(doc.get_f64_by_key("float4"), Some(5e+22));
+    assert_eq!(doc.get_f64_by_key("float5"), Some(1e06));
+    assert_eq!(doc.get_f64_by_key("float6"), Some(-2E-2));
+    assert_eq!(doc.get_f64_by_key("float7"), Some(6.626e-34));
+    assert_eq!(doc.get_f64_by_key("float8"), Some(224_617.445_991_228));
+    assert_eq!(doc.get_f64_by_key("infinite1"), Some(f64::INFINITY));
+    assert_eq!(doc.get_f64_by_key("infinite2"), Some(f64::INFINITY));
+    assert_eq!(doc.get_f64_by_key("infinite3"), Some(-f64::INFINITY));
+    assert!(if let Some(n) = doc.get_f64_by_key("not1") {
+        n.is_nan() && n.is_sign_positive()
+    } else {
+        false
+    });
+    assert!(if let Some(n) = doc.get_f64_by_key("not2") {
+        n.is_nan() && n.is_sign_positive()
+    } else {
+        false
+    });
+    assert!(if let Some(n) = doc.get_f64_by_key("not3") {
+        n.is_nan() && n.is_sign_negative()
+    } else {
+        false
+    });
 
     // WIP. Read a string.
     // 作業中。 文字列読取。

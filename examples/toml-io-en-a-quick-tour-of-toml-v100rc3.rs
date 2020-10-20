@@ -106,13 +106,25 @@ is preserved.
     assert_eq!(doc.get_f64_by_key("float5"), Some(1e06));
     assert_eq!(doc.get_f64_by_key("float6"), Some(-2E-2));
     assert_eq!(doc.get_f64_by_key("float7"), Some(6.626e-34));
-    // assert_eq!(doc.get_f64_by_key("float8"), Some(224_617.445_991_228));
+    assert_eq!(doc.get_f64_by_key("float8"), Some(224_617.445_991_228));
     assert_eq!(doc.get_f64_by_key("infinite1"), Some(f64::INFINITY));
     assert_eq!(doc.get_f64_by_key("infinite2"), Some(f64::INFINITY));
     assert_eq!(doc.get_f64_by_key("infinite3"), Some(-f64::INFINITY));
-    // assert_eq!(doc.get_f64_by_key("not1"), Some(f64::NAN));
-    // assert_eq!(doc.get_f64_by_key("not2"), Some(f64::NAN));
-    // assert_eq!(doc.get_f64_by_key("not3"), Some(-f64::NAN));
+    assert!(if let Some(n) = doc.get_f64_by_key("not1") {
+        n.is_nan() && n.is_sign_positive()
+    } else {
+        false
+    });
+    assert!(if let Some(n) = doc.get_f64_by_key("not2") {
+        n.is_nan() && n.is_sign_positive()
+    } else {
+        false
+    });
+    assert!(if let Some(n) = doc.get_f64_by_key("not3") {
+        n.is_nan() && n.is_sign_negative()
+    } else {
+        false
+    });
 
     assert_eq!(
         doc.get_datetime_utc_by_key("odt1"),

@@ -39,82 +39,212 @@ You can think that you can't do anything that isn't written here.
 ここに書かれていないことは何もできないと思ってもらって構いません。  
 
 ```rust
-age = 40
-int_max = 2147483647
-int_min = -2147483648
-weight = 93.5
+//! An exemplary program.
+//! 模範的なプログラム。
+//!
+//! `cargo run --example example`
 
-# hexadecimal with prefix `0x`
-hex1 = 0xDEADBEEF
-hex2 = 0xdeadbeef
-hex3 = 0xdead_beef
+extern crate tomboy_toml_dom;
 
-# octal with prefix `0o`
-oct1 = 0o01234567
-oct2 = 0o755
+use chrono::prelude::{DateTime, Utc};
+use tomboy_toml_dom::Toml;
 
-# binary with prefix `0b`
-bin1 = 0b11010110
+fn main() {
+    // Read a toml.
+    // Toml読取。
+    let doc = Toml::from_file("./resource/example.toml");
 
-# basic string
-apple = "pie"
-basic_string_empty = ""
-basic_string_escape_backslash = "\\"
-basic_string_escape_double_quotation = "\""
-basic_string_letter = "Hello, world!!"
-basic_string_punctuation = "., ={}[]'\"\\!?"
-basic_string_tab = "a\tb"
+    // Read a number.
+    // 数値読取。
+    assert_eq!(doc.get_i128_by_key("age"), Some(40));
+    assert_eq!(doc.get_i128_by_key("int_max"), Some(2147483647));
+    assert_eq!(doc.get_i128_by_key("int_min"), Some(-2147483648));
+    assert_eq!(doc.get_f64_by_key("weight"), Some(93.5));
+    assert_eq!(doc.get_i128_by_key("hex1"), Some(0xDEADBEEF));
+    assert_eq!(doc.get_i128_by_key("hex2"), Some(0xdeadbeef));
+    assert_eq!(doc.get_i128_by_key("hex3"), Some(0xdead_beef));
+    assert_eq!(doc.get_i128_by_key("oct1"), Some(0o01234567));
+    assert_eq!(doc.get_i128_by_key("oct2"), Some(0o755));
+    assert_eq!(doc.get_i128_by_key("bin1"), Some(0b11010110));
+    assert_eq!(doc.get_f64_by_key("float1"), Some(1.0));
+    assert_eq!(doc.get_f64_by_key("float2"), Some(3.1415));
+    assert_eq!(doc.get_f64_by_key("float3"), Some(-0.01));
+    assert_eq!(doc.get_f64_by_key("float4"), Some(5e+22));
+    assert_eq!(doc.get_f64_by_key("float5"), Some(1e06));
+    assert_eq!(doc.get_f64_by_key("float6"), Some(-2E-2));
+    assert_eq!(doc.get_f64_by_key("float7"), Some(6.626e-34));
+    assert_eq!(doc.get_f64_by_key("float8"), Some(224_617.445_991_228));
+    assert_eq!(doc.get_f64_by_key("infinite1"), Some(f64::INFINITY));
+    assert_eq!(doc.get_f64_by_key("infinite2"), Some(f64::INFINITY));
+    assert_eq!(doc.get_f64_by_key("infinite3"), Some(-f64::INFINITY));
+    assert!(if let Some(n) = doc.get_f64_by_key("not1") {
+        n.is_nan() && n.is_sign_positive()
+    } else {
+        false
+    });
+    assert!(if let Some(n) = doc.get_f64_by_key("not2") {
+        n.is_nan() && n.is_sign_positive()
+    } else {
+        false
+    });
+    assert!(if let Some(n) = doc.get_f64_by_key("not3") {
+        n.is_nan() && n.is_sign_negative()
+    } else {
+        false
+    });
 
-multiline_basic_string_letter = """Hello,
-world!!"""
-multiline_basic_string_punctuation = """., ={}[]"'""\\
-!?"""
-multiline_basic_string_trim_start = """\
-  The quick brown \
-  fox jumps over \
-  the lazy dog.\
-  """
-multiline_basic_string_escape_double_quotation = """
+    // WIP. Read a string.
+    // 作業中。 文字列読取。
+    assert_eq!(doc.get_string_by_key("apple"), Some("pie".to_string()));
+
+    assert_eq!(
+        doc.get_string_by_key("basic_string_letter"),
+        Some("Hello, world!!".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("basic_string_empty"),
+        Some("".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("basic_string_escape_backslash"),
+        Some("\\".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("basic_string_escape_double_quotation"),
+        Some("\"".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("basic_string_punctuation"),
+        Some("., ={}[]'\"\\!?".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("basic_string_tab"),
+        Some("a\tb".to_string())
+    );
+
+    assert_eq!(
+        doc.get_string_by_key("multiline_basic_string_letter"),
+        Some(
+            "Hello,
+world!!"
+                .to_string()
+        )
+    );
+
+    assert_eq!(
+        doc.get_string_by_key("multiline_basic_string_punctuation"),
+        Some(
+            "., ={}[]\"'\"\"\\
+!?"
+            .to_string()
+        )
+    );
+    assert_eq!(
+        doc.get_string_by_key("multiline_basic_string_trim_start"),
+        Some("The quick brown fox jumps over the lazy dog.".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("multiline_basic_string_escape_double_quotation"),
+        Some(
+            "
 \\
-"""
-multiline_basic_string_tab = """
+"
+            .to_string()
+        )
+    );
+    /*
+    // Fixed.
+    println!(
+        "debug|multiline_basic_string_tab|{}",
+        doc.get_debug_string_by_key("multiline_basic_string_tab")
+    );
+    */
+    assert_eq!(
+        doc.get_string_by_key("multiline_basic_string_tab"),
+        Some(
+            "
 a\tb
-"""
+"
+            .to_string()
+        )
+    );
 
-literal_string_empty = ''
-literal_string_letter = 'Hello, world!!'
-literal_string_punctuation = '., ={}[]"\!?'
-
-multiline_literal_string_letter = '''Hello,
-world!!'''
-multiline_literal_string_punctuation = '''., ={}[]'"\
-!?'''
-multiline_literal_string_first_newline_is_trimmed = '''
-The first newline is
+    assert_eq!(
+        doc.get_string_by_key("literal_string_empty"),
+        Some("".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("literal_string_letter"),
+        Some("Hello, world!!".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("literal_string_punctuation"),
+        Some("., ={}[]\"\\!?".to_string())
+    );
+    assert_eq!(
+        doc.get_string_by_key("multiline_literal_string_letter"),
+        Some(
+            "Hello,
+world!!"
+                .to_string()
+        )
+    );
+    assert_eq!(
+        doc.get_string_by_key("multiline_literal_string_punctuation"),
+        Some(
+            "., ={}[]'\"\\
+!?"
+            .to_string()
+        )
+    );
+    assert_eq!(
+        doc.get_string_by_key("multiline_literal_string_first_newline_is_trimmed"),
+        Some(
+            "The first newline is
 trimmed in raw strings.
 All other whitespace
 is preserved.
-'''
+"
+            .to_string()
+        )
+    );
 
-adult = true
-student = false
+    // Read a boolean.
+    // 論理値読取。
+    assert_eq!(doc.get_bool_by_key("adult"), Some(true));
+    assert_eq!(doc.get_bool_by_key("student"), Some(false));
 
-dob = 1979-05-27T07:32:00-08:00
+    // DateTime.
+    // 日付と時刻。
+    assert_eq!(
+        doc.get_datetime_utc_by_key("dob"),
+        Some(
+            "1979-05-27T07:32:00-08:00"
+                .parse::<DateTime<Utc>>()
+                .unwrap()
+        )
+    );
+}
 ```
 
 ## TODO
 
 * [ ] Literal
-  * [x] Parsing a literal containing dots. Example: `3.14`.  
-      ドットを含むリテラル文字列の解析。例： `3.14`。
   * [ ] Literal numbers...
-    * [x] `0b` - binary.
-    * [x] `0o` - oct.
-    * [x] `0x` - hex.
-    * [ ] `_` - space.
-    * [ ] `nan` - Not a number.
-    * [ ] `+nan` - Not a number.
-    * [ ] `-nan` - Not a number.
+    * [ ] integer
+      * [x] `0b` - binary.
+      * [x] `0o` - octal.
+      * [x] `0x` - hexadecimal.
+      * [x] `_` - separators.
+    * [ ] float
+      * [x] `.` - point. Example: `3.14`.
+      * [x] `_` - separators.
+      * [x] `inf` - Positive infinity.
+      * [x] `+inf` - Positive infinity.
+      * [x] `-inf` - Negative infinity.
+      * [x] `nan` - Not a number. Positive.
+      * [x] `+nan` - Not a number. Positive.
+      * [x] `-nan` - Not a number. Negative.
 * [ ] String (Not str)
   * [x] `"abc"` - Basic string.
     * [x] Plain.
