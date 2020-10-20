@@ -27,7 +27,7 @@ pub enum State {
 impl Default for LiteralValueP {
     fn default() -> Self {
         LiteralValueP {
-            hex_string_p: None,
+            positional_numeral_p: None,
             buffer: Some(LiteralValue::default()),
             state: State::First,
         }
@@ -156,13 +156,13 @@ impl LiteralValueP {
                 // トークンの文字列の先頭が x のケースです。
                 // 例えば `0xDEADBEEF` の場合、 `xDEADBEEF` という文字列トークンです。
                 // println!("[trace160={}]", token0);
-                self.hex_string_p = Some(HexStringP::default().clone());
+                self.positional_numeral_p = Some(HexStringP::default().clone());
                 self.state = State::ZeroXString;
                 PResult::Ongoing
             }
             State::ZeroXString => {
                 // println!("[trace164={}]", token0);
-                let p = self.hex_string_p.as_mut().unwrap();
+                let p = self.positional_numeral_p.as_mut().unwrap();
                 match p.parse(&tokens) {
                     PResult::End => {
                         // Filled.
@@ -181,7 +181,7 @@ impl LiteralValueP {
                         // println!("[trace187={}]", &m.to_string());
                         // println!("[trace188={:?}]", &m.to_string());
 
-                        self.hex_string_p = None;
+                        self.positional_numeral_p = None;
                         self.state = State::End;
                         return PResult::End;
                     }

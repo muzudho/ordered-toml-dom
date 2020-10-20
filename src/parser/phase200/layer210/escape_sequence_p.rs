@@ -28,7 +28,7 @@ pub enum State {
 impl Default for EscapeSequenceP {
     fn default() -> Self {
         EscapeSequenceP {
-            hex_string_p: None,
+            positional_numeral_p: None,
             buffer: Vec::new(),
             state: State::First,
             string_buffer: String::new(),
@@ -94,13 +94,13 @@ impl EscapeSequenceP {
                             "u" => {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
-                                self.hex_string_p =
+                                self.positional_numeral_p =
                                     Some(HexStringP::default().set_expected_digits(4).clone());
                             }
                             "U" => {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
-                                self.hex_string_p =
+                                self.positional_numeral_p =
                                     Some(HexStringP::default().set_expected_digits(8).clone());
                             }
                             _ => {
@@ -142,7 +142,7 @@ impl EscapeSequenceP {
                 }
             }
             State::UnicodeDigits => {
-                let p = self.hex_string_p.as_mut().unwrap();
+                let p = self.positional_numeral_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         // Filled.
@@ -159,7 +159,7 @@ impl EscapeSequenceP {
                             TokenType::AbChar, // TODO EscapeSequence
                         ));
                         self.state = State::End;
-                        self.hex_string_p = None;
+                        self.positional_numeral_p = None;
                         return PResult::End;
                     }
                     PResult::Err(mut table) => {

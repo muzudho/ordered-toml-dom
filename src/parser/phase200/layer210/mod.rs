@@ -3,10 +3,10 @@ pub mod comment_p;
 pub mod escape_sequence_p;
 pub mod header_p_of_array_of_table;
 pub mod header_p_of_table;
-pub mod hex_string_p;
 pub mod key_p;
 pub mod literal_string_p;
 pub mod literal_value_p;
+pub mod positional_numeral_string_p;
 
 use crate::model::{
     layer210::{BasicString, Comment, Key, LiteralString, LiteralValue},
@@ -45,7 +45,7 @@ pub struct BasicStringP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct EscapeSequenceP {
-    hex_string_p: Option<HexStringP>,
+    positional_numeral_p: Option<HexStringP>,
     buffer: Vec<Token>,
     state: EscapeSequenceState,
     string_buffer: String,
@@ -117,7 +117,7 @@ pub struct LiteralStringP {
 /// Example: `abc`.  
 #[derive(Clone)]
 pub struct LiteralValueP {
-    hex_string_p: Option<HexStringP>,
+    positional_numeral_p: Option<HexStringP>,
     buffer: Option<LiteralValue>,
     state: LiteralValueState,
 }

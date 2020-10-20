@@ -228,8 +228,8 @@ is preserved.
     * [x] `\r` - caridge return.
     * [x] `\n` - line feed.
     * [x] `\t` - tab.
-    * [x] `\\` - tab.
-    * [x] `\"` - tab.
+    * [x] `\\` - backslash.
+    * [x] `\"` - double quotation.
     * [x] `\u0000` - Unicode.
     * [ ] `\U00000000` - Unicode.
 * [ ] DateTime
