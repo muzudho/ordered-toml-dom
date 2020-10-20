@@ -76,6 +76,8 @@ pub struct HeaderPOfTable {
 #[derive(Clone)]
 pub struct PositionalNumeralStringP {
     buffer: Vec<Token>,
+    /// `0b`, `0o`, '', `0x`.
+    prefix: String,
     string_buffer: String,
     /// 桁数をぴったり指定したければこれ。でなければ 0。
     expected_digits: usize,

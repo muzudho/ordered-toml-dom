@@ -128,6 +128,8 @@ impl LiteralValueP {
                     // `0x` の `0` は無視します。
                     // println!("[trace129={}]", token0);
                     self.state = State::ZeroXPrefix1st;
+                    self.positional_numeral_string_p =
+                        Some(PositionalNumeralStringP::new("0x").clone());
                     PResult::Ongoing
                 } else {
                     // Look-ahead.
@@ -153,11 +155,11 @@ impl LiteralValueP {
                 }
             }
             State::ZeroXPrefix1st => {
-                // トークンの文字列の先頭が x のケースです。
-                // 例えば `0xDEADBEEF` の場合、 `xDEADBEEF` という文字列トークンです。
+                // ここで トークンを文字列でまとめていたとき、
+                // 例えば `0xDEADBEEF` の場合、2文字目の `x` を取ろうとすると
+                // `xDEADBEEF` と、まとまりで取ってしまい、溢れる分の後処理が手間取りました。
+                // そこで、アルファベットは１トークンずつ取ることにしました。
                 // println!("[trace160={}]", token0);
-                self.positional_numeral_string_p =
-                    Some(PositionalNumeralStringP::default().clone());
                 self.state = State::ZeroXString;
                 PResult::Ongoing
             }

@@ -7,16 +7,15 @@ use crate::parser::phase200::layer210::{PResult, PositionalNumeralStringP};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
 
-impl Default for PositionalNumeralStringP {
-    fn default() -> Self {
+impl PositionalNumeralStringP {
+    pub fn new(prefix: &str) -> Self {
         PositionalNumeralStringP {
             buffer: Vec::new(),
+            prefix: prefix.to_string(),
             string_buffer: String::new(),
             expected_digits: 0,
         }
     }
-}
-impl PositionalNumeralStringP {
     pub fn set_expected_digits(&mut self, val: usize) -> &mut Self {
         self.expected_digits = val;
         self

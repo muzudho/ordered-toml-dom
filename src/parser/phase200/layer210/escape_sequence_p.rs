@@ -95,7 +95,7 @@ impl EscapeSequenceP {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
                                 self.positional_numeral_string_p = Some(
-                                    PositionalNumeralStringP::default()
+                                    PositionalNumeralStringP::new("0x")
                                         .set_expected_digits(4)
                                         .clone(),
                                 );
@@ -104,7 +104,7 @@ impl EscapeSequenceP {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
                                 self.positional_numeral_string_p = Some(
-                                    PositionalNumeralStringP::default()
+                                    PositionalNumeralStringP::new("0x")
                                         .set_expected_digits(8)
                                         .clone(),
                                 );
