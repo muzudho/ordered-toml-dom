@@ -8,7 +8,7 @@ use crate::model::{
 };
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer210::HexStringP;
+use crate::parser::phase200::layer210::PositionalNumeralStringP;
 use crate::parser::phase200::layer210::{LiteralValueP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table as LogTable;
@@ -156,7 +156,7 @@ impl LiteralValueP {
                 // トークンの文字列の先頭が x のケースです。
                 // 例えば `0xDEADBEEF` の場合、 `xDEADBEEF` という文字列トークンです。
                 // println!("[trace160={}]", token0);
-                self.positional_numeral_p = Some(HexStringP::default().clone());
+                self.positional_numeral_p = Some(PositionalNumeralStringP::default().clone());
                 self.state = State::ZeroXString;
                 PResult::Ongoing
             }
@@ -175,7 +175,7 @@ impl LiteralValueP {
                         m.push_token(&Token::new(
                             token0.column_number,
                             &numeral_string,
-                            TokenType::SPHexString,
+                            TokenType::SPPositionalNumeralString,
                         ));
 
                         // println!("[trace187={}]", &m.to_string());

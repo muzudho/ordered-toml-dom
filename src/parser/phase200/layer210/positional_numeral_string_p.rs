@@ -3,20 +3,20 @@
 
 use crate::model::layer110::{Token, TokenType};
 use crate::parser::phase200::error;
-use crate::parser::phase200::layer210::{HexStringP, PResult};
+use crate::parser::phase200::layer210::{PResult, PositionalNumeralStringP};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
 
-impl Default for HexStringP {
+impl Default for PositionalNumeralStringP {
     fn default() -> Self {
-        HexStringP {
+        PositionalNumeralStringP {
             buffer: Vec::new(),
             string_buffer: String::new(),
             expected_digits: 0,
         }
     }
 }
-impl HexStringP {
+impl PositionalNumeralStringP {
     pub fn set_expected_digits(&mut self, val: usize) -> &mut Self {
         self.expected_digits = val;
         self
@@ -79,7 +79,7 @@ impl HexStringP {
                     self.buffer.push(Token::new(
                         token0.column_number,
                         &self.string_buffer,
-                        TokenType::SPHexString,
+                        TokenType::SPPositionalNumeralString,
                     ));
                     return PResult::End;
                 }

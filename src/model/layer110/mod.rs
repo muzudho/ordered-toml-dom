@@ -43,8 +43,13 @@ pub enum TokenType {
     /// A ～ Z, a ～ z.  Multiple disits.   
     /// 構文解析の結果。文字列トークン。  
     SPAlphabetString,
-    /// 構文解析の結果。 `0x01aB23Cd` なら、 `01aB23Cd` の部分。
-    SPHexString,
+    /// Syntax parser result.  
+    /// Positional numeral system string.  
+    /// Binary, Octal, Decimal, Hexadecimal...  
+    /// 構文解析の結果。  
+    /// 進数文字列。  
+    /// `0x01aB23Cd` なら、 `01aB23Cd` の部分。  
+    SPPositionalNumeralString,
     /// _  
     Underscore,
     /// Multi-byte character or more.  

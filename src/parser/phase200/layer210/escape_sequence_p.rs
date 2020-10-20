@@ -5,7 +5,7 @@ use crate::model::layer110::token::tokens_stringify;
 use crate::model::layer110::{Token, TokenType};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer210::HexStringP;
+use crate::parser::phase200::layer210::PositionalNumeralStringP;
 use crate::parser::phase200::layer210::{EscapeSequenceP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
@@ -94,14 +94,20 @@ impl EscapeSequenceP {
                             "u" => {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
-                                self.positional_numeral_p =
-                                    Some(HexStringP::default().set_expected_digits(4).clone());
+                                self.positional_numeral_p = Some(
+                                    PositionalNumeralStringP::default()
+                                        .set_expected_digits(4)
+                                        .clone(),
+                                );
                             }
                             "U" => {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
-                                self.positional_numeral_p =
-                                    Some(HexStringP::default().set_expected_digits(8).clone());
+                                self.positional_numeral_p = Some(
+                                    PositionalNumeralStringP::default()
+                                        .set_expected_digits(8)
+                                        .clone(),
+                                );
                             }
                             _ => {
                                 return error(&mut self.log(), &tokens, "escape_sequence_p.rs.206.")

@@ -45,7 +45,7 @@ pub struct BasicStringP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct EscapeSequenceP {
-    positional_numeral_p: Option<HexStringP>,
+    positional_numeral_p: Option<PositionalNumeralStringP>,
     buffer: Vec<Token>,
     state: EscapeSequenceState,
     string_buffer: String,
@@ -74,7 +74,7 @@ pub struct HeaderPOfTable {
 ///
 /// Example: `01Ab23cD`.  
 #[derive(Clone)]
-pub struct HexStringP {
+pub struct PositionalNumeralStringP {
     buffer: Vec<Token>,
     string_buffer: String,
     /// 桁数をぴったり指定したければこれ。でなければ 0。
@@ -117,7 +117,7 @@ pub struct LiteralStringP {
 /// Example: `abc`.  
 #[derive(Clone)]
 pub struct LiteralValueP {
-    positional_numeral_p: Option<HexStringP>,
+    positional_numeral_p: Option<PositionalNumeralStringP>,
     buffer: Option<LiteralValue>,
     state: LiteralValueState,
 }
