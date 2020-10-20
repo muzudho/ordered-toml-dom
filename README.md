@@ -39,163 +39,67 @@ You can think that you can't do anything that isn't written here.
 ここに書かれていないことは何もできないと思ってもらって構いません。  
 
 ```rust
-//! An exemplary program.
-//! 模範的なプログラム。
-//!
-//! `cargo run --example example`
+age = 40
+int_max = 2147483647
+int_min = -2147483648
+weight = 93.5
 
-extern crate tomboy_toml_dom;
+# hexadecimal with prefix `0x`
+hex1 = 0xDEADBEEF
+hex2 = 0xdeadbeef
+hex3 = 0xdead_beef
 
-use chrono::prelude::{DateTime, Utc};
-use tomboy_toml_dom::Toml;
+# octal with prefix `0o`
+oct1 = 0o01234567
+oct2 = 0o755
 
-fn main() {
-    // Read a toml.
-    // Toml読取。
-    let doc = Toml::from_file("./resource/example.toml");
+# binary with prefix `0b`
+bin1 = 0b11010110
 
-    // Read a number.
-    // 数値読取。
-    assert_eq!(doc.get_i128_by_key("age"), Some(40));
-    assert_eq!(doc.get_i128_by_key("int_max"), Some(2147483647));
-    assert_eq!(doc.get_i128_by_key("int_min"), Some(-2147483648));
-    assert_eq!(doc.get_f64_by_key("weight"), Some(93.5));
-    assert_eq!(doc.get_i128_by_key("hex1"), Some(0xDEADBEEF));
-    assert_eq!(doc.get_i128_by_key("hex2"), Some(0xdeadbeef));
-    assert_eq!(doc.get_i128_by_key("hex3"), Some(0xdead_beef));
+# basic string
+apple = "pie"
+basic_string_empty = ""
+basic_string_escape_backslash = "\\"
+basic_string_escape_double_quotation = "\""
+basic_string_letter = "Hello, world!!"
+basic_string_punctuation = "., ={}[]'\"\\!?"
+basic_string_tab = "a\tb"
 
-    // WIP. Read a string.
-    // 作業中。 文字列読取。
-    assert_eq!(doc.get_string_by_key("apple"), Some("pie".to_string()));
-
-    assert_eq!(
-        doc.get_string_by_key("basic_string_letter"),
-        Some("Hello, world!!".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("basic_string_empty"),
-        Some("".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("basic_string_escape_backslash"),
-        Some("\\".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("basic_string_escape_double_quotation"),
-        Some("\"".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("basic_string_punctuation"),
-        Some("., ={}[]'\"\\!?".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("basic_string_tab"),
-        Some("a\tb".to_string())
-    );
-
-    assert_eq!(
-        doc.get_string_by_key("multiline_basic_string_letter"),
-        Some(
-            "Hello,
-world!!"
-                .to_string()
-        )
-    );
-
-    assert_eq!(
-        doc.get_string_by_key("multiline_basic_string_punctuation"),
-        Some(
-            "., ={}[]\"'\"\"\\
-!?"
-            .to_string()
-        )
-    );
-    assert_eq!(
-        doc.get_string_by_key("multiline_basic_string_trim_start"),
-        Some("The quick brown fox jumps over the lazy dog.".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("multiline_basic_string_escape_double_quotation"),
-        Some(
-            "
+multiline_basic_string_letter = """Hello,
+world!!"""
+multiline_basic_string_punctuation = """., ={}[]"'""\\
+!?"""
+multiline_basic_string_trim_start = """\
+  The quick brown \
+  fox jumps over \
+  the lazy dog.\
+  """
+multiline_basic_string_escape_double_quotation = """
 \\
-"
-            .to_string()
-        )
-    );
-    /*
-    // Fixed.
-    println!(
-        "debug|multiline_basic_string_tab|{}",
-        doc.get_debug_string_by_key("multiline_basic_string_tab")
-    );
-    */
-    assert_eq!(
-        doc.get_string_by_key("multiline_basic_string_tab"),
-        Some(
-            "
+"""
+multiline_basic_string_tab = """
 a\tb
-"
-            .to_string()
-        )
-    );
+"""
 
-    assert_eq!(
-        doc.get_string_by_key("literal_string_empty"),
-        Some("".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("literal_string_letter"),
-        Some("Hello, world!!".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("literal_string_punctuation"),
-        Some("., ={}[]\"\\!?".to_string())
-    );
-    assert_eq!(
-        doc.get_string_by_key("multiline_literal_string_letter"),
-        Some(
-            "Hello,
-world!!"
-                .to_string()
-        )
-    );
-    assert_eq!(
-        doc.get_string_by_key("multiline_literal_string_punctuation"),
-        Some(
-            "., ={}[]'\"\\
-!?"
-            .to_string()
-        )
-    );
-    assert_eq!(
-        doc.get_string_by_key("multiline_literal_string_first_newline_is_trimmed"),
-        Some(
-            "The first newline is
+literal_string_empty = ''
+literal_string_letter = 'Hello, world!!'
+literal_string_punctuation = '., ={}[]"\!?'
+
+multiline_literal_string_letter = '''Hello,
+world!!'''
+multiline_literal_string_punctuation = '''., ={}[]'"\
+!?'''
+multiline_literal_string_first_newline_is_trimmed = '''
+The first newline is
 trimmed in raw strings.
 All other whitespace
 is preserved.
-"
-            .to_string()
-        )
-    );
+'''
 
-    // Read a boolean.
-    // 論理値読取。
-    assert_eq!(doc.get_bool_by_key("adult"), Some(true));
-    assert_eq!(doc.get_bool_by_key("student"), Some(false));
+adult = true
+student = false
 
-    // DateTime.
-    // 日付と時刻。
-    assert_eq!(
-        doc.get_datetime_utc_by_key("dob"),
-        Some(
-            "1979-05-27T07:32:00-08:00"
-                .parse::<DateTime<Utc>>()
-                .unwrap()
-        )
-    );
-}
+dob = 1979-05-27T07:32:00-08:00
 ```
 
 ## TODO
@@ -204,9 +108,9 @@ is preserved.
   * [x] Parsing a literal containing dots. Example: `3.14`.  
       ドットを含むリテラル文字列の解析。例： `3.14`。
   * [ ] Literal numbers...
+    * [x] `0b` - binary.
+    * [x] `0o` - oct.
     * [x] `0x` - hex.
-    * [ ] `0o` - oct.
-    * [ ] `0b` - binary.
     * [ ] `_` - space.
     * [ ] `nan` - Not a number.
     * [ ] `+nan` - Not a number.

@@ -22,6 +22,9 @@ fn main() {
     assert_eq!(doc.get_i128_by_key("hex1"), Some(0xDEADBEEF));
     assert_eq!(doc.get_i128_by_key("hex2"), Some(0xdeadbeef));
     assert_eq!(doc.get_i128_by_key("hex3"), Some(0xdead_beef));
+    assert_eq!(doc.get_i128_by_key("oct1"), Some(0o01234567));
+    assert_eq!(doc.get_i128_by_key("oct2"), Some(0o755));
+    assert_eq!(doc.get_i128_by_key("bin1"), Some(0b11010110));
 
     // WIP. Read a string.
     // 作業中。 文字列読取。

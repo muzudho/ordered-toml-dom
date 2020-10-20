@@ -85,12 +85,22 @@ impl Document {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
                         let s = literal_value.to_string();
 
-                        // 16進数かも知れない。
-                        if s.starts_with("0x") {
+                        // 10進数ではないかも知れない。
+                        let base_number = if s.starts_with("0b") {
+                            2
+                        } else if s.starts_with("0o") {
+                            8
+                        } else if s.starts_with("0x") {
+                            16
+                        } else {
+                            10
+                        };
+
+                        if 10 != base_number {
                             // 頭の `0x` と、アンダースコアは除去しないと変換できない。
                             let s2 = &s[2..].replace("_", "");
                             // println!("[trace91={}]", s2);
-                            match i128::from_str_radix(s2, 16) {
+                            match i128::from_str_radix(s2, base_number) {
                                 Ok(n) => return Some(n),
                                 Err(why) => panic!("{}", why),
                             };

@@ -108,9 +108,6 @@ impl LiteralValueP {
                     _ => return error(&mut self.log(), &tokens, "literal_value_p.rs.38."),
                 };
 
-                // TODO 機能停止中。これをコメントアウトすると float1 が見つからなくなる。
-                // let zero_x = false;
-
                 match base_number {
                     2 => {
                         self.state = State::ZeroXPrefix1st;
