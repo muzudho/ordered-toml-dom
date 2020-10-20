@@ -58,17 +58,13 @@ impl LiteralValueP {
             }
             State::First => {
                 // println!("[trace61 token0.type_={:?}]", &token0.type_);
-                let zero_x = match token0.type_ {
+                let base_number = match token0.type_ {
                     TokenType::AbChar
                     | TokenType::Colon
                     | TokenType::Dot
                     | TokenType::Hyphen
                     | TokenType::Plus
-                    | TokenType::Underscore => {
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
-                        false
-                    }
+                    | TokenType::Underscore => 10,
                     TokenType::NumChar => {
                         let length = if let Some(buffer) = &self.buffer {
                             buffer.to_string().len()
@@ -77,7 +73,7 @@ impl LiteralValueP {
                         };
                         // println!("[trace78 length={}]", length);
 
-                        let base_number = if length == 0 {
+                        if length == 0 {
                             if let Some(ch0) = token0.to_string().chars().nth(0) {
                                 // println!("[trace82 ch0={}]", ch0);
                                 if ch0 == '0' {
@@ -87,35 +83,26 @@ impl LiteralValueP {
                                     if let Some(token1) = tokens.one_ahead.as_ref() {
                                         match token1.type_ {
                                             TokenType::AbChar => {
-                                                let ch1 = token1.to_string();
-                                                if ch1 == "x" {
-                                                    16
-                                                } else {
-                                                    0
+                                                match token1.to_string().as_str() {
+                                                    "b" => 2,
+                                                    "o" => 8,
+                                                    "x" => 16,
+                                                    _ => 10,
                                                 }
                                             }
-                                            _ => 0,
+                                            _ => 10,
                                         }
                                     } else {
-                                        0
+                                        10
                                     }
                                 } else {
-                                    0
+                                    10
                                 }
                             } else {
-                                0
+                                10
                             }
                         } else {
-                            0
-                        };
-                        // println!("[trace111 base_number={}]", base_number);
-
-                        if base_number == 16 {
-                            true
-                        } else {
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&token0);
-                            false
+                            10
                         }
                     }
                     _ => return error(&mut self.log(), &tokens, "literal_value_p.rs.38."),
@@ -124,34 +111,52 @@ impl LiteralValueP {
                 // TODO 機能停止中。これをコメントアウトすると float1 が見つからなくなる。
                 // let zero_x = false;
 
-                if zero_x {
-                    // `0x` の `0` は無視します。
-                    // println!("[trace129={}]", token0);
-                    self.state = State::ZeroXPrefix1st;
-                    self.positional_numeral_string_p =
-                        Some(PositionalNumeralStringP::new("0x").clone());
-                    PResult::Ongoing
-                } else {
-                    // Look-ahead.
-                    // 先読み。
-                    if let Some(token1) = &tokens.one_ahead {
-                        match token1.type_ {
-                            TokenType::AbChar
-                            | TokenType::Colon
-                            | TokenType::Dot
-                            | TokenType::Hyphen
-                            | TokenType::NumChar
-                            | TokenType::Plus
-                            | TokenType::Underscore => PResult::Ongoing,
-                            _ => {
-                                self.state = State::End;
-                                PResult::End
-                            }
-                        }
-                    } else {
-                        self.state = State::End;
-                        PResult::End
+                match base_number {
+                    2 => {
+                        self.state = State::ZeroXPrefix1st;
+                        self.positional_numeral_string_p =
+                            Some(PositionalNumeralStringP::new("0b").clone());
+                        PResult::Ongoing
                     }
+                    8 => {
+                        self.state = State::ZeroXPrefix1st;
+                        self.positional_numeral_string_p =
+                            Some(PositionalNumeralStringP::new("0o").clone());
+                        PResult::Ongoing
+                    }
+                    16 => {
+                        // `0x` は無視します。
+                        // println!("[trace129={}]", token0);
+                        self.state = State::ZeroXPrefix1st;
+                        self.positional_numeral_string_p =
+                            Some(PositionalNumeralStringP::new("0x").clone());
+                        PResult::Ongoing
+                    }
+                    10 => {
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&token0);
+                        // Look-ahead.
+                        // 先読み。
+                        if let Some(token1) = &tokens.one_ahead {
+                            match token1.type_ {
+                                TokenType::AbChar
+                                | TokenType::Colon
+                                | TokenType::Dot
+                                | TokenType::Hyphen
+                                | TokenType::NumChar
+                                | TokenType::Plus
+                                | TokenType::Underscore => PResult::Ongoing,
+                                _ => {
+                                    self.state = State::End;
+                                    PResult::End
+                                }
+                            }
+                        } else {
+                            self.state = State::End;
+                            PResult::End
+                        }
+                    }
+                    _ => panic!("Err.170.Unimplemented."),
                 }
             }
             State::ZeroXPrefix1st => {
