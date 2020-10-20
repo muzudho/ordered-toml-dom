@@ -28,7 +28,7 @@ pub enum State {
 impl Default for EscapeSequenceP {
     fn default() -> Self {
         EscapeSequenceP {
-            positional_numeral_p: None,
+            positional_numeral_string_p: None,
             buffer: Vec::new(),
             state: State::First,
             string_buffer: String::new(),
@@ -94,7 +94,7 @@ impl EscapeSequenceP {
                             "u" => {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
-                                self.positional_numeral_p = Some(
+                                self.positional_numeral_string_p = Some(
                                     PositionalNumeralStringP::default()
                                         .set_expected_digits(4)
                                         .clone(),
@@ -103,7 +103,7 @@ impl EscapeSequenceP {
                             "U" => {
                                 self.state = State::UnicodeDigits;
                                 self.string_buffer = String::new();
-                                self.positional_numeral_p = Some(
+                                self.positional_numeral_string_p = Some(
                                     PositionalNumeralStringP::default()
                                         .set_expected_digits(8)
                                         .clone(),
@@ -148,7 +148,7 @@ impl EscapeSequenceP {
                 }
             }
             State::UnicodeDigits => {
-                let p = self.positional_numeral_p.as_mut().unwrap();
+                let p = self.positional_numeral_string_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         // Filled.
@@ -165,7 +165,7 @@ impl EscapeSequenceP {
                             TokenType::AbChar, // TODO EscapeSequence
                         ));
                         self.state = State::End;
-                        self.positional_numeral_p = None;
+                        self.positional_numeral_string_p = None;
                         return PResult::End;
                     }
                     PResult::Err(mut table) => {

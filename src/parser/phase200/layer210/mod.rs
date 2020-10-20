@@ -45,7 +45,7 @@ pub struct BasicStringP {
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct EscapeSequenceP {
-    positional_numeral_p: Option<PositionalNumeralStringP>,
+    positional_numeral_string_p: Option<PositionalNumeralStringP>,
     buffer: Vec<Token>,
     state: EscapeSequenceState,
     string_buffer: String,
@@ -117,7 +117,7 @@ pub struct LiteralStringP {
 /// Example: `abc`.  
 #[derive(Clone)]
 pub struct LiteralValueP {
-    positional_numeral_p: Option<PositionalNumeralStringP>,
+    positional_numeral_string_p: Option<PositionalNumeralStringP>,
     buffer: Option<LiteralValue>,
     state: LiteralValueState,
 }
