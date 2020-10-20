@@ -171,8 +171,10 @@ impl LiteralValueP {
                         // Filled.
                         // 満ちたなら。
 
-                        // 数値変換はせず、頭に 0x を付けます。
-                        let numeral_string = &format!("0x{}", tokens_stringify(&p.flush()));
+                        // 数値変換はせず、頭に `0x` などを付けます。
+                        // borrow の制約から、まず flush してから prefix にアクセスします。
+                        let n_string = tokens_stringify(&p.flush());
+                        let numeral_string = &format!("{}{}", &p.prefix, n_string);
 
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
