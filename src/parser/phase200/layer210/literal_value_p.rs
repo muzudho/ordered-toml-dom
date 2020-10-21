@@ -19,6 +19,7 @@ use casual_logger::Table as LogTable;
 pub enum State {
     End,
     First,
+    Second,
     /// 0x
     ZeroXPrefix1st,
     ZeroXString,
@@ -58,6 +59,26 @@ impl LiteralValueP {
             }
             State::First => {
                 // println!("[trace61 token0.type_={:?}]", &token0.type_);
+
+                // TODO まず日付型かどうか調べると楽そう。
+                if let Some(token4) = tokens.four_ahead.as_ref() {
+                    if let Some(ch4) = token4.to_string().chars().nth(0) {
+                        if ch4 == '-' {
+                            // `????-`.
+                            if let Some(token3) = tokens.three_ahead.as_ref() {
+                                if let Some(ch3) = token3.to_string().chars().nth(0) {
+                                    match ch3 {
+                                        '0'..='9' => {
+                                            // `???n-`.
+                                        }
+                                        _ => {}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 let base_number = match token0.type_ {
                     TokenType::AbChar
                     | TokenType::Colon
@@ -66,34 +87,21 @@ impl LiteralValueP {
                     | TokenType::Plus
                     | TokenType::Underscore => 10,
                     TokenType::NumChar => {
-                        let length = if let Some(buffer) = &self.buffer {
-                            buffer.to_string().len()
-                        } else {
-                            0
-                        };
-                        // println!("[trace78 length={}]", length);
-
-                        if length == 0 {
-                            if let Some(ch0) = token0.to_string().chars().nth(0) {
-                                // println!("[trace82 ch0={}]", ch0);
-                                if ch0 == '0' {
-                                    // 0x ?
-                                    // Look-ahead.
-                                    // 先読み。
-                                    if let Some(token1) = tokens.one_ahead.as_ref() {
-                                        match token1.type_ {
-                                            TokenType::AbChar => {
-                                                match token1.to_string().as_str() {
-                                                    "b" => 2,
-                                                    "o" => 8,
-                                                    "x" => 16,
-                                                    _ => 10,
-                                                }
-                                            }
+                        if let Some(ch0) = token0.to_string().chars().nth(0) {
+                            // println!("[trace82 ch0={}]", ch0);
+                            if ch0 == '0' {
+                                // 0x ?
+                                // Look-ahead.
+                                // 先読み。
+                                if let Some(token1) = tokens.one_ahead.as_ref() {
+                                    match token1.type_ {
+                                        TokenType::AbChar => match token1.to_string().as_str() {
+                                            "b" => 2,
+                                            "o" => 8,
+                                            "x" => 16,
                                             _ => 10,
-                                        }
-                                    } else {
-                                        10
+                                        },
+                                        _ => 10,
                                     }
                                 } else {
                                     10
@@ -110,23 +118,23 @@ impl LiteralValueP {
 
                 match base_number {
                     2 => {
-                        self.state = State::ZeroXPrefix1st;
                         self.positional_numeral_string_p =
                             Some(PositionalNumeralStringP::new("0b").clone());
+                        self.state = State::ZeroXPrefix1st;
                         PResult::Ongoing
                     }
                     8 => {
-                        self.state = State::ZeroXPrefix1st;
                         self.positional_numeral_string_p =
                             Some(PositionalNumeralStringP::new("0o").clone());
+                        self.state = State::ZeroXPrefix1st;
                         PResult::Ongoing
                     }
                     16 => {
                         // `0x` は無視します。
                         // println!("[trace129={}]", token0);
-                        self.state = State::ZeroXPrefix1st;
                         self.positional_numeral_string_p =
                             Some(PositionalNumeralStringP::new("0x").clone());
+                        self.state = State::ZeroXPrefix1st;
                         PResult::Ongoing
                     }
                     10 => {
@@ -142,7 +150,10 @@ impl LiteralValueP {
                                 | TokenType::Hyphen
                                 | TokenType::NumChar
                                 | TokenType::Plus
-                                | TokenType::Underscore => PResult::Ongoing,
+                                | TokenType::Underscore => {
+                                    self.state = State::Second;
+                                    PResult::Ongoing
+                                }
                                 _ => {
                                     self.state = State::End;
                                     PResult::End
@@ -154,6 +165,31 @@ impl LiteralValueP {
                         }
                     }
                     _ => panic!("Err.170.Unimplemented."),
+                }
+            }
+            State::Second => {
+                // 10進数のみです。
+                let m = self.buffer.as_mut().unwrap();
+                m.push_token(&token0);
+                // Look-ahead.
+                // 先読み。
+                if let Some(token1) = &tokens.one_ahead {
+                    match token1.type_ {
+                        TokenType::AbChar
+                        | TokenType::Colon
+                        | TokenType::Dot
+                        | TokenType::Hyphen
+                        | TokenType::NumChar
+                        | TokenType::Plus
+                        | TokenType::Underscore => PResult::Ongoing,
+                        _ => {
+                            self.state = State::End;
+                            PResult::End
+                        }
+                    }
+                } else {
+                    self.state = State::End;
+                    PResult::End
                 }
             }
             State::ZeroXPrefix1st => {
