@@ -1,10 +1,7 @@
 //! Document syntax parser.  
 //! ドキュメント構文解析器。  
 
-use crate::model::{
-    layer110::{Token, TokenLine},
-    layer310::Document,
-};
+use crate::model::{layer110::TokenLine, layer310::Document};
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error_via,
@@ -29,13 +26,13 @@ impl DocumentP {
         //             先読みを含むトークン。
         // (Current token, 1 ahead token, 2 ahead token)
         // （現在のトークン, １つ先のトークン，２つ先のトークン）
-        let mut tokens = LookAheadTokens::default(); //: (Option<&Token>, Option<&Token>, Option<&Token>) = (None, None, None);
+        let mut tokens = LookAheadTokens::default();
         for (_i, token) in token_line.tokens.iter().enumerate() {
             // Shift.
             // The current token is the look-ahead token, and the previous look-ahead token is the current token.
             // ずらします。
             // 現在のトークンは先読みトークン、前回の先読みトークンは今回のトークンです。
-            tokens.push(&Some(token.clone())); // tokens = (tokens.1, tokens.2, Some(token));
+            tokens.push(Some(token.clone()));
             if let Some(_) = tokens.current {
                 match self.one_delay_loop(&tokens, doc) {
                     PResult::End => {}
@@ -49,14 +46,14 @@ impl DocumentP {
 
         // Last 2 token.
         // 最後の２トークン。
-        tokens.push(&None); // tokens = (tokens.1, tokens.2, None);
+        tokens.push(None);
         if let Some(_) = tokens.current {
             self.one_delay_loop(&tokens, doc);
         }
 
         // Last 1 token.
         // 最後の１トークン。
-        tokens.push(&None); // tokens = (tokens.1, tokens.2, None);
+        tokens.push(None);
         if let Some(_) = tokens.current {
             self.one_delay_loop(&tokens, doc);
         }
