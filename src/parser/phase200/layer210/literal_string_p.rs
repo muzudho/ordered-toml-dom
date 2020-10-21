@@ -1,10 +1,7 @@
 //! Single quoted string syntax parser.  
 //! 単一引用符文字列構文パーサー。  
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer210::LiteralString,
-};
+use crate::model::{layer110::TokenType, layer210::LiteralString};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{LiteralStringP, PResult};
 use crate::parser::phase200::LookAheadTokens;
@@ -107,7 +104,7 @@ impl LiteralStringP {
                 match token0.type_ {
                     // `'`
                     TokenType::SingleQuotation => {
-                        if check_triple_single_quotation(tokens.to_old()) {
+                        if check_triple_single_quotation(tokens) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
@@ -184,11 +181,11 @@ impl LiteralStringP {
 ///
 /// It's triple single quotation.  
 /// ３連一重引用符。  
-fn check_triple_single_quotation(tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> bool {
-    if let Some(token_2_ahead) = tokens.2 {
+fn check_triple_single_quotation(tokens: &LookAheadTokens) -> bool {
+    if let Some(token_2_ahead) = &tokens.two_ahead {
         match token_2_ahead.type_ {
             TokenType::SingleQuotation => {
-                if let Some(token_1_ahead) = tokens.1 {
+                if let Some(token_1_ahead) = &tokens.one_ahead {
                     match token_1_ahead.type_ {
                         TokenType::SingleQuotation => {
                             // Triple single quote.

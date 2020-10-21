@@ -24,23 +24,4 @@ impl LookAheadTokens {
             },
         }
     }
-
-    pub fn to_old(&self) -> (Option<&Token>, Option<&Token>, Option<&Token>) {
-        let c = if let Some(t) = &self.current {
-            Some(t)
-        } else {
-            None
-        };
-        let o = if let Some(t) = &self.one_ahead {
-            Some(t)
-        } else {
-            None
-        };
-        let t = if let Some(t) = &self.two_ahead {
-            Some(t)
-        } else {
-            None
-        };
-        (c, o, t)
-    }
 }
