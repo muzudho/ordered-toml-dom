@@ -44,6 +44,20 @@ impl DocumentP {
             }
         }
 
+        // Last 4 token.
+        // 最後の４トークン。
+        tokens.push(None);
+        if let Some(_) = tokens.current {
+            self.one_delay_loop(&tokens, doc);
+        }
+
+        // Last 3 token.
+        // 最後の３トークン。
+        tokens.push(None);
+        if let Some(_) = tokens.current {
+            self.one_delay_loop(&tokens, doc);
+        }
+
         // Last 2 token.
         // 最後の２トークン。
         tokens.push(None);

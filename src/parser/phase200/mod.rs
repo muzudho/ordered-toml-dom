@@ -18,6 +18,9 @@ pub struct LookAheadTokens {
     pub current: Option<Token>,
     pub one_ahead: Option<Token>,
     pub two_ahead: Option<Token>,
+    pub three_ahead: Option<Token>,
+    /// `2020-10-21` を `2020-` のハイフンまで先読みするのに使います。
+    pub four_ahead: Option<Token>,
 }
 
 /// Error message.  

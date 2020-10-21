@@ -10,6 +10,8 @@ impl Default for LookAheadTokens {
             current: None,
             one_ahead: None,
             two_ahead: None,
+            three_ahead: None,
+            four_ahead: None,
         }
     }
 }
@@ -17,6 +19,8 @@ impl LookAheadTokens {
     pub fn push(&mut self, token: Option<Token>) {
         self.current = self.one_ahead.clone();
         self.one_ahead = self.two_ahead.clone();
-        self.two_ahead = token;
+        self.two_ahead = self.three_ahead.clone();
+        self.three_ahead = self.four_ahead.clone();
+        self.four_ahead = token;
     }
 }
