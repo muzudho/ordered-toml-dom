@@ -29,23 +29,18 @@ impl DocumentP {
         //             先読みを含むトークン。
         // (Current token, 1 ahead token, 2 ahead token)
         // （現在のトークン, １つ先のトークン，２つ先のトークン）
-        let mut tokens: (Option<&Token>, Option<&Token>, Option<&Token>) = (None, None, None);
+        let mut tokens = LookAheadTokens::default(); //: (Option<&Token>, Option<&Token>, Option<&Token>) = (None, None, None);
         for (_i, token) in token_line.tokens.iter().enumerate() {
             // Shift.
             // The current token is the look-ahead token, and the previous look-ahead token is the current token.
             // ずらします。
             // 現在のトークンは先読みトークン、前回の先読みトークンは今回のトークンです。
-            tokens = (tokens.1, tokens.2, Some(token));
-            if let Some(_) = tokens.0 {
-                match self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc) {
+            tokens.push(&Some(token.clone())); // tokens = (tokens.1, tokens.2, Some(token));
+            if let Some(_) = tokens.current {
+                match self.one_delay_loop(&tokens, doc) {
                     PResult::End => {}
                     PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &LookAheadTokens::from_tuple(tokens),
-                            "document.rs.43.",
-                        );
+                        return error_via(&mut table, &mut self.log(), &tokens, "document.rs.43.");
                     }
                     PResult::Ongoing => {}
                 }
@@ -54,16 +49,16 @@ impl DocumentP {
 
         // Last 2 token.
         // 最後の２トークン。
-        tokens = (tokens.1, tokens.2, None);
-        if let Some(_) = tokens.0 {
-            self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc);
+        tokens.push(&None); // tokens = (tokens.1, tokens.2, None);
+        if let Some(_) = tokens.current {
+            self.one_delay_loop(&tokens, doc);
         }
 
         // Last 1 token.
         // 最後の１トークン。
-        tokens = (tokens.1, tokens.2, None);
-        if let Some(_) = tokens.0 {
-            self.one_delay_loop(&LookAheadTokens::from_tuple(tokens), doc);
+        tokens.push(&None); // tokens = (tokens.1, tokens.2, None);
+        if let Some(_) = tokens.current {
+            self.one_delay_loop(&tokens, doc);
         }
 
         PResult::Ongoing
