@@ -10,10 +10,7 @@
 //! // ワールド"""
 //! ```
 
-use crate::model::{
-    layer110::{Token, TokenType},
-    layer210::BasicString,
-};
+use crate::model::{layer110::TokenType, layer210::BasicString};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{BasicStringP, EscapeSequenceP, PResult};
@@ -131,7 +128,7 @@ impl BasicStringP {
                     // "
                     TokenType::DoubleQuotation => {
                         // print!("trace.10.");
-                        if check_triple_double_quotation(tokens.to_old()) {
+                        if check_triple_double_quotation(tokens) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
@@ -222,7 +219,7 @@ impl BasicStringP {
                     } // Ignore it.
                     // "
                     TokenType::DoubleQuotation => {
-                        if check_triple_double_quotation(tokens.to_old()) {
+                        if check_triple_double_quotation(tokens) {
                             // println!("[trace309 check_triple_double_quotation]");
                             self.state = State::MultiLineEnd1;
                         } else {
@@ -318,11 +315,11 @@ impl BasicStringP {
 ///
 /// It's triple double quotation.  
 /// ３連一重引用符。  
-fn check_triple_double_quotation(tokens: (Option<&Token>, Option<&Token>, Option<&Token>)) -> bool {
-    if let Some(token_2_ahead) = tokens.2 {
+fn check_triple_double_quotation(tokens: &LookAheadTokens) -> bool {
+    if let Some(token_2_ahead) = &tokens.two_ahead {
         match token_2_ahead.type_ {
             TokenType::DoubleQuotation => {
-                if let Some(token_1_ahead) = tokens.1 {
+                if let Some(token_1_ahead) = &tokens.one_ahead {
                     match token_1_ahead.type_ {
                         TokenType::DoubleQuotation => {
                             // Triple double quote.

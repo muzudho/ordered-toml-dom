@@ -6,7 +6,7 @@
 extern crate tomboy_toml_dom;
 
 use casual_logger::{Level, Log, Table};
-use chrono::prelude::{DateTime, Utc};
+use chrono::prelude::{DateTime, Local, Utc};
 use tomboy_toml_dom::Toml;
 
 /// WIP.  
@@ -149,9 +149,11 @@ is preserved.
     // TODO Local datetime
     /*
     assert_eq!(
-        doc.get_datetime_utc_by_key("ldt1"),
-        Some("1979-05-27T07:32:00".parse::<DateTime<Utc>>().unwrap())
+        doc.get_datetime_local_by_key("ldt1"),
+        Some("1979-05-27T07:32:00".parse::<DateTime<Local>>().unwrap())
     );
+    */
+    /*
     assert_eq!(
         doc.get_datetime_utc_by_key("ldt2"),
         Some(
