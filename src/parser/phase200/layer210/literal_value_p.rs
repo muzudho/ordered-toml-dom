@@ -61,18 +61,98 @@ impl LiteralValueP {
                 // println!("[trace61 token0.type_={:?}]", &token0.type_);
 
                 // TODO まず日付型かどうか調べると楽そう。
-                if let Some(token4) = tokens.four_ahead.as_ref() {
-                    if let Some(ch4) = token4.to_string().chars().nth(0) {
-                        if ch4 == '-' {
-                            // `????-`.
-                            if let Some(token3) = tokens.three_ahead.as_ref() {
-                                if let Some(ch3) = token3.to_string().chars().nth(0) {
-                                    match ch3 {
-                                        '0'..='9' => {
-                                            // `???n-`.
-                                        }
-                                        _ => {}
+                // ２文字先を最初に調べるのがコツ。
+                let mut is_date = true;
+                let mut is_time = true;
+                // `??n??`.
+                if let Some(token2) = tokens.two_ahead.as_ref() {
+                    if let Some(ch2) = token2.to_string().chars().nth(0) {
+                        match ch2 {
+                            '0'..='9' => {
+                                is_time = false;
+                            }
+                            ':' => {
+                                is_date = false;
+                            }
+                            _ => {
+                                is_date = false;
+                                is_time = false;
+                            }
+                        }
+                    }
+                }
+                if is_date {
+                    // `??n?-`.
+                    if let Some(token4) = tokens.four_ahead.as_ref() {
+                        if let Some(ch4) = token4.to_string().chars().nth(0) {
+                            if ch4 != '-' {
+                                is_date = false;
+                            }
+                        }
+                    }
+                    // `??nn-`.
+                    if is_date {
+                        if let Some(token3) = tokens.three_ahead.as_ref() {
+                            if let Some(ch3) = token3.to_string().chars().nth(0) {
+                                match ch3 {
+                                    '0'..='9' => {}
+                                    _ => {
+                                        is_date = false;
                                     }
+                                }
+                            }
+                        }
+                    }
+                    // `?nnn-`.
+                    if is_date {
+                        if let Some(token1) = tokens.one_ahead.as_ref() {
+                            if let Some(ch1) = token1.to_string().chars().nth(0) {
+                                match ch1 {
+                                    '0'..='9' => {}
+                                    _ => {
+                                        is_date = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // `nnnn-`.
+                    if is_date {
+                        if let Some(ch0) = token0.to_string().chars().nth(0) {
+                            match ch0 {
+                                '0'..='9' => {}
+                                _ => {
+                                    // 日付型なのは確定。
+                                    println!("trace126.日付型確定。");
+                                    is_date = false;
+                                }
+                            }
+                        }
+                    }
+                }
+                if is_time {
+                    // `?n:`.
+                    if is_date {
+                        if let Some(token1) = tokens.one_ahead.as_ref() {
+                            if let Some(ch1) = token1.to_string().chars().nth(0) {
+                                match ch1 {
+                                    '0'..='9' => {}
+                                    _ => {
+                                        is_date = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // `nn:`.
+                    if is_date {
+                        if let Some(ch0) = token0.to_string().chars().nth(0) {
+                            match ch0 {
+                                '0'..='9' => {}
+                                _ => {
+                                    // 時刻型なのは確定。
+                                    println!("trace154.時刻型確定。");
+                                    is_date = false;
                                 }
                             }
                         }
