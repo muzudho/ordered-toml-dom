@@ -1,15 +1,23 @@
 pub mod basic_string;
 pub mod comment;
+pub mod date_time;
 pub mod key;
 pub mod literal_string;
 pub mod literal_value;
 
 use crate::model::layer110::Token;
 
-/// It has one string.  
-/// １つの文字列を持ちます。  
+/// Comment.  
+/// コメント。  
 #[derive(Clone)]
 pub struct Comment {
+    pub tokens: Vec<Token>,
+}
+
+/// Date time.  
+/// 年月日日付。  
+#[derive(Clone)]
+pub struct DateTime {
     pub tokens: Vec<Token>,
 }
 
