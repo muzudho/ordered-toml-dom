@@ -43,6 +43,7 @@ pub enum TokenType {
     /// A ～ Z, a ～ z.  Multiple disits.   
     /// 構文解析の結果。文字列トークン。  
     SPAlphabetString,
+    SPDateTimeString,
     /// Syntax parser result.  
     /// Positional numeral system string.  
     /// Binary, Octal, Decimal, Hexadecimal...  

@@ -10,7 +10,9 @@ use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::DateTimeP;
 use crate::parser::phase200::layer210::PositionalNumeralStringP;
-use crate::parser::phase200::layer210::{LiteralValueP, PResult};
+use crate::parser::phase200::layer210::{
+    date_time_p::State as DateTimeState, LiteralValueP, PResult,
+};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table as LogTable;
 
@@ -61,19 +63,16 @@ impl LiteralValueP {
                 let p = self.date_time_p.as_mut().unwrap();
                 match p.parse(&tokens) {
                     PResult::End => {
-                        if let Some(child_m) = p.flush() {
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::new(
-                                token0.column_number,
-                                &child_m.to_string(),
-                                TokenType::SPPositionalNumeralString,
-                            ));
-                            self.date_time_p = None;
-                            self.state = State::End;
-                            return PResult::End;
-                        } else {
-                            return error(&mut self.log(), &tokens, "literal_value_p.rs.68.");
-                        }
+                        let string_buffer = tokens_stringify(&p.flush());
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&Token::new(
+                            token0.column_number,
+                            &string_buffer,
+                            TokenType::SPDateTimeString,
+                        ));
+                        self.date_time_p = None;
+                        self.state = State::End;
+                        return PResult::End;
                     }
                     PResult::Err(mut table) => {
                         return error_via(
@@ -156,7 +155,8 @@ impl LiteralValueP {
                                     // 日付型なのは確定。
                                     println!("trace126.日付型確定。");
                                     self.state = State::DateTime;
-                                    self.date_time_p = Some(DateTimeP::new());
+                                    self.date_time_p =
+                                        Some(DateTimeP::new(DateTimeState::FirstOfDate));
                                 }
                                 _ => {
                                     is_date = false;
@@ -187,7 +187,8 @@ impl LiteralValueP {
                                     // 時刻型なのは確定。
                                     println!("trace154.時刻型確定。");
                                     self.state = State::DateTime;
-                                    self.date_time_p = Some(DateTimeP::new());
+                                    self.date_time_p =
+                                        Some(DateTimeP::new(DateTimeState::FirstOfTime));
                                 }
                                 _ => {
                                     is_date = false;
