@@ -8,6 +8,7 @@ use crate::model::{
 };
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
+use crate::parser::phase200::layer210::DateTimeP;
 use crate::parser::phase200::layer210::PositionalNumeralStringP;
 use crate::parser::phase200::layer210::{LiteralValueP, PResult};
 use crate::parser::phase200::LookAheadTokens;
@@ -17,6 +18,7 @@ use casual_logger::Table as LogTable;
 /// 構文状態遷移。  
 #[derive(Debug, Clone)]
 pub enum State {
+    DateTime,
     End,
     First,
     Second,
@@ -28,6 +30,7 @@ pub enum State {
 impl Default for LiteralValueP {
     fn default() -> Self {
         LiteralValueP {
+            date_time_p: None,
             positional_numeral_string_p: None,
             buffer: Some(LiteralValue::default()),
             state: State::First,
@@ -54,6 +57,35 @@ impl LiteralValueP {
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
+            State::DateTime => {
+                let p = self.date_time_p.as_mut().unwrap();
+                match p.parse(&tokens) {
+                    PResult::End => {
+                        if let Some(child_m) = p.flush() {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_token(&Token::new(
+                                token0.column_number,
+                                &child_m.to_string(),
+                                TokenType::SPPositionalNumeralString,
+                            ));
+                            self.date_time_p = None;
+                            self.state = State::End;
+                            return PResult::End;
+                        } else {
+                            return error(&mut self.log(), &tokens, "literal_value_p.rs.68.");
+                        }
+                    }
+                    PResult::Err(mut table) => {
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &tokens,
+                            "literal_value_p.rs.90.",
+                        );
+                    }
+                    PResult::Ongoing => PResult::Ongoing,
+                }
+            }
             State::End => {
                 return error(&mut self.log(), &tokens, "literal_value.rs.57.");
             }
@@ -120,10 +152,13 @@ impl LiteralValueP {
                     if is_date {
                         if let Some(ch0) = token0.to_string().chars().nth(0) {
                             match ch0 {
-                                '0'..='9' => {}
-                                _ => {
+                                '0'..='9' => {
                                     // 日付型なのは確定。
                                     println!("trace126.日付型確定。");
+                                    self.state = State::DateTime;
+                                    self.date_time_p = Some(DateTimeP::new());
+                                }
+                                _ => {
                                     is_date = false;
                                 }
                             }
@@ -148,10 +183,13 @@ impl LiteralValueP {
                     if is_date {
                         if let Some(ch0) = token0.to_string().chars().nth(0) {
                             match ch0 {
-                                '0'..='9' => {}
-                                _ => {
+                                '0'..='9' => {
                                     // 時刻型なのは確定。
                                     println!("trace154.時刻型確定。");
+                                    self.state = State::DateTime;
+                                    self.date_time_p = Some(DateTimeP::new());
+                                }
+                                _ => {
                                     is_date = false;
                                 }
                             }
@@ -159,29 +197,37 @@ impl LiteralValueP {
                     }
                 }
 
-                let base_number = match token0.type_ {
-                    TokenType::AbChar
-                    | TokenType::Colon
-                    | TokenType::Dot
-                    | TokenType::Hyphen
-                    | TokenType::Plus
-                    | TokenType::Underscore => 10,
-                    TokenType::NumChar => {
-                        if let Some(ch0) = token0.to_string().chars().nth(0) {
-                            // println!("[trace82 ch0={}]", ch0);
-                            if ch0 == '0' {
-                                // 0x ?
-                                // Look-ahead.
-                                // 先読み。
-                                if let Some(token1) = tokens.one_ahead.as_ref() {
-                                    match token1.type_ {
-                                        TokenType::AbChar => match token1.to_string().as_str() {
-                                            "b" => 2,
-                                            "o" => 8,
-                                            "x" => 16,
+                if is_date || is_time {
+                    PResult::Ongoing
+                } else {
+                    let base_number = match token0.type_ {
+                        TokenType::AbChar
+                        | TokenType::Colon
+                        | TokenType::Dot
+                        | TokenType::Hyphen
+                        | TokenType::Plus
+                        | TokenType::Underscore => 10,
+                        TokenType::NumChar => {
+                            if let Some(ch0) = token0.to_string().chars().nth(0) {
+                                // println!("[trace82 ch0={}]", ch0);
+                                if ch0 == '0' {
+                                    // 0x ?
+                                    // Look-ahead.
+                                    // 先読み。
+                                    if let Some(token1) = tokens.one_ahead.as_ref() {
+                                        match token1.type_ {
+                                            TokenType::AbChar => {
+                                                match token1.to_string().as_str() {
+                                                    "b" => 2,
+                                                    "o" => 8,
+                                                    "x" => 16,
+                                                    _ => 10,
+                                                }
+                                            }
                                             _ => 10,
-                                        },
-                                        _ => 10,
+                                        }
+                                    } else {
+                                        10
                                     }
                                 } else {
                                     10
@@ -189,62 +235,60 @@ impl LiteralValueP {
                             } else {
                                 10
                             }
-                        } else {
-                            10
                         }
-                    }
-                    _ => return error(&mut self.log(), &tokens, "literal_value_p.rs.38."),
-                };
+                        _ => return error(&mut self.log(), &tokens, "literal_value_p.rs.38."),
+                    };
 
-                match base_number {
-                    2 => {
-                        self.positional_numeral_string_p =
-                            Some(PositionalNumeralStringP::new("0b").clone());
-                        self.state = State::ZeroXPrefix1st;
-                        PResult::Ongoing
-                    }
-                    8 => {
-                        self.positional_numeral_string_p =
-                            Some(PositionalNumeralStringP::new("0o").clone());
-                        self.state = State::ZeroXPrefix1st;
-                        PResult::Ongoing
-                    }
-                    16 => {
-                        // `0x` は無視します。
-                        // println!("[trace129={}]", token0);
-                        self.positional_numeral_string_p =
-                            Some(PositionalNumeralStringP::new("0x").clone());
-                        self.state = State::ZeroXPrefix1st;
-                        PResult::Ongoing
-                    }
-                    10 => {
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
-                        // Look-ahead.
-                        // 先読み。
-                        if let Some(token1) = &tokens.one_ahead {
-                            match token1.type_ {
-                                TokenType::AbChar
-                                | TokenType::Colon
-                                | TokenType::Dot
-                                | TokenType::Hyphen
-                                | TokenType::NumChar
-                                | TokenType::Plus
-                                | TokenType::Underscore => {
-                                    self.state = State::Second;
-                                    PResult::Ongoing
-                                }
-                                _ => {
-                                    self.state = State::End;
-                                    PResult::End
-                                }
-                            }
-                        } else {
-                            self.state = State::End;
-                            PResult::End
+                    match base_number {
+                        2 => {
+                            self.positional_numeral_string_p =
+                                Some(PositionalNumeralStringP::new("0b").clone());
+                            self.state = State::ZeroXPrefix1st;
+                            PResult::Ongoing
                         }
+                        8 => {
+                            self.positional_numeral_string_p =
+                                Some(PositionalNumeralStringP::new("0o").clone());
+                            self.state = State::ZeroXPrefix1st;
+                            PResult::Ongoing
+                        }
+                        16 => {
+                            // `0x` は無視します。
+                            // println!("[trace129={}]", token0);
+                            self.positional_numeral_string_p =
+                                Some(PositionalNumeralStringP::new("0x").clone());
+                            self.state = State::ZeroXPrefix1st;
+                            PResult::Ongoing
+                        }
+                        10 => {
+                            let m = self.buffer.as_mut().unwrap();
+                            m.push_token(&token0);
+                            // Look-ahead.
+                            // 先読み。
+                            if let Some(token1) = &tokens.one_ahead {
+                                match token1.type_ {
+                                    TokenType::AbChar
+                                    | TokenType::Colon
+                                    | TokenType::Dot
+                                    | TokenType::Hyphen
+                                    | TokenType::NumChar
+                                    | TokenType::Plus
+                                    | TokenType::Underscore => {
+                                        self.state = State::Second;
+                                        PResult::Ongoing
+                                    }
+                                    _ => {
+                                        self.state = State::End;
+                                        PResult::End
+                                    }
+                                }
+                            } else {
+                                self.state = State::End;
+                                PResult::End
+                            }
+                        }
+                        _ => panic!("Err.170.Unimplemented."),
                     }
-                    _ => panic!("Err.170.Unimplemented."),
                 }
             }
             State::Second => {

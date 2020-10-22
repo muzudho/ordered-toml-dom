@@ -129,6 +129,7 @@ pub struct LiteralStringP {
 /// Example: `abc`.  
 #[derive(Clone)]
 pub struct LiteralValueP {
+    date_time_p: Option<DateTimeP>,
     positional_numeral_string_p: Option<PositionalNumeralStringP>,
     buffer: Option<LiteralValue>,
     state: LiteralValueState,
