@@ -146,16 +146,14 @@ is preserved.
         )
     );
 
-    /*
     assert_eq!(
-        doc.get_datetime_utc_by_key("odt3"),
+        doc.get_datetime_fixed_offset_by_key("odt3"),
         Some(
             "1979-05-27T00:32:00.999999-07:00"
-                .parse::<DateTime<Utc>>()
+                .parse::<DateTime<FixedOffset>>()
                 .unwrap()
         )
     );
-    */
 
     // TODO Local datetime
     assert_eq!(

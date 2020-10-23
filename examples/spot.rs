@@ -58,4 +58,13 @@ fn main() {
                 .unwrap()
         )
     );
+
+    assert_eq!(
+        doc.get_datetime_fixed_offset_by_key("odt3"),
+        Some(
+            "1979-05-27T00:32:00.999999-07:00"
+                .parse::<DateTime<FixedOffset>>()
+                .unwrap()
+        )
+    );
 }
