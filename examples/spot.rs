@@ -5,6 +5,7 @@
 
 extern crate tomboy_toml_dom;
 
+use chrono::FixedOffset;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use tomboy_toml_dom::Toml;
 
@@ -45,6 +46,15 @@ fn main() {
         doc.get_naive_datetime_by_key("ldt2"),
         Some(
             NaiveDateTime::parse_from_str("1979-05-27T00:32:00.999999", "%Y-%m-%dT%H:%M:%S%.6f")
+                .unwrap()
+        )
+    );
+
+    assert_eq!(
+        doc.get_datetime_fixed_offset_by_key("odt2"),
+        Some(
+            "1979-05-27T00:32:00-07:00"
+                .parse::<DateTime<FixedOffset>>()
                 .unwrap()
         )
     );
