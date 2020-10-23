@@ -80,6 +80,17 @@ impl Document {
         None
     }
 
+    /// Contains key.  
+    /// キーを含むか？  
+    pub fn contains_key(&self, key: &str) -> bool {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                return key_value.key.to_string() == key.to_string();
+            }
+        }
+        false
+    }
+
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_i128_by_key(&self, key: &str) -> Option<i128> {
@@ -87,7 +98,8 @@ impl Document {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*key_value.value {
-                        let s = literal_value.to_string();
+                        // アンダースコアは除去しないと変換できない。
+                        let s = literal_value.to_string().replace("_", "");
 
                         // 10進数ではないかも知れない。
                         let base_number = if s.starts_with("0b") {
@@ -101,10 +113,135 @@ impl Document {
                         };
 
                         if 10 != base_number {
-                            // 頭の `0x` と、アンダースコアは除去しないと変換できない。
-                            let s2 = &s[2..].replace("_", "");
-                            // println!("[trace91={}]", s2);
+                            // 頭の `0x` は除去しないと変換できない。
+                            let s2 = &s[2..];
                             match i128::from_str_radix(s2, base_number) {
+                                Ok(n) => return Some(n),
+                                Err(why) => panic!("{}", why),
+                            };
+                        }
+
+                        match s.parse() {
+                            Ok(n) => return Some(n),
+                            Err(_why) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_isize_by_key(&self, key: &str) -> Option<isize> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        // アンダースコアは除去しないと変換できない。
+                        let s = literal_value.to_string().replace("_", "");
+
+                        // 10進数ではないかも知れない。
+                        let base_number = if s.starts_with("0b") {
+                            2
+                        } else if s.starts_with("0o") {
+                            8
+                        } else if s.starts_with("0x") {
+                            16
+                        } else {
+                            10
+                        };
+
+                        if 10 != base_number {
+                            // 頭の `0x` は除去しないと変換できない。
+                            let s2 = &s[2..];
+                            // println!("[trace91={}]", s2);
+                            match isize::from_str_radix(s2, base_number) {
+                                Ok(n) => return Some(n),
+                                Err(why) => panic!("{}", why),
+                            };
+                        }
+
+                        match s.parse() {
+                            Ok(n) => return Some(n),
+                            Err(_) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_u128_by_key(&self, key: &str) -> Option<u128> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        // アンダースコアは除去しないと変換できない。
+                        let s = literal_value.to_string().replace("_", "");
+
+                        // 10進数ではないかも知れない。
+                        let base_number = if s.starts_with("0b") {
+                            2
+                        } else if s.starts_with("0o") {
+                            8
+                        } else if s.starts_with("0x") {
+                            16
+                        } else {
+                            10
+                        };
+
+                        if 10 != base_number {
+                            // 頭の `0x` は除去しないと変換できない。
+                            let s2 = &s[2..];
+                            // println!("[trace91={}]", s2);
+                            match u128::from_str_radix(s2, base_number) {
+                                Ok(n) => return Some(n),
+                                Err(why) => panic!("{}", why),
+                            };
+                        }
+
+                        match s.parse() {
+                            Ok(n) => return Some(n),
+                            Err(_) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_usize_by_key(&self, key: &str) -> Option<usize> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        // アンダースコアは除去しないと変換できない。
+                        let s = literal_value.to_string().replace("_", "");
+
+                        // 10進数ではないかも知れない。
+                        let base_number = if s.starts_with("0b") {
+                            2
+                        } else if s.starts_with("0o") {
+                            8
+                        } else if s.starts_with("0x") {
+                            16
+                        } else {
+                            10
+                        };
+
+                        if 10 != base_number {
+                            // 頭の `0x` は除去しないと変換できない。
+                            let s2 = &s[2..];
+                            // println!("[trace91={}]", s2);
+                            match usize::from_str_radix(s2, base_number) {
                                 Ok(n) => return Some(n),
                                 Err(why) => panic!("{}", why),
                             };

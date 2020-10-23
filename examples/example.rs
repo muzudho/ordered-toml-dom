@@ -5,11 +5,10 @@
 
 extern crate tomboy_toml_dom;
 
-use chrono::prelude::{DateTime, Utc};
-use chrono::FixedOffset;
-use chrono::NaiveDate;
-use chrono::NaiveDateTime;
-use chrono::NaiveTime;
+use chrono::{
+    prelude::{DateTime, Utc},
+    FixedOffset, NaiveDate, NaiveDateTime, NaiveTime,
+};
 use tomboy_toml_dom::Toml;
 
 fn main() {
@@ -19,10 +18,29 @@ fn main() {
 
     // Read a number.
     // 数値読取。
+    assert!(doc.contains_key("age"));
     assert_eq!(doc.get_i128_by_key("age"), Some(40));
-    assert_eq!(doc.get_i128_by_key("int_max"), Some(2147483647));
-    assert_eq!(doc.get_i128_by_key("int_min"), Some(-2147483648));
+    assert_eq!(doc.get_isize_by_key("age"), Some(40));
+    assert_eq!(doc.get_u128_by_key("age"), Some(40));
+    assert_eq!(doc.get_usize_by_key("age"), Some(40));
     assert_eq!(doc.get_f64_by_key("weight"), Some(93.5));
+
+    assert_eq!(doc.get_i128_by_key("i32_max"), Some(2147483647));
+    assert_eq!(doc.get_i128_by_key("i32_min"), Some(-2147483648));
+
+    assert_eq!(
+        doc.get_i128_by_key("i128_max"),
+        Some(170_141_183_460_469_231_731_687_303_715_884_105_727)
+    );
+    assert_eq!(
+        doc.get_i128_by_key("i128_min"),
+        Some(-170_141_183_460_469_231_731_687_303_715_884_105_728)
+    );
+    assert_eq!(
+        doc.get_u128_by_key("u128_max"),
+        Some(340_282_366_920_938_463_463_374_607_431_768_211_455)
+    );
+
     assert_eq!(doc.get_i128_by_key("hex1"), Some(0xDEADBEEF));
     assert_eq!(doc.get_i128_by_key("hex2"), Some(0xdeadbeef));
     assert_eq!(doc.get_i128_by_key("hex3"), Some(0xdead_beef));
