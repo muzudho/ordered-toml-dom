@@ -175,7 +175,12 @@ impl DateTimeP {
                 }
                 PResult::Ongoing
             }
-            State::LongitudeZero => PResult::Ongoing,
+            State::LongitudeZero => {
+                let token0 = tokens.current.as_ref().unwrap();
+                self.buffer.push(token0.clone());
+                self.state = State::End;
+                PResult::End
+            }
             State::OffsetSign => PResult::Ongoing,
             State::Point => PResult::Ongoing,
         }

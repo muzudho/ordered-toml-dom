@@ -5,8 +5,7 @@
 
 extern crate tomboy_toml_dom;
 
-use chrono::NaiveDate;
-use chrono::NaiveDateTime;
+use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use tomboy_toml_dom::Toml;
 
 fn main() {
@@ -34,5 +33,10 @@ fn main() {
                 Err(why) => panic!("{}", why),
             }
         )
+    );
+
+    assert_eq!(
+        doc.get_datetime_utc_by_key("odt1"),
+        Some("1979-05-27T07:32:00Z".parse::<DateTime<Utc>>().unwrap())
     );
 }
