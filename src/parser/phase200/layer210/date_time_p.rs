@@ -181,7 +181,41 @@ impl DateTimeP {
                 self.state = State::End;
                 PResult::End
             }
-            State::OffsetSign => PResult::Ongoing,
+            State::OffsetSign => {
+                let token0 = tokens.current.as_ref().unwrap();
+                let token1 = tokens.one_ahead.as_ref().unwrap();
+                match token0.type_ {
+                    TokenType::Colon | TokenType::Hyphen | TokenType::NumChar | TokenType::Plus => {
+                        self.buffer.push(token0.clone());
+                        match token1.type_ {
+                            TokenType::Colon | TokenType::NumChar => {
+                                println!(
+                                    "[trace193={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                            }
+                            _ => {
+                                println!(
+                                    "[trace200={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                                return PResult::End;
+                            }
+                        }
+                    }
+                    _ => {
+                        println!(
+                            "[trace210={}|{}]",
+                            token0.to_string().as_str(),
+                            token1.to_string().as_str()
+                        );
+                        return error(&mut self.log(), &tokens, "date_time_p.rs.244.");
+                    }
+                }
+                PResult::Ongoing
+            }
             State::FractionalSeconds => {
                 let token0 = tokens.current.as_ref().unwrap();
                 let token1 = tokens.one_ahead.as_ref().unwrap();
@@ -190,8 +224,9 @@ impl DateTimeP {
                         self.buffer.push(token0.clone());
                         match token1.type_ {
                             TokenType::Hyphen | TokenType::Plus => {
+                                // - or +.
                                 println!(
-                                    "[trace194={}|{}]",
+                                    "[trace229={}|{}]",
                                     token0.to_string().as_str(),
                                     token1.to_string().as_str()
                                 );
@@ -199,14 +234,14 @@ impl DateTimeP {
                             }
                             TokenType::Dot | TokenType::NumChar => {
                                 println!(
-                                    "[trace202={}|{}]",
+                                    "[trace237={}|{}]",
                                     token0.to_string().as_str(),
                                     token1.to_string().as_str()
                                 );
                             }
                             _ => {
                                 println!(
-                                    "[trace209={}|{}]",
+                                    "[trace244={}|{}]",
                                     token0.to_string().as_str(),
                                     token1.to_string().as_str()
                                 );

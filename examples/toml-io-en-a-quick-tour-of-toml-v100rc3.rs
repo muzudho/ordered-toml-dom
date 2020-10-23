@@ -6,6 +6,7 @@
 extern crate tomboy_toml_dom;
 
 use casual_logger::{Level, Log, Table};
+use chrono::FixedOffset;
 use chrono::NaiveDate;
 use chrono::TimeZone;
 use chrono::{
@@ -136,16 +137,16 @@ is preserved.
         Some("1979-05-27T07:32:00Z".parse::<DateTime<Utc>>().unwrap())
     );
 
-    /*
     assert_eq!(
-        doc.get_datetime_utc_by_key("odt2"),
+        doc.get_datetime_fixed_offset_by_key("odt2"),
         Some(
             "1979-05-27T00:32:00-07:00"
-                .parse::<DateTime<Utc>>()
+                .parse::<DateTime<FixedOffset>>()
                 .unwrap()
         )
     );
 
+    /*
     assert_eq!(
         doc.get_datetime_utc_by_key("odt3"),
         Some(
