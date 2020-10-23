@@ -1,12 +1,11 @@
 //! Comment syntax parser.  
 //! コメント構文パーサー。  
 
-use crate::model::layer110::token::tokens_stringify;
 use crate::model::layer110::TokenType;
 use crate::parser::phase200::Token;
 use crate::parser::phase200::{
     error,
-    layer210::{DateTime, DateTimeP, PResult},
+    layer210::{DateTimeP, PResult},
     LookAheadTokens,
 };
 use casual_logger::Table;
@@ -15,7 +14,6 @@ use casual_logger::Table;
 /// 構文状態遷移。  
 #[derive(Debug, Clone)]
 pub enum State {
-    AfterSecond,
     End,
     FirstOfDate,
     FirstOfTime,
@@ -47,7 +45,6 @@ impl DateTimeP {
     ///                             結果。
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         match self.state {
-            State::AfterSecond => PResult::Ongoing,
             State::End => {
                 return error(&mut self.log(), &tokens, "date_time_p.rs.50.");
             }

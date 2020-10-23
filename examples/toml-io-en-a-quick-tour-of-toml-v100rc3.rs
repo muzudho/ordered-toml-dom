@@ -9,10 +9,9 @@ use casual_logger::{Level, Log, Table};
 use chrono::FixedOffset;
 use chrono::NaiveDate;
 use chrono::NaiveTime;
-use chrono::TimeZone;
 use chrono::{
     naive::NaiveDateTime,
-    prelude::{DateTime, Local, Utc},
+    prelude::{DateTime, Utc},
 };
 use tomboy_toml_dom::Toml;
 
