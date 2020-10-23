@@ -73,4 +73,9 @@ fn main() {
         doc.get_naive_time_by_key("lt1"),
         Some(NaiveTime::parse_from_str("07:32:00", "%H:%M:%S").unwrap())
     );
+
+    assert_eq!(
+        doc.get_naive_time_by_key("lt2"),
+        Some(NaiveTime::parse_from_str("00:32:00.999999", "%H:%M:%S%.6f").unwrap())
+    );
 }
