@@ -8,6 +8,7 @@ extern crate tomboy_toml_dom;
 use casual_logger::{Level, Log, Table};
 use chrono::FixedOffset;
 use chrono::NaiveDate;
+use chrono::NaiveTime;
 use chrono::TimeZone;
 use chrono::{
     naive::NaiveDateTime,
@@ -185,12 +186,12 @@ is preserved.
         })
     );
 
-    /*
     assert_eq!(
-        doc.get_datetime_utc_by_key("lt1"),
-        Some("07:32:00".parse::<DateTime<Utc>>().unwrap())
+        doc.get_naive_time_by_key("lt1"),
+        Some(NaiveTime::parse_from_str("07:32:00", "%H:%M:%S").unwrap())
     );
 
+    /*
     assert_eq!(
         doc.get_datetime_utc_by_key("lt2"),
         Some("00:32:00.999999".parse::<DateTime<Utc>>().unwrap())

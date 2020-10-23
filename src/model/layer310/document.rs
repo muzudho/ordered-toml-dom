@@ -9,6 +9,7 @@ use chrono::prelude::{DateTime, Local, Utc};
 use chrono::FixedOffset;
 use chrono::NaiveDate;
 use chrono::NaiveDateTime;
+use chrono::NaiveTime;
 use std::fmt;
 
 impl Default for Document {
@@ -308,6 +309,24 @@ impl Document {
     /// Date. Naive.  
     /// 日付。ナイーブ。  
     pub fn get_naive_date_by_key(&self, key: &str) -> Option<NaiveDate> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
+                            Err(_) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Time. Naive.  
+    /// 日時。ナイーブ。  
+    pub fn get_naive_time_by_key(&self, key: &str) -> Option<NaiveTime> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key.to_string() == key.to_string() {
