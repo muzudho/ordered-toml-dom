@@ -1,6 +1,7 @@
 //! Comment syntax parser.  
 //! コメント構文パーサー。  
 
+use crate::model::layer110::token::tokens_stringify;
 use crate::model::layer110::TokenType;
 use crate::parser::phase200::Token;
 use crate::parser::phase200::{
@@ -33,6 +34,7 @@ impl DateTimeP {
     pub fn flush(&mut self) -> Vec<Token> {
         let m = self.buffer.clone();
         self.buffer.clear();
+        println!("[trace36.flush={}]", tokens_stringify(&m));
         m
     }
     /// # Arguments
@@ -47,14 +49,51 @@ impl DateTimeP {
         match self.state {
             State::AfterSecond => PResult::Ongoing,
             State::End => {
-                return error(&mut self.log(), &tokens, "date_time_p.rs.42.");
+                return error(&mut self.log(), &tokens, "date_time_p.rs.50.");
             }
             State::FirstOfDate => {
                 let token0 = tokens.current.as_ref().unwrap();
+                let token1 = tokens.one_ahead.as_ref().unwrap();
                 match token0.type_ {
-                    TokenType::EndOfLine => return PResult::End,
-                    _ => {
+                    TokenType::EndOfLine => {
+                        println!("[trace59.]");
+                        return PResult::End;
+                    }
+                    TokenType::AbChar => match token0.to_string().as_str() {
+                        "T" => {
+                            println!("[trace64.]");
+                            self.buffer.push(token0.clone());
+                            self.state = State::End;
+                        }
+                        _ => {
+                            println!("[trace69.]");
+                            return error(&mut self.log(), &tokens, "date_time_p.rs.63.");
+                        }
+                    },
+                    TokenType::Hyphen | TokenType::NumChar => {
                         self.buffer.push(token0.clone());
+                        match token1.type_ {
+                            TokenType::AbChar => match token1.to_string().as_str() {
+                                "T" => {
+                                    println!("[trace78.]");
+                                }
+                                _ => {
+                                    println!("[trace81.]");
+                                    return error(&mut self.log(), &tokens, "date_time_p.rs.72.");
+                                }
+                            },
+                            TokenType::Hyphen | TokenType::NumChar => {
+                                println!("[trace86={}]", token0.to_string().as_str());
+                            }
+                            _ => {
+                                println!("[trace89={}]", token0.to_string().as_str());
+                                return PResult::End;
+                            }
+                        }
+                    }
+                    _ => {
+                        println!("[trace95.]");
+                        return error(&mut self.log(), &tokens, "date_time_p.rs.82.");
                     }
                 }
                 PResult::Ongoing

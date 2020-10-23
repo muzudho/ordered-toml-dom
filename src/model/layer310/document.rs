@@ -6,6 +6,9 @@ use crate::model::layer225::RightValue;
 use crate::model::layer230::DocumentElement::KeyValue;
 use crate::model::{layer230::DocumentElement, layer310::Document};
 use chrono::prelude::{DateTime, Local, Utc};
+use chrono::FixedOffset;
+use chrono::NaiveDate;
+use chrono::NaiveDateTime;
 use std::fmt;
 
 impl Default for Document {
@@ -251,6 +254,60 @@ impl Document {
     /// DateTime. Local.  
     /// 日付と時刻。ローカル時。  
     pub fn get_datetime_local_by_key(&self, key: &str) -> Option<DateTime<Local>> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
+                            Err(_) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// DateTime. Fixed offset.  
+    /// 日付と時刻。オフセット。  
+    pub fn get_datetime_fixed_offset_by_key(&self, key: &str) -> Option<DateTime<FixedOffset>> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
+                            Err(_) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// DateTime. Naive.  
+    /// 日付と時刻。ナイーブ。  
+    pub fn get_naive_datetime_by_key(&self, key: &str) -> Option<NaiveDateTime> {
+        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+            if let KeyValue(key_value) = doc_elm {
+                if key_value.key.to_string() == key.to_string() {
+                    if let RightValue::LiteralValue(literal_value) = &*key_value.value {
+                        match format!("{}", literal_value).to_string().parse() {
+                            Ok(n) => return Some(n),
+                            Err(_) => return None,
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    /// Date. Naive.  
+    /// 日付。ナイーブ。  
+    pub fn get_naive_date_by_key(&self, key: &str) -> Option<NaiveDate> {
         if let Some(doc_elm) = self.get_right_value_by_key(key) {
             if let KeyValue(key_value) = doc_elm {
                 if key_value.key.to_string() == key.to_string() {

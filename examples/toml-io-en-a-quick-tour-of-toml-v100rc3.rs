@@ -6,7 +6,12 @@
 extern crate tomboy_toml_dom;
 
 use casual_logger::{Level, Log, Table};
-use chrono::prelude::{DateTime, Local, Utc};
+use chrono::NaiveDate;
+use chrono::TimeZone;
+use chrono::{
+    naive::NaiveDateTime,
+    prelude::{DateTime, Local, Utc},
+};
 use tomboy_toml_dom::Toml;
 
 /// WIP.  
@@ -126,6 +131,7 @@ is preserved.
         false
     });
 
+    /*
     assert_eq!(
         doc.get_datetime_utc_by_key("odt1"),
         Some("1979-05-27T07:32:00Z".parse::<DateTime<Utc>>().unwrap())
@@ -146,11 +152,18 @@ is preserved.
                 .unwrap()
         )
     );
+    */
     // TODO Local datetime
     /*
     assert_eq!(
-        doc.get_datetime_local_by_key("ldt1"),
-        Some("1979-05-27T07:32:00".parse::<DateTime<Local>>().unwrap())
+        // "1979-05-27T07:32:00". Toml の独自書式か。該当するフォーマット定義見つからず。
+        doc.get_naive_datetime_by_key("ldt1"),
+        Some(
+            match NaiveDateTime::parse_from_str("1979-05-27 07:32:00", "%Y-%m-%d %H:%M:%S") {
+                Ok(n) => n,
+                Err(why) => panic!("{}", why),
+            }
+        )
     );
     */
     /*
@@ -162,10 +175,16 @@ is preserved.
                 .unwrap()
         )
     );
+    */
     assert_eq!(
-        doc.get_datetime_utc_by_key("ld1"),
-        Some("1979-05-27".parse::<DateTime<Utc>>().unwrap())
+        // "1979-05-27".
+        doc.get_naive_date_by_key("ld1"),
+        Some(match NaiveDate::parse_from_str("1979-05-27", "%Y-%m-%d") {
+            Ok(n) => n,
+            Err(why) => panic!("{}", why),
+        })
     );
+    /*
     assert_eq!(
         doc.get_datetime_utc_by_key("lt1"),
         Some("07:32:00".parse::<DateTime<Utc>>().unwrap())

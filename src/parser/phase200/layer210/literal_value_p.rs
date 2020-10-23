@@ -111,6 +111,9 @@ impl LiteralValueP {
                             }
                         }
                     }
+                } else {
+                    is_date = false;
+                    is_time = false;
                 }
                 if is_date {
                     // `??n?-`.
@@ -157,6 +160,26 @@ impl LiteralValueP {
                                     self.state = State::DateTime;
                                     self.date_time_p =
                                         Some(DateTimeP::new(DateTimeState::FirstOfDate));
+
+                                    let p = self.date_time_p.as_mut().unwrap();
+                                    match p.parse(&tokens) {
+                                        PResult::End => {
+                                            return error(
+                                                &mut self.log(),
+                                                &tokens,
+                                                "literal_value_p.rs.170.",
+                                            );
+                                        }
+                                        PResult::Err(mut table) => {
+                                            return error_via(
+                                                &mut table,
+                                                &mut self.log(),
+                                                &tokens,
+                                                "literal_value_p.rs.178.",
+                                            );
+                                        }
+                                        PResult::Ongoing => {}
+                                    }
                                 }
                                 _ => {
                                     is_date = false;
@@ -189,6 +212,26 @@ impl LiteralValueP {
                                     self.state = State::DateTime;
                                     self.date_time_p =
                                         Some(DateTimeP::new(DateTimeState::FirstOfTime));
+
+                                    let p = self.date_time_p.as_mut().unwrap();
+                                    match p.parse(&tokens) {
+                                        PResult::End => {
+                                            return error(
+                                                &mut self.log(),
+                                                &tokens,
+                                                "literal_value_p.rs.222.",
+                                            );
+                                        }
+                                        PResult::Err(mut table) => {
+                                            return error_via(
+                                                &mut table,
+                                                &mut self.log(),
+                                                &tokens,
+                                                "literal_value_p.rs.230.",
+                                            );
+                                        }
+                                        PResult::Ongoing => {}
+                                    }
                                 }
                                 _ => {
                                     is_date = false;

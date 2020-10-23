@@ -5,6 +5,7 @@
 
 extern crate tomboy_toml_dom;
 
+use chrono::NaiveDate;
 use tomboy_toml_dom::Toml;
 
 fn main() {
@@ -14,8 +15,12 @@ fn main() {
     println!("display=|{}|", doc);
     println!("debug=|{:?}|", doc);
 
-    // z = """abc\txyz"""
-    // assert_eq!(doc.get_string_by_key("z"), Some("abc\txyz".to_string()));
-    // float1 = +1.0
-    assert_eq!(doc.get_f64_by_key("float1"), Some(1.0));
+    assert_eq!(
+        // "1979-05-27".
+        doc.get_naive_date_by_key("ld1"),
+        Some(match NaiveDate::parse_from_str("1979-05-27", "%Y-%m-%d") {
+            Ok(n) => n,
+            Err(why) => panic!("{}", why),
+        })
+    );
 }
