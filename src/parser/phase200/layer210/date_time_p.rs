@@ -75,10 +75,19 @@ impl DateTimeP {
                         match token1.type_ {
                             TokenType::AbChar => match token1.to_string().as_str() {
                                 "T" => {
-                                    println!("[trace78.]");
+                                    println!(
+                                        "[trace78={}|{}]",
+                                        token0.to_string().as_str(),
+                                        token1.to_string().as_str()
+                                    );
+                                    self.state = State::FirstOfTime;
                                 }
                                 _ => {
-                                    println!("[trace81.]");
+                                    println!(
+                                        "[trace81={}|{}]",
+                                        token0.to_string().as_str(),
+                                        token1.to_string().as_str()
+                                    );
                                     return error(&mut self.log(), &tokens, "date_time_p.rs.72.");
                                 }
                             },
@@ -100,8 +109,66 @@ impl DateTimeP {
             }
             State::FirstOfTime => {
                 let token0 = tokens.current.as_ref().unwrap();
+                let token1 = tokens.one_ahead.as_ref().unwrap();
                 match token0.type_ {
-                    TokenType::EndOfLine => return PResult::End,
+                    TokenType::EndOfLine => {
+                        println!("[trace114.]");
+                        return PResult::End;
+                    }
+                    TokenType::Colon | TokenType::NumChar => {
+                        self.buffer.push(token0.clone());
+                        match token1.type_ {
+                            TokenType::AbChar => match token1.to_string().as_str() {
+                                "Z" => {
+                                    println!(
+                                        "[trace124={}|{}]",
+                                        token0.to_string().as_str(),
+                                        token1.to_string().as_str()
+                                    );
+                                    self.state = State::LongitudeZero;
+                                }
+                                _ => {
+                                    println!(
+                                        "[trace132={}|{}]",
+                                        token0.to_string().as_str(),
+                                        token1.to_string().as_str()
+                                    );
+                                    return error(&mut self.log(), &tokens, "date_time_p.rs.72.");
+                                }
+                            },
+                            TokenType::Dot => {
+                                println!(
+                                    "[trace141={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                                self.state = State::Point;
+                            }
+                            TokenType::Plus | TokenType::Hyphen => {
+                                println!(
+                                    "[trace149={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                                self.state = State::OffsetSign;
+                            }
+                            TokenType::Colon | TokenType::NumChar => {
+                                println!(
+                                    "[trace156={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                            }
+                            _ => {
+                                println!(
+                                    "[trace164={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                                return PResult::End;
+                            }
+                        }
+                    }
                     _ => {
                         self.buffer.push(token0.clone());
                     }

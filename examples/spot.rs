@@ -6,6 +6,7 @@
 extern crate tomboy_toml_dom;
 
 use chrono::NaiveDate;
+use chrono::NaiveDateTime;
 use tomboy_toml_dom::Toml;
 
 fn main() {
@@ -22,5 +23,16 @@ fn main() {
             Ok(n) => n,
             Err(why) => panic!("{}", why),
         })
+    );
+
+    assert_eq!(
+        // "1979-05-27T07:32:00". Toml の独自書式か。該当するフォーマット定義見つからず。
+        doc.get_naive_datetime_by_key("ldt1"),
+        Some(
+            match NaiveDateTime::parse_from_str("1979-05-27T07:32:00", "%Y-%m-%dT%H:%M:%S") {
+                Ok(n) => n,
+                Err(why) => panic!("{}", why),
+            }
+        )
     );
 }
