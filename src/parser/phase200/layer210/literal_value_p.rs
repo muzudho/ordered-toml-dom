@@ -156,7 +156,7 @@ impl LiteralValueP {
                             match ch0 {
                                 '0'..='9' => {
                                     // 日付型なのは確定。
-                                    println!("trace126.日付型確定。");
+                                    // println!("[trace126.日付型確定。]");
                                     self.state = State::DateTime;
                                     self.date_time_p =
                                         Some(DateTimeP::new(DateTimeState::FirstOfDate));
@@ -187,28 +187,27 @@ impl LiteralValueP {
                             }
                         }
                     }
-                }
-                if is_time {
+                } else if is_time {
                     // `?n:`.
-                    if is_date {
+                    if is_time {
                         if let Some(token1) = tokens.one_ahead.as_ref() {
                             if let Some(ch1) = token1.to_string().chars().nth(0) {
                                 match ch1 {
                                     '0'..='9' => {}
                                     _ => {
-                                        is_date = false;
+                                        is_time = false;
                                     }
                                 }
                             }
                         }
                     }
                     // `nn:`.
-                    if is_date {
+                    if is_time {
                         if let Some(ch0) = token0.to_string().chars().nth(0) {
                             match ch0 {
                                 '0'..='9' => {
                                     // 時刻型なのは確定。
-                                    println!("trace154.時刻型確定。");
+                                    // println!("[trace154.時刻型確定。]");
                                     self.state = State::DateTime;
                                     self.date_time_p =
                                         Some(DateTimeP::new(DateTimeState::FirstOfTime));
@@ -234,7 +233,7 @@ impl LiteralValueP {
                                     }
                                 }
                                 _ => {
-                                    is_date = false;
+                                    is_time = false;
                                 }
                             }
                         }
