@@ -185,6 +185,44 @@ impl DateTimeP {
             State::FractionalSeconds => {
                 let token0 = tokens.current.as_ref().unwrap();
                 let token1 = tokens.one_ahead.as_ref().unwrap();
+                match token0.type_ {
+                    TokenType::Dot | TokenType::NumChar => {
+                        self.buffer.push(token0.clone());
+                        match token1.type_ {
+                            TokenType::Hyphen | TokenType::Plus => {
+                                println!(
+                                    "[trace194={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                                self.state = State::OffsetSign;
+                            }
+                            TokenType::Dot | TokenType::NumChar => {
+                                println!(
+                                    "[trace202={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                            }
+                            _ => {
+                                println!(
+                                    "[trace209={}|{}]",
+                                    token0.to_string().as_str(),
+                                    token1.to_string().as_str()
+                                );
+                                return PResult::End;
+                            }
+                        }
+                    }
+                    _ => {
+                        println!(
+                            "[trace219={}|{}]",
+                            token0.to_string().as_str(),
+                            token1.to_string().as_str()
+                        );
+                        return error(&mut self.log(), &tokens, "date_time_p.rs.244.");
+                    }
+                }
                 PResult::Ongoing
             }
         }

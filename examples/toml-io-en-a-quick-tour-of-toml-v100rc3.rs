@@ -135,6 +135,7 @@ is preserved.
         doc.get_datetime_utc_by_key("odt1"),
         Some("1979-05-27T07:32:00Z".parse::<DateTime<Utc>>().unwrap())
     );
+
     /*
     assert_eq!(
         doc.get_datetime_utc_by_key("odt2"),
@@ -144,6 +145,7 @@ is preserved.
                 .unwrap()
         )
     );
+
     assert_eq!(
         doc.get_datetime_utc_by_key("odt3"),
         Some(
@@ -153,6 +155,7 @@ is preserved.
         )
     );
     */
+
     // TODO Local datetime
     assert_eq!(
         // "1979-05-27T07:32:00". Toml の独自書式か。該当するフォーマット定義見つからず。
@@ -164,14 +167,16 @@ is preserved.
             }
         )
     );
+
     assert_eq!(
-        doc.get_datetime_utc_by_key("ldt2"),
+        // "1979-05-27T00:32:00.999999".
+        doc.get_naive_datetime_by_key("ldt2"),
         Some(
-            "1979-05-27T00:32:00.999999"
-                .parse::<DateTime<Utc>>()
+            NaiveDateTime::parse_from_str("1979-05-27T00:32:00.999999", "%Y-%m-%dT%H:%M:%S%.6f")
                 .unwrap()
         )
     );
+
     assert_eq!(
         // "1979-05-27".
         doc.get_naive_date_by_key("ld1"),
@@ -180,11 +185,13 @@ is preserved.
             Err(why) => panic!("{}", why),
         })
     );
+
     /*
     assert_eq!(
         doc.get_datetime_utc_by_key("lt1"),
         Some("07:32:00".parse::<DateTime<Utc>>().unwrap())
     );
+
     assert_eq!(
         doc.get_datetime_utc_by_key("lt2"),
         Some("00:32:00.999999".parse::<DateTime<Utc>>().unwrap())
