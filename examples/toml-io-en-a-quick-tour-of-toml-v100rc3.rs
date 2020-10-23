@@ -164,7 +164,6 @@ is preserved.
             }
         )
     );
-    /*
     assert_eq!(
         doc.get_datetime_utc_by_key("ldt2"),
         Some(
@@ -173,7 +172,6 @@ is preserved.
                 .unwrap()
         )
     );
-    */
     assert_eq!(
         // "1979-05-27".
         doc.get_naive_date_by_key("ld1"),

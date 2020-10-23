@@ -20,7 +20,7 @@ pub enum State {
     FirstOfDate,
     FirstOfTime,
     LongitudeZero,
-    Point,
+    FractionalSeconds,
     OffsetSign,
 }
 
@@ -142,7 +142,7 @@ impl DateTimeP {
                                     token0.to_string().as_str(),
                                     token1.to_string().as_str()
                                 );
-                                self.state = State::Point;
+                                self.state = State::FractionalSeconds;
                             }
                             TokenType::Plus | TokenType::Hyphen => {
                                 println!(
@@ -182,7 +182,11 @@ impl DateTimeP {
                 PResult::End
             }
             State::OffsetSign => PResult::Ongoing,
-            State::Point => PResult::Ongoing,
+            State::FractionalSeconds => {
+                let token0 = tokens.current.as_ref().unwrap();
+                let token1 = tokens.one_ahead.as_ref().unwrap();
+                PResult::Ongoing
+            }
         }
     }
     /// Log.  

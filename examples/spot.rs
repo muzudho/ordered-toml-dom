@@ -39,4 +39,13 @@ fn main() {
         doc.get_datetime_utc_by_key("odt1"),
         Some("1979-05-27T07:32:00Z".parse::<DateTime<Utc>>().unwrap())
     );
+
+    assert_eq!(
+        // "1979-05-27T00:32:00.999999".
+        doc.get_naive_datetime_by_key("ldt2"),
+        Some(
+            NaiveDateTime::parse_from_str("1979-05-27T00:32:00.999999", "%Y-%m-%dT%H:%M:%S%.6f")
+                .unwrap()
+        )
+    );
 }
