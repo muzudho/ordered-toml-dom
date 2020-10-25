@@ -1,10 +1,10 @@
 use casual_logger::{Level, Log, Table};
-use tomboy_toml_dom::model::layer310::Document;
+use tomboy_toml_dom::model::layer310::TomlDocument;
 
 pub trait LogExt {
     fn println(s: &str);
     fn println_t(s: &str, t: &mut Table);
-    fn info_toml_document(toml_file: &str, doc: &Document);
+    fn info_toml_document(toml_file: &str, doc: &TomlDocument);
 }
 
 impl LogExt for Log {
@@ -24,7 +24,7 @@ impl LogExt for Log {
         Log::infoln_t(s, t);
     }
 
-    fn info_toml_document(toml_file: &str, doc: &Document) {
+    fn info_toml_document(toml_file: &str, doc: &TomlDocument) {
         Log::info_t(
             "Read",
             Table::default()

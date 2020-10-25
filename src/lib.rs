@@ -23,7 +23,7 @@ pub mod model;
 mod parser;
 mod util;
 
-use crate::model::layer310::Document;
+use crate::model::layer310::TomlDocument;
 use crate::parser::{
     phase100::lexical_parser::LexicalParser,
     phase200::{layer210::PResult, layer310::DocumentP},
@@ -39,9 +39,9 @@ pub struct Toml {}
 impl Toml {
     /// Line scan.
     /// 行走査。
-    pub fn from_file(path: &str) -> Document {
+    pub fn from_file(path: &str) -> TomlDocument {
         let mut error_tables = Vec::<Table>::new();
-        let mut output_document = Document::default();
+        let mut output_document = TomlDocument::default();
         match File::open(path) {
             Ok(file) => {
                 let mut document_p = DocumentP::default();

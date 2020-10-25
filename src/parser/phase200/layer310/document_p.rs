@@ -1,7 +1,7 @@
 //! Document syntax parser.  
 //! ドキュメント構文解析器。  
 
-use crate::model::{layer110::TokenLine, layer310::Document};
+use crate::model::{layer110::TokenLine, layer310::TomlDocument};
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error_via,
@@ -21,7 +21,7 @@ impl DocumentP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn scan_line(&mut self, token_line: &TokenLine, doc: &mut Document) -> PResult {
+    pub fn scan_line(&mut self, token_line: &TokenLine, doc: &mut TomlDocument) -> PResult {
         // * `tokens` - Tokens contains look ahead.
         //             先読みを含むトークン。
         // (Current token, 1 ahead token, 2 ahead token)
@@ -82,7 +82,7 @@ impl DocumentP {
     ///
     /// * `tokens` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
-    fn one_delay_loop(&mut self, tokens: &LookAheadTokens, doc: &mut Document) -> PResult {
+    fn one_delay_loop(&mut self, tokens: &LookAheadTokens, doc: &mut TomlDocument) -> PResult {
         if let None = self.document_element_p {
             self.document_element_p = Some(DocumentElementP::default());
         }

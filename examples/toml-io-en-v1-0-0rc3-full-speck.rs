@@ -6,13 +6,6 @@
 extern crate tomboy_toml_dom;
 
 use casual_logger::{Level, Log, Table};
-use chrono::FixedOffset;
-use chrono::NaiveDate;
-use chrono::NaiveTime;
-use chrono::{
-    naive::NaiveDateTime,
-    prelude::{DateTime, Utc},
-};
 use tomboy_toml_dom::Toml;
 
 /// WIP.  

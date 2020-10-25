@@ -4,7 +4,7 @@
 use crate::model::layer210::LiteralValue;
 use crate::model::layer225::RightValue;
 use crate::model::layer230::DocumentElement::KeyValue;
-use crate::model::{layer230::DocumentElement, layer310::Document};
+use crate::model::{layer230::DocumentElement, layer310::TomlDocument};
 use chrono::prelude::{DateTime, Local, Utc};
 use chrono::FixedOffset;
 use chrono::NaiveDate;
@@ -12,14 +12,14 @@ use chrono::NaiveDateTime;
 use chrono::NaiveTime;
 use std::fmt;
 
-impl Default for Document {
+impl Default for TomlDocument {
     fn default() -> Self {
-        Document {
+        TomlDocument {
             elements: Vec::new(),
         }
     }
 }
-impl Document {
+impl TomlDocument {
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
     pub fn get_right_value_by_key(&self, key: &str) -> Option<&DocumentElement> {
@@ -489,7 +489,7 @@ impl Document {
         format!("{}", self)
     }
 }
-impl fmt::Display for Document {
+impl fmt::Display for TomlDocument {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for elem in &self.elements {
@@ -498,7 +498,7 @@ impl fmt::Display for Document {
         write!(f, "{}", buf)
     }
 }
-impl fmt::Debug for Document {
+impl fmt::Debug for TomlDocument {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for elem in &self.elements {
