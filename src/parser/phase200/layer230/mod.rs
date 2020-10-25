@@ -19,4 +19,6 @@ pub struct ExpressionP {
     state: ExpressionState,
     /// White space parser 1.
     ws_p_1: Option<WSP>,
+    /// White space parser 2.
+    ws_p_2: Option<WSP>,
 }

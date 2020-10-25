@@ -16,8 +16,13 @@ impl Expression {
     pub fn from_empty_line(ws: &WS, comment: &Comment) -> Self {
         Expression::EmptyLine(ws.clone(), Some(comment.clone()))
     }
-    pub fn from_keyval(m: &Keyval) -> Self {
-        Expression::Keyval(m.clone())
+    pub fn from_keyval(ws1: &WS, keyval: &Keyval, ws2: &WS, comment: &Comment) -> Self {
+        Expression::Keyval(
+            ws1.clone(),
+            keyval.clone(),
+            ws2.clone(),
+            Some(comment.clone()),
+        )
     }
     pub fn from_header_of_table(m: &HeaderOfTable) -> Self {
         Expression::HeaderOfTable(m.clone())
@@ -43,7 +48,18 @@ impl fmt::Display for Expression {
                     "".to_string()
                 }
             ),
-            Expression::Keyval(m) => write!(f, "{}", m),
+            Expression::Keyval(ws1, keyval, ws2, comment) => write!(
+                f,
+                "{}{}{}{}",
+                ws1,
+                keyval,
+                ws2,
+                if let Some(comment) = comment {
+                    comment.to_string()
+                } else {
+                    "".to_string()
+                }
+            ),
             Expression::HeaderOfTable(m) => write!(f, "{}", m),
         }
     }
@@ -53,7 +69,9 @@ impl fmt::Debug for Expression {
         match self {
             Expression::HeaderOfArrayOfTable(m) => write!(f, "{:?}", m),
             Expression::EmptyLine(ws, comment) => write!(f, "{:?}{:?}", ws, comment),
-            Expression::Keyval(m) => write!(f, "{:?}", m),
+            Expression::Keyval(ws1, keyval, ws2, comment) => {
+                write!(f, "{:?}{:?}{:?}{:?}", ws1, keyval, ws2, comment)
+            }
             Expression::HeaderOfTable(m) => write!(f, "{:?}", m),
         }
     }

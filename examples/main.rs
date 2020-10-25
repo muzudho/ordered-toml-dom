@@ -48,12 +48,12 @@ fn main() {
                         ),
                 );
             }
-            Expression::Keyval(m) => {
+            Expression::Keyval(_ws1, keyval, _ws2, _comment) => {
                 Log::info_t(
                     "Scan a Broad-line.",
-                    Table::default().str("Keyval", &format!("{}", m)),
+                    Table::default().str("Keyval", &format!("{}", keyval)),
                 );
-                match *m.val {
+                match *keyval.val {
                     Val::Array(m) => Log::info(&format!("{}", m)),
                     Val::BasicString(m) => Log::info(&format!("{}", m)),
                     Val::InlineTable(m) => Log::info(&format!("{}", m)),
