@@ -38,12 +38,20 @@ fn main() {
                     Table::default().str("Comment", &format!("{}", m)),
                 );
             }
-            Expression::EmptyLine(ws) => {
+            Expression::EmptyLine(ws, comment) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default()
                         .str("EmptyLine", "")
-                        .str("ws", &ws.to_string()),
+                        .str("ws", &ws.to_string())
+                        .str(
+                            "comment",
+                            &if let Some(comment) = comment.as_ref() {
+                                comment.to_string()
+                            } else {
+                                "".to_string()
+                            },
+                        ),
                 );
             }
             Expression::KeyValue(m) => {

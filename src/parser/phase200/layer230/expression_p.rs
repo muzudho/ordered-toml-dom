@@ -147,10 +147,6 @@ impl ExpressionP {
             }
             State::FirstWhitespace1 => match token0.type_ {
                 TokenType::EndOfLine => {
-                    if let Some(_) = &self.comment_p {
-                        self.comment_p = None;
-                        return PResult::End;
-                    }
                     if let Some(_) = &self.key_value_p {
                         self.key_value_p = None;
                         return PResult::End;
@@ -161,7 +157,16 @@ impl ExpressionP {
                         } else {
                             WS::default()
                         },
+                        if let Some(comment_p) = self.comment_p.as_mut() {
+                            comment_p.flush()
+                        } else {
+                            None
+                        },
                     ));
+                    if let Some(_) = &self.comment_p {
+                        self.comment_p = None;
+                        return PResult::End;
+                    }
                     self.ws_p_1 = None;
                     self.state = State::Finished;
                     return PResult::End;

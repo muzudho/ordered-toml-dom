@@ -20,7 +20,7 @@ pub struct HeaderOfArrayOfTable {
 pub enum Expression {
     HeaderOfArrayOfTable(HeaderOfArrayOfTable),
     Comment(Comment),
-    EmptyLine(WS),
+    EmptyLine(WS, Option<Comment>),
     KeyValue(KeyValue),
     HeaderOfTable(HeaderOfTable),
 }
