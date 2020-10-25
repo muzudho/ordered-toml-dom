@@ -1,14 +1,14 @@
 //! Key value syntax parser.  
 //! キー値構文パーサー。  
 
-use crate::model::{layer110::TokenType, layer225::RightValue};
+use crate::model::{layer110::TokenType, layer225::Val};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{BasicStringP, LiteralStringP, LiteralValueP, PResult},
     layer220::ArrayP,
-    layer225::{InlineTableP, RightValueP},
+    layer225::{InlineTableP, ValP},
 };
 use casual_logger::Table as LogTable;
 
@@ -27,9 +27,9 @@ pub enum State {
     End,
 }
 
-impl Default for RightValueP {
+impl Default for ValP {
     fn default() -> Self {
-        RightValueP {
+        ValP {
             array_p: None,
             buffer: None,
             basic_string_p: None,
@@ -40,8 +40,8 @@ impl Default for RightValueP {
         }
     }
 }
-impl RightValueP {
-    pub fn flush(&mut self) -> Option<RightValue> {
+impl ValP {
+    pub fn flush(&mut self) -> Option<Val> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
@@ -64,7 +64,7 @@ impl RightValueP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::InlineTable(child_m));
+                            self.buffer = Some(Val::InlineTable(child_m));
                             self.inline_table_p = None;
                             self.state = State::End;
                             return PResult::End;
@@ -84,7 +84,7 @@ impl RightValueP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::Array(child_m));
+                            self.buffer = Some(Val::Array(child_m));
                             self.array_p = None;
                             self.state = State::End;
                             return PResult::End;
@@ -104,7 +104,7 @@ impl RightValueP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::BasicString(child_m));
+                            self.buffer = Some(Val::BasicString(child_m));
                             self.basic_string_p = None;
                             self.state = State::End;
                             return PResult::End;
@@ -152,7 +152,7 @@ impl RightValueP {
                         match p.parse(&tokens) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
-                                    self.buffer = Some(RightValue::LiteralValue(child_m));
+                                    self.buffer = Some(Val::LiteralValue(child_m));
                                     self.literal_value_p = None;
                                     self.state = State::End;
                                     return PResult::End;
@@ -179,7 +179,7 @@ impl RightValueP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::LiteralValue(child_m));
+                            self.buffer = Some(Val::LiteralValue(child_m));
                             self.literal_value_p = None;
                             self.state = State::End;
                             return PResult::End;
@@ -199,7 +199,7 @@ impl RightValueP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.buffer = Some(RightValue::LiteralString(child_m));
+                            self.buffer = Some(Val::LiteralString(child_m));
                             self.literal_string_p = None;
                             self.state = State::End;
                             return PResult::End;

@@ -25,14 +25,15 @@ pub enum State {
     End,
     /// `[[name]]`
     HeaderOfArrayOfTable,
-    /// Whitespace and comment.
-    WsComment,
     Finished,
-    FirstWhitespace1,
-    /// `key = val`.
-    KeyvalSyntax,
     /// `[name]`
     Table,
+    /// Whitespace 1.
+    Ws1,
+    /// Whitespace 1 and comment.
+    Ws1Comment,
+    /// `key = val`.
+    Ws1Keyval,
 }
 
 impl Default for ExpressionP {
@@ -43,7 +44,7 @@ impl Default for ExpressionP {
             header_p_of_array_of_table: None,
             header_p_of_table: None,
             keyval_p: None,
-            state: State::FirstWhitespace1,
+            state: State::Ws1,
             ws_p_1: None,
         }
     }
@@ -121,39 +122,13 @@ impl ExpressionP {
                     PResult::Ongoing => {}
                 }
             }
-            State::WsComment => {
-                let p = self.comment_p.as_mut().unwrap();
-                match p.parse(&tokens) {
-                    PResult::End => {
-                        self.buffer = Some(Expression::EmptyLine(
-                            if let Some(ws_p_1) = self.ws_p_1.as_mut() {
-                                ws_p_1.flush()
-                            } else {
-                                WS::default()
-                            },
-                            if let Some(comment_p) = self.comment_p.as_mut() {
-                                comment_p.flush()
-                            } else {
-                                None
-                            },
-                        ));
-                        self.ws_p_1 = None;
-                        self.comment_p = None;
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &tokens,
-                            "document_element.rs.162.",
-                        );
-                    }
-                    PResult::Ongoing => {}
-                }
+            State::Finished => {
+                return error(&mut self.log(), &tokens, "document_element.rs.205.");
             }
-            State::FirstWhitespace1 => match token0.type_ {
+            State::Table => {
+                return self.parse_header_of_table(tokens);
+            }
+            State::Ws1 => match token0.type_ {
                 TokenType::EndOfLine => {
                     self.buffer = Some(Expression::EmptyLine(
                         if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -194,7 +169,7 @@ impl ExpressionP {
                         }
                         PResult::Ongoing => {}
                     }
-                    self.state = State::KeyvalSyntax;
+                    self.state = State::Ws1Keyval;
                 }
                 // `[`
                 TokenType::LeftSquareBracket => {
@@ -203,7 +178,7 @@ impl ExpressionP {
                 // `#`
                 TokenType::Sharp => {
                     self.comment_p = Some(CommentP::new());
-                    self.state = State::WsComment;
+                    self.state = State::Ws1Comment;
                 }
                 TokenType::WhiteSpaceString => {
                     if let None = self.ws_p_1 {
@@ -228,10 +203,39 @@ impl ExpressionP {
                     return error(&mut self.log(), &tokens, "document_element.rs.246.");
                 }
             },
-            State::Finished => {
-                return error(&mut self.log(), &tokens, "document_element.rs.205.");
+            State::Ws1Comment => {
+                let p = self.comment_p.as_mut().unwrap();
+                match p.parse(&tokens) {
+                    PResult::End => {
+                        self.buffer = Some(Expression::EmptyLine(
+                            if let Some(ws_p_1) = self.ws_p_1.as_mut() {
+                                ws_p_1.flush()
+                            } else {
+                                WS::default()
+                            },
+                            if let Some(comment_p) = self.comment_p.as_mut() {
+                                comment_p.flush()
+                            } else {
+                                None
+                            },
+                        ));
+                        self.ws_p_1 = None;
+                        self.comment_p = None;
+                        self.state = State::End;
+                        return PResult::End;
+                    }
+                    PResult::Err(mut table) => {
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &tokens,
+                            "document_element.rs.162.",
+                        );
+                    }
+                    PResult::Ongoing => {}
+                }
             }
-            State::KeyvalSyntax => {
+            State::Ws1Keyval => {
                 let p = self.keyval_p.as_mut().unwrap();
                 match p.parse(&tokens) {
                     PResult::End => {
@@ -254,9 +258,6 @@ impl ExpressionP {
                     }
                     PResult::Ongoing => {}
                 }
-            }
-            State::Table => {
-                return self.parse_header_of_table(tokens);
             }
         }
 

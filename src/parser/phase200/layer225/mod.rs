@@ -4,14 +4,14 @@ pub mod val_p;
 
 use crate::model::{
     layer210::Key,
-    layer225::{InlineTable, RightValue},
+    layer225::{InlineTable, Val},
 };
 use crate::parser::phase200::{
     layer210::{BasicStringP, KeyP, LiteralStringP, LiteralValueP},
     layer220::ArrayP,
     layer225::{
         inline_table_p::State as InlineTableState, keyval_p::State as KeyvalState,
-        val_p::State as RightValueState,
+        val_p::State as ValState,
     },
 };
 
@@ -31,9 +31,9 @@ pub struct InlineTableP {
 /// `key = value`.  
 pub struct KeyvalP {
     key_buffer: Option<Key>,
-    val_buffer: Option<RightValue>,
+    val_buffer: Option<Val>,
     key_p: Option<KeyP>,
-    val_p: Option<RightValueP>,
+    val_p: Option<ValP>,
     state: KeyvalState,
 }
 
@@ -41,12 +41,12 @@ pub struct KeyvalP {
 /// 右値構文パーサー。  
 ///
 /// `key = this`.  
-pub struct RightValueP {
+pub struct ValP {
     array_p: Option<ArrayP>,
-    buffer: Option<RightValue>,
+    buffer: Option<Val>,
     basic_string_p: Option<BasicStringP>,
     inline_table_p: Option<InlineTableP>,
     literal_value_p: Option<LiteralValueP>,
     literal_string_p: Option<LiteralStringP>,
-    state: RightValueState,
+    state: ValState,
 }

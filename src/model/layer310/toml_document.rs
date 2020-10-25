@@ -2,7 +2,7 @@
 //! ドキュメント・モデル。  
 
 use crate::model::layer210::LiteralValue;
-use crate::model::layer225::RightValue;
+use crate::model::layer225::Val;
 use crate::model::layer230::Expression::Keyval;
 use crate::model::{layer230::Expression, layer310::TomlDocument};
 use chrono::prelude::{DateTime, Local, Utc};
@@ -68,7 +68,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         return Some(literal_value);
                     }
                 }
@@ -94,7 +94,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         // アンダースコアは除去しないと変換できない。
                         let s = literal_value.to_string().replace("_", "");
 
@@ -135,7 +135,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         // アンダースコアは除去しないと変換できない。
                         let s = literal_value.to_string().replace("_", "");
 
@@ -177,7 +177,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         // アンダースコアは除去しないと変換できない。
                         let s = literal_value.to_string().replace("_", "");
 
@@ -219,7 +219,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         // アンダースコアは除去しないと変換できない。
                         let s = literal_value.to_string().replace("_", "");
 
@@ -267,7 +267,7 @@ impl TomlDocument {
                 // println!("[trace86]");
                 if keyval.key.to_string() == key.to_string() {
                     // println!("[trace88]");
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         // println!("[trace90]");
                         let s = literal_value.to_string();
 
@@ -316,11 +316,11 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    match &*keyval.value {
-                        RightValue::BasicString(basic_string) => {
+                    match &*keyval.val {
+                        Val::BasicString(basic_string) => {
                             return Some(basic_string.to_string());
                         }
-                        RightValue::LiteralString(literal_string) => {
+                        Val::LiteralString(literal_string) => {
                             return Some(literal_string.to_string());
                         }
                         _ => {}
@@ -335,11 +335,11 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    match &*keyval.value {
-                        RightValue::BasicString(basic_string) => {
+                    match &*keyval.val {
+                        Val::BasicString(basic_string) => {
                             return basic_string.to_debug_string();
                         }
-                        RightValue::LiteralString(literal_string) => {
+                        Val::LiteralString(literal_string) => {
                             return literal_string.to_debug_string();
                         }
                         _ => {}
@@ -356,7 +356,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         match literal_value.to_string().parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
@@ -374,7 +374,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         match format!("{}", literal_value).to_string().parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
@@ -392,7 +392,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         match format!("{}", literal_value).to_string().parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
@@ -410,7 +410,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         match format!("{}", literal_value).to_string().parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
@@ -428,7 +428,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         match format!("{}", literal_value).to_string().parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
@@ -446,7 +446,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         match format!("{}", literal_value).to_string().parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,
@@ -464,7 +464,7 @@ impl TomlDocument {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
-                    if let RightValue::LiteralValue(literal_value) = &*keyval.value {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
                         match format!("{}", literal_value).to_string().parse() {
                             Ok(n) => return Some(n),
                             Err(_) => return None,

@@ -10,7 +10,7 @@ mod modules;
 use crate::modules::log_ext::LogExt;
 use casual_logger::{Log, Table};
 use tomboy_toml_dom::{
-    model::{layer225::RightValue, layer230::Expression},
+    model::{layer225::Val, layer230::Expression},
     Toml,
 };
 
@@ -53,12 +53,12 @@ fn main() {
                     "Scan a Broad-line.",
                     Table::default().str("Keyval", &format!("{}", m)),
                 );
-                match *m.value {
-                    RightValue::Array(m) => Log::info(&format!("{}", m)),
-                    RightValue::BasicString(m) => Log::info(&format!("{}", m)),
-                    RightValue::InlineTable(m) => Log::info(&format!("{}", m)),
-                    RightValue::LiteralValue(m) => Log::info(&format!("{}", m)),
-                    RightValue::LiteralString(m) => Log::info(&format!("{}", m)),
+                match *m.val {
+                    Val::Array(m) => Log::info(&format!("{}", m)),
+                    Val::BasicString(m) => Log::info(&format!("{}", m)),
+                    Val::InlineTable(m) => Log::info(&format!("{}", m)),
+                    Val::LiteralValue(m) => Log::info(&format!("{}", m)),
+                    Val::LiteralString(m) => Log::info(&format!("{}", m)),
                 }
             }
             Expression::HeaderOfTable(m) => {

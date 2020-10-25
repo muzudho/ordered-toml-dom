@@ -13,7 +13,7 @@ use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{KeyP, PResult},
-    layer225::{KeyvalP, RightValueP},
+    layer225::{KeyvalP, ValP},
 };
 use casual_logger::Table as LogTable;
 
@@ -27,7 +27,7 @@ pub enum State {
     BeforeEqual,
     End,
     First,
-    RightValue,
+    Val,
 }
 
 impl KeyvalP {
@@ -69,8 +69,8 @@ impl KeyvalP {
         match self.state {
             // After `=`.
             State::AfterEquals => {
-                self.val_p = Some(RightValueP::default());
-                self.state = State::RightValue;
+                self.val_p = Some(ValP::default());
+                self.state = State::Val;
             }
             // After key.
             State::BeforeEqual => {
@@ -116,7 +116,7 @@ impl KeyvalP {
                 }
             }
             // After `=`.
-            State::RightValue => {
+            State::Val => {
                 let p = self.val_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {

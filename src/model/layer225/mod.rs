@@ -12,15 +12,15 @@ use crate::model::{
 #[derive(Clone)]
 pub struct Keyval {
     pub key: Box<Key>,
-    /// Recursive.
-    /// 再帰的。
-    pub value: Box<RightValue>,
+    /// Right value. Recursive.
+    /// 右値。 再帰的。
+    pub val: Box<Val>,
 }
 
 /// The right side of the key value model.  
 /// キー値モデルの右辺です。  
 #[derive(Clone)]
-pub enum RightValue {
+pub enum Val {
     /// Recursive.
     /// 再帰的。
     Array(Array),
