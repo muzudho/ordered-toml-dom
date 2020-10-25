@@ -1,0 +1,116 @@
+age = 40 # Comment.
+weight = 93.5 # Comment.
+
+# Long. 32bit size.
+i32_max = 2_147_483_647 # Comment.
+i32_min = -2_147_483_648 # Comment.
+u32_max = 4_294_967_295 # Comment.
+
+# Long long. 64bit size.
+i64_max = 9_223_372_036_854_775_807 # Comment.
+i64_min = -9_223_372_036_854_775_808 # Comment.
+u64_max = 18_446_744_073_709_551_615 # Comment.
+
+# 128bit size.
+i128_max = 170_141_183_460_469_231_731_687_303_715_884_105_727 # Comment.
+i128_min = -170_141_183_460_469_231_731_687_303_715_884_105_728 # Comment.
+u128_max = 340_282_366_920_938_463_463_374_607_431_768_211_455 # Comment.
+
+# hexadecimal with prefix `0x`
+hex1 = 0xDEADBEEF # Comment.
+hex2 = 0xdeadbeef # Comment.
+hex3 = 0xdead_beef # Comment.
+
+# octal with prefix `0o`
+oct1 = 0o01234567 # Comment.
+oct2 = 0o755 # Comment.
+
+# binary with prefix `0b`
+bin1 = 0b11010110 # Comment.
+
+# fractional
+float1 = +1.0 # Comment.
+float2 = 3.1415 # Comment.
+float3 = -0.01 # Comment.
+
+# exponent
+float4 = 5e+22 # Comment.
+float5 = 1e06 # Comment.
+float6 = -2E-2 # Comment.
+
+# both
+float7 = 6.626e-34 # Comment.
+
+# separators
+float8 = 224_617.445_991_228 # Comment.
+
+# infinity
+infinite1 = inf # positive infinity
+infinite2 = +inf # positive infinity
+infinite3 = -inf # negative infinity
+
+# not a number
+not1 = nan # Comment.
+not2 = +nan # Comment.
+not3 = -nan # Comment.
+
+# basic string
+apple = "pie" # Comment.
+basic_string_empty = "" # Comment.
+basic_string_escape_backslash = "\\" # Comment.
+basic_string_escape_double_quotation = "\"" # Comment.
+basic_string_letter = "Hello, world!!" # Comment.
+basic_string_punctuation = "., ={}[]'\"\\!?" # Comment.
+basic_string_tab = "a\tb" # Comment.
+
+multiline_basic_string_letter = """Hello,
+world!!""" # Comment.
+multiline_basic_string_punctuation = """., ={}[]"'""\\
+!?""" # Comment.
+multiline_basic_string_trim_start = """\
+  The quick brown \
+  fox jumps over \
+  the lazy dog.\
+  """ # Comment.
+multiline_basic_string_escape_double_quotation = """
+\\
+""" # Comment.
+multiline_basic_string_tab = """
+a\tb
+""" # Comment.
+
+literal_string_empty = '' # Comment.
+literal_string_letter = 'Hello, world!!' # Comment.
+literal_string_punctuation = '., ={}[]"\!?' # Comment.
+
+multiline_literal_string_letter = '''Hello,
+world!!''' # Comment.
+multiline_literal_string_punctuation = '''., ={}[]'"\
+!?''' # Comment.
+multiline_literal_string_first_newline_is_trimmed = '''
+The first newline is
+trimmed in raw strings.
+All other whitespace
+is preserved.
+''' # Comment.
+
+adult = true # Comment.
+student = false # Comment.
+
+dob = 1979-05-27T07:32:00-08:00 # Comment.
+
+#offset datetime
+odt1 = 1979-05-27T07:32:00Z # Comment.
+odt2 = 1979-05-27T00:32:00-07:00 # Comment.
+odt3 = 1979-05-27T00:32:00.999999-07:00 # Comment.
+
+# local datetime
+ldt1 = 1979-05-27T07:32:00 # Comment.
+ldt2 = 1979-05-27T00:32:00.999999 # Comment.
+
+# local date
+ld1 = 1979-05-27 # Comment.
+
+# local time
+lt1 = 07:32:00 # Comment.
+lt2 = 00:32:00.999999 # Comment.

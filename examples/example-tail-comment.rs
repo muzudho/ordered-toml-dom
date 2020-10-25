@@ -1,46 +1,3 @@
-# Tomboy toml dom
-
-For those who are struggling with Rust's cool syntax, our goal is to provide a TOML parser that's as easy as pointing to a menu and eating fast food.  
-Rustのイケてる構文に難儀している人のために、メニューを指差してファーストフードを食べるぐらい簡単な操作のTOMLパーサーを提供することを目標とします。  
-
-Unstable version. It's a tryal and error process. Specifications will change.  
-不安定版。 試行錯誤中です。 仕様はコロコロ変わるでしょう。  
-
-Tomboy is a pun.  
-トムボーイ（おてんば娘）は語呂合わせです。  
-
-References:  
-
-* [Developer's blog(開発者ブログ)](https://crieit.net/drafts/5f8094a14a0cf)
-* [TOML parsing（TOMLの構文解析）](https://crieit.net/posts/TOML-parsing-TOML)
-
-## Run (実行)
-
-Take a look at the repository.  
-リポジトリを見てください。  
-
-```shell
-cargo run --example comment
-cargo run --example example
-cargo run --example example-tail-comment
-cargo run --example inline_table
-cargo run --example main
-cargo run --example mix_array
-cargo run --example spot
-cargo run --example table
-cargo run --example toml-io-en-a-quick-tour-of-toml-v1-0-0rc3
-cargo run --example toml-io-en-v1-0-0rc3-full-speck
-```
-
-## Specification (仕様)
-
-The specifications will gradually solidify.  
-仕様は少しずつ固めていきます。  
-
-You can think that you can't do anything that isn't written here.  
-ここに書かれていないことは何もできないと思ってもらって構いません。  
-
-```rust
 //! An exemplary program.
 //! 模範的なプログラム。
 //!
@@ -57,7 +14,7 @@ use tomboy_toml_dom::Toml;
 fn main() {
     // Read a toml.
     // Toml読取。
-    let doc = Toml::from_file("./resource/example.toml");
+    let doc = Toml::from_file("./resource/example-tail-comment.toml");
 
     // Read a number.
     // 数値読取。
@@ -312,58 +269,3 @@ is preserved.
         Some(NaiveTime::parse_from_str("00:32:00.999999", "%H:%M:%S%.6f").unwrap())
     );
 }
-```
-
-## TODO
-
-* [ ] Comment
-  * [x] In empty line.
-  * [x] After keyval.
-  * [ ] After table.
-* [ ] Literal
-  * [ ] Literal numbers...
-    * [ ] integer
-      * [x] `0b` - binary.
-      * [x] `0o` - octal.
-      * [x] `0x` - hexadecimal.
-      * [x] `_` - separators.
-    * [ ] float
-      * [x] `.` - point. Example: `3.14`.
-      * [x] `_` - separators.
-      * [x] `inf` - Positive infinity.
-      * [x] `+inf` - Positive infinity.
-      * [x] `-inf` - Negative infinity.
-      * [x] `nan` - Not a number. Positive.
-      * [x] `+nan` - Not a number. Positive.
-      * [x] `-nan` - Not a number. Negative.
-* [ ] String (Not str)
-  * [x] `"abc"` - Basic string.
-    * [x] Plain.
-    * [ ] Escape sequence.
-  * [ ] `"""abc"""` - Multi-line basic string.
-    * [x] Plain.
-    * [ ] Escape sequence.
-    * [x] Ending backslash to automatically trim.
-  * [ ] `'abc'` - Literal string.
-    * [x] Plain.
-  * [ ] `'''abc'''` - multi-line literal string.
-    * [x] Plain.
-    * [x] The first newline is trimmed in raw string.
-  * [ ] Escape sequence.
-    * [x] `\r` - caridge return.
-    * [x] `\n` - line feed.
-    * [x] `\t` - tab.
-    * [x] `\\` - backslash.
-    * [x] `\"` - double quotation.
-    * [x] `\u0000` - Unicode.
-    * [ ] `\U00000000` - Unicode.
-* [ ] DateTime
-  * [x] `1979-05-27` - Local date. (Naive date)
-  * [x] `1979-05-27T07:32:00` - Local datetime. (Naive datetime)
-  * [x] `1979-05-27T07:32:00Z` - UTC datetime. (Datetime Utc)
-  * [x] `1979-05-27T00:32:00.999999` - Local datetime. (Naive datetime)
-  * [x] `1979-05-27T00:32:00-07:00` - UTC datetime. (Datetime fixed offset)
-  * [x] `1979-05-27T00:32:00.999999-07:00` - UTC datetime. (Datetime fixed offset)
-  * [x] `07:32:00` - Local time. (Naive time)
-  * [x] `00:32:00.999999` - Local time. (Naive time)
-

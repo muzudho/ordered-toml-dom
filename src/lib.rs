@@ -4,7 +4,8 @@
 // Publish:
 //
 // (1) `cargo test`
-// (2) `cargo run --example example`
+// (2a) `cargo run --example example`
+// (2b) `cargo run --example example-tail-comment`
 // (3) Open auto-generated log file. I check it.
 // (4) Remove the log file.
 // (5) Update `README.md`.
