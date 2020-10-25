@@ -19,7 +19,6 @@ pub struct HeaderOfArrayOfTable {
 #[derive(Clone)]
 pub enum Expression {
     HeaderOfArrayOfTable(HeaderOfArrayOfTable),
-    Comment(Comment),
     EmptyLine(WS, Option<Comment>),
     KeyValue(KeyValue),
     HeaderOfTable(HeaderOfTable),

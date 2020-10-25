@@ -19,14 +19,14 @@ use casual_logger::Table;
 #[derive(Debug)]
 pub enum State {
     AfterArrayOfTable,
-    AfterComment,
     AfterKeyValue,
     AfterLeftSquareBracket,
     AfterTable,
+    End,
     /// `[[name]]`
     HeaderOfArrayOfTable,
-    /// `# comment`.
-    CommentSyntax,
+    /// Whitespace and comment.
+    WsComment,
     Finished,
     FirstWhitespace1,
     /// `key = right_value`.
@@ -70,9 +70,6 @@ impl ExpressionP {
                 // TODO 後ろにコメントがあるかも。
                 return error(&mut self.log(), &tokens, "document_element.rs.66.");
             }
-            State::AfterComment => {
-                return error(&mut self.log(), &tokens, "document_element.rs.74.");
-            }
             State::AfterKeyValue => match token0.type_ {
                 TokenType::WhiteSpaceString => {} // Ignore it.
                 // `,`
@@ -96,6 +93,9 @@ impl ExpressionP {
             State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
                 return error(&mut self.log(), &tokens, "document_element.rs.106.");
+            }
+            State::End => {
+                return error(&mut self.log(), &tokens, "document_element.rs.98.");
             }
             State::HeaderOfArrayOfTable => {
                 let p = self.header_p_of_array_of_table.as_mut().unwrap();
@@ -121,18 +121,26 @@ impl ExpressionP {
                     PResult::Ongoing => {}
                 }
             }
-            State::CommentSyntax => {
+            State::WsComment => {
                 let p = self.comment_p.as_mut().unwrap();
                 match p.parse(&tokens) {
                     PResult::End => {
-                        if let Some(m) = p.flush() {
-                            self.buffer = Some(Expression::from_comment(&m));
-                            self.comment_p = None;
-                            self.state = State::AfterComment;
-                            return PResult::End;
-                        } else {
-                            return error(&mut self.log(), &tokens, "document_element.rs.153.");
-                        }
+                        self.buffer = Some(Expression::EmptyLine(
+                            if let Some(ws_p_1) = self.ws_p_1.as_mut() {
+                                ws_p_1.flush()
+                            } else {
+                                WS::default()
+                            },
+                            if let Some(comment_p) = self.comment_p.as_mut() {
+                                comment_p.flush()
+                            } else {
+                                None
+                            },
+                        ));
+                        self.ws_p_1 = None;
+                        self.comment_p = None;
+                        self.state = State::End;
+                        return PResult::End;
                     }
                     PResult::Err(mut table) => {
                         return error_via(
@@ -147,10 +155,6 @@ impl ExpressionP {
             }
             State::FirstWhitespace1 => match token0.type_ {
                 TokenType::EndOfLine => {
-                    if let Some(_) = &self.key_value_p {
-                        self.key_value_p = None;
-                        return PResult::End;
-                    }
                     self.buffer = Some(Expression::EmptyLine(
                         if let Some(ws_p_1) = self.ws_p_1.as_mut() {
                             ws_p_1.flush()
@@ -163,11 +167,9 @@ impl ExpressionP {
                             None
                         },
                     ));
-                    if let Some(_) = &self.comment_p {
-                        self.comment_p = None;
-                        return PResult::End;
-                    }
                     self.ws_p_1 = None;
+                    self.comment_p = None;
+                    self.key_value_p = None;
                     self.state = State::Finished;
                     return PResult::End;
                 }
@@ -201,7 +203,7 @@ impl ExpressionP {
                 // `#`
                 TokenType::Sharp => {
                     self.comment_p = Some(CommentP::new());
-                    self.state = State::CommentSyntax;
+                    self.state = State::WsComment;
                 }
                 TokenType::WhiteSpaceString => {
                     if let None = self.ws_p_1 {

@@ -1,6 +1,7 @@
 //! Expression model.  
 //! 縦幅のある行 モデル。  
 
+use crate::model::layer230::WS;
 use crate::model::{
     layer210::Comment,
     layer225::KeyValue,
@@ -12,8 +13,8 @@ impl Expression {
     pub fn from_header_of_array_of_table(m: &HeaderOfArrayOfTable) -> Self {
         Expression::HeaderOfArrayOfTable(m.clone())
     }
-    pub fn from_comment(m: &Comment) -> Self {
-        Expression::Comment(m.clone())
+    pub fn from_empty_line(ws: &WS, comment: &Comment) -> Self {
+        Expression::EmptyLine(ws.clone(), Some(comment.clone()))
     }
     pub fn from_key_value(m: &KeyValue) -> Self {
         Expression::KeyValue(m.clone())
@@ -32,7 +33,6 @@ impl fmt::Display for Expression {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Expression::HeaderOfArrayOfTable(m) => write!(f, "{}", m),
-            Expression::Comment(m) => write!(f, "{}", m),
             Expression::EmptyLine(ws, comment) => write!(
                 f,
                 "{}{}",
@@ -52,7 +52,6 @@ impl fmt::Debug for Expression {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Expression::HeaderOfArrayOfTable(m) => write!(f, "{:?}", m),
-            Expression::Comment(m) => write!(f, "{:?}", m),
             Expression::EmptyLine(ws, comment) => write!(f, "{:?}{:?}", ws, comment),
             Expression::KeyValue(m) => write!(f, "{:?}", m),
             Expression::HeaderOfTable(m) => write!(f, "{:?}", m),
