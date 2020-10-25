@@ -38,8 +38,13 @@ fn main() {
                     Table::default().str("Comment", &format!("{}", m)),
                 );
             }
-            Expression::EmptyLine => {
-                Log::info_t("Scan a Broad-line.", Table::default().str("EmptyLine", ""));
+            Expression::EmptyLine(ws) => {
+                Log::info_t(
+                    "Scan a Broad-line.",
+                    Table::default()
+                        .str("EmptyLine", "")
+                        .str("ws", &ws.to_string()),
+                );
             }
             Expression::KeyValue(m) => {
                 Log::info_t(

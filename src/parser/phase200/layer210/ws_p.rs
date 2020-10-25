@@ -4,7 +4,6 @@
 use crate::model::{layer110::TokenType, layer210::WS};
 use crate::parser::phase200::layer210::{PResult, WSP};
 use crate::parser::phase200::LookAheadTokens;
-use casual_logger::Table;
 
 impl Default for WSP {
     fn default() -> Self {
@@ -36,12 +35,5 @@ impl WSP {
             }
         }
         PResult::Ongoing
-    }
-    /// Log.  
-    /// ログ。  
-    pub fn log(&self) -> Table {
-        let mut t = Table::default().clone();
-        t.str("buffer", &self.buffer.to_string());
-        t
     }
 }

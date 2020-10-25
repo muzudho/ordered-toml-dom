@@ -33,7 +33,7 @@ impl fmt::Display for Expression {
         match self {
             Expression::HeaderOfArrayOfTable(m) => write!(f, "{}", m),
             Expression::Comment(m) => write!(f, "{}", m),
-            Expression::EmptyLine => write!(f, ""),
+            Expression::EmptyLine(ws) => write!(f, "{}", ws),
             Expression::KeyValue(m) => write!(f, "{}", m),
             Expression::HeaderOfTable(m) => write!(f, "{}", m),
         }
@@ -44,7 +44,7 @@ impl fmt::Debug for Expression {
         match self {
             Expression::HeaderOfArrayOfTable(m) => write!(f, "{:?}", m),
             Expression::Comment(m) => write!(f, "{:?}", m),
-            Expression::EmptyLine => write!(f, ""),
+            Expression::EmptyLine(ws) => write!(f, "{:?}", ws),
             Expression::KeyValue(m) => write!(f, "{:?}", m),
             Expression::HeaderOfTable(m) => write!(f, "{:?}", m),
         }

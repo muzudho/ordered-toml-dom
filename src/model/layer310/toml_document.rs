@@ -33,7 +33,7 @@ impl TomlDocument {
                 Expression::Comment(_) => {
                     // println!("[trace30]");
                 }
-                Expression::EmptyLine => {
+                Expression::EmptyLine(_ws) => {
                     // println!("[trace33]");
                 }
                 Expression::KeyValue(m) => {

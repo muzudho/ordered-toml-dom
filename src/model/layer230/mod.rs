@@ -2,7 +2,11 @@ pub mod expression;
 pub mod header_of_array_of_table;
 pub mod header_of_table;
 
-use crate::model::{layer110::Token, layer210::Comment, layer225::KeyValue};
+use crate::model::{
+    layer110::Token,
+    layer210::{Comment, WS},
+    layer225::KeyValue,
+};
 
 /// WIP.  
 #[derive(Clone)]
@@ -16,7 +20,7 @@ pub struct HeaderOfArrayOfTable {
 pub enum Expression {
     HeaderOfArrayOfTable(HeaderOfArrayOfTable),
     Comment(Comment),
-    EmptyLine,
+    EmptyLine(WS),
     KeyValue(KeyValue),
     HeaderOfTable(HeaderOfTable),
 }

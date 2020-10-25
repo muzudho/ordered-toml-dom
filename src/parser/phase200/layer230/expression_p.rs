@@ -1,6 +1,7 @@
 //! Broad-line syntax parser.  
 //! `縦幅のある行` 構文パーサー。  
 
+use crate::model::layer210::WS;
 use crate::model::{layer110::TokenType, layer230::Expression};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
@@ -147,12 +148,21 @@ impl ExpressionP {
             State::FirstWhitespace1 => match token0.type_ {
                 TokenType::EndOfLine => {
                     if let Some(_) = &self.comment_p {
+                        self.comment_p = None;
                         return PResult::End;
                     }
                     if let Some(_) = &self.key_value_p {
+                        self.key_value_p = None;
                         return PResult::End;
                     }
-                    self.buffer = Some(Expression::EmptyLine);
+                    self.buffer = Some(Expression::EmptyLine(
+                        if let Some(ws_p_1) = self.ws_p_1.as_mut() {
+                            ws_p_1.flush()
+                        } else {
+                            WS::default()
+                        },
+                    ));
+                    self.ws_p_1 = None;
                     self.state = State::Finished;
                     return PResult::End;
                 }
