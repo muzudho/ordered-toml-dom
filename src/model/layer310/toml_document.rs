@@ -3,8 +3,8 @@
 
 use crate::model::layer210::LiteralValue;
 use crate::model::layer225::RightValue;
-use crate::model::layer230::DocumentElement::KeyValue;
-use crate::model::{layer230::DocumentElement, layer310::TomlDocument};
+use crate::model::layer230::Expression::KeyValue;
+use crate::model::{layer230::Expression, layer310::TomlDocument};
 use chrono::prelude::{DateTime, Local, Utc};
 use chrono::FixedOffset;
 use chrono::NaiveDate;
@@ -22,21 +22,21 @@ impl Default for TomlDocument {
 impl TomlDocument {
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
-    pub fn get_right_value_by_key(&self, key: &str) -> Option<&DocumentElement> {
+    pub fn get_right_value_by_key(&self, key: &str) -> Option<&Expression> {
         // println!("[trace22]");
         for elem in &self.elements {
             match elem {
-                DocumentElement::HeaderOfArrayOfTable(_) => {
+                Expression::HeaderOfArrayOfTable(_) => {
                     // TODO
                     // println!("[trace27]");
                 }
-                DocumentElement::Comment(_) => {
+                Expression::Comment(_) => {
                     // println!("[trace30]");
                 }
-                DocumentElement::EmptyLine => {
+                Expression::EmptyLine => {
                     // println!("[trace33]");
                 }
-                DocumentElement::KeyValue(m) => {
+                Expression::KeyValue(m) => {
                     if m.key.to_string() == key.to_string() {
                         /*
                         println!(
@@ -56,7 +56,7 @@ impl TomlDocument {
                         */
                     }
                 }
-                DocumentElement::HeaderOfTable(_) => {
+                Expression::HeaderOfTable(_) => {
                     // TODO
                     // println!("[trace45]");
                 }
@@ -479,7 +479,7 @@ impl TomlDocument {
         None
     }
 
-    pub fn push_element(&mut self, m: &DocumentElement) {
+    pub fn push_element(&mut self, m: &Expression) {
         self.elements.push(m.clone());
     }
     pub fn to_debug_string(&self) -> String {

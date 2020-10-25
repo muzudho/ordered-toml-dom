@@ -5,7 +5,7 @@ use crate::model::{layer110::TokenLine, layer310::TomlDocument};
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     error_via,
-    {layer210::PResult, layer230::DocumentElementP, layer310::DocumentP},
+    {layer210::PResult, layer230::ExpressionP, layer310::DocumentP},
 };
 use casual_logger::Table;
 
@@ -84,7 +84,7 @@ impl DocumentP {
     ///             先読みを含むトークン。  
     fn one_delay_loop(&mut self, tokens: &LookAheadTokens, doc: &mut TomlDocument) -> PResult {
         if let None = self.document_element_p {
-            self.document_element_p = Some(DocumentElementP::default());
+            self.document_element_p = Some(ExpressionP::default());
         }
         let p = self.document_element_p.as_mut().unwrap();
         match p.parse(&tokens) {

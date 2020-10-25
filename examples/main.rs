@@ -10,7 +10,7 @@ mod modules;
 use crate::modules::log_ext::LogExt;
 use casual_logger::{Log, Table};
 use tomboy_toml_dom::{
-    model::{layer225::RightValue, layer230::DocumentElement},
+    model::{layer225::RightValue, layer230::Expression},
     Toml,
 };
 
@@ -26,22 +26,22 @@ fn main() {
 
     for elem in doc.elements {
         match elem {
-            DocumentElement::HeaderOfArrayOfTable(m) => {
+            Expression::HeaderOfArrayOfTable(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("HeaderOfArrayOfTable", &format!("{}", m)),
                 );
             }
-            DocumentElement::Comment(m) => {
+            Expression::Comment(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("Comment", &format!("{}", m)),
                 );
             }
-            DocumentElement::EmptyLine => {
+            Expression::EmptyLine => {
                 Log::info_t("Scan a Broad-line.", Table::default().str("EmptyLine", ""));
             }
-            DocumentElement::KeyValue(m) => {
+            Expression::KeyValue(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("KeyValue", &format!("{}", m)),
@@ -54,7 +54,7 @@ fn main() {
                     RightValue::LiteralString(m) => Log::info(&format!("{}", m)),
                 }
             }
-            DocumentElement::HeaderOfTable(m) => {
+            Expression::HeaderOfTable(m) => {
                 Log::info_t(
                     "Scan a Broad-line.",
                     Table::default().str("Table", &format!("{}", m)),

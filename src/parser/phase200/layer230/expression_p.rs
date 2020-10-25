@@ -1,14 +1,14 @@
 //! Broad-line syntax parser.  
 //! `縦幅のある行` 構文パーサー。  
 
-use crate::model::{layer110::TokenType, layer230::DocumentElement};
+use crate::model::{layer110::TokenType, layer230::Expression};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
     layer225::KeyValueP,
-    layer230::DocumentElementP,
+    layer230::ExpressionP,
 };
 use casual_logger::Table;
 
@@ -33,9 +33,9 @@ pub enum State {
     Table,
 }
 
-impl Default for DocumentElementP {
+impl Default for ExpressionP {
     fn default() -> Self {
-        DocumentElementP {
+        ExpressionP {
             header_p_of_array_of_table: None,
             buffer: None,
             comment_p: None,
@@ -45,8 +45,8 @@ impl Default for DocumentElementP {
         }
     }
 }
-impl DocumentElementP {
-    pub fn flush(&mut self) -> Option<DocumentElement> {
+impl ExpressionP {
+    pub fn flush(&mut self) -> Option<Expression> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
@@ -99,7 +99,7 @@ impl DocumentElementP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
-                            self.buffer = Some(DocumentElement::from_header_of_array_of_table(&m));
+                            self.buffer = Some(Expression::from_header_of_array_of_table(&m));
                             self.header_p_of_array_of_table = None;
                             self.state = State::AfterArrayOfTable;
                             return PResult::End;
@@ -123,7 +123,7 @@ impl DocumentElementP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
-                            self.buffer = Some(DocumentElement::from_comment(&m));
+                            self.buffer = Some(Expression::from_comment(&m));
                             self.comment_p = None;
                             self.state = State::AfterComment;
                             return PResult::End;
@@ -150,7 +150,7 @@ impl DocumentElementP {
                     if let Some(_) = &self.key_value_p {
                         return PResult::End;
                     }
-                    self.buffer = Some(DocumentElement::EmptyLine);
+                    self.buffer = Some(Expression::EmptyLine);
                     self.state = State::Finished;
                     return PResult::End;
                 }
@@ -199,7 +199,7 @@ impl DocumentElementP {
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
-                            self.buffer = Some(DocumentElement::from_key_value(&m));
+                            self.buffer = Some(Expression::from_key_value(&m));
                             self.key_value_p = None;
                             self.state = State::AfterKeyValue;
                             return PResult::End;
@@ -237,7 +237,7 @@ impl DocumentElementP {
         match p.parse(&tokens) {
             PResult::End => {
                 if let Some(m) = p.flush() {
-                    self.buffer = Some(DocumentElement::from_header_of_table(&m));
+                    self.buffer = Some(Expression::from_header_of_table(&m));
                     self.header_p_of_table = None;
                     self.state = State::AfterTable;
                     return PResult::End;

@@ -29,7 +29,7 @@ impl LogExt for Log {
             "Read",
             Table::default()
                 .str("File", &format!("{}", toml_file))
-                .uint("DocumentElementCount", doc.elements.len() as u128)
+                .uint("ExpressionCount", doc.elements.len() as u128)
                 .str("OutputDocument", &format!("{}", doc)),
         );
     }
