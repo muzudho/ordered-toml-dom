@@ -42,7 +42,7 @@ impl Default for ExpressionP {
             comment_p: None,
             header_p_of_array_of_table: None,
             header_p_of_table: None,
-            key_value_p: None,
+            keyval_p: None,
             state: State::FirstWhitespace1,
             ws_p_1: None,
         }
@@ -169,7 +169,7 @@ impl ExpressionP {
                     ));
                     self.ws_p_1 = None;
                     self.comment_p = None;
-                    self.key_value_p = None;
+                    self.keyval_p = None;
                     self.state = State::Finished;
                     return PResult::End;
                 }
@@ -178,8 +178,8 @@ impl ExpressionP {
                 | TokenType::NumChar
                 | TokenType::Hyphen
                 | TokenType::Underscore => {
-                    self.key_value_p = Some(KeyValueP::new());
-                    match self.key_value_p.as_mut().unwrap().parse(&tokens) {
+                    self.keyval_p = Some(KeyValueP::new());
+                    match self.keyval_p.as_mut().unwrap().parse(&tokens) {
                         PResult::End => {
                             // 1トークンでは終わらないから。
                             return error(&mut self.log(), &tokens, "document_element.rs.164.");
@@ -232,12 +232,12 @@ impl ExpressionP {
                 return error(&mut self.log(), &tokens, "document_element.rs.205.");
             }
             State::KeyValueSyntax => {
-                let p = self.key_value_p.as_mut().unwrap();
+                let p = self.keyval_p.as_mut().unwrap();
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
-                            self.buffer = Some(Expression::from_key_value(&m));
-                            self.key_value_p = None;
+                            self.buffer = Some(Expression::from_keyval(&m));
+                            self.keyval_p = None;
                             self.state = State::AfterKeyValue;
                             return PResult::End;
                         } else {
@@ -302,8 +302,8 @@ impl ExpressionP {
         if let Some(p) = &self.comment_p {
             t.sub_t("comment_p", &p.log());
         }
-        if let Some(p) = &self.key_value_p {
-            t.sub_t("key_value_p", &p.log());
+        if let Some(p) = &self.keyval_p {
+            t.sub_t("keyval_p", &p.log());
         }
         t
     }

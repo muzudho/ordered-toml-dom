@@ -32,12 +32,6 @@ fn main() {
                     Table::default().str("HeaderOfArrayOfTable", &format!("{}", m)),
                 );
             }
-            Expression::Comment(m) => {
-                Log::info_t(
-                    "Scan a Broad-line.",
-                    Table::default().str("Comment", &format!("{}", m)),
-                );
-            }
             Expression::EmptyLine(ws, comment) => {
                 Log::info_t(
                     "Scan a Broad-line.",

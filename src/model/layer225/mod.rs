@@ -1,5 +1,5 @@
 pub mod inline_table;
-pub mod key_value;
+pub mod keyval;
 pub mod right_value;
 
 use crate::model::{

@@ -15,7 +15,7 @@ pub struct ExpressionP {
     comment_p: Option<CommentP>,
     header_p_of_array_of_table: Option<HeaderPOfArrayOfTable>,
     header_p_of_table: Option<HeaderPOfTable>,
-    key_value_p: Option<KeyValueP>,
+    keyval_p: Option<KeyValueP>,
     state: ExpressionState,
     /// White space parser 1.
     ws_p_1: Option<WSP>,

@@ -16,7 +16,7 @@ impl Expression {
     pub fn from_empty_line(ws: &WS, comment: &Comment) -> Self {
         Expression::EmptyLine(ws.clone(), Some(comment.clone()))
     }
-    pub fn from_key_value(m: &KeyValue) -> Self {
+    pub fn from_keyval(m: &KeyValue) -> Self {
         Expression::KeyValue(m.clone())
     }
     pub fn from_header_of_table(m: &HeaderOfTable) -> Self {

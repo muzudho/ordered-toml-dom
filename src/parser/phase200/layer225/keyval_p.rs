@@ -46,10 +46,10 @@ impl KeyValueP {
             if let Some(right_value) = &self.right_value_buffer {
                 Some(KeyValue::new(&key, &right_value))
             } else {
-                panic!("key_value_p.rs.53.")
+                panic!("keyval_p.rs.53.")
             }
         } else {
-            panic!("key_value_p.rs.56.")
+            panic!("keyval_p.rs.56.")
         };
         self.key_buffer = None;
         self.right_value_buffer = None;
@@ -80,7 +80,7 @@ impl KeyValueP {
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
                     }
-                    _ => return error(&mut self.log(), &tokens, "key_value.rs.65."),
+                    _ => return error(&mut self.log(), &tokens, "keyval.rs.65."),
                 }
             }
             State::First => {
@@ -98,7 +98,7 @@ impl KeyValueP {
                                     self.key_p = None;
                                     self.state = State::BeforeEqual;
                                 } else {
-                                    return error(&mut self.log(), &tokens, "key_value.rs.84.");
+                                    return error(&mut self.log(), &tokens, "keyval.rs.84.");
                                 }
                             }
                             PResult::Err(mut table) => {
@@ -106,13 +106,13 @@ impl KeyValueP {
                                     &mut table,
                                     &mut self.log(),
                                     &tokens,
-                                    "key_value.rs.84.",
+                                    "keyval.rs.84.",
                                 );
                             }
                             PResult::Ongoing => {}
                         }
                     }
-                    _ => return error(&mut self.log(), &tokens, "key_value.rs.65."),
+                    _ => return error(&mut self.log(), &tokens, "keyval.rs.65."),
                 }
             }
             // After `=`.
@@ -126,16 +126,16 @@ impl KeyValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "key_value.rs.84.");
+                            return error(&mut self.log(), &tokens, "keyval.rs.84.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "key_value.rs.88.");
+                        return error_via(&mut table, &mut self.log(), &tokens, "keyval.rs.88.");
                     }
                     PResult::Ongoing => {}
                 }
             }
-            State::End => return error(&mut self.log(), &tokens, "key_value.rs.93."),
+            State::End => return error(&mut self.log(), &tokens, "keyval.rs.93."),
         }
         PResult::Ongoing
     }

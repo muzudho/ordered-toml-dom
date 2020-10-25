@@ -16,7 +16,7 @@ impl Default for InlineTable {
     }
 }
 impl InlineTable {
-    pub fn push_key_value(&mut self, m: &KeyValue) {
+    pub fn push_keyval(&mut self, m: &KeyValue) {
         self.items.push(m.clone());
     }
     pub fn to_debug_string(&self) -> String {
