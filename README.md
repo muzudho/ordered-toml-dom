@@ -27,7 +27,8 @@ cargo run --example main
 cargo run --example mix_array
 cargo run --example spot
 cargo run --example table
-cargo run --example toml-io-en-a-quick-tour-of-toml-v100rc3
+cargo run --example toml-io-en-a-quick-tour-of-toml-v1-0-0rc3
+cargo run --example toml-io-en-v1-0-0rc3-full-speck
 ```
 
 ## Specification (仕様)

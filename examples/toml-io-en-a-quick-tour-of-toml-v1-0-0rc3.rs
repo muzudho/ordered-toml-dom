@@ -19,14 +19,14 @@ use tomboy_toml_dom::Toml;
 /// 作業中。  
 fn main() {
     // Configuration a log.
-    Log::set_file_name("exa-toml-io-en-a-quick-tour-of-toml-v100rc3");
+    Log::set_file_name("exa-toml-io-en-a-quick-tour-of-toml-v1-0-0rc3");
     Log::set_level(Level::Debug);
     Log::set_retention_days(-1);
     Log::remove_old_logs();
 
     // Read a toml.
     // Toml読取。
-    let doc = Toml::from_file("./resource/toml-io-en-a-quick-tour-of-toml-v100rc3.toml");
+    let doc = Toml::from_file("./resource/toml-io-en-a-quick-tour-of-toml-v1-0-0rc3.toml");
     Log::info_t(
         "Read.",
         Table::default()
