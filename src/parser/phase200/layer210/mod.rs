@@ -8,9 +8,10 @@ pub mod key_p;
 pub mod literal_string_p;
 pub mod literal_value_p;
 pub mod positional_numeral_string_p;
+pub mod ws_p;
 
 use crate::model::{
-    layer210::{BasicString, Comment, Key, LiteralString, LiteralValue},
+    layer210::{BasicString, Comment, Key, LiteralString, LiteralValue, WS},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
@@ -135,4 +136,13 @@ pub struct LiteralValueP {
     positional_numeral_string_p: Option<PositionalNumeralStringP>,
     buffer: Option<LiteralValue>,
     state: LiteralValueState,
+}
+
+/// Comment parser.  
+/// コメント・パーサー。  
+///
+/// Example: `# comment`.  
+#[derive(Clone)]
+pub struct WSP {
+    buffer: WS,
 }
