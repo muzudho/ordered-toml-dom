@@ -22,7 +22,7 @@ impl Default for TomlDocument {
 impl TomlDocument {
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
-    pub fn get_right_value_by_key(&self, key: &str) -> Option<&Expression> {
+    pub fn get_val_by_key(&self, key: &str) -> Option<&Expression> {
         // println!("[trace22]");
         for elem in &self.elements {
             match elem {
@@ -65,7 +65,7 @@ impl TomlDocument {
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
     pub fn get_literal_string_by_key(&self, key: &str) -> Option<&LiteralValue> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -80,7 +80,7 @@ impl TomlDocument {
     /// Contains key.  
     /// キーを含むか？  
     pub fn contains_key(&self, key: &str) -> bool {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 return keyval.key.to_string() == key.to_string();
             }
@@ -91,7 +91,7 @@ impl TomlDocument {
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_i128_by_key(&self, key: &str) -> Option<i128> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -132,7 +132,7 @@ impl TomlDocument {
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_isize_by_key(&self, key: &str) -> Option<isize> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -174,7 +174,7 @@ impl TomlDocument {
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_u128_by_key(&self, key: &str) -> Option<u128> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -216,7 +216,7 @@ impl TomlDocument {
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_usize_by_key(&self, key: &str) -> Option<usize> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -261,7 +261,7 @@ impl TomlDocument {
     /// キー・バリューの右の整数値。  
     pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
         // println!("[trace100 get_f64_by_key={}]", key);
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             // println!("[trace84]");
             if let Keyval(keyval) = doc_elm {
                 // println!("[trace86]");
@@ -313,7 +313,7 @@ impl TomlDocument {
     /// Right string of `left = "abc"`.  
     /// キー・バリューの右の文字列。  
     pub fn get_string_by_key(&self, key: &str) -> Option<String> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     match &*keyval.value {
@@ -332,7 +332,7 @@ impl TomlDocument {
     }
     /// For this library developer.
     pub fn get_debug_string_by_key(&self, key: &str) -> String {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     match &*keyval.value {
@@ -353,7 +353,7 @@ impl TomlDocument {
     /// Right boolean of `left = true`.  
     /// キー・バリューの右の論理値。  
     pub fn get_bool_by_key(&self, key: &str) -> Option<bool> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -371,7 +371,7 @@ impl TomlDocument {
     /// DateTime. UTC.  
     /// 日付と時刻。協定世界時。  
     pub fn get_datetime_utc_by_key(&self, key: &str) -> Option<DateTime<Utc>> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -389,7 +389,7 @@ impl TomlDocument {
     /// DateTime. Local.  
     /// 日付と時刻。ローカル時。  
     pub fn get_datetime_local_by_key(&self, key: &str) -> Option<DateTime<Local>> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -407,7 +407,7 @@ impl TomlDocument {
     /// DateTime. Fixed offset.  
     /// 日付と時刻。オフセット。  
     pub fn get_datetime_fixed_offset_by_key(&self, key: &str) -> Option<DateTime<FixedOffset>> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -425,7 +425,7 @@ impl TomlDocument {
     /// DateTime. Naive.  
     /// 日付と時刻。ナイーブ。  
     pub fn get_naive_datetime_by_key(&self, key: &str) -> Option<NaiveDateTime> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -443,7 +443,7 @@ impl TomlDocument {
     /// Date. Naive.  
     /// 日付。ナイーブ。  
     pub fn get_naive_date_by_key(&self, key: &str) -> Option<NaiveDate> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {
@@ -461,7 +461,7 @@ impl TomlDocument {
     /// Time. Naive.  
     /// 日時。ナイーブ。  
     pub fn get_naive_time_by_key(&self, key: &str) -> Option<NaiveTime> {
-        if let Some(doc_elm) = self.get_right_value_by_key(key) {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(keyval) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
                     if let RightValue::LiteralValue(literal_value) = &*keyval.value {

@@ -1,6 +1,6 @@
 pub mod inline_table;
 pub mod keyval;
-pub mod right_value;
+pub mod val;
 
 use crate::model::{
     layer210::{BasicString, Key, LiteralString, LiteralValue},

@@ -15,7 +15,7 @@ use casual_logger::Table as LogTable;
 /// Key value syntax machine state.  
 /// キー値構文状態遷移。  
 ///
-/// Example: `key = right_value`.  
+/// Example: `key = val`.  
 #[derive(Debug)]
 pub enum State {
     AfterLeftCurlyBracket,
@@ -69,16 +69,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "right_value.rs.68.");
+                            return error(&mut self.log(), &tokens, "val.rs.68.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &tokens,
-                            "right_value.rs.72.",
-                        )
+                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.72.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -94,16 +89,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "right_value.rs.88.");
+                            return error(&mut self.log(), &tokens, "val.rs.88.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &tokens,
-                            "right_value.rs.92.",
-                        )
+                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.92.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -119,16 +109,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "right_value.rs.108.");
+                            return error(&mut self.log(), &tokens, "val.rs.108.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &tokens,
-                            "right_value.rs.112.",
-                        )
+                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.112.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -172,7 +157,7 @@ impl RightValueP {
                                     self.state = State::End;
                                     return PResult::End;
                                 } else {
-                                    return error(&mut self.log(), &tokens, "right_value.rs.152.");
+                                    return error(&mut self.log(), &tokens, "val.rs.152.");
                                 }
                             }
                             PResult::Err(mut table) => {
@@ -180,7 +165,7 @@ impl RightValueP {
                                     &mut table,
                                     &mut self.log(),
                                     &tokens,
-                                    "right_value.rs.156.",
+                                    "val.rs.156.",
                                 )
                             }
                             PResult::Ongoing => {}
@@ -199,16 +184,11 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "right_value.rs.174.");
+                            return error(&mut self.log(), &tokens, "val.rs.174.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &tokens,
-                            "right_value.rs.178.",
-                        )
+                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.178.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -224,22 +204,17 @@ impl RightValueP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "right_value.rs.194.");
+                            return error(&mut self.log(), &tokens, "val.rs.194.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &tokens,
-                            "right_value.rs.198.",
-                        )
+                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.198.")
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return error(&mut self.log(), &tokens, "right_value.rs.204.");
+                return error(&mut self.log(), &tokens, "val.rs.204.");
             }
         }
         PResult::Ongoing

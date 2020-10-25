@@ -29,7 +29,7 @@ pub enum State {
     WsComment,
     Finished,
     FirstWhitespace1,
-    /// `key = right_value`.
+    /// `key = val`.
     KeyvalSyntax,
     /// `[name]`
     Table,

@@ -4,7 +4,7 @@
 //! # Examples
 //!
 //! ```
-//! // key = right_value
+//! // key = val
 //! ```
 
 use crate::model::{layer110::TokenType, layer225::Keyval};
@@ -34,17 +34,17 @@ impl KeyvalP {
     pub fn new() -> Self {
         KeyvalP {
             key_buffer: None,
-            right_value_buffer: None,
+            val_buffer: None,
             key_p: Some(KeyP::default()),
-            right_value_p: None,
+            val_p: None,
             state: State::First,
         }
     }
 
     pub fn flush(&mut self) -> Option<Keyval> {
         let m = if let Some(key) = &self.key_buffer {
-            if let Some(right_value) = &self.right_value_buffer {
-                Some(Keyval::new(&key, &right_value))
+            if let Some(val) = &self.val_buffer {
+                Some(Keyval::new(&key, &val))
             } else {
                 panic!("keyval_p.rs.53.")
             }
@@ -52,7 +52,7 @@ impl KeyvalP {
             panic!("keyval_p.rs.56.")
         };
         self.key_buffer = None;
-        self.right_value_buffer = None;
+        self.val_buffer = None;
         m
     }
 
@@ -69,7 +69,7 @@ impl KeyvalP {
         match self.state {
             // After `=`.
             State::AfterEquals => {
-                self.right_value_p = Some(RightValueP::default());
+                self.val_p = Some(RightValueP::default());
                 self.state = State::RightValue;
             }
             // After key.
@@ -117,12 +117,12 @@ impl KeyvalP {
             }
             // After `=`.
             State::RightValue => {
-                let p = self.right_value_p.as_mut().unwrap();
+                let p = self.val_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
-                            self.right_value_buffer = Some(child_m);
-                            self.right_value_p = None;
+                            self.val_buffer = Some(child_m);
+                            self.val_p = None;
                             self.state = State::End;
                             return PResult::End;
                         } else {
@@ -149,11 +149,11 @@ impl KeyvalP {
         if let Some(m) = &self.key_buffer {
             t.str("key_buffer", &m.to_string());
         }
-        if let Some(m) = &self.right_value_buffer {
-            t.str("right_value_buffer", &m.to_string());
+        if let Some(m) = &self.val_buffer {
+            t.str("val_buffer", &m.to_string());
         }
-        if let Some(p) = &self.right_value_p {
-            t.sub_t("right_value_p", &p.log());
+        if let Some(p) = &self.val_p {
+            t.sub_t("val_p", &p.log());
         }
         t
     }

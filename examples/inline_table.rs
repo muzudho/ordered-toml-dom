@@ -14,7 +14,7 @@ fn main() {
     // TODO
     /*
     assert_eq!(
-        &format!("{:?}", doc.get_right_value_by_key("inline_table_3")),
+        &format!("{:?}", doc.get_val_by_key("inline_table_3")),
         "{ name = \"b\", weight = 93.5 }"
     );
     */
