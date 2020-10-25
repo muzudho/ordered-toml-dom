@@ -7,7 +7,7 @@ use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::PResult,
-    layer225::{InlineTableP, KeyValueP},
+    layer225::{InlineTableP, KeyvalP},
 };
 use casual_logger::Table as LogTable;
 
@@ -19,8 +19,8 @@ use casual_logger::Table as LogTable;
 pub enum State {
     // First. After `{`.
     First,
-    KeyValue,
-    AfterKeyValue,
+    Keyval,
+    AfterKeyval,
 }
 
 impl Default for InlineTableP {
@@ -58,8 +58,8 @@ impl InlineTableP {
                     | TokenType::NumChar
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
-                        self.keyval_p = Some(Box::new(KeyValueP::new()));
-                        self.state = State::KeyValue;
+                        self.keyval_p = Some(Box::new(KeyvalP::new()));
+                        self.state = State::Keyval;
                         match self.keyval_p.as_mut().unwrap().parse(tokens) {
                             PResult::End => {
                                 // 1トークンでは終わらないから。
@@ -84,14 +84,14 @@ impl InlineTableP {
                 }
             }
             // `apple.banana`.
-            State::KeyValue => {
+            State::Keyval => {
                 let p = self.keyval_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer.as_mut().unwrap().push_keyval(&child_m);
                             self.keyval_p = None;
-                            self.state = State::AfterKeyValue;
+                            self.state = State::AfterKeyval;
                         } else {
                             return error(&mut self.log(), &tokens, "inline_table.rs.76.");
                         }
@@ -108,7 +108,7 @@ impl InlineTableP {
                 }
             }
             // After `banana = 3`.
-            State::AfterKeyValue => match token0.type_ {
+            State::AfterKeyval => match token0.type_ {
                 TokenType::WhiteSpaceString => {} // Ignore it.
                 // `,`
                 TokenType::Comma => {

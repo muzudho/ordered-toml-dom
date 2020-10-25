@@ -10,7 +10,7 @@ use crate::parser::phase200::{
     layer210::{BasicStringP, KeyP, LiteralStringP, LiteralValueP},
     layer220::ArrayP,
     layer225::{
-        inline_table_p::State as InlineTableState, keyval_p::State as KeyValueState,
+        inline_table_p::State as InlineTableState, keyval_p::State as KeyvalState,
         right_value_p::State as RightValueState,
     },
 };
@@ -22,19 +22,19 @@ use crate::parser::phase200::{
 pub struct InlineTableP {
     state: InlineTableState,
     buffer: Option<InlineTable>,
-    keyval_p: Option<Box<KeyValueP>>,
+    keyval_p: Option<Box<KeyvalP>>,
 }
 
 /// Key value syntax parser.  
 /// キー値構文パーサー。  
 ///
 /// `key = value`.  
-pub struct KeyValueP {
+pub struct KeyvalP {
     key_buffer: Option<Key>,
     right_value_buffer: Option<RightValue>,
     key_p: Option<KeyP>,
     right_value_p: Option<RightValueP>,
-    state: KeyValueState,
+    state: KeyvalState,
 }
 
 /// Right value syntax parser.  

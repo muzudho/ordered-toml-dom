@@ -9,7 +9,7 @@ use crate::parser::phase200::layer230::WSP;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
-    layer225::KeyValueP,
+    layer225::KeyvalP,
     layer230::ExpressionP,
 };
 use casual_logger::Table;
@@ -19,7 +19,7 @@ use casual_logger::Table;
 #[derive(Debug)]
 pub enum State {
     AfterArrayOfTable,
-    AfterKeyValue,
+    AfterKeyval,
     AfterLeftSquareBracket,
     AfterTable,
     End,
@@ -30,7 +30,7 @@ pub enum State {
     Finished,
     FirstWhitespace1,
     /// `key = right_value`.
-    KeyValueSyntax,
+    KeyvalSyntax,
     /// `[name]`
     Table,
 }
@@ -70,7 +70,7 @@ impl ExpressionP {
                 // TODO 後ろにコメントがあるかも。
                 return error(&mut self.log(), &tokens, "document_element.rs.66.");
             }
-            State::AfterKeyValue => match token0.type_ {
+            State::AfterKeyval => match token0.type_ {
                 TokenType::WhiteSpaceString => {} // Ignore it.
                 // `,`
                 TokenType::EndOfLine => return PResult::End,
@@ -178,7 +178,7 @@ impl ExpressionP {
                 | TokenType::NumChar
                 | TokenType::Hyphen
                 | TokenType::Underscore => {
-                    self.keyval_p = Some(KeyValueP::new());
+                    self.keyval_p = Some(KeyvalP::new());
                     match self.keyval_p.as_mut().unwrap().parse(&tokens) {
                         PResult::End => {
                             // 1トークンでは終わらないから。
@@ -194,7 +194,7 @@ impl ExpressionP {
                         }
                         PResult::Ongoing => {}
                     }
-                    self.state = State::KeyValueSyntax;
+                    self.state = State::KeyvalSyntax;
                 }
                 // `[`
                 TokenType::LeftSquareBracket => {
@@ -231,14 +231,14 @@ impl ExpressionP {
             State::Finished => {
                 return error(&mut self.log(), &tokens, "document_element.rs.205.");
             }
-            State::KeyValueSyntax => {
+            State::KeyvalSyntax => {
                 let p = self.keyval_p.as_mut().unwrap();
                 match p.parse(&tokens) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(Expression::from_keyval(&m));
                             self.keyval_p = None;
-                            self.state = State::AfterKeyValue;
+                            self.state = State::AfterKeyval;
                             return PResult::End;
                         } else {
                             return error(&mut self.log(), &tokens, "document_element.rs.222.");

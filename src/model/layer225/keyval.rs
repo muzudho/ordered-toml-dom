@@ -3,13 +3,13 @@
 
 use crate::model::{
     layer210::Key,
-    layer225::{KeyValue, RightValue},
+    layer225::{Keyval, RightValue},
 };
 use std::fmt;
 
-impl KeyValue {
+impl Keyval {
     pub fn new(key: &Key, value: &RightValue) -> Self {
-        KeyValue {
+        Keyval {
             key: Box::new(key.clone()),
             value: Box::new(value.clone()),
         }
@@ -21,12 +21,12 @@ impl KeyValue {
         format!("{}", self)
     }
 }
-impl fmt::Display for KeyValue {
+impl fmt::Display for Keyval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}={}", self.key, self.value)
     }
 }
-impl fmt::Debug for KeyValue {
+impl fmt::Debug for Keyval {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{:?}={:?}", self.key, self.value)
     }

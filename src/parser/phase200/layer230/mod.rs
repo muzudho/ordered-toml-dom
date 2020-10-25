@@ -4,7 +4,7 @@ use crate::model::layer230::Expression;
 use crate::parser::phase200::layer210::WSP;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable},
-    layer225::KeyValueP,
+    layer225::KeyvalP,
     layer230::expression_p::State as ExpressionState,
 };
 
@@ -15,7 +15,7 @@ pub struct ExpressionP {
     comment_p: Option<CommentP>,
     header_p_of_array_of_table: Option<HeaderPOfArrayOfTable>,
     header_p_of_table: Option<HeaderPOfTable>,
-    keyval_p: Option<KeyValueP>,
+    keyval_p: Option<KeyvalP>,
     state: ExpressionState,
     /// White space parser 1.
     ws_p_1: Option<WSP>,

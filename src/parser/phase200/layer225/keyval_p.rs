@@ -7,13 +7,13 @@
 //! // key = right_value
 //! ```
 
-use crate::model::{layer110::TokenType, layer225::KeyValue};
+use crate::model::{layer110::TokenType, layer225::Keyval};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{KeyP, PResult},
-    layer225::{KeyValueP, RightValueP},
+    layer225::{KeyvalP, RightValueP},
 };
 use casual_logger::Table as LogTable;
 
@@ -30,9 +30,9 @@ pub enum State {
     RightValue,
 }
 
-impl KeyValueP {
+impl KeyvalP {
     pub fn new() -> Self {
-        KeyValueP {
+        KeyvalP {
             key_buffer: None,
             right_value_buffer: None,
             key_p: Some(KeyP::default()),
@@ -41,10 +41,10 @@ impl KeyValueP {
         }
     }
 
-    pub fn flush(&mut self) -> Option<KeyValue> {
+    pub fn flush(&mut self) -> Option<Keyval> {
         let m = if let Some(key) = &self.key_buffer {
             if let Some(right_value) = &self.right_value_buffer {
-                Some(KeyValue::new(&key, &right_value))
+                Some(Keyval::new(&key, &right_value))
             } else {
                 panic!("keyval_p.rs.53.")
             }

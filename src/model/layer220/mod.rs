@@ -3,7 +3,7 @@ pub mod item_value;
 
 use crate::model::{
     layer210::{BasicString, LiteralString, LiteralValue},
-    layer225::{InlineTable, KeyValue},
+    layer225::{InlineTable, Keyval},
 };
 
 /// It has multiple item values.  
@@ -26,7 +26,7 @@ pub enum ItemValue {
     InlineTable(InlineTable),
     /// Recursive.
     /// 再帰的。
-    KeyValue(KeyValue),
+    Keyval(Keyval),
     LiteralValue(LiteralValue),
     LiteralString(LiteralString),
 }

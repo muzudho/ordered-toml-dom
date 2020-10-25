@@ -10,7 +10,7 @@ impl fmt::Display for RightValue {
             RightValue::Array(m) => write!(f, "{}", m),
             RightValue::BasicString(m) => write!(f, "{}", m),
             RightValue::InlineTable(m) => write!(f, "{}", m),
-            // No KeyValue.
+            // No Keyval.
             RightValue::LiteralValue(m) => write!(f, "{}", m),
             RightValue::LiteralString(m) => write!(f, "{}", m),
         }
@@ -22,7 +22,7 @@ impl fmt::Debug for RightValue {
             RightValue::Array(m) => write!(f, "{:?}", m),
             RightValue::BasicString(m) => write!(f, "{:?}", m),
             RightValue::InlineTable(m) => write!(f, "{:?}", m),
-            // No KeyValue.
+            // No Keyval.
             RightValue::LiteralValue(m) => write!(f, "{:?}", m),
             RightValue::LiteralString(m) => write!(f, "{:?}", m),
         }

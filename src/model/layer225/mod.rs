@@ -10,7 +10,7 @@ use crate::model::{
 /// It has a key and a value.  
 /// キーと値を持ちます。  
 #[derive(Clone)]
-pub struct KeyValue {
+pub struct Keyval {
     pub key: Box<Key>,
     /// Recursive.
     /// 再帰的。
@@ -28,7 +28,7 @@ pub enum RightValue {
     /// Recursive.
     /// 再帰的。
     InlineTable(InlineTable),
-    // No KeyValue.
+    // No Keyval.
     LiteralValue(LiteralValue),
     LiteralString(LiteralString),
 }
@@ -37,5 +37,5 @@ pub enum RightValue {
 /// 複数の キー・バリュー を持ちます。  
 #[derive(Clone)]
 pub struct InlineTable {
-    items: Vec<KeyValue>,
+    items: Vec<Keyval>,
 }

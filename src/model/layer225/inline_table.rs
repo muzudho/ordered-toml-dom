@@ -7,7 +7,7 @@
 //! // { name="a", pass="b", age=3 }
 //! ```
 
-use crate::model::layer225::{InlineTable, KeyValue};
+use crate::model::layer225::{InlineTable, Keyval};
 use std::fmt;
 
 impl Default for InlineTable {
@@ -16,7 +16,7 @@ impl Default for InlineTable {
     }
 }
 impl InlineTable {
-    pub fn push_keyval(&mut self, m: &KeyValue) {
+    pub fn push_keyval(&mut self, m: &Keyval) {
         self.items.push(m.clone());
     }
     pub fn to_debug_string(&self) -> String {

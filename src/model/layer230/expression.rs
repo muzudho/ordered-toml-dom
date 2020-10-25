@@ -4,7 +4,7 @@
 use crate::model::layer230::WS;
 use crate::model::{
     layer210::Comment,
-    layer225::KeyValue,
+    layer225::Keyval,
     layer230::{Expression, HeaderOfArrayOfTable, HeaderOfTable},
 };
 use std::fmt;
@@ -16,8 +16,8 @@ impl Expression {
     pub fn from_empty_line(ws: &WS, comment: &Comment) -> Self {
         Expression::EmptyLine(ws.clone(), Some(comment.clone()))
     }
-    pub fn from_keyval(m: &KeyValue) -> Self {
-        Expression::KeyValue(m.clone())
+    pub fn from_keyval(m: &Keyval) -> Self {
+        Expression::Keyval(m.clone())
     }
     pub fn from_header_of_table(m: &HeaderOfTable) -> Self {
         Expression::HeaderOfTable(m.clone())
@@ -43,7 +43,7 @@ impl fmt::Display for Expression {
                     "".to_string()
                 }
             ),
-            Expression::KeyValue(m) => write!(f, "{}", m),
+            Expression::Keyval(m) => write!(f, "{}", m),
             Expression::HeaderOfTable(m) => write!(f, "{}", m),
         }
     }
@@ -53,7 +53,7 @@ impl fmt::Debug for Expression {
         match self {
             Expression::HeaderOfArrayOfTable(m) => write!(f, "{:?}", m),
             Expression::EmptyLine(ws, comment) => write!(f, "{:?}{:?}", ws, comment),
-            Expression::KeyValue(m) => write!(f, "{:?}", m),
+            Expression::Keyval(m) => write!(f, "{:?}", m),
             Expression::HeaderOfTable(m) => write!(f, "{:?}", m),
         }
     }
