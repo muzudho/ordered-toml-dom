@@ -6,12 +6,14 @@ use crate::parser::phase200::layer210::{PResult, WSP};
 use crate::parser::phase200::LookAheadTokens;
 use casual_logger::Table;
 
-impl WSP {
-    pub fn new() -> Self {
+impl Default for WSP {
+    fn default() -> Self {
         WSP {
             buffer: WS::default(),
         }
     }
+}
+impl WSP {
     pub fn flush(&mut self) -> WS {
         let m = self.buffer.clone();
         self.buffer.clear();

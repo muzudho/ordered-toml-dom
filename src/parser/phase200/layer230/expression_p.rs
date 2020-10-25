@@ -4,6 +4,7 @@
 use crate::model::{layer110::TokenType, layer230::Expression};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
+use crate::parser::phase200::layer230::WSP;
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
@@ -26,7 +27,7 @@ pub enum State {
     /// `# comment`.
     CommentSyntax,
     Finished,
-    First,
+    FirstWhitespace1,
     /// `key = right_value`.
     KeyValueSyntax,
     /// `[name]`
@@ -36,12 +37,13 @@ pub enum State {
 impl Default for ExpressionP {
     fn default() -> Self {
         ExpressionP {
-            header_p_of_array_of_table: None,
             buffer: None,
             comment_p: None,
-            key_value_p: None,
-            state: State::First,
+            header_p_of_array_of_table: None,
             header_p_of_table: None,
+            key_value_p: None,
+            state: State::FirstWhitespace1,
+            ws_p_1: None,
         }
     }
 }
@@ -142,7 +144,7 @@ impl ExpressionP {
                     PResult::Ongoing => {}
                 }
             }
-            State::First => match token0.type_ {
+            State::FirstWhitespace1 => match token0.type_ {
                 TokenType::EndOfLine => {
                     if let Some(_) = &self.comment_p {
                         return PResult::End;
@@ -186,7 +188,25 @@ impl ExpressionP {
                     self.comment_p = Some(CommentP::new());
                     self.state = State::CommentSyntax;
                 }
-                TokenType::WhiteSpaceString => {} // Ignored it.
+                TokenType::WhiteSpaceString => {
+                    if let None = self.ws_p_1 {
+                        self.ws_p_1 = Some(WSP::default());
+                    }
+                    match self.ws_p_1.as_mut().unwrap().parse(&tokens) {
+                        PResult::End => {
+                            return error(&mut self.log(), &tokens, "document_element.rs.197.");
+                        }
+                        PResult::Err(mut table) => {
+                            return error_via(
+                                &mut table,
+                                &mut self.log(),
+                                &tokens,
+                                "document_element.rs.200.",
+                            );
+                        }
+                        PResult::Ongoing => {}
+                    }
+                } // Ignored it.
                 _ => {
                     return error(&mut self.log(), &tokens, "document_element.rs.246.");
                 }
