@@ -18,6 +18,7 @@
 // #[macro_use]
 // extern crate lazy_static;
 extern crate chrono;
+extern crate num_traits;
 extern crate rand;
 
 pub mod model;

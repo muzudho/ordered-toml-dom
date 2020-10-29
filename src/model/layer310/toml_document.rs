@@ -10,6 +10,7 @@ use chrono::FixedOffset;
 use chrono::NaiveDate;
 use chrono::NaiveDateTime;
 use chrono::NaiveTime;
+use num_traits::Num;
 use std::fmt;
 
 impl Default for TomlDocument {
@@ -91,6 +92,21 @@ impl TomlDocument {
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_i128_by_key(&self, key: &str) -> Option<i128> {
+        return self.get_number_by_key(key);
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    ///
+    /// from_str_radix() が使えるように num_traits::Num トレイトを付けます。
+    /// s.parse() が使えるように std::str::FromStr トレイトを付けます。
+    /// why を文字列表示できるように、 std::fmt::Display トレイトを付けます。
+    ///
+    /// 返り値を Result に変えたい。
+    pub fn get_number_by_key<T: Num + std::str::FromStr>(&self, key: &str) -> Option<T>
+    where
+        <T as num_traits::Num>::FromStrRadixErr: std::fmt::Display,
+    {
         if let Some(doc_elm) = self.get_val_by_key(key) {
             if let Keyval(_ws1, keyval, _ws2, _comment) = doc_elm {
                 if keyval.key.to_string() == key.to_string() {
@@ -112,7 +128,7 @@ impl TomlDocument {
                         if 10 != base_number {
                             // 頭の `0x` は除去しないと変換できない。
                             let s2 = &s[2..];
-                            match i128::from_str_radix(s2, base_number) {
+                            match T::from_str_radix(s2, base_number) {
                                 Ok(n) => return Some(n),
                                 Err(why) => panic!("{}", why),
                             };
@@ -132,43 +148,7 @@ impl TomlDocument {
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_isize_by_key(&self, key: &str) -> Option<isize> {
-        if let Some(doc_elm) = self.get_val_by_key(key) {
-            if let Keyval(_ws1, keyval, _ws2, _comment) = doc_elm {
-                if keyval.key.to_string() == key.to_string() {
-                    if let Val::LiteralValue(literal_value) = &*keyval.val {
-                        // アンダースコアは除去しないと変換できない。
-                        let s = literal_value.to_string().replace("_", "");
-
-                        // 10進数ではないかも知れない。
-                        let base_number = if s.starts_with("0b") {
-                            2
-                        } else if s.starts_with("0o") {
-                            8
-                        } else if s.starts_with("0x") {
-                            16
-                        } else {
-                            10
-                        };
-
-                        if 10 != base_number {
-                            // 頭の `0x` は除去しないと変換できない。
-                            let s2 = &s[2..];
-                            // println!("[trace91={}]", s2);
-                            match isize::from_str_radix(s2, base_number) {
-                                Ok(n) => return Some(n),
-                                Err(why) => panic!("{}", why),
-                            };
-                        }
-
-                        match s.parse() {
-                            Ok(n) => return Some(n),
-                            Err(_) => return None,
-                        }
-                    }
-                }
-            }
-        }
-        None
+        return self.get_number_by_key(key);
     }
 
     /// Right integer of `left = 123`.  

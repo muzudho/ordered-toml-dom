@@ -21,6 +21,7 @@ Take a look at the repository.
 
 ```shell
 cargo run --example comment
+cargo run --example cover
 cargo run --example example
 cargo run --example example-tail-comment
 cargo run --example inline_table

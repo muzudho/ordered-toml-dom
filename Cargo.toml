@@ -18,3 +18,4 @@ exclude = ["doc/*", "examples/*", "resource/*"]
 rand = "0.7.3"
 casual_logger = "0.6.5"
 chrono = "0.4.19"
+num-traits = "0.2"
