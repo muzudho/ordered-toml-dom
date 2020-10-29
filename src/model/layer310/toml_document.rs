@@ -5,6 +5,7 @@ use crate::model::layer210::LiteralValue;
 use crate::model::layer225::Val;
 use crate::model::layer230::Expression::Keyval;
 use crate::model::{layer230::Expression, layer310::TomlDocument};
+use crate::util::type_of;
 use chrono::prelude::{DateTime, Local, Utc};
 use chrono::FixedOffset;
 use chrono::NaiveDate;
@@ -89,28 +90,51 @@ impl TomlDocument {
         false
     }
 
+    /*
+    /// TODO float にしか使えないので結局意味がない。 f64::NAN の取り扱いを条件分岐で外せないか？
+    pub fn get_number_by_key<T: std::str::FromStr + num_traits::Num>(&self, key: &str) -> Option<T>
+    where
+        <T as num_traits::Num>::FromStrRadixErr: std::fmt::Display,
+        T: num_traits::float::FloatCore,
+    {
+        if type_of(key).starts_with("&f") {
+            return self.get_float_by_key(key);
+        } else {
+            return self.get_int_by_key(key);
+        }
+    }
+    */
+
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_i128_by_key(&self, key: &str) -> Option<i128> {
-        return self.get_number_by_key(key);
+        return self.get_int_by_key(key);
     }
 
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_isize_by_key(&self, key: &str) -> Option<isize> {
-        return self.get_number_by_key(key);
+        return self.get_int_by_key(key);
     }
 
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_u128_by_key(&self, key: &str) -> Option<u128> {
-        return self.get_number_by_key(key);
+        return self.get_int_by_key(key);
     }
 
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
     pub fn get_usize_by_key(&self, key: &str) -> Option<usize> {
-        return self.get_number_by_key(key);
+        return self.get_int_by_key(key);
+    }
+
+    /// WIP. まだ `.` をパースできていません。  
+    ///
+    /// Right integer of `left = 1.2`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
+        return self.get_float_by_key(key);
     }
 
     /// Right integer of `left = 123`.  
@@ -121,7 +145,7 @@ impl TomlDocument {
     /// why を文字列表示できるように、 std::fmt::Display トレイトを付けます。
     ///
     /// 返り値を Result に変えたい。
-    pub fn get_number_by_key<T: Num + std::str::FromStr>(&self, key: &str) -> Option<T>
+    pub fn get_int_by_key<T: Num + std::str::FromStr>(&self, key: &str) -> Option<T>
     where
         <T as num_traits::Num>::FromStrRadixErr: std::fmt::Display,
     {
@@ -167,41 +191,33 @@ impl TomlDocument {
     ///
     /// Right integer of `left = 1.2`.  
     /// キー・バリューの右の整数値。  
-    pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
-        // println!("[trace100 get_f64_by_key={}]", key);
+    pub fn get_float_by_key<T: num_traits::float::FloatCore + Num + std::str::FromStr>(
+        &self,
+        key: &str,
+    ) -> Option<T> {
         if let Some(doc_elm) = self.get_val_by_key(key) {
-            // println!("[trace84]");
             if let Keyval(_ws1, keyval, _ws2, _comment) = doc_elm {
-                // println!("[trace86]");
                 if keyval.key.to_string() == key.to_string() {
-                    // println!("[trace88]");
                     if let Val::LiteralValue(literal_value) = &*keyval.val {
-                        // println!("[trace90]");
-                        let s = literal_value.to_string();
+                        // アンダースコアは除去しないと変換できない。
+                        let s = literal_value.to_string().replace("_", "");
 
                         match s.as_str() {
                             "nan" => {
-                                return Some(f64::NAN);
+                                return Some(T::nan());
                             }
                             "+nan" => {
-                                return Some(f64::NAN);
+                                return Some(T::nan());
                             }
                             "-nan" => {
-                                return Some(-f64::NAN);
+                                return Some(-T::nan());
                             }
                             _ => {}
                         }
 
-                        // アンダースコアは除去しないと変換できない。
-                        match s.replace("_", "").parse() {
-                            Ok(n) => {
-                                // println!("[trace93]");
-                                return Some(n);
-                            }
-                            Err(_why) => {
-                                // println!("[trace97={}]", why);
-                                return None;
-                            }
+                        match s.parse() {
+                            Ok(n) => return Some(n),
+                            Err(_why) => return None,
                         }
                     }
                 }
