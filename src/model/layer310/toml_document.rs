@@ -97,6 +97,24 @@ impl TomlDocument {
 
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
+    pub fn get_isize_by_key(&self, key: &str) -> Option<isize> {
+        return self.get_number_by_key(key);
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_u128_by_key(&self, key: &str) -> Option<u128> {
+        return self.get_number_by_key(key);
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_usize_by_key(&self, key: &str) -> Option<usize> {
+        return self.get_number_by_key(key);
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
     ///
     /// from_str_radix() が使えるように num_traits::Num トレイトを付けます。
     /// s.parse() が使えるように std::str::FromStr トレイトを付けます。
@@ -137,96 +155,6 @@ impl TomlDocument {
                         match s.parse() {
                             Ok(n) => return Some(n),
                             Err(_why) => return None,
-                        }
-                    }
-                }
-            }
-        }
-        None
-    }
-
-    /// Right integer of `left = 123`.  
-    /// キー・バリューの右の整数値。  
-    pub fn get_isize_by_key(&self, key: &str) -> Option<isize> {
-        return self.get_number_by_key(key);
-    }
-
-    /// Right integer of `left = 123`.  
-    /// キー・バリューの右の整数値。  
-    pub fn get_u128_by_key(&self, key: &str) -> Option<u128> {
-        if let Some(doc_elm) = self.get_val_by_key(key) {
-            if let Keyval(_ws1, keyval, _ws2, _comment) = doc_elm {
-                if keyval.key.to_string() == key.to_string() {
-                    if let Val::LiteralValue(literal_value) = &*keyval.val {
-                        // アンダースコアは除去しないと変換できない。
-                        let s = literal_value.to_string().replace("_", "");
-
-                        // 10進数ではないかも知れない。
-                        let base_number = if s.starts_with("0b") {
-                            2
-                        } else if s.starts_with("0o") {
-                            8
-                        } else if s.starts_with("0x") {
-                            16
-                        } else {
-                            10
-                        };
-
-                        if 10 != base_number {
-                            // 頭の `0x` は除去しないと変換できない。
-                            let s2 = &s[2..];
-                            // println!("[trace91={}]", s2);
-                            match u128::from_str_radix(s2, base_number) {
-                                Ok(n) => return Some(n),
-                                Err(why) => panic!("{}", why),
-                            };
-                        }
-
-                        match s.parse() {
-                            Ok(n) => return Some(n),
-                            Err(_) => return None,
-                        }
-                    }
-                }
-            }
-        }
-        None
-    }
-
-    /// Right integer of `left = 123`.  
-    /// キー・バリューの右の整数値。  
-    pub fn get_usize_by_key(&self, key: &str) -> Option<usize> {
-        if let Some(doc_elm) = self.get_val_by_key(key) {
-            if let Keyval(_ws1, keyval, _ws2, _comment) = doc_elm {
-                if keyval.key.to_string() == key.to_string() {
-                    if let Val::LiteralValue(literal_value) = &*keyval.val {
-                        // アンダースコアは除去しないと変換できない。
-                        let s = literal_value.to_string().replace("_", "");
-
-                        // 10進数ではないかも知れない。
-                        let base_number = if s.starts_with("0b") {
-                            2
-                        } else if s.starts_with("0o") {
-                            8
-                        } else if s.starts_with("0x") {
-                            16
-                        } else {
-                            10
-                        };
-
-                        if 10 != base_number {
-                            // 頭の `0x` は除去しないと変換できない。
-                            let s2 = &s[2..];
-                            // println!("[trace91={}]", s2);
-                            match usize::from_str_radix(s2, base_number) {
-                                Ok(n) => return Some(n),
-                                Err(why) => panic!("{}", why),
-                            };
-                        }
-
-                        match s.parse() {
-                            Ok(n) => return Some(n),
-                            Err(_) => return None,
                         }
                     }
                 }
