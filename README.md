@@ -13,6 +13,7 @@ References:
 
 * [Developer's blog(開発者ブログ)](https://crieit.net/drafts/5f8094a14a0cf)
 * [TOML parsing（TOMLの構文解析）](https://crieit.net/posts/TOML-parsing-TOML)
+* ABNF: [toml.abnf](https://github.com/toml-lang/toml/blob/1.0.0-rc.3/toml.abnf)
 
 ## Run (実行)
 

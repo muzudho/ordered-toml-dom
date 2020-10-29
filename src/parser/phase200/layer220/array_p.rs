@@ -75,7 +75,7 @@ impl ArrayP {
             // After `]`.
             State::AfterArray => {
                 match token0.type_ {
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::WS => {} // Ignore it.
                     // ,
                     TokenType::Comma => {
                         self.state = State::AfterCommaBehindArray;
@@ -96,7 +96,7 @@ impl ArrayP {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::WS => {} // Ignore it.
                     // ]
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -118,7 +118,7 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::WS => {} // Ignore it.
                     // ]
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -130,8 +130,8 @@ impl ArrayP {
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
                 match token0.type_ {
-                    TokenType::AbChar
-                    | TokenType::NumChar
+                    TokenType::Alpha
+                    | TokenType::Digit
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
@@ -142,7 +142,7 @@ impl ArrayP {
                         m.push_literal_string(&LiteralValue::from_token(token0));
                         self.state = State::LiteralValue;
                     }
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::WS => {} // Ignore it.
                     // `]`.
                     TokenType::RightSquareBracket => {
                         self.state = State::End;
@@ -154,7 +154,7 @@ impl ArrayP {
             // After " or '.
             State::AfterString => {
                 match token0.type_ {
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::WS => {} // Ignore it.
                     TokenType::Comma => {
                         self.state = State::AfterCommaBefindString;
                     }
@@ -196,8 +196,8 @@ impl ArrayP {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
-                    TokenType::AbChar
-                    | TokenType::NumChar
+                    TokenType::Alpha
+                    | TokenType::Digit
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
@@ -223,7 +223,7 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::WS => {} // Ignore it.
                     _ => return error(&mut self.log(), &tokens, "array.rs.358."),
                 }
             }

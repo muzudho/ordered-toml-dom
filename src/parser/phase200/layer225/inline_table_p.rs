@@ -52,10 +52,10 @@ impl InlineTableP {
             // After `{`.
             State::First => {
                 match token0.type_ {
-                    TokenType::WhiteSpaceString => {} // Ignore it.
+                    TokenType::WS => {} // Ignore it.
                     // `apple.banana`
-                    TokenType::AbChar
-                    | TokenType::NumChar
+                    TokenType::Alpha
+                    | TokenType::Digit
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         self.keyval_p = Some(Box::new(KeyvalP::new()));
@@ -109,7 +109,7 @@ impl InlineTableP {
             }
             // After `banana = 3`.
             State::AfterKeyval => match token0.type_ {
-                TokenType::WhiteSpaceString => {} // Ignore it.
+                TokenType::WS => {} // Ignore it.
                 // `,`
                 TokenType::Comma => {
                     self.state = State::First;

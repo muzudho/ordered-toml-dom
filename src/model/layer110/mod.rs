@@ -6,7 +6,7 @@ pub mod token_line;
 #[derive(Clone, Copy, Debug)]
 pub enum TokenType {
     /// Alphabet character. A ～ Z, a ～ z.  1 disit.  
-    AbChar,
+    Alpha,
     /// \  
     Backslash,
     /// }  
@@ -29,7 +29,7 @@ pub enum TokenType {
     /// [  
     LeftSquareBracket,
     /// Numeral character. 0 ～ 9. 1 disit.  
-    NumChar,
+    Digit,
     /// +  
     Plus,
     /// }  
@@ -58,7 +58,7 @@ pub enum TokenType {
     Unknown,
     /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20). Multiple digits.  
     /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。 複数桁です。  
-    WhiteSpaceString,
+    WS,
 }
 
 /// A row of tokens.  

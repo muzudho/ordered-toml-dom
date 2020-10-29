@@ -140,9 +140,9 @@ impl ValP {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                     }
-                    TokenType::WhiteSpaceString => {} //Ignored it.
-                    TokenType::AbChar
-                    | TokenType::NumChar
+                    TokenType::WS => {} //Ignored it.
+                    TokenType::Alpha
+                    | TokenType::Digit
                     | TokenType::Hyphen
                     | TokenType::Underscore
                     | _ => {

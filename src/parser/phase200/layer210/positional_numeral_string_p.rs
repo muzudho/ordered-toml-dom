@@ -37,7 +37,7 @@ impl PositionalNumeralStringP {
         let token0 = tokens.current.as_ref().unwrap();
 
         match token0.type_ {
-            TokenType::AbChar | TokenType::NumChar | TokenType::Underscore => {
+            TokenType::Alpha | TokenType::Digit | TokenType::Underscore => {
                 let s = token0.to_string();
                 let expected_len = 1;
                 if s.len() != expected_len {
@@ -50,7 +50,7 @@ impl PositionalNumeralStringP {
                 // 次がHexの文字以外か？
                 let finished = if let Some(token1) = tokens.one_ahead.as_ref() {
                     match token1.type_ {
-                        TokenType::AbChar | TokenType::NumChar | TokenType::Underscore => {
+                        TokenType::Alpha | TokenType::Digit | TokenType::Underscore => {
                             // 続行。
                             false
                         }

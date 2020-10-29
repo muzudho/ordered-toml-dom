@@ -144,10 +144,7 @@ impl ExpressionP {
                     return PResult::End;
                 }
                 // `abc`
-                TokenType::AbChar
-                | TokenType::NumChar
-                | TokenType::Hyphen
-                | TokenType::Underscore => {
+                TokenType::Alpha | TokenType::Digit | TokenType::Hyphen | TokenType::Underscore => {
                     self.keyval_p = Some(KeyvalP::new());
                     match self.keyval_p.as_mut().unwrap().parse(&tokens) {
                         PResult::End => {
@@ -175,7 +172,7 @@ impl ExpressionP {
                     self.comment_p = Some(CommentP::new());
                     self.state = State::Ws1Comment;
                 }
-                TokenType::WhiteSpaceString => {
+                TokenType::WS => {
                     if let None = self.ws_p_1 {
                         self.ws_p_1 = Some(WSP::default());
                     }
@@ -259,7 +256,7 @@ impl ExpressionP {
                                 self.comment_p = Some(CommentP::new());
                                 self.state = State::Ws1KeyvalWs2Comment;
                             }
-                            TokenType::WhiteSpaceString => {
+                            TokenType::WS => {
                                 self.ws_p_2 = Some(WSP::default());
                                 self.state = State::Ws1KeyvalWs2;
                             }
@@ -280,7 +277,7 @@ impl ExpressionP {
                 }
             }
             State::Ws1KeyvalWs2 => match token0.type_ {
-                TokenType::WhiteSpaceString => {
+                TokenType::WS => {
                     let token1 = tokens.one_ahead.as_ref().unwrap();
 
                     match token1.type_ {

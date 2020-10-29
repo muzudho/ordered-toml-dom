@@ -244,13 +244,13 @@ impl LiteralValueP {
                     PResult::Ongoing
                 } else {
                     let base_number = match token0.type_ {
-                        TokenType::AbChar
+                        TokenType::Alpha
                         | TokenType::Colon
                         | TokenType::Dot
                         | TokenType::Hyphen
                         | TokenType::Plus
                         | TokenType::Underscore => 10,
-                        TokenType::NumChar => {
+                        TokenType::Digit => {
                             if let Some(ch0) = token0.to_string().chars().nth(0) {
                                 // println!("[trace82 ch0={}]", ch0);
                                 if ch0 == '0' {
@@ -259,14 +259,12 @@ impl LiteralValueP {
                                     // 先読み。
                                     if let Some(token1) = tokens.one_ahead.as_ref() {
                                         match token1.type_ {
-                                            TokenType::AbChar => {
-                                                match token1.to_string().as_str() {
-                                                    "b" => 2,
-                                                    "o" => 8,
-                                                    "x" => 16,
-                                                    _ => 10,
-                                                }
-                                            }
+                                            TokenType::Alpha => match token1.to_string().as_str() {
+                                                "b" => 2,
+                                                "o" => 8,
+                                                "x" => 16,
+                                                _ => 10,
+                                            },
                                             _ => 10,
                                         }
                                     } else {
@@ -310,11 +308,11 @@ impl LiteralValueP {
                             // 先読み。
                             if let Some(token1) = &tokens.one_ahead {
                                 match token1.type_ {
-                                    TokenType::AbChar
+                                    TokenType::Alpha
                                     | TokenType::Colon
                                     | TokenType::Dot
                                     | TokenType::Hyphen
-                                    | TokenType::NumChar
+                                    | TokenType::Digit
                                     | TokenType::Plus
                                     | TokenType::Underscore => {
                                         self.state = State::Second;
@@ -342,11 +340,11 @@ impl LiteralValueP {
                 // 先読み。
                 if let Some(token1) = &tokens.one_ahead {
                     match token1.type_ {
-                        TokenType::AbChar
+                        TokenType::Alpha
                         | TokenType::Colon
                         | TokenType::Dot
                         | TokenType::Hyphen
-                        | TokenType::NumChar
+                        | TokenType::Digit
                         | TokenType::Plus
                         | TokenType::Underscore => PResult::Ongoing,
                         _ => {

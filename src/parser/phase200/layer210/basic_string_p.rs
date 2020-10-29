@@ -214,8 +214,8 @@ impl BasicStringP {
                     TokenType::EndOfLine => {
                         // println!("[trace312 EndOfLine]");
                     } // Ignore it.
-                    TokenType::WhiteSpaceString => {
-                        // println!("[trace308 WhiteSpaceString]");
+                    TokenType::WS => {
+                        // println!("[trace308 WS]");
                     } // Ignore it.
                     // "
                     TokenType::DoubleQuotation => {

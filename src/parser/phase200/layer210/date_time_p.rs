@@ -56,7 +56,7 @@ impl DateTimeP {
                         // println!("[trace59.]");
                         return PResult::End;
                     }
-                    TokenType::AbChar => match token0.to_string().as_str() {
+                    TokenType::Alpha => match token0.to_string().as_str() {
                         "T" => {
                             // println!("[trace64.]");
                             self.buffer.push(token0.clone());
@@ -67,10 +67,10 @@ impl DateTimeP {
                             return error(&mut self.log(), &tokens, "date_time_p.rs.63.");
                         }
                     },
-                    TokenType::Hyphen | TokenType::NumChar => {
+                    TokenType::Hyphen | TokenType::Digit => {
                         self.buffer.push(token0.clone());
                         match token1.type_ {
-                            TokenType::AbChar => match token1.to_string().as_str() {
+                            TokenType::Alpha => match token1.to_string().as_str() {
                                 "T" => {
                                     /*
                                     println!(
@@ -92,7 +92,7 @@ impl DateTimeP {
                                     return error(&mut self.log(), &tokens, "date_time_p.rs.72.");
                                 }
                             },
-                            TokenType::Hyphen | TokenType::NumChar => {
+                            TokenType::Hyphen | TokenType::Digit => {
                                 // println!("[trace86={}]", token0.to_string().as_str());
                             }
                             _ => {
@@ -116,10 +116,10 @@ impl DateTimeP {
                         // println!("[trace114.]");
                         return PResult::End;
                     }
-                    TokenType::Colon | TokenType::NumChar => {
+                    TokenType::Colon | TokenType::Digit => {
                         self.buffer.push(token0.clone());
                         match token1.type_ {
-                            TokenType::AbChar => match token1.to_string().as_str() {
+                            TokenType::Alpha => match token1.to_string().as_str() {
                                 "Z" => {
                                     /*
                                     println!(
@@ -161,7 +161,7 @@ impl DateTimeP {
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            TokenType::Colon | TokenType::NumChar => {
+                            TokenType::Colon | TokenType::Digit => {
                                 /*
                                 println!(
                                     // "[trace156={}|{}]",
@@ -198,10 +198,10 @@ impl DateTimeP {
                 let token0 = tokens.current.as_ref().unwrap();
                 let token1 = tokens.one_ahead.as_ref().unwrap();
                 match token0.type_ {
-                    TokenType::Colon | TokenType::Hyphen | TokenType::NumChar | TokenType::Plus => {
+                    TokenType::Colon | TokenType::Hyphen | TokenType::Digit | TokenType::Plus => {
                         self.buffer.push(token0.clone());
                         match token1.type_ {
-                            TokenType::Colon | TokenType::NumChar => {
+                            TokenType::Colon | TokenType::Digit => {
                                 /*
                                 println!(
                                     // "[trace193={}|{}]",
@@ -239,7 +239,7 @@ impl DateTimeP {
                 let token0 = tokens.current.as_ref().unwrap();
                 let token1 = tokens.one_ahead.as_ref().unwrap();
                 match token0.type_ {
-                    TokenType::Dot | TokenType::NumChar => {
+                    TokenType::Dot | TokenType::Digit => {
                         self.buffer.push(token0.clone());
                         match token1.type_ {
                             TokenType::Hyphen | TokenType::Plus => {
@@ -253,7 +253,7 @@ impl DateTimeP {
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            TokenType::Dot | TokenType::NumChar => {
+                            TokenType::Dot | TokenType::Digit => {
                                 /*
                                 println!(
                                     // "[trace237={}|{}]",

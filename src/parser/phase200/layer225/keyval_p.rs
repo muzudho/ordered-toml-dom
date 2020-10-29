@@ -75,7 +75,7 @@ impl KeyvalP {
             // After key.
             State::BeforeEqual => {
                 match token0.type_ {
-                    TokenType::WhiteSpaceString => {} //Ignored it.
+                    TokenType::WS => {} //Ignored it.
                     // `=`.
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
@@ -85,9 +85,9 @@ impl KeyvalP {
             }
             State::First => {
                 match token0.type_ {
-                    TokenType::WhiteSpaceString => {} //Ignored it.
-                    TokenType::AbChar
-                    | TokenType::NumChar
+                    TokenType::WS => {} //Ignored it.
+                    TokenType::Alpha
+                    | TokenType::Digit
                     | TokenType::Hyphen
                     | TokenType::Underscore => {
                         let p = self.key_p.as_mut().unwrap();
