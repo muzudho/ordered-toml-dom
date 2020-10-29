@@ -342,6 +342,15 @@ is preserved.
       * [x] `nan` - Not a number. Positive.
       * [x] `+nan` - Not a number. Positive.
       * [x] `-nan` - Not a number. Negative.
+  * [ ] DateTime
+    * [x] `1979-05-27` - Local date. (Naive date)
+    * [x] `1979-05-27T07:32:00` - Local datetime. (Naive datetime)
+    * [x] `1979-05-27T07:32:00Z` - UTC datetime. (Datetime Utc)
+    * [x] `1979-05-27T00:32:00.999999` - Local datetime. (Naive datetime)
+    * [x] `1979-05-27T00:32:00-07:00` - UTC datetime. (Datetime fixed offset)
+    * [x] `1979-05-27T00:32:00.999999-07:00` - UTC datetime. (Datetime fixed offset)
+    * [x] `07:32:00` - Local time. (Naive time)
+    * [x] `00:32:00.999999` - Local time. (Naive time)
 * [ ] String (Not str)
   * [x] `"abc"` - Basic string.
     * [x] Plain.
@@ -363,13 +372,5 @@ is preserved.
     * [x] `\"` - double quotation.
     * [x] `\u0000` - Unicode.
     * [ ] `\U00000000` - Unicode.
-* [ ] DateTime
-  * [x] `1979-05-27` - Local date. (Naive date)
-  * [x] `1979-05-27T07:32:00` - Local datetime. (Naive datetime)
-  * [x] `1979-05-27T07:32:00Z` - UTC datetime. (Datetime Utc)
-  * [x] `1979-05-27T00:32:00.999999` - Local datetime. (Naive datetime)
-  * [x] `1979-05-27T00:32:00-07:00` - UTC datetime. (Datetime fixed offset)
-  * [x] `1979-05-27T00:32:00.999999-07:00` - UTC datetime. (Datetime fixed offset)
-  * [x] `07:32:00` - Local time. (Naive time)
-  * [x] `00:32:00.999999` - Local time. (Naive time)
-
+* [ ] Array
+  * [x] `["a", 'b', '"c"']` - String array.

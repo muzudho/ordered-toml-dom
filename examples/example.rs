@@ -271,4 +271,15 @@ is preserved.
         doc.get_naive_time_by_key("lt2"),
         Some(NaiveTime::parse_from_str("00:32:00.999999", "%H:%M:%S%.6f").unwrap())
     );
+
+    // Read a array.
+    // 配列読取。
+    assert_eq!(
+        doc.get_string_array_by_key("string_array"),
+        Ok(Some(vec![
+            "a".to_string(),
+            "b".to_string(),
+            "\"c\"".to_string()
+        ]))
+    );
 }

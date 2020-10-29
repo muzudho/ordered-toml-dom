@@ -22,6 +22,27 @@ impl Default for TomlDocument {
     }
 }
 impl TomlDocument {
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    ///
+    /// from_str_radix() が使えるように num_traits::Num トレイトを付けます。
+    /// s.parse() が使えるように std::str::FromStr トレイトを付けます。
+    /// why を文字列表示できるように、 std::fmt::Display トレイトを付けます。
+    ///
+    /// 返り値を Result に変えたい。
+    pub fn get_string_array_by_key(&self, key: &str) -> Result<Option<Vec<String>>, String> {
+        if let Some(val) = self.get_val_by_key(key) {
+            if let Keyval(_ws1, keyval, _ws2, _comment) = val {
+                if keyval.key.to_string() == key.to_string() {
+                    if let Val::Array(array) = &*keyval.val {
+                        return Ok(Some(array.to_string_vector()));
+                    }
+                }
+            }
+        }
+        Ok(None)
+    }
+
     /// Right of `left = right`.  
     /// キー・バリューの右値。  
     pub fn get_val_by_key(&self, key: &str) -> Option<&Expression> {

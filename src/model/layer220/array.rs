@@ -37,6 +37,13 @@ impl Array {
     pub fn to_string(&self) -> String {
         format!("{}", self)
     }
+    pub fn to_string_vector(&self) -> Vec<String> {
+        let mut vec = Vec::<String>::new();
+        for item in &self.items {
+            vec.push(item.to_string());
+        }
+        vec
+    }
 }
 impl fmt::Display for Array {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

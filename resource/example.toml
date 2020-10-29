@@ -114,3 +114,7 @@ ld1 = 1979-05-27
 # local time
 lt1 = 07:32:00
 lt2 = 00:32:00.999999
+
+# Array
+number_array = [1, 2, 3]
+string_array = ["a", 'b', '"c"']
