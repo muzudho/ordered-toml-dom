@@ -2,7 +2,8 @@
 
 apple = 'pie'
 
-number_array = [1, 2, 3]
+# int_array = [-1, 0, 1]
+# float_array = [0.0, 0.5, 1.0]
 string_array = ["a", 'b', '"c"']
 mix_array = [[1, 2, 3], ["a", 'b', '"c"'], []]
 

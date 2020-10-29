@@ -6,6 +6,7 @@
 //! ```
 //! // [ 1, 2, 3 ]
 //! ```
+use num_traits::Num;
 
 use crate::model::{
     layer210::{BasicString, LiteralString, LiteralValue},
@@ -43,6 +44,20 @@ impl Array {
             vec.push(item.to_string());
         }
         vec
+    }
+    pub fn to_int_vector<T: Num + std::str::FromStr>(&self) -> Result<Vec<T>, String>
+    where
+        <T as std::str::FromStr>::Err: std::fmt::Display,
+    {
+        let mut vec = Vec::<T>::new();
+        for item in &self.items {
+            let num = match item.to_string().parse() {
+                Ok(n) => n,
+                Err(why) => return Err(format!("{}", why)),
+            };
+            vec.push(num);
+        }
+        Ok(vec)
     }
 }
 impl fmt::Display for Array {

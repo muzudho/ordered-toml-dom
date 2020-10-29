@@ -43,6 +43,134 @@ The specifications will gradually solidify.
 You can think that you can't do anything that isn't written here.  
 ここに書かれていないことは何もできないと思ってもらって構いません。  
 
+./resource/example.toml:  
+
+```plain
+age = 40
+weight = 93.5
+
+# Long. 32bit size.
+i32_max = 2_147_483_647
+i32_min = -2_147_483_648
+u32_max = 4_294_967_295
+
+# Long long. 64bit size.
+i64_max = 9_223_372_036_854_775_807
+i64_min = -9_223_372_036_854_775_808
+u64_max = 18_446_744_073_709_551_615
+
+# 128bit size.
+i128_max = 170_141_183_460_469_231_731_687_303_715_884_105_727
+i128_min = -170_141_183_460_469_231_731_687_303_715_884_105_728
+u128_max = 340_282_366_920_938_463_463_374_607_431_768_211_455
+
+# hexadecimal with prefix `0x`
+hex1 = 0xDEADBEEF
+hex2 = 0xdeadbeef
+hex3 = 0xdead_beef
+
+# octal with prefix `0o`
+oct1 = 0o01234567
+oct2 = 0o755
+
+# binary with prefix `0b`
+bin1 = 0b11010110
+
+# fractional
+float1 = +1.0
+float2 = 3.1415
+float3 = -0.01
+
+# exponent
+float4 = 5e+22
+float5 = 1e06
+float6 = -2E-2
+
+# both
+float7 = 6.626e-34
+
+# separators
+float8 = 224_617.445_991_228
+
+# infinity
+infinite1 = inf # positive infinity
+infinite2 = +inf # positive infinity
+infinite3 = -inf # negative infinity
+
+# not a number
+not1 = nan
+not2 = +nan
+not3 = -nan
+
+# basic string
+apple = "pie"
+basic_string_empty = ""
+basic_string_escape_backslash = "\\"
+basic_string_escape_double_quotation = "\""
+basic_string_letter = "Hello, world!!"
+basic_string_punctuation = "., ={}[]'\"\\!?"
+basic_string_tab = "a\tb"
+
+multiline_basic_string_letter = """Hello,
+world!!"""
+multiline_basic_string_punctuation = """., ={}[]"'""\\
+!?"""
+multiline_basic_string_trim_start = """\
+  The quick brown \
+  fox jumps over \
+  the lazy dog.\
+  """
+multiline_basic_string_escape_double_quotation = """
+\\
+"""
+multiline_basic_string_tab = """
+a\tb
+"""
+
+literal_string_empty = ''
+literal_string_letter = 'Hello, world!!'
+literal_string_punctuation = '., ={}[]"\!?'
+
+multiline_literal_string_letter = '''Hello,
+world!!'''
+multiline_literal_string_punctuation = '''., ={}[]'"\
+!?'''
+multiline_literal_string_first_newline_is_trimmed = '''
+The first newline is
+trimmed in raw strings.
+All other whitespace
+is preserved.
+'''
+
+adult = true
+student = false
+
+dob = 1979-05-27T07:32:00-08:00
+
+#offset datetime
+odt1 = 1979-05-27T07:32:00Z
+odt2 = 1979-05-27T00:32:00-07:00
+odt3 = 1979-05-27T00:32:00.999999-07:00
+
+# local datetime
+ldt1 = 1979-05-27T07:32:00
+ldt2 = 1979-05-27T00:32:00.999999
+
+# local date
+ld1 = 1979-05-27
+
+# local time
+lt1 = 07:32:00
+lt2 = 00:32:00.999999
+
+# Array
+# int_array = [-1, 0, 1]
+# float_array = [0.0, 0.5, 1.0]
+string_array = ["a", 'b', '"c"']
+```
+
+examples/example.rs:  
+
 ```rust
 //! An exemplary program.
 //! 模範的なプログラム。
@@ -317,6 +445,17 @@ is preserved.
         doc.get_naive_time_by_key("lt2"),
         Some(NaiveTime::parse_from_str("00:32:00.999999", "%H:%M:%S%.6f").unwrap())
     );
+
+    // Read a array.
+    // 配列読取。
+    assert_eq!(
+        doc.get_string_array_by_key("string_array"),
+        Ok(Some(vec![
+            "a".to_string(),
+            "b".to_string(),
+            "\"c\"".to_string()
+        ]))
+    );
 }
 ```
 
@@ -373,4 +512,6 @@ is preserved.
     * [x] `\u0000` - Unicode.
     * [ ] `\U00000000` - Unicode.
 * [ ] Array
+  * [ ] `[-1, 0, 1]` - Int array.
+  * [ ] `[0.1, 0.5, 1.0]` - Float array.
   * [x] `["a", 'b', '"c"']` - String array.

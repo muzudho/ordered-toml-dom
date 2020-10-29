@@ -5,7 +5,6 @@ use crate::model::layer210::LiteralValue;
 use crate::model::layer225::Val;
 use crate::model::layer230::Expression::Keyval;
 use crate::model::{layer230::Expression, layer310::TomlDocument};
-// use crate::util::type_of;
 use chrono::prelude::{DateTime, Local, Utc};
 use chrono::FixedOffset;
 use chrono::NaiveDate;
@@ -22,22 +21,62 @@ impl Default for TomlDocument {
     }
 }
 impl TomlDocument {
-    /// Right integer of `left = 123`.  
-    /// キー・バリューの右の整数値。  
-    ///
-    /// from_str_radix() が使えるように num_traits::Num トレイトを付けます。
-    /// s.parse() が使えるように std::str::FromStr トレイトを付けます。
-    /// why を文字列表示できるように、 std::fmt::Display トレイトを付けます。
-    ///
-    /// 返り値を Result に変えたい。
+    /// Get a [-1, 0, 1].
+    pub fn get_int_array_by_key<T: num_traits::Num + std::str::FromStr>(
+        &self,
+        key: &str,
+    ) -> Result<Option<Vec<T>>, String>
+    where
+        <T as std::str::FromStr>::Err: std::fmt::Display,
+    {
+        if let Some(val) = self.get_val_by_key(key) {
+            if let Keyval(_ws1, keyval, _ws2, _comment) = val {
+                if keyval.key.to_string() == key.to_string() {
+                    if let Val::Array(array) = &*keyval.val {
+                        match array.to_int_vector() {
+                            Ok(x) => return Ok(Some(x)),
+                            Err(why) => return Err(why),
+                        }
+                    } else {
+                        return Err(format!(
+                            "{} is not array. It's a {}.",
+                            key.to_string(),
+                            keyval.val
+                        ));
+                    }
+                }
+            } else {
+                return Err(format!(
+                    "{} is not keyval. It's a {}.",
+                    key.to_string(),
+                    val
+                ));
+            }
+        }
+        Ok(None)
+    }
+
+    /// Get a ["a", 'b', '"c"'].
     pub fn get_string_array_by_key(&self, key: &str) -> Result<Option<Vec<String>>, String> {
         if let Some(val) = self.get_val_by_key(key) {
             if let Keyval(_ws1, keyval, _ws2, _comment) = val {
                 if keyval.key.to_string() == key.to_string() {
                     if let Val::Array(array) = &*keyval.val {
                         return Ok(Some(array.to_string_vector()));
+                    } else {
+                        return Err(format!(
+                            "{} is not array. It's a {}.",
+                            key.to_string(),
+                            keyval.val
+                        ));
                     }
                 }
+            } else {
+                return Err(format!(
+                    "{} is not keyval. It's a {}.",
+                    key.to_string(),
+                    val
+                ));
             }
         }
         Ok(None)

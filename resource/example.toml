@@ -116,5 +116,6 @@ lt1 = 07:32:00
 lt2 = 00:32:00.999999
 
 # Array
-number_array = [1, 2, 3]
+# int_array = [-1, 0, 1]
+# float_array = [0.0, 0.5, 1.0]
 string_array = ["a", 'b', '"c"']
