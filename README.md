@@ -20,8 +20,10 @@ Take a look at the repository.
 リポジトリを見てください。  
 
 ```shell
+cargo run --example advanced
 cargo run --example comment
 cargo run --example cover
+cargo run --example deprecated
 cargo run --example example
 cargo run --example example-tail-comment
 cargo run --example inline_table

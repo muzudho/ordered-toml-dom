@@ -107,34 +107,69 @@ impl TomlDocument {
 
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
+    #[deprecated(
+        since = "0.1.20",
+        note = "Please change to the tomboy_toml_dom::model::layer310::toml_document::get_i128_by_key_v2() method instead"
+    )]
     pub fn get_i128_by_key(&self, key: &str) -> Option<i128> {
         return self.get_int_by_key(key);
     }
+    pub fn get_i128_by_key_v2(&self, key: &str) -> Result<Option<i128>, String> {
+        return self.get_int_by_key_v2(key);
+    }
 
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
+    #[deprecated(
+        since = "0.1.20",
+        note = "Please change to the tomboy_toml_dom::model::layer310::toml_document::get_isize_by_key_v2() method instead"
+    )]
     pub fn get_isize_by_key(&self, key: &str) -> Option<isize> {
         return self.get_int_by_key(key);
     }
-
-    /// Right integer of `left = 123`.  
-    /// キー・バリューの右の整数値。  
-    pub fn get_u128_by_key(&self, key: &str) -> Option<u128> {
-        return self.get_int_by_key(key);
+    pub fn get_isize_by_key_v2(&self, key: &str) -> Result<Option<isize>, String> {
+        return self.get_int_by_key_v2(key);
     }
 
     /// Right integer of `left = 123`.  
     /// キー・バリューの右の整数値。  
+    #[deprecated(
+        since = "0.1.20",
+        note = "Please change to the tomboy_toml_dom::model::layer310::toml_document::get_u128_by_key_v2() method instead"
+    )]
+    pub fn get_u128_by_key(&self, key: &str) -> Option<u128> {
+        return self.get_int_by_key(key);
+    }
+    pub fn get_u128_by_key_v2(&self, key: &str) -> Result<Option<u128>, String> {
+        return self.get_int_by_key_v2(key);
+    }
+
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    #[deprecated(
+        since = "0.1.20",
+        note = "Please change to the tomboy_toml_dom::model::layer310::toml_document::get_usize_by_key_v2() method instead"
+    )]
     pub fn get_usize_by_key(&self, key: &str) -> Option<usize> {
         return self.get_int_by_key(key);
+    }
+    pub fn get_usize_by_key_v2(&self, key: &str) -> Result<Option<usize>, String> {
+        return self.get_int_by_key_v2(key);
     }
 
     /// WIP. まだ `.` をパースできていません。  
     ///
     /// Right integer of `left = 1.2`.  
     /// キー・バリューの右の整数値。  
+    #[deprecated(
+        since = "0.1.20",
+        note = "Please change to the tomboy_toml_dom::model::layer310::toml_document::get_f64_by_key_v2() method instead"
+    )]
     pub fn get_f64_by_key(&self, key: &str) -> Option<f64> {
         return self.get_float_by_key(key);
+    }
+    pub fn get_f64_by_key_v2(&self, key: &str) -> Result<Option<f64>, String> {
+        return self.get_float_by_key_v2(key);
     }
 
     /// Right integer of `left = 123`.  
@@ -145,6 +180,10 @@ impl TomlDocument {
     /// why を文字列表示できるように、 std::fmt::Display トレイトを付けます。
     ///
     /// 返り値を Result に変えたい。
+    #[deprecated(
+        since = "0.1.20",
+        note = "Please change to the tomboy_toml_dom::model::layer310::toml_document::get_int_by_key_v2() method instead"
+    )]
     pub fn get_int_by_key<T: Num + std::str::FromStr>(&self, key: &str) -> Option<T>
     where
         <T as num_traits::Num>::FromStrRadixErr: std::fmt::Display,
@@ -187,10 +226,68 @@ impl TomlDocument {
         None
     }
 
+    /// Right integer of `left = 123`.  
+    /// キー・バリューの右の整数値。  
+    ///
+    /// from_str_radix() が使えるように num_traits::Num トレイトを付けます。
+    /// s.parse() が使えるように std::str::FromStr トレイトを付けます。
+    /// why を文字列表示できるように、 std::fmt::Display トレイトを付けます。
+    ///
+    /// 返り値を Result に変えたい。
+    pub fn get_int_by_key_v2<T: Num + std::str::FromStr>(
+        &self,
+        key: &str,
+    ) -> Result<Option<T>, String>
+    where
+        <T as num_traits::Num>::FromStrRadixErr: std::fmt::Display,
+        <T as std::str::FromStr>::Err: std::fmt::Display,
+    {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
+            if let Keyval(_ws1, keyval, _ws2, _comment) = doc_elm {
+                if keyval.key.to_string() == key.to_string() {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
+                        // アンダースコアは除去しないと変換できない。
+                        let s = literal_value.to_string().replace("_", "");
+
+                        // 10進数ではないかも知れない。
+                        let base_number = if s.starts_with("0b") {
+                            2
+                        } else if s.starts_with("0o") {
+                            8
+                        } else if s.starts_with("0x") {
+                            16
+                        } else {
+                            10
+                        };
+
+                        if 10 != base_number {
+                            // 頭の `0x` は除去しないと変換できない。
+                            let s2 = &s[2..];
+                            match T::from_str_radix(s2, base_number) {
+                                Ok(n) => return Ok(Some(n)),
+                                Err(why) => return Err(format!("{}", why)),
+                            };
+                        }
+
+                        match s.parse() {
+                            Ok(n) => return Ok(Some(n)),
+                            Err(why) => return Err(format!("{}", why)),
+                        }
+                    }
+                }
+            }
+        }
+        Ok(None)
+    }
+
     /// WIP. まだ `.` をパースできていません。  
     ///
     /// Right integer of `left = 1.2`.  
     /// キー・バリューの右の整数値。  
+    #[deprecated(
+        since = "0.1.20",
+        note = "Please change to the tomboy_toml_dom::model::layer310::toml_document::get_float_by_key_v2() method instead"
+    )]
     pub fn get_float_by_key<T: num_traits::float::FloatCore + Num + std::str::FromStr>(
         &self,
         key: &str,
@@ -226,9 +323,51 @@ impl TomlDocument {
         None
     }
 
+    /// WIP. まだ `.` をパースできていません。  
+    ///
+    /// Right integer of `left = 1.2`.  
+    /// キー・バリューの右の整数値。  
+    pub fn get_float_by_key_v2<T: num_traits::float::FloatCore + Num + std::str::FromStr>(
+        &self,
+        key: &str,
+    ) -> Result<Option<T>, String>
+    where
+        <T as std::str::FromStr>::Err: std::fmt::Display,
+    {
+        if let Some(doc_elm) = self.get_val_by_key(key) {
+            if let Keyval(_ws1, keyval, _ws2, _comment) = doc_elm {
+                if keyval.key.to_string() == key.to_string() {
+                    if let Val::LiteralValue(literal_value) = &*keyval.val {
+                        // アンダースコアは除去しないと変換できない。
+                        let s = literal_value.to_string().replace("_", "");
+
+                        match s.as_str() {
+                            "nan" => {
+                                return Ok(Some(T::nan()));
+                            }
+                            "+nan" => {
+                                return Ok(Some(T::nan()));
+                            }
+                            "-nan" => {
+                                return Ok(Some(-T::nan()));
+                            }
+                            _ => {}
+                        }
+
+                        match s.parse() {
+                            Ok(n) => return Ok(Some(n)),
+                            Err(why) => return Err(format!("{}", why)),
+                        }
+                    }
+                }
+            }
+        }
+        Ok(None)
+    }
+
     #[deprecated(
         since = "0.1.10",
-        note = "Please use the tomboy_toml_dom::model::layer310::document::get_string_by_key() method instead"
+        note = "Please use the tomboy_toml_dom::model::layer310::toml_document::get_string_by_key() method instead"
     )]
     pub fn get_str_by_key(&self, _key: &str) -> Option<&str> {
         panic!("Obsoleted. Please use the tomboy_toml_dom::model::layer310::document::get_string_by_key() method instead.")
