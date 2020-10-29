@@ -1,11 +1,6 @@
-//! An exemplary program.
-//! 模範的なプログラム。
-//!
-//! `cargo run --example example`
-
 extern crate tomboy_toml_dom;
 
-use tomboy_toml_dom::Toml;
+// use tomboy_toml_dom::Toml;
 
 fn main() {
     /*

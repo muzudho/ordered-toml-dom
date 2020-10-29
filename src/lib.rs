@@ -6,6 +6,8 @@
 // (1) `cargo test`
 // (2a) `cargo run --example example`
 // (2b) `cargo run --example example-tail-comment`
+// (2c) `cargo run --example toml-io-en-a-quick-tour-of-toml-v1-0-0rc3`
+// (2d) `cargo run --example toml-io-en-v1-0-0rc3-full-speck`
 // (3) Open auto-generated log file. I check it.
 // (4) Remove the log file.
 // (5) Update `README.md`.
