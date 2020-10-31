@@ -25,10 +25,11 @@ impl NonAsciiP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn check_starts(token: &Token) -> bool {
+    pub fn check_non_ascii(token: &Token) -> bool {
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
-            0x80..=0xD7FF => true,
+            // non-ascii
+            0x80..=0xD7FF | 0xE000..=0x10FFFF => true,
             _ => false,
         }
     }
@@ -42,28 +43,24 @@ impl NonAsciiP {
     ///                             結果。
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
-        let ch = token0.to_string_chars_nth(0).unwrap();
-        let unicode = ch as u32;
-        match unicode {
-            0x80..=0xD7FF => {
-                if let None = self.buffer {
-                    self.buffer = Some(NonAscii::default());
-                }
-                let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::new(
-                    token0.column_number,
-                    &ch.to_string(),
-                    TokenType::NonAscii,
-                ));
+        if Self::check_non_ascii(token0) {
+            let ch = token0.to_string_chars_nth(0).unwrap();
+            if let None = self.buffer {
+                self.buffer = Some(NonAscii::default());
+            }
+            let m = self.buffer.as_mut().unwrap();
+            m.push_token(&Token::new(
+                token0.column_number,
+                &ch.to_string(),
+                TokenType::NonAscii,
+            ));
 
-                let token1 = tokens.current.as_ref().unwrap();
-                if !Self::check_starts(&token1) {
-                    return PResult::End;
-                }
+            let token1 = tokens.current.as_ref().unwrap();
+            if !Self::check_non_ascii(&token1) {
+                return PResult::End;
             }
-            _ => {
-                return error(&mut self.log(), &tokens, "non_ascii_p.rs.65.");
-            }
+        } else {
+            return error(&mut self.log(), &tokens, "non_ascii_p.rs.65.");
         }
         PResult::Ongoing
     }

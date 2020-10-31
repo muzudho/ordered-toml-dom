@@ -43,7 +43,7 @@ impl NonEolP {
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
     pub fn check_starts(token: &Token) -> bool {
-        if NonAsciiP::check_starts(token) {
+        if NonAsciiP::check_non_ascii(token) {
             return true;
         }
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
@@ -65,7 +65,7 @@ impl NonEolP {
         match self.state {
             State::End => {}
             State::First => {
-                if NonAsciiP::check_starts(token0) {
+                if NonAsciiP::check_non_ascii(token0) {
                     self.non_ascii_p = Some(NonAsciiP::new());
                     self.state = State::NonAscii;
                     return self.parse_non_ascii(tokens);

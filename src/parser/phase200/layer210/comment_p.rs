@@ -75,6 +75,9 @@ impl CommentP {
                 let p = self.non_eol_p.as_mut().unwrap();
                 match p.parse(tokens) {
                     PResult::End => {
+                        let m = self.buffer.as_mut().unwrap();
+                        m.extend_tokens(&p.flush().unwrap().tokens);
+
                         self.non_eol_p = None;
                         self.state = State::End;
                         return PResult::End;
