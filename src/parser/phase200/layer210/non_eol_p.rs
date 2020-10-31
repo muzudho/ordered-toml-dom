@@ -42,14 +42,14 @@ impl NonEolP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn check_starts(token: &Token) -> bool {
+    pub fn judge(token: &Token) -> State {
         if NonAsciiP::check_non_ascii(token) {
-            return true;
+            return State::NonAscii;
         }
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
-            0x09 | 0x20..=0x7F => true,
-            _ => false,
+            0x09 | 0x20..=0x7F => State::First,
+            _ => State::End,
         }
     }
     /// # Arguments
@@ -62,34 +62,26 @@ impl NonEolP {
     ///                             結果。
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
+        self.state = Self::judge(token0);
         match self.state {
-            State::End => {}
+            State::End => {
+                return PResult::End;
+            }
             State::First => {
-                if NonAsciiP::check_non_ascii(token0) {
-                    self.non_ascii_p = Some(NonAsciiP::new());
-                    self.state = State::NonAscii;
-                    return self.parse_non_ascii(tokens);
-                } else {
-                    let ch = token0.to_string_chars_nth(0).unwrap();
-                    let unicode = ch as u32;
-                    match unicode {
-                        0x09 | 0x20..=0x7F => {
-                            if let None = self.buffer {
-                                self.buffer = Some(NonEol::default());
-                            }
-                            let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_base(token0, TokenType::NonEol));
+                // Horizon tab and Ascii code.
+                if let None = self.buffer {
+                    self.buffer = Some(NonEol::default());
+                }
+                let m = self.buffer.as_mut().unwrap();
+                m.push_token(&Token::from_base(token0, TokenType::NonEol));
 
-                            // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
-                            let token1 = tokens.current.as_ref().unwrap();
-                            if !Self::check_starts(&token1) {
-                                return PResult::End;
-                            }
-                        }
-                        _ => {
-                            return error(&mut self.log(), &tokens, "non_eol_p.rs.86.");
-                        }
+                // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
+                let token1 = tokens.current.as_ref().unwrap();
+                match Self::judge(&token1) {
+                    State::End => {
+                        return PResult::End;
                     }
+                    _ => {}
                 }
             }
             State::NonAscii => {
@@ -100,6 +92,9 @@ impl NonEolP {
     }
 
     fn parse_non_ascii(&mut self, tokens: &LookAheadTokens) -> PResult {
+        if let None = self.non_ascii_p {
+            self.non_ascii_p = Some(NonAsciiP::new());
+        }
         let p = self.non_ascii_p.as_mut().unwrap();
         match p.parse(tokens) {
             PResult::End => {
