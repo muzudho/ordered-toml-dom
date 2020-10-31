@@ -7,9 +7,11 @@ pub mod header_p_of_table;
 pub mod key_p;
 pub mod literal_string_p;
 pub mod literal_value_p;
+pub mod non_ascii_p;
 pub mod positional_numeral_string_p;
 pub mod ws_p;
 
+use crate::model::layer210::NonAscii;
 use crate::model::{
     layer210::{BasicString, Comment, Key, LiteralString, LiteralValue, WS},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
@@ -80,6 +82,13 @@ pub struct HeaderPOfArrayOfTable {
 #[derive(Clone)]
 pub struct HeaderPOfTable {
     buffer: Option<HeaderOfTable>,
+}
+
+/// Non ascii parser.  
+/// 非ASCIIパーサー。  
+#[derive(Clone)]
+pub struct NonAsciiP {
+    buffer: Option<NonAscii>,
 }
 
 /// Hex string parser.  

@@ -38,6 +38,8 @@ pub enum TokenType {
     RightSquareBracket,
     /// #  
     CommentStartSymbol,
+    /// 0x80 - 0xD7FF.
+    NonAscii,
     /// '  
     SingleQuotation,
     /// A ～ Z, a ～ z.  Multiple disits.   

@@ -12,6 +12,9 @@ impl Token {
             type_: type_,
         }
     }
+    pub fn to_string_chars_nth(&self, nth: usize) -> Option<char> {
+        self.to_string().chars().nth(nth)
+    }
     pub fn to_debug_string(&self) -> String {
         format!("{:?}", self)
     }

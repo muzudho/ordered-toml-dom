@@ -4,6 +4,7 @@ pub mod date_time;
 pub mod key;
 pub mod literal_string;
 pub mod literal_value;
+pub mod non_ascii;
 pub mod ws;
 
 use crate::model::layer110::Token;
@@ -47,6 +48,13 @@ pub struct LiteralString {
 /// １つの文字列を持ちます。  
 #[derive(Clone)]
 pub struct LiteralValue {
+    pub tokens: Vec<Token>,
+}
+
+/// NonAscii.  
+/// 非ASCII。  
+#[derive(Clone)]
+pub struct NonAscii {
     pub tokens: Vec<Token>,
 }
 
