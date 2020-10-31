@@ -3,7 +3,7 @@
 
 use crate::model::{layer110::TokenType, layer210::NonEol};
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer210::{non_ascii_p::State as NonAsciiPState, NonAsciiP};
+use crate::parser::phase200::layer210::{non_ascii_p::Judge as NonAsciiPJudge, NonAsciiP};
 use crate::parser::phase200::layer210::{NonEolP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::Token;
@@ -16,6 +16,12 @@ pub enum State {
     End,
     First,
     NonAscii,
+}
+
+pub enum Judge {
+    None,
+    NonAscii,
+    HorizontalTabAndAscii,
 }
 
 impl Default for NonEolP {
@@ -41,17 +47,17 @@ impl NonEolP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(token: &Token) -> State {
+    pub fn judge(token: &Token) -> Judge {
         match NonAsciiP::judge(token) {
-            NonAsciiPState::End => {}
-            NonAsciiPState::First => {
-                return State::NonAscii;
+            NonAsciiPJudge::None => {}
+            NonAsciiPJudge::NonAscii => {
+                return Judge::NonAscii;
             }
         }
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
-            0x09 | 0x20..=0x7F => State::First,
-            _ => State::End,
+            0x09 | 0x20..=0x7F => Judge::HorizontalTabAndAscii,
+            _ => Judge::None,
         }
     }
     /// # Arguments
@@ -63,8 +69,6 @@ impl NonEolP {
     /// * `PResult` - Result.  
     ///                             結果。
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
-        self.state = Self::judge(token0);
         match self.state {
             State::End => {
                 return PResult::End;
@@ -75,12 +79,13 @@ impl NonEolP {
                     self.buffer = Some(NonEol::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
+                let token0 = tokens.current.as_ref().unwrap();
                 m.push_token(&Token::from_base(token0, TokenType::NonEol));
 
                 // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
                 let token1 = tokens.current.as_ref().unwrap();
                 match Self::judge(&token1) {
-                    State::End => {
+                    Judge::None => {
                         return PResult::End;
                     }
                     _ => {}

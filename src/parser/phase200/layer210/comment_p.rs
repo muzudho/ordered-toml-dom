@@ -4,7 +4,7 @@
 use crate::model::{layer110::TokenType, layer210::Comment};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer210::NonEolP;
+use crate::parser::phase200::layer210::{non_eol_p::Judge as NonEolPJudge, NonEolP};
 use crate::parser::phase200::layer210::{CommentP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::Token;
@@ -17,6 +17,11 @@ pub enum State {
     End,
     First,
     NonEol,
+}
+
+pub enum Judge {
+    None,
+    Comment,
 }
 
 impl CommentP {
@@ -40,10 +45,13 @@ impl CommentP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn check_starts(token: &Token) -> bool {
+    pub fn judge(token: &Token) -> Judge {
         match token.type_ {
-            TokenType::CommentStartSymbol => true,
-            _ => false,
+            TokenType::CommentStartSymbol => Judge::Comment,
+            _ => match NonEolP::judge(token) {
+                NonEolPJudge::None => Judge::Comment,
+                NonEolPJudge::HorizontalTabAndAscii | NonEolPJudge::NonAscii => Judge::Comment,
+            },
         }
     }
     /// # Arguments
@@ -59,16 +67,19 @@ impl CommentP {
             State::End => {}
             State::First => {
                 let token0 = tokens.current.as_ref().unwrap();
-                if Self::check_starts(token0) {
-                    if let None = self.buffer {
-                        self.buffer = Some(Comment::default());
+                match Self::judge(token0) {
+                    Judge::None => {
+                        return error(&mut self.log(), &tokens, "comment_p.rs.61.");
                     }
-                    let m = self.buffer.as_mut().unwrap();
-                    m.push_token(&token0);
-                    self.non_eol_p = Some(NonEolP::default());
-                    self.state = State::NonEol;
-                } else {
-                    return error(&mut self.log(), &tokens, "comment_p.rs.61.");
+                    Judge::Comment => {
+                        if let None = self.buffer {
+                            self.buffer = Some(Comment::default());
+                        }
+                        let m = self.buffer.as_mut().unwrap();
+                        m.push_token(&token0);
+                        self.non_eol_p = Some(NonEolP::default());
+                        self.state = State::NonEol;
+                    }
                 }
             }
             State::NonEol => {

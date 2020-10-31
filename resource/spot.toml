@@ -1,1 +1,2 @@
-string_array = ["a", 'b', '"c"']
+# Long. 32bit size.
+i32_max = 2_147_483_647

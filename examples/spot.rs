@@ -14,14 +14,5 @@ fn main() {
     println!("display=|{}|", doc);
     println!("debug=|{:?}|", doc);
 
-    // Read a array.
-    // 配列読取。
-    assert_eq!(
-        doc.get_string_array_by_key("string_array"),
-        Ok(Some(vec![
-            "a".to_string(),
-            "b".to_string(),
-            "\"c\"".to_string()
-        ]))
-    );
+    assert_eq!(doc.get_i128_by_key_v2("i32_max"), Ok(Some(2147483647)));
 }

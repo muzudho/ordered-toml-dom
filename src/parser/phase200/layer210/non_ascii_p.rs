@@ -13,6 +13,11 @@ pub enum State {
     End,
     First,
 }
+#[derive(Debug, Clone)]
+pub enum Judge {
+    None,
+    NonAscii,
+}
 
 impl NonAsciiP {
     pub fn new() -> Self {
@@ -34,12 +39,13 @@ impl NonAsciiP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(token: &Token) -> State {
+    pub fn judge(token: &Token) -> Judge {
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
             // non-ascii
-            0x80..=0xD7FF | 0xE000..=0x10FFFF => State::First,
-            _ => State::End,
+            0x80..=0xD7FF | 0xE000..=0x10FFFF => Judge::NonAscii,
+            // 0x80..=0xD7FF | 0xE000..=u32::MAX => Judge::NonAscii,
+            _ => Judge::None,
         }
     }
     /// # Arguments
@@ -51,8 +57,6 @@ impl NonAsciiP {
     /// * `PResult` - Result.  
     ///                             結果。
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
-        self.state = Self::judge(token0);
         match self.state {
             State::End => {
                 return PResult::End;
@@ -62,10 +66,11 @@ impl NonAsciiP {
                     self.buffer = Some(NonAscii::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
+                let token0 = tokens.current.as_ref().unwrap();
                 m.push_token(&Token::from_base(token0, TokenType::NonAscii));
                 let token1 = tokens.current.as_ref().unwrap();
                 match Self::judge(&token1) {
-                    State::End => {
+                    Judge::None => {
                         return PResult::End;
                     }
                     _ => {}
