@@ -48,10 +48,17 @@ impl CommentP {
     pub fn judge(token: &Token) -> Judge {
         match token.type_ {
             TokenType::CommentStartSymbol => Judge::Comment,
-            _ => match NonEolP::judge(token) {
-                NonEolPJudge::None => Judge::Comment,
-                NonEolPJudge::HorizontalTabAndAscii | NonEolPJudge::NonAscii => Judge::Comment,
-            },
+            _ => {
+                if let Some(judge) = NonEolP::judge(token) {
+                    match judge {
+                        NonEolPJudge::HorizontalTabAndAscii | NonEolPJudge::NonAscii => {
+                            Judge::Comment
+                        }
+                    }
+                } else {
+                    Judge::Comment
+                }
+            }
         }
     }
     /// # Arguments

@@ -19,7 +19,6 @@ pub enum State {
 }
 
 pub enum Judge {
-    None,
     NonAscii,
     HorizontalTabAndAscii,
 }
@@ -47,14 +46,14 @@ impl NonEolP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(token: &Token) -> Judge {
+    pub fn judge(token: &Token) -> Option<Judge> {
         if let Some(_judge) = NonAsciiP::judge(token) {
-            return Judge::NonAscii;
+            return Some(Judge::NonAscii);
         }
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
-            0x09 | 0x20..=0x7F => Judge::HorizontalTabAndAscii,
-            _ => Judge::None,
+            0x09 | 0x20..=0x7F => Some(Judge::HorizontalTabAndAscii),
+            _ => None,
         }
     }
     /// # Arguments
@@ -81,11 +80,8 @@ impl NonEolP {
 
                 // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
                 let token1 = tokens.current.as_ref().unwrap();
-                match Self::judge(&token1) {
-                    Judge::None => {
-                        return PResult::End;
-                    }
-                    _ => {}
+                if let None = Self::judge(&token1) {
+                    return PResult::End;
                 }
             }
             State::NonAscii => {
