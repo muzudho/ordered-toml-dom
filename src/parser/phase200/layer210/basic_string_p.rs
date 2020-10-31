@@ -211,8 +211,8 @@ impl BasicStringP {
             State::MultiLineTrimStart => {
                 // println!("[trace307 MultiLineTrimStart]");
                 match token0.type_ {
-                    TokenType::EndOfLine => {
-                        // println!("[trace312 EndOfLine]");
+                    TokenType::Newline => {
+                        // println!("[trace312 Newline]");
                     } // Ignore it.
                     TokenType::WS => {
                         // println!("[trace308 WS]");

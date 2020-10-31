@@ -52,7 +52,7 @@ impl LiteralStringP {
                 // 先読み。
                 if let Some(token_1_ahead) = &tokens.one_ahead {
                     match token_1_ahead.type_ {
-                        TokenType::EndOfLine => {
+                        TokenType::Newline => {
                             self.state = State::BeforeMultiLine2;
                         }
                         _ => {

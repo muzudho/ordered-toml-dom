@@ -124,7 +124,7 @@ impl ExpressionP {
                 return self.parse_header_of_table(tokens);
             }
             State::Ws1 => match token0.type_ {
-                TokenType::EndOfLine => {
+                TokenType::Newline => {
                     self.buffer = Some(Expression::EmptyLine(
                         if let Some(ws_p_1) = self.ws_p_1.as_mut() {
                             ws_p_1.flush()
@@ -234,7 +234,7 @@ impl ExpressionP {
                         let token1 = tokens.one_ahead.as_ref().unwrap();
 
                         match token1.type_ {
-                            TokenType::EndOfLine => {
+                            TokenType::Newline => {
                                 if let Some(keyval) = p.flush() {
                                     self.buffer = Some(Expression::from_keyval(
                                         &if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -281,7 +281,7 @@ impl ExpressionP {
                     let token1 = tokens.one_ahead.as_ref().unwrap();
 
                     match token1.type_ {
-                        TokenType::EndOfLine => {
+                        TokenType::Newline => {
                             return PResult::End;
                         }
                         TokenType::Sharp => {
@@ -294,7 +294,7 @@ impl ExpressionP {
                     }
                 } // Ignore it.
                 // `,`
-                TokenType::EndOfLine => return PResult::End,
+                TokenType::Newline => return PResult::End,
                 _ => {
                     return error(&mut self.log(), &tokens, "expression.rs.84.");
                 }

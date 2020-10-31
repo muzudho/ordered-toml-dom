@@ -52,7 +52,7 @@ impl DateTimeP {
                 let token0 = tokens.current.as_ref().unwrap();
                 let token1 = tokens.one_ahead.as_ref().unwrap();
                 match token0.type_ {
-                    TokenType::EndOfLine => {
+                    TokenType::Newline => {
                         // println!("[trace59.]");
                         return PResult::End;
                     }
@@ -112,7 +112,7 @@ impl DateTimeP {
                 let token0 = tokens.current.as_ref().unwrap();
                 let token1 = tokens.one_ahead.as_ref().unwrap();
                 match token0.type_ {
-                    TokenType::EndOfLine => {
+                    TokenType::Newline => {
                         // println!("[trace114.]");
                         return PResult::End;
                     }

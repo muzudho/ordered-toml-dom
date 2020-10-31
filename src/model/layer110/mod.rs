@@ -19,7 +19,7 @@ pub enum TokenType {
     Dot,
     /// "  
     DoubleQuotation,
-    EndOfLine,
+    Newline,
     /// =  
     Equals,
     /// -  

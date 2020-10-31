@@ -29,7 +29,7 @@ impl WSP {
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
-            TokenType::EndOfLine => return PResult::End,
+            TokenType::Newline => return PResult::End,
             _ => {
                 self.buffer.push_token(&token0);
             }

@@ -64,7 +64,7 @@ impl EscapeSequenceP {
                             // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
                             self.state = State::EscapedCharacter;
                         }
-                        TokenType::EndOfLine => {
+                        TokenType::Newline => {
                             // 行末に \ があったケース。
                             // println!("[trace3 行末にEOLがあったケース]");
                             self.state = State::End;

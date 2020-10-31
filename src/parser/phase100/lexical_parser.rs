@@ -79,7 +79,7 @@ impl LexicalParser {
             ch_vec.len(),
             "
 ",
-            TokenType::EndOfLine,
+            TokenType::Newline,
         ));
     }
     fn one_delay_loop(&mut self, i: usize, chars: (Option<&char>, Option<&char>)) {
