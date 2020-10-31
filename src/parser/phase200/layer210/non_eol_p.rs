@@ -48,11 +48,8 @@ impl NonEolP {
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
     pub fn judge(token: &Token) -> Judge {
-        match NonAsciiP::judge(token) {
-            NonAsciiPJudge::None => {}
-            NonAsciiPJudge::NonAscii => {
-                return Judge::NonAscii;
-            }
+        if let Some(_judge) = NonAsciiP::judge(token) {
+            return Judge::NonAscii;
         }
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
