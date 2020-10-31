@@ -37,7 +37,7 @@ pub enum TokenType {
     /// ]  
     RightSquareBracket,
     /// #  
-    Sharp,
+    CommentStartSymbol,
     /// '  
     SingleQuotation,
     /// A ～ Z, a ～ z.  Multiple disits.   

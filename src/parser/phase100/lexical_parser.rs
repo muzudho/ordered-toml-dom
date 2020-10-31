@@ -194,7 +194,7 @@ impl LexicalParser {
                     }
                     // #
                     '#' => {
-                        self.buffer_string_token_type = TokenType::Sharp;
+                        self.buffer_string_token_type = TokenType::CommentStartSymbol;
                         self.flush();
                     }
                     // '

@@ -168,7 +168,7 @@ impl ExpressionP {
                     self.state = State::AfterLeftSquareBracket;
                 }
                 // `#`
-                TokenType::Sharp => {
+                TokenType::CommentStartSymbol => {
                     self.comment_p = Some(CommentP::new());
                     self.state = State::Ws1Comment;
                 }
@@ -252,7 +252,7 @@ impl ExpressionP {
                                 }
                                 return PResult::End;
                             }
-                            TokenType::Sharp => {
+                            TokenType::CommentStartSymbol => {
                                 self.comment_p = Some(CommentP::new());
                                 self.state = State::Ws1KeyvalWs2Comment;
                             }
@@ -284,7 +284,7 @@ impl ExpressionP {
                         TokenType::Newline => {
                             return PResult::End;
                         }
-                        TokenType::Sharp => {
+                        TokenType::CommentStartSymbol => {
                             self.comment_p = Some(CommentP::new());
                             self.state = State::Ws1KeyvalWs2Comment;
                         }
