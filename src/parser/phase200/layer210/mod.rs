@@ -22,7 +22,7 @@ use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, comment_p::State as CommentState,
     date_time_p::State as DateTimeState, escape_sequence_p::State as EscapeSequenceState,
     literal_string_p::State as LiteralStringState, literal_value_p::State as LiteralValueState,
-    non_eol_p::State as NonEolState,
+    non_ascii_p::State as NonAsciiState, non_eol_p::State as NonEolState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -33,9 +33,9 @@ use casual_logger::Table as LogTable;
 /// Example: `"value"`.  
 #[derive(Clone)]
 pub struct BasicStringP {
-    escape_sequence_p: Option<EscapeSequenceP>,
     buffer: Option<BasicString>,
     state: BasicStringState,
+    escape_sequence_p: Option<EscapeSequenceP>,
 }
 
 /// Comment parser.  
@@ -94,6 +94,7 @@ pub struct HeaderPOfTable {
 #[derive(Clone)]
 pub struct NonAsciiP {
     buffer: Option<NonAscii>,
+    state: NonAsciiState,
 }
 
 /// Non end-of-line parser.  

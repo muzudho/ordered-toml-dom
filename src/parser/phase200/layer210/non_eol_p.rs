@@ -2,9 +2,8 @@
 //! 非行末パーサー。  
 
 use crate::model::{layer110::TokenType, layer210::NonEol};
-use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer210::NonAsciiP;
+use crate::parser::phase200::layer210::{non_ascii_p::State as NonAsciiPState, NonAsciiP};
 use crate::parser::phase200::layer210::{NonEolP, PResult};
 use crate::parser::phase200::LookAheadTokens;
 use crate::parser::phase200::Token;
@@ -43,8 +42,11 @@ impl NonEolP {
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
     pub fn judge(token: &Token) -> State {
-        if NonAsciiP::check_non_ascii(token) {
-            return State::NonAscii;
+        match NonAsciiP::judge(token) {
+            NonAsciiPState::End => {}
+            NonAsciiPState::First => {
+                return State::NonAscii;
+            }
         }
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
