@@ -19,9 +19,10 @@ use crate::model::{
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
-    basic_string_p::State as BasicStringState, date_time_p::State as DateTimeState,
-    escape_sequence_p::State as EscapeSequenceState, literal_string_p::State as LiteralStringState,
-    literal_value_p::State as LiteralValueState, non_eol_p::State as NonEolState,
+    basic_string_p::State as BasicStringState, comment_p::State as CommentState,
+    date_time_p::State as DateTimeState, escape_sequence_p::State as EscapeSequenceState,
+    literal_string_p::State as LiteralStringState, literal_value_p::State as LiteralValueState,
+    non_eol_p::State as NonEolState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -44,6 +45,8 @@ pub struct BasicStringP {
 #[derive(Clone)]
 pub struct CommentP {
     buffer: Option<Comment>,
+    state: CommentState,
+    non_eol_p: Option<NonEolP>,
 }
 
 /// Date time parser.  

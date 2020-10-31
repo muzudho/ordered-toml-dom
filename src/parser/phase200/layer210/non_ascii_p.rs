@@ -25,7 +25,7 @@ impl NonAsciiP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn check(token: &Token) -> bool {
+    pub fn check_starts(token: &Token) -> bool {
         let unicode = token.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
             0x80..=0xD7FF => true,
@@ -57,7 +57,7 @@ impl NonAsciiP {
                 ));
 
                 let token1 = tokens.current.as_ref().unwrap();
-                if !Self::check(&token1) {
+                if !Self::check_starts(&token1) {
                     return PResult::End;
                 }
             }

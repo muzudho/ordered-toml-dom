@@ -2,18 +2,49 @@
 //! コメント構文パーサー。  
 
 use crate::model::{layer110::TokenType, layer210::Comment};
+use crate::parser::phase200::error;
+use crate::parser::phase200::error_via;
+use crate::parser::phase200::layer210::NonEolP;
 use crate::parser::phase200::layer210::{CommentP, PResult};
 use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::Token;
 use casual_logger::Table;
+
+/// Syntax machine state.  
+/// 構文状態遷移。  
+#[derive(Debug, Clone)]
+pub enum State {
+    End,
+    First,
+    NonEol,
+}
 
 impl CommentP {
     pub fn new() -> Self {
-        CommentP { buffer: None }
+        CommentP {
+            buffer: None,
+            state: State::First,
+            non_eol_p: None,
+        }
     }
     pub fn flush(&mut self) -> Option<Comment> {
         let m = self.buffer.clone();
         self.buffer = None;
         m
+    }
+    /// # Arguments
+    ///
+    /// * `token` - Token.  
+    ///             トークン。  
+    /// # Returns
+    ///
+    /// * `bool` - このパーサーの対象とするトークンになる.  
+    ///                             結果。
+    pub fn check_starts(token: &Token) -> bool {
+        match token.type_ {
+            TokenType::CommentStartSymbol => true,
+            _ => false,
+        }
     }
     /// # Arguments
     ///
@@ -24,17 +55,40 @@ impl CommentP {
     /// * `PResult` - Result.  
     ///                             結果。
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
-        match token0.type_ {
-            TokenType::Newline => return PResult::End,
-            _ => {
-                if let None = self.buffer {
-                    self.buffer = Some(Comment::default());
+        match self.state {
+            State::End => {}
+            State::First => {
+                let token0 = tokens.current.as_ref().unwrap();
+                if Self::check_starts(token0) {
+                    if let None = self.buffer {
+                        self.buffer = Some(Comment::default());
+                    }
+                    let m = self.buffer.as_mut().unwrap();
+                    m.push_token(&token0);
+                    self.non_eol_p = Some(NonEolP::default());
+                    self.state = State::NonEol;
+                } else {
+                    return error(&mut self.log(), &tokens, "comment_p.rs.61.");
                 }
-                let m = self.buffer.as_mut().unwrap();
-                m.push_token(&token0);
+            }
+            State::NonEol => {
+                let p = self.non_eol_p.as_mut().unwrap();
+                match p.parse(tokens) {
+                    PResult::End => {
+                        self.non_eol_p = None;
+                        self.state = State::End;
+                        return PResult::End;
+                    }
+                    PResult::Err(mut table) => {
+                        return error_via(&mut table, &mut self.log(), &tokens, "comment_p.rs.87.");
+                    }
+                    PResult::Ongoing => {
+                        return PResult::Ongoing;
+                    }
+                }
             }
         }
+
         PResult::Ongoing
     }
     /// Log.  
