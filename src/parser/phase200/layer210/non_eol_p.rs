@@ -78,11 +78,7 @@ impl NonEolP {
                                 self.buffer = Some(NonEol::default());
                             }
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::new(
-                                token0.column_number,
-                                &ch.to_string(),
-                                TokenType::NonEol,
-                            ));
+                            m.push_token(&Token::from_base(token0, TokenType::NonEol));
 
                             // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
                             let token1 = tokens.current.as_ref().unwrap();

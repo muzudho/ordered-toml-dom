@@ -44,28 +44,24 @@ impl NonAsciiP {
     pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         if Self::check_non_ascii(token0) {
-            let ch = token0.to_string_chars_nth(0).unwrap();
             if let None = self.buffer {
                 self.buffer = Some(NonAscii::default());
             }
             let m = self.buffer.as_mut().unwrap();
-            m.push_token(&Token::new(
-                token0.column_number,
-                &ch.to_string(),
-                TokenType::NonAscii,
-            ));
+            m.push_token(&Token::from_base(token0, TokenType::NonAscii));
 
             let token1 = tokens.current.as_ref().unwrap();
             if !Self::check_non_ascii(&token1) {
                 return PResult::End;
             }
         } else {
-            return error(&mut self.log(), &tokens, "non_ascii_p.rs.65.");
+            return PResult::End;
         }
         PResult::Ongoing
     }
-    /// Log.  
-    /// ログ。  
+    /*
+    /// Log.
+    /// ログ。
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
         if let Some(m) = &self.buffer {
@@ -73,4 +69,5 @@ impl NonAsciiP {
         }
         t
     }
+    */
 }

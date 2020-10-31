@@ -12,6 +12,13 @@ impl Token {
             type_: type_,
         }
     }
+    pub fn from_base(token: &Token, type_: TokenType) -> Self {
+        Token {
+            column_number: token.column_number,
+            value: token.value.to_string(),
+            type_: type_,
+        }
+    }
     pub fn to_string_chars_nth(&self, nth: usize) -> Option<char> {
         self.to_string().chars().nth(nth)
     }
