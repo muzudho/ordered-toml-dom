@@ -20,8 +20,8 @@ pub enum State {
 }
 
 pub enum Judge {
-    None,
-    Comment,
+    CommentStartSymbol,
+    CommentText,
 }
 
 impl CommentP {
@@ -45,18 +45,18 @@ impl CommentP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(token: &Token) -> Judge {
+    pub fn judge(token: &Token) -> Option<Judge> {
         match token.type_ {
-            TokenType::CommentStartSymbol => Judge::Comment,
+            TokenType::CommentStartSymbol => Some(Judge::CommentStartSymbol),
             _ => {
                 if let Some(judge) = NonEolP::judge(token) {
                     match judge {
                         NonEolPJudge::HorizontalTabAndAscii | NonEolPJudge::NonAscii => {
-                            Judge::Comment
+                            Some(Judge::CommentText)
                         }
                     }
                 } else {
-                    Judge::Comment
+                    None
                 }
             }
         }
@@ -74,19 +74,17 @@ impl CommentP {
             State::End => {}
             State::First => {
                 let token0 = tokens.current.as_ref().unwrap();
-                match Self::judge(token0) {
-                    Judge::None => {
-                        return error(&mut self.log(), &tokens, "comment_p.rs.61.");
+
+                if let Some(_judge) = Self::judge(token0) {
+                    if let None = self.buffer {
+                        self.buffer = Some(Comment::default());
                     }
-                    Judge::Comment => {
-                        if let None = self.buffer {
-                            self.buffer = Some(Comment::default());
-                        }
-                        let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
-                        self.non_eol_p = Some(NonEolP::default());
-                        self.state = State::NonEol;
-                    }
+                    let m = self.buffer.as_mut().unwrap();
+                    m.push_token(&token0);
+                    self.non_eol_p = Some(NonEolP::default());
+                    self.state = State::NonEol;
+                } else {
+                    return error(&mut self.log(), &tokens, "comment_p.rs.61.");
                 }
             }
             State::NonEol => {
