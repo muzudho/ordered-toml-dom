@@ -5,6 +5,7 @@ pub mod key;
 pub mod literal_string;
 pub mod literal_value;
 pub mod non_ascii;
+pub mod non_eol;
 pub mod ws;
 
 use crate::model::layer110::Token;
@@ -55,6 +56,13 @@ pub struct LiteralValue {
 /// 非ASCII。  
 #[derive(Clone)]
 pub struct NonAscii {
+    pub tokens: Vec<Token>,
+}
+
+/// Non end-of-line.  
+/// 非行末。  
+#[derive(Clone)]
+pub struct NonEol {
     pub tokens: Vec<Token>,
 }
 

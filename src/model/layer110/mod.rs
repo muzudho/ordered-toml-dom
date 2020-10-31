@@ -13,33 +13,36 @@ pub enum TokenType {
     CloseCurlyBracket,
     /// :  
     Colon,
+    /// #  
+    CommentStartSymbol,
     /// ,  
     Comma,
+    /// Numeral character. 0 ～ 9. 1 disit.  
+    Digit,
     /// .  
     Dot,
     /// "  
     DoubleQuotation,
-    Newline,
     /// =  
     Equals,
+    /// \r, \n, or combine.
+    Newline,
     /// -  
     Hyphen,
     /// {  
     LeftCurlyBracket,
     /// [  
     LeftSquareBracket,
-    /// Numeral character. 0 ～ 9. 1 disit.  
-    Digit,
     /// +  
     Plus,
     /// }  
     RightCurlyBracket,
     /// ]  
     RightSquareBracket,
-    /// #  
-    CommentStartSymbol,
     /// 0x80 - 0xD7FF.
     NonAscii,
+    /// Non end-of-line. 0x09, 0x20 - 0x7F, non-ascii.
+    NonEol,
     /// '  
     SingleQuotation,
     /// A ～ Z, a ～ z.  Multiple disits.   

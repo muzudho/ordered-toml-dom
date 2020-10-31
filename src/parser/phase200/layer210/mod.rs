@@ -8,10 +8,12 @@ pub mod key_p;
 pub mod literal_string_p;
 pub mod literal_value_p;
 pub mod non_ascii_p;
+pub mod non_eol_p;
 pub mod positional_numeral_string_p;
 pub mod ws_p;
 
 use crate::model::layer210::NonAscii;
+use crate::model::layer210::NonEol;
 use crate::model::{
     layer210::{BasicString, Comment, Key, LiteralString, LiteralValue, WS},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
@@ -19,7 +21,7 @@ use crate::model::{
 use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, date_time_p::State as DateTimeState,
     escape_sequence_p::State as EscapeSequenceState, literal_string_p::State as LiteralStringState,
-    literal_value_p::State as LiteralValueState,
+    literal_value_p::State as LiteralValueState, non_eol_p::State as NonEolState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -89,6 +91,15 @@ pub struct HeaderPOfTable {
 #[derive(Clone)]
 pub struct NonAsciiP {
     buffer: Option<NonAscii>,
+}
+
+/// Non end-of-line parser.  
+/// 非行末パーサー。  
+#[derive(Clone)]
+pub struct NonEolP {
+    buffer: Option<NonEol>,
+    state: NonEolState,
+    non_ascii_p: Option<NonAsciiP>,
 }
 
 /// Hex string parser.  
