@@ -1,6 +1,7 @@
 //! Comment syntax parser.  
 //! コメント構文パーサー。  
 
+use crate::model::layer210::NonEol;
 use crate::model::{
     layer110::{CharacterType, TokenType},
     layer210::Comment,
@@ -25,7 +26,7 @@ pub enum State {
 
 pub enum Judge {
     CommentStartSymbol(Character),
-    CommentCharacter(Character),
+    CommentCharacter(NonEol),
 }
 
 impl CommentP {
@@ -86,9 +87,11 @@ impl CommentP {
                 Judge::CommentStartSymbol(_ch) => {
                     panic!("comment_p.rs.108.");
                 }
-                Judge::CommentCharacter(ch) => {
-                    self.product
-                        .push_token(&Token::from_character(&ch, TokenType::Comment));
+                Judge::CommentCharacter(non_eol) => {
+                    self.product.push_token(&Token::from_character(
+                        &non_eol.get_character(),
+                        TokenType::Comment,
+                    ));
                 }
             },
         }
@@ -104,7 +107,7 @@ impl CommentP {
     pub fn forward(&mut self, characters: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
-                return error(&mut self.log(), &characters, "comment_p.rs.61.");
+                panic!("comment_p.rs.61.");
             }
             State::First => {
                 let character0 = characters.current.as_ref().unwrap();
@@ -119,7 +122,7 @@ impl CommentP {
                         return PResult::End;
                     }
                 } else {
-                    return error(&mut self.log(), &characters, "comment_p.rs.99.");
+                    panic!("comment_p.rs.99.");
                 }
             }
             State::NonEol => {
@@ -133,7 +136,7 @@ impl CommentP {
                         return PResult::End;
                     }
                 } else {
-                    return error(&mut self.log(), &characters, "comment_p.rs.124.");
+                    panic!("comment_p.rs.124.");
                 }
             }
         }

@@ -11,6 +11,9 @@ impl NonEol {
             character: character.clone(),
         }
     }
+    pub fn get_character(&self) -> Character {
+        self.character.clone()
+    }
     pub fn to_debug_string(&self) -> String {
         format!("{:?}", self.character)
     }
