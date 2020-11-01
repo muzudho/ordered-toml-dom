@@ -6,9 +6,6 @@ use std::fmt;
 #[derive(Debug)]
 enum State {
     EscapeSequenceCharacter,
-    /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
-    /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
-    ContinuationOfWhiteSpaceString,
     First,
 }
 
@@ -93,18 +90,6 @@ impl LexicalParser {
                 self.buffer_string.push(*ch0);
                 self.flush();
                 self.state = State::First;
-            }
-            State::ContinuationOfWhiteSpaceString => {
-                self.buffer_string.push(*ch0);
-                if let Some(ch1) = chars.1 {
-                    match ch1 {
-                        '\t' | ' ' => {}
-                        _ => {
-                            self.flush();
-                            self.state = State::First;
-                        }
-                    }
-                }
             }
             State::First => {
                 self.buffer_string_token_column_number = i;
@@ -210,18 +195,7 @@ impl LexicalParser {
                     // Whitespace.
                     '\t' | ' ' => {
                         self.buffer_string_token_type = TokenType::WS;
-                        if let Some(ch1) = chars.1 {
-                            match ch1 {
-                                '\t' | ' ' => {
-                                    self.state = State::ContinuationOfWhiteSpaceString;
-                                }
-                                _ => {
-                                    self.flush();
-                                }
-                            }
-                        } else {
-                            self.flush();
-                        }
+                        self.flush();
                     }
                     _ => {
                         self.buffer_string_token_type = TokenType::Unknown;
