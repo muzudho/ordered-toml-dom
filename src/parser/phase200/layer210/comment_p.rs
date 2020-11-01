@@ -76,7 +76,7 @@ impl CommentP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, judge: &Judge, characters: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 return error(&mut self.log(), &characters, "comment_p.rs.61.");

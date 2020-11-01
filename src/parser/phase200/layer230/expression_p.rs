@@ -201,34 +201,39 @@ impl ExpressionP {
             },
             State::Ws1Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                match p.parse(&characters) {
-                    PResult::End => {
-                        self.buffer = Some(Expression::EmptyLine(
-                            if let Some(ws_p_1) = self.ws_p_1.as_mut() {
-                                ws_p_1.get_ws()
-                            } else {
-                                Ws::default()
-                            },
-                            if let Some(comment_p) = self.comment_p.as_mut() {
-                                Some(comment_p.get_product())
-                            } else {
-                                None
-                            },
-                        ));
-                        self.ws_p_1 = None;
-                        self.comment_p = None;
-                        self.state = State::End;
-                        return PResult::End;
+                let judge = p.judge(&character0);
+                if let Some(judge) = judge {
+                    match p.parse(&judge, &characters) {
+                        PResult::End => {
+                            self.buffer = Some(Expression::EmptyLine(
+                                if let Some(ws_p_1) = self.ws_p_1.as_mut() {
+                                    ws_p_1.get_ws()
+                                } else {
+                                    Ws::default()
+                                },
+                                if let Some(comment_p) = self.comment_p.as_mut() {
+                                    Some(comment_p.get_product())
+                                } else {
+                                    None
+                                },
+                            ));
+                            self.ws_p_1 = None;
+                            self.comment_p = None;
+                            self.state = State::End;
+                            return PResult::End;
+                        }
+                        PResult::Err(mut table) => {
+                            return error_via(
+                                &mut table,
+                                &mut self.log(),
+                                &characters,
+                                "expression.rs.162.",
+                            );
+                        }
+                        PResult::Ongoing => {}
                     }
-                    PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &characters,
-                            "expression.rs.162.",
-                        );
-                    }
-                    PResult::Ongoing => {}
+                } else {
+                    return error(&mut self.log(), &characters, "expression.rs.236.");
                 }
             }
             State::Ws1Keyval => {
@@ -309,40 +314,45 @@ impl ExpressionP {
             },
             State::Ws1KeyvalWs2Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                match p.parse(&characters) {
-                    PResult::End => {
-                        self.buffer = Some(Expression::Keyval(
-                            if let Some(ws_p_1) = self.ws_p_1.as_mut() {
-                                ws_p_1.get_ws()
-                            } else {
-                                Ws::default()
-                            },
-                            self.keyval_p.as_mut().unwrap().flush().unwrap(), // TODO
-                            if let Some(ws_p_2) = self.ws_p_2.as_mut() {
-                                ws_p_2.get_ws()
-                            } else {
-                                Ws::default()
-                            },
-                            if let Some(comment_p) = self.comment_p.as_mut() {
-                                Some(comment_p.get_product())
-                            } else {
-                                None
-                            },
-                        ));
-                        self.ws_p_1 = None;
-                        self.comment_p = None;
-                        self.state = State::End;
-                        return PResult::End;
+                let judge = p.judge(&character0);
+                if let Some(judge) = judge {
+                    match p.parse(&judge, &characters) {
+                        PResult::End => {
+                            self.buffer = Some(Expression::Keyval(
+                                if let Some(ws_p_1) = self.ws_p_1.as_mut() {
+                                    ws_p_1.get_ws()
+                                } else {
+                                    Ws::default()
+                                },
+                                self.keyval_p.as_mut().unwrap().flush().unwrap(), // TODO
+                                if let Some(ws_p_2) = self.ws_p_2.as_mut() {
+                                    ws_p_2.get_ws()
+                                } else {
+                                    Ws::default()
+                                },
+                                if let Some(comment_p) = self.comment_p.as_mut() {
+                                    Some(comment_p.get_product())
+                                } else {
+                                    None
+                                },
+                            ));
+                            self.ws_p_1 = None;
+                            self.comment_p = None;
+                            self.state = State::End;
+                            return PResult::End;
+                        }
+                        PResult::Err(mut table) => {
+                            return error_via(
+                                &mut table,
+                                &mut self.log(),
+                                &characters,
+                                "expression.rs.162.",
+                            );
+                        }
+                        PResult::Ongoing => {}
                     }
-                    PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &characters,
-                            "expression.rs.162.",
-                        );
-                    }
-                    PResult::Ongoing => {}
+                } else {
+                    return error(&mut self.log(), &characters, "expression.rs.315.");
                 }
             }
         }
