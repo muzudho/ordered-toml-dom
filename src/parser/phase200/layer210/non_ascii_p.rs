@@ -52,13 +52,13 @@ impl NonAsciiP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;
@@ -68,9 +68,9 @@ impl NonAsciiP {
                     self.buffer = Some(NonAscii::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
-                let character0 = tokens.current.as_ref().unwrap();
+                let character0 = characters.current.as_ref().unwrap();
                 m.push_token(&Token::from_character(character0, TokenType::NonAscii));
-                let character1 = tokens.current.as_ref().unwrap();
+                let character1 = characters.current.as_ref().unwrap();
                 if let None = Self::judge(&character1) {
                     return PResult::End;
                 }

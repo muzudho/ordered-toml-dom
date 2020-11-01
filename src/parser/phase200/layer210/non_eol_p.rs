@@ -19,6 +19,7 @@ pub enum State {
     End,
     First,
     NonAscii,
+    HorizontalTabAndAscii,
 }
 
 pub enum Judge {
@@ -81,11 +82,23 @@ impl NonEolP {
                 let character0 = characters.current.as_ref().unwrap();
                 m.push_token(&Token::from_character(character0, TokenType::NonEol));
 
-                // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
-                let character1 = characters.current.as_ref().unwrap();
-                if let None = Self::judge(&character1) {
+                let character1 = characters.one_ahead.as_ref().unwrap();
+                if let Some(judge) = Self::judge(&character1) {
+                    match judge {
+                        Judge::HorizontalTabAndAscii => {
+                            self.state = State::HorizontalTabAndAscii;
+                        }
+                        Judge::NonAscii => {
+                            self.non_ascii_p = Some(NonAsciiP::new());
+                            self.state = State::NonAscii;
+                        }
+                    }
+                } else {
                     return PResult::End;
                 }
+            }
+            State::HorizontalTabAndAscii => {
+                return self.parse_horizontal_tab_and_ascii(characters);
             }
             State::NonAscii => {
                 return self.parse_non_ascii(characters);
@@ -94,10 +107,34 @@ impl NonEolP {
         PResult::Ongoing
     }
 
-    fn parse_non_ascii(&mut self, characters: &LookAheadCharacters) -> PResult {
-        if let None = self.non_ascii_p {
-            self.non_ascii_p = Some(NonAsciiP::new());
+    fn parse_horizontal_tab_and_ascii(&mut self, characters: &LookAheadCharacters) -> PResult {
+        if let None = self.buffer {
+            self.buffer = Some(NonEol::default());
         }
+        let m = self.buffer.as_mut().unwrap();
+        let character0 = characters.current.as_ref().unwrap();
+        m.push_token(&Token::from_character(character0, TokenType::NonAscii));
+
+        // Forward.
+        let character1 = characters.one_ahead.as_ref().unwrap();
+        if let Some(judge) = Self::judge(&character1) {
+            match judge {
+                Judge::HorizontalTabAndAscii => {
+                    self.state = State::HorizontalTabAndAscii;
+                }
+                Judge::NonAscii => {
+                    self.non_ascii_p = Some(NonAsciiP::new());
+                    self.state = State::NonAscii;
+                }
+            }
+            PResult::Ongoing
+        } else {
+            PResult::End
+        }
+    }
+
+    fn parse_non_ascii(&mut self, characters: &LookAheadCharacters) -> PResult {
+        if let None = self.non_ascii_p {}
         let p = self.non_ascii_p.as_mut().unwrap();
         match p.parse(characters) {
             PResult::End => {
@@ -111,12 +148,7 @@ impl NonEolP {
                 return PResult::End;
             }
             PResult::Err(mut table) => {
-                return error_via(
-                    &mut table,
-                    &mut self.log(),
-                    &characters,
-                    "literal_value_p.rs.90.",
-                );
+                return error_via(&mut table, &mut self.log(), &characters, "non_eol_p.rs.90.");
             }
             PResult::Ongoing => {
                 return PResult::Ongoing;
