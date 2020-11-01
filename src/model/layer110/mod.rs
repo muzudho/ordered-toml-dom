@@ -75,6 +75,7 @@ pub enum TokenType {
     LiteralString,
     Key,
     BasicString,
+    Comment,
     /// White space.
     WS,
 }
