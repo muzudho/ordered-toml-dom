@@ -5,6 +5,7 @@ pub mod escape_sequence_p;
 pub mod header_p_of_array_of_table;
 pub mod header_p_of_table;
 pub mod key_p;
+pub mod keyval_sep_p;
 pub mod literal_string_p;
 pub mod literal_value_p;
 pub mod non_ascii_p;
@@ -22,9 +23,9 @@ use crate::model::{
 use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, comment_p::State as CommentState,
     date_time_p::State as DateTimeState, escape_sequence_p::State as EscapeSequenceState,
-    literal_string_p::State as LiteralStringState, literal_value_p::State as LiteralValueState,
-    non_ascii_p::State as NonAsciiState, non_eol_p::State as NonEolState, ws_p::State as WsPState,
-    wschar_p::State as WscharState,
+    keyval_sep_p::State as KeyvalSepPState, literal_string_p::State as LiteralStringState,
+    literal_value_p::State as LiteralValueState, non_ascii_p::State as NonAsciiState,
+    non_eol_p::State as NonEolState, ws_p::State as WsPState, wschar_p::State as WscharState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -120,6 +121,17 @@ pub struct PositionalNumeralStringP {
     string_buffer: String,
     /// 桁数をぴったり指定したければこれ。でなければ 0。
     expected_digits: usize,
+}
+
+/// Keyval-separator parser.  
+/// キー値仕切りパーサー。  
+///
+/// Example: ` = `.  
+#[derive(Clone)]
+pub struct KeyvalSepP {
+    state: KeyvalSepPState,
+    ws1: Ws,
+    ws2: Ws,
 }
 
 /// Key parser.  
