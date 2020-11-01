@@ -68,6 +68,31 @@ impl CommentP {
             }
         }
     }
+    pub fn commit(&mut self, judge: &Judge) {
+        match self.state {
+            State::End => {
+                panic!("comment_p.rs.61.");
+            }
+            State::First => match judge {
+                Judge::CommentStartSymbol(ch) => {
+                    self.product
+                        .push_token(&Token::from_character(&ch, TokenType::Comment));
+                }
+                Judge::CommentCharacter(ch) => {
+                    panic!("comment_p.rs.82.");
+                }
+            },
+            State::NonEol => match judge {
+                Judge::CommentStartSymbol(_ch) => {
+                    panic!("comment_p.rs.108.");
+                }
+                Judge::CommentCharacter(ch) => {
+                    self.product
+                        .push_token(&Token::from_character(&ch, TokenType::Comment));
+                }
+            },
+        }
+    }
     /// # Arguments
     ///
     /// * `characters` - Tokens contains look ahead.  
@@ -76,7 +101,7 @@ impl CommentP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, judge: &Judge, characters: &LookAheadCharacters) -> PResult {
+    pub fn forward(&mut self, characters: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 return error(&mut self.log(), &characters, "comment_p.rs.61.");
@@ -85,16 +110,6 @@ impl CommentP {
                 let character0 = characters.current.as_ref().unwrap();
 
                 if let Some(judge) = self.judge(character0) {
-                    match judge {
-                        Judge::CommentStartSymbol(ch) => {
-                            self.product
-                                .push_token(&Token::from_character(&ch, TokenType::Comment));
-                        }
-                        Judge::CommentCharacter(_ch) => {
-                            return error(&mut self.log(), &characters, "comment_p.rs.95.");
-                        }
-                    }
-
                     // 次の１文字。
                     let character1 = characters.current.as_ref().unwrap();
                     if let Some(_judge) = self.judge(character1) {
@@ -111,16 +126,6 @@ impl CommentP {
                 let character0 = characters.current.as_ref().unwrap();
 
                 if let Some(judge) = self.judge(character0) {
-                    match judge {
-                        Judge::CommentStartSymbol(_ch) => {
-                            return error(&mut self.log(), &characters, "comment_p.rs.108.");
-                        }
-                        Judge::CommentCharacter(ch) => {
-                            self.product
-                                .push_token(&Token::from_character(&ch, TokenType::Comment));
-                        }
-                    }
-
                     // 次の１文字。
                     let character1 = characters.current.as_ref().unwrap();
                     if let None = self.judge(character1) {

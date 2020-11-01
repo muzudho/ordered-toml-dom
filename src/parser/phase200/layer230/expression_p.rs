@@ -203,7 +203,8 @@ impl ExpressionP {
                 let p = self.comment_p.as_mut().unwrap();
                 let judge = p.judge(&character0);
                 if let Some(judge) = judge {
-                    match p.parse(&judge, &characters) {
+                    p.commit(&judge);
+                    match p.forward(&characters) {
                         PResult::End => {
                             self.buffer = Some(Expression::EmptyLine(
                                 if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -316,7 +317,8 @@ impl ExpressionP {
                 let p = self.comment_p.as_mut().unwrap();
                 let judge = p.judge(&character0);
                 if let Some(judge) = judge {
-                    match p.parse(&judge, &characters) {
+                    p.commit(&judge);
+                    match p.forward(&characters) {
                         PResult::End => {
                             self.buffer = Some(Expression::Keyval(
                                 if let Some(ws_p_1) = self.ws_p_1.as_mut() {
