@@ -1,7 +1,10 @@
 //! Single quoted string syntax parser.  
 //! 単一引用符文字列構文パーサー。  
 
-use crate::model::{layer110::TokenType, layer210::LiteralString};
+use crate::model::{
+    layer110::{CharacterType, Token, TokenType},
+    layer210::LiteralString,
+};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{LiteralStringP, PResult};
 use crate::parser::phase200::LookAheadCharacters;
@@ -37,22 +40,22 @@ impl LiteralStringP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let character0 = characters.current.as_ref().unwrap();
         match self.state {
             State::BeforeMultiLine1 => {
                 // Skip 3rd single quotation.
                 // Look-ahead.
                 // 先読み。
-                if let Some(token_1_ahead) = &tokens.one_ahead {
+                if let Some(token_1_ahead) = &characters.one_ahead {
                     match token_1_ahead.type_ {
-                        TokenType::Newline => {
+                        CharacterType::Newline => {
                             self.state = State::BeforeMultiLine2;
                         }
                         _ => {
@@ -60,7 +63,7 @@ impl LiteralStringP {
                         }
                     }
                 } else {
-                    return error(&mut self.log(), &tokens, "literal_string_p.rs.67.");
+                    return error(&mut self.log(), &characters, "literal_string_p.rs.67.");
                 }
             }
             State::BeforeMultiLine2 => {
@@ -68,17 +71,17 @@ impl LiteralStringP {
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error(&mut self.log(), &tokens, "literal_string_p.rs.66.");
+                return error(&mut self.log(), &characters, "literal_string_p.rs.66.");
             }
             State::First => {
-                match token0.type_ {
+                match character0.type_ {
                     // `'`
-                    TokenType::SingleQuotation => {
+                    CharacterType::SingleQuotation => {
                         // Look-ahead.
                         // 先読み。
-                        if let Some(token_1_ahead) = &tokens.one_ahead {
+                        if let Some(token_1_ahead) = &characters.one_ahead {
                             match token_1_ahead.type_ {
-                                TokenType::SingleQuotation => {
+                                CharacterType::SingleQuotation => {
                                     // Before triple sinble quoted string.
                                     self.state = State::BeforeMultiLine1;
                                 }
@@ -90,62 +93,71 @@ impl LiteralStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), &tokens, "literal_string_p.rs.112.");
+                            return error(&mut self.log(), &characters, "literal_string_p.rs.112.");
                         }
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
+                        m.push_token(&Token::from_character(
+                            &character0,
+                            TokenType::LiteralString,
+                        ));
                         self.state = State::SingleLine;
                     }
                 }
             }
             State::MultiLine => {
-                match token0.type_ {
+                match character0.type_ {
                     // `'`
-                    TokenType::SingleQuotation => {
-                        if check_triple_single_quotation(tokens) {
+                    CharacterType::SingleQuotation => {
+                        if check_triple_single_quotation(characters) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&token0);
+                            m.push_token(&Token::from_character(
+                                &character0,
+                                TokenType::LiteralString,
+                            ));
                         }
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
+                        m.push_token(&Token::from_character(
+                            &character0,
+                            TokenType::LiteralString,
+                        ));
                     }
                 }
             }
             State::MultiLineEnd1 => {
-                match token0.type_ {
+                match character0.type_ {
                     // `'`
-                    TokenType::SingleQuotation => {
+                    CharacterType::SingleQuotation => {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), &tokens, "literal_string_p.rs.124.");
+                        return error(&mut self.log(), &characters, "literal_string_p.rs.124.");
                     }
                 }
             }
             State::MultiLineEnd2 => {
-                match token0.type_ {
+                match character0.type_ {
                     // `'`
-                    TokenType::SingleQuotation => {
+                    CharacterType::SingleQuotation => {
                         // End of syntax.
                         // 構文の終わり。
                         self.state = State::End;
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), &tokens, "literal_string_p.rs.136.");
+                        return error(&mut self.log(), &characters, "literal_string_p.rs.136.");
                     }
                 }
             }
             State::SingleLine => {
-                match token0.type_ {
+                match character0.type_ {
                     // `'`
-                    TokenType::SingleQuotation => {
+                    CharacterType::SingleQuotation => {
                         // End of syntax.
                         // 構文の終わり。
                         self.state = State::End;
@@ -153,7 +165,10 @@ impl LiteralStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&token0);
+                        m.push_token(&Token::from_character(
+                            &character0,
+                            TokenType::LiteralString,
+                        ));
                     }
                 }
             }
@@ -175,19 +190,19 @@ impl LiteralStringP {
 
 /// # Arguments
 ///
-/// * `tokens` - Tokens contains look ahead.  
+/// * `characters` - Tokens contains look ahead.  
 ///             先読みを含むトークン。  
 /// # Returns
 ///
 /// It's triple single quotation.  
 /// ３連一重引用符。  
-fn check_triple_single_quotation(tokens: &LookAheadCharacters) -> bool {
-    if let Some(token_2_ahead) = &tokens.two_ahead {
+fn check_triple_single_quotation(characters: &LookAheadCharacters) -> bool {
+    if let Some(token_2_ahead) = &characters.two_ahead {
         match token_2_ahead.type_ {
-            TokenType::SingleQuotation => {
-                if let Some(token_1_ahead) = &tokens.one_ahead {
+            CharacterType::SingleQuotation => {
+                if let Some(token_1_ahead) = &characters.one_ahead {
                     match token_1_ahead.type_ {
-                        TokenType::SingleQuotation => {
+                        CharacterType::SingleQuotation => {
                             // Triple single quote.
                             true
                         }
