@@ -6,7 +6,7 @@ use crate::model::{
     layer210::Ws,
 };
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer210::{wschar_p::Judge as NonAsciiPJudge, WscharP};
+use crate::parser::phase200::layer210::WscharP;
 use crate::parser::phase200::layer210::{PResult, WsP};
 use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
@@ -88,13 +88,13 @@ impl WsP {
                 }
             }
             State::Wschar => {
-                return self.parse_non_ascii(characters);
+                return self.parse_wschar(characters);
             }
         }
         PResult::Ongoing
     }
 
-    fn parse_non_ascii(&mut self, characters: &LookAheadCharacters) -> PResult {
+    fn parse_wschar(&mut self, characters: &LookAheadCharacters) -> PResult {
         if let None = self.wschar_p {
             self.wschar_p = Some(WscharP::new());
         }

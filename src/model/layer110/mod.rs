@@ -105,7 +105,7 @@ pub struct TokenLine {
 #[derive(Clone)]
 pub struct Character {
     pub column_number: usize,
-    pub value: String,
+    pub value: char,
     pub type_: CharacterType,
 }
 

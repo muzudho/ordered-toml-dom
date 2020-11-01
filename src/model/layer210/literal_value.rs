@@ -21,11 +21,8 @@ impl Default for LiteralValue {
 impl LiteralValue {
     pub fn from_character(character: &Character) -> Self {
         let mut m = LiteralValue::default();
-        m.tokens.push(Token::new(
-            character.column_number,
-            &character.value,
-            TokenType::LiteralValue,
-        ));
+        m.tokens
+            .push(Token::from_character(&character, TokenType::LiteralValue));
         m
     }
     pub fn from_token(token: &Token) -> Self {

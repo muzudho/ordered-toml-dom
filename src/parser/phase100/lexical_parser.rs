@@ -1,23 +1,16 @@
 //! Combines only consecutive whitespace into one.  
 //! 連続する空白のみを1つに結合します。  
+
 use crate::model::layer110::{Character, CharacterLine, CharacterType};
+use crate::parser::phase100::LexicalParser;
 use std::fmt;
 
 #[derive(Debug)]
-enum State {
+pub enum State {
     // EscapeSequenceCharacter,
     First,
 }
 
-/// Lexical parser.  
-/// 字句解析器。  
-pub struct LexicalParser {
-    state: State,
-    product: CharacterLine,
-    buffer_character_column_number: usize,
-    buffer_character_type: Option<CharacterType>,
-    buffer_string: String,
-}
 impl LexicalParser {
     pub fn new(row_number: usize) -> Self {
         LexicalParser {
@@ -25,18 +18,6 @@ impl LexicalParser {
             product: CharacterLine::new(row_number),
             buffer_character_column_number: 0,
             buffer_character_type: None,
-            buffer_string: String::new(),
-        }
-    }
-    /// Flush.
-    fn flush(&mut self) {
-        if !self.buffer_string.is_empty() {
-            self.product.characters.push(Character::new(
-                self.buffer_character_column_number,
-                &self.buffer_string,
-                self.buffer_character_type.unwrap(),
-            ));
-            self.buffer_string.clear();
         }
     }
     pub fn product(&self) -> &CharacterLine {
@@ -68,149 +49,63 @@ impl LexicalParser {
             self.one_delay_loop(j, chars);
         }
 
-        // Log::info("End of line.");
-        self.flush();
         // Append an end of line.
         // 行末を追加します。
-        self.product.characters.push(Character::new(
-            ch_vec.len(),
-            "
-",
-            CharacterType::Newline,
-        ));
+        // TODO とりあえず 改行は \n を入れておく。Windows と Linux で違うが。
+        self.product
+            .characters
+            .push(Character::new(ch_vec.len(), '\n', CharacterType::Newline));
     }
     fn one_delay_loop(&mut self, i: usize, chars: (Option<&char>, Option<&char>)) {
         let ch0 = chars.0.unwrap();
         match self.state {
-            /*
-            // `\` の次に連なる文字列は、先頭1文字でトークンを切ります。
-            State::EscapeSequenceCharacter => {
-                // print!("[trace101 AlbetChar={:?}]", ch0);
-                self.buffer_character_column_number = i;
-                self.buffer_character_type = TokenType::Alpha;
-                self.buffer_string.push(*ch0);
-                self.flush();
-                self.state = State::First;
-            }
-            */
             State::First => {
                 self.buffer_character_column_number = i;
-                self.buffer_string.push(*ch0);
-                match ch0 {
+                self.product.characters.push(Character::new(
+                    self.buffer_character_column_number,
+                    *ch0,
+                    self.buffer_character_type.unwrap(),
+                ));
+                self.buffer_character_type = match ch0 {
                     // A ～ Z, a ～ z.
-                    'A'..='Z' | 'a'..='z' => {
-                        // print!("[trace105 albet={:?}]", ch0);
-                        self.buffer_character_type = Some(CharacterType::Alpha);
-                        self.flush();
-                    }
+                    'A'..='Z' | 'a'..='z' => Some(CharacterType::Alpha),
                     // \
-                    '\\' => {
-                        // print!("[trace104 bs={:?}]", ch0);
-                        self.buffer_character_type = Some(CharacterType::Backslash);
-                        self.flush();
-                        /*
-                        if let Some(ch1) = chars.1 {
-                            match ch1 {
-                                'A'..='Z' | 'a'..='z' => {
-                                    // print!("[trace103 ahead={:?}]", ch1);
-                                    self.state = State::EscapeSequenceCharacter;
-                                }
-                                _ => {
-                                    // print!("[trace102 ahead={:?}]", ch1);
-                                }
-                            }
-                        }
-                        */
-                    }
+                    '\\' => Some(CharacterType::Backslash),
                     // :
-                    ':' => {
-                        self.buffer_character_type = Some(CharacterType::Colon);
-                        self.flush();
-                    }
+                    ':' => Some(CharacterType::Colon),
                     // ,
-                    ',' => {
-                        self.buffer_character_type = Some(CharacterType::Comma);
-                        self.flush();
-                    }
+                    ',' => Some(CharacterType::Comma),
                     // #
-                    '#' => {
-                        self.buffer_character_type = Some(CharacterType::CommentStartSymbol);
-                        self.flush();
-                    }
-                    '0'..='9' => {
-                        self.buffer_character_type = Some(CharacterType::Digit);
-                        self.flush();
-                    }
+                    '#' => Some(CharacterType::CommentStartSymbol),
+                    '0'..='9' => Some(CharacterType::Digit),
                     // .
-                    '.' => {
-                        self.buffer_character_type = Some(CharacterType::Dot);
-                        self.flush();
-                    }
+                    '.' => Some(CharacterType::Dot),
                     // "
-                    '"' => {
-                        self.buffer_character_type = Some(CharacterType::DoubleQuotation);
-                        self.flush();
-                    }
+                    '"' => Some(CharacterType::DoubleQuotation),
                     // =
-                    '=' => {
-                        self.buffer_character_type = Some(CharacterType::Equals);
-                        self.flush();
-                    }
+                    '=' => Some(CharacterType::Equals),
                     // Horizontal tab.
-                    '\t' => {
-                        self.buffer_character_type = Some(CharacterType::HorizontalTab);
-                        self.flush();
-                    }
+                    '\t' => Some(CharacterType::HorizontalTab),
                     // -
-                    '-' => {
-                        self.buffer_character_type = Some(CharacterType::Hyphen);
-                        self.flush();
-                    }
+                    '-' => Some(CharacterType::Hyphen),
                     // {
-                    '{' => {
-                        self.buffer_character_type = Some(CharacterType::LeftCurlyBracket);
-                        self.flush();
-                    }
+                    '{' => Some(CharacterType::LeftCurlyBracket),
                     // [
-                    '[' => {
-                        self.buffer_character_type = Some(CharacterType::LeftSquareBracket);
-                        self.flush();
-                    }
+                    '[' => Some(CharacterType::LeftSquareBracket),
                     // +
-                    '+' => {
-                        self.buffer_character_type = Some(CharacterType::Plus);
-                        self.flush();
-                    }
+                    '+' => Some(CharacterType::Plus),
                     // }
-                    '}' => {
-                        self.buffer_character_type = Some(CharacterType::RightCurlyBracket);
-                        self.flush();
-                    }
+                    '}' => Some(CharacterType::RightCurlyBracket),
                     // ]
-                    ']' => {
-                        self.buffer_character_type = Some(CharacterType::RightSquareBracket);
-                        self.flush();
-                    }
+                    ']' => Some(CharacterType::RightSquareBracket),
                     // '
-                    '\'' => {
-                        self.buffer_character_type = Some(CharacterType::SingleQuotation);
-                        self.flush();
-                    }
+                    '\'' => Some(CharacterType::SingleQuotation),
                     // Space.
-                    ' ' => {
-                        self.buffer_character_type = Some(CharacterType::Space);
-                        self.flush();
-                    }
+                    ' ' => Some(CharacterType::Space),
                     // _
-                    '_' => {
-                        self.buffer_character_type = Some(CharacterType::Underscore);
-                        self.flush();
-                    }
-                    _ => {
-                        self.buffer_character_type = Some(CharacterType::NonAscii);
-                        self.flush();
-                    }
-                }
+                    '_' => Some(CharacterType::Underscore),
+                    _ => Some(CharacterType::NonAscii),
+                };
             }
         }
     }

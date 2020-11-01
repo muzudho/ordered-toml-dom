@@ -5,22 +5,22 @@ use crate::model::layer110::{Character, CharacterType};
 use std::fmt;
 
 impl Character {
-    pub fn new(column_number: usize, value: &str, type_: CharacterType) -> Self {
+    pub fn new(column_number: usize, value: char, type_: CharacterType) -> Self {
         Character {
             column_number: column_number,
-            value: value.to_string(),
+            value: value,
             type_: type_,
         }
     }
     pub fn from_base(token: &Character, type_: CharacterType) -> Self {
         Character {
             column_number: token.column_number,
-            value: token.value.to_string(),
+            value: token.value,
             type_: type_,
         }
     }
-    pub fn to_string_chars_nth(&self, nth: usize) -> Option<char> {
-        self.to_string().chars().nth(nth)
+    pub fn to_char(&self) -> char {
+        self.value
     }
     pub fn to_debug_string(&self) -> String {
         format!("{:?}", self)

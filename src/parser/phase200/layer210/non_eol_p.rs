@@ -6,7 +6,7 @@ use crate::model::{
     layer210::NonEol,
 };
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer210::{non_ascii_p::Judge as NonAsciiPJudge, NonAsciiP};
+use crate::parser::phase200::layer210::NonAsciiP;
 use crate::parser::phase200::layer210::{NonEolP, PResult};
 use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
