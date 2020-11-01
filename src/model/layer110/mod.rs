@@ -78,6 +78,7 @@ pub enum TokenType {
     Comment,
     DateTime,
     EscapeSequence,
+    Table,
     /// White space.
     WS,
 }
