@@ -6,8 +6,8 @@ pub mod literal_string;
 pub mod literal_value;
 pub mod non_ascii;
 pub mod non_eol;
-pub mod ws;
 pub mod wschar;
+pub mod wsold;
 
 use crate::model::layer110::Token;
 
@@ -70,7 +70,7 @@ pub struct NonEol {
 /// White space.  
 /// ホワイト・スペース。  
 #[derive(Clone)]
-pub struct WS {
+pub struct WSOld {
     pub tokens: Vec<Token>,
 }
 

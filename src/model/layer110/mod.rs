@@ -81,7 +81,7 @@ pub enum TokenType {
     EscapeSequence,
     Table,
     /// White space.
-    WS,
+    WSOld,
     Wschar,
 }
 

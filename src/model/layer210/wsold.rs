@@ -1,15 +1,15 @@
 //! White space.  
 //! ホワイト・スペース。  
 
-use crate::model::{layer110::Token, layer210::WS};
+use crate::model::{layer110::Token, layer210::WSOld};
 use std::fmt;
 
-impl Default for WS {
+impl Default for WSOld {
     fn default() -> Self {
-        WS { tokens: Vec::new() }
+        WSOld { tokens: Vec::new() }
     }
 }
-impl WS {
+impl WSOld {
     pub fn clear(&mut self) {
         self.tokens.clear();
     }
@@ -26,7 +26,7 @@ impl WS {
         format!("{}", self)
     }
 }
-impl fmt::Display for WS {
+impl fmt::Display for WSOld {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for token in &self.tokens {
@@ -35,7 +35,7 @@ impl fmt::Display for WS {
         write!(f, "{}", buf)
     }
 }
-impl fmt::Debug for WS {
+impl fmt::Debug for WSOld {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut buf = String::new();
         for token in &self.tokens {

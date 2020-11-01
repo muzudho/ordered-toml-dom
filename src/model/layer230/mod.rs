@@ -4,7 +4,7 @@ pub mod header_of_table;
 
 use crate::model::{
     layer110::Token,
-    layer210::{Comment, WS},
+    layer210::{Comment, WSOld},
     layer225::Keyval,
 };
 
@@ -19,8 +19,8 @@ pub struct HeaderOfArrayOfTable {
 #[derive(Clone)]
 pub enum Expression {
     HeaderOfArrayOfTable(HeaderOfArrayOfTable),
-    EmptyLine(WS, Option<Comment>),
-    Keyval(WS, Keyval, WS, Option<Comment>),
+    EmptyLine(WSOld, Option<Comment>),
+    Keyval(WSOld, Keyval, WSOld, Option<Comment>),
     HeaderOfTable(HeaderOfTable),
 }
 

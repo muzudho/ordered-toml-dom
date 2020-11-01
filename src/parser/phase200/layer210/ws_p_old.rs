@@ -3,20 +3,20 @@
 
 use crate::model::{
     layer110::{CharacterType, Token, TokenType},
-    layer210::WS,
+    layer210::WSOld,
 };
-use crate::parser::phase200::layer210::{PResult, WSP};
+use crate::parser::phase200::layer210::{PResult, WSPOld};
 use crate::parser::phase200::LookAheadCharacters;
 
-impl Default for WSP {
+impl Default for WSPOld {
     fn default() -> Self {
-        WSP {
-            buffer: WS::default(),
+        WSPOld {
+            buffer: WSOld::default(),
         }
     }
 }
-impl WSP {
-    pub fn flush(&mut self) -> WS {
+impl WSPOld {
+    pub fn flush(&mut self) -> WSOld {
         let m = self.buffer.clone();
         self.buffer.clear();
         m
@@ -35,7 +35,7 @@ impl WSP {
             CharacterType::Newline => return PResult::End,
             _ => {
                 self.buffer
-                    .push_token(&Token::from_character(character0, TokenType::WS));
+                    .push_token(&Token::from_character(character0, TokenType::WSOld));
             }
         }
         PResult::Ongoing

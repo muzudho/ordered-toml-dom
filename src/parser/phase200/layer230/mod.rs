@@ -1,7 +1,7 @@
 pub mod expression_p;
 
 use crate::model::layer230::Expression;
-use crate::parser::phase200::layer210::WSP;
+use crate::parser::phase200::layer210::WSPOld;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable},
     layer225::KeyvalP,
@@ -18,7 +18,7 @@ pub struct ExpressionP {
     keyval_p: Option<KeyvalP>,
     state: ExpressionState,
     /// White space parser 1.
-    ws_p_1: Option<WSP>,
+    ws_p_1: Option<WSPOld>,
     /// White space parser 2.
-    ws_p_2: Option<WSP>,
+    ws_p_2: Option<WSPOld>,
 }
