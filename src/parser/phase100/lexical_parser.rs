@@ -5,7 +5,7 @@ use std::fmt;
 
 #[derive(Debug)]
 enum State {
-    EscapeSequenceCharacter,
+    // EscapeSequenceCharacter,
     First,
 }
 
@@ -82,6 +82,7 @@ impl LexicalParser {
     fn one_delay_loop(&mut self, i: usize, chars: (Option<&char>, Option<&char>)) {
         let ch0 = chars.0.unwrap();
         match self.state {
+            /*
             // `\` の次に連なる文字列は、先頭1文字でトークンを切ります。
             State::EscapeSequenceCharacter => {
                 // print!("[trace101 AlbetChar={:?}]", ch0);
@@ -91,6 +92,7 @@ impl LexicalParser {
                 self.flush();
                 self.state = State::First;
             }
+            */
             State::First => {
                 self.buffer_string_token_column_number = i;
                 self.buffer_string.push(*ch0);
@@ -106,6 +108,7 @@ impl LexicalParser {
                         // print!("[trace104 bs={:?}]", ch0);
                         self.buffer_string_token_type = TokenType::Backslash;
                         self.flush();
+                        /*
                         if let Some(ch1) = chars.1 {
                             match ch1 {
                                 'A'..='Z' | 'a'..='z' => {
@@ -117,6 +120,7 @@ impl LexicalParser {
                                 }
                             }
                         }
+                        */
                     }
                     // :
                     ':' => {
