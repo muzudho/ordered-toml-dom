@@ -3,7 +3,7 @@
 
 use crate::model::layer110::token::tokens_stringify;
 use crate::model::{
-    layer110::{Token, TokenType},
+    layer110::{CharacterType, Token, TokenType},
     layer210::LiteralValue,
 };
 use crate::parser::phase200::error;
@@ -50,23 +50,23 @@ impl LiteralValueP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let character0 = characters.current.as_ref().unwrap();
         match self.state {
             State::DateTime => {
                 let p = self.date_time_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&characters) {
                     PResult::End => {
                         let string_buffer = tokens_stringify(&p.flush());
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
-                            token0.column_number,
+                            character0.column_number,
                             &string_buffer,
                             TokenType::SPDateTimeString,
                         ));
@@ -78,7 +78,7 @@ impl LiteralValueP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &tokens,
+                            &characters,
                             "literal_value_p.rs.90.",
                         );
                     }
@@ -86,17 +86,17 @@ impl LiteralValueP {
                 }
             }
             State::End => {
-                return error(&mut self.log(), &tokens, "literal_value.rs.57.");
+                return error(&mut self.log(), &characters, "literal_value.rs.57.");
             }
             State::First => {
-                // println!("[trace61 token0.type_={:?}]", &token0.type_);
+                // println!("[trace61 character0.type_={:?}]", &character0.type_);
 
                 // TODO まず日付型かどうか調べると楽そう。
                 // ２文字先を最初に調べるのがコツ。
                 let mut is_date = true;
                 let mut is_time = true;
                 // `??n??`.
-                if let Some(token2) = tokens.two_ahead.as_ref() {
+                if let Some(token2) = characters.two_ahead.as_ref() {
                     if let Some(ch2) = token2.to_string().chars().nth(0) {
                         match ch2 {
                             '0'..='9' => {
@@ -117,7 +117,7 @@ impl LiteralValueP {
                 }
                 if is_date {
                     // `??n?-`.
-                    if let Some(token4) = tokens.four_ahead.as_ref() {
+                    if let Some(token4) = characters.four_ahead.as_ref() {
                         if let Some(ch4) = token4.to_string().chars().nth(0) {
                             if ch4 != '-' {
                                 is_date = false;
@@ -126,7 +126,7 @@ impl LiteralValueP {
                     }
                     // `??nn-`.
                     if is_date {
-                        if let Some(token3) = tokens.three_ahead.as_ref() {
+                        if let Some(token3) = characters.three_ahead.as_ref() {
                             if let Some(ch3) = token3.to_string().chars().nth(0) {
                                 match ch3 {
                                     '0'..='9' => {}
@@ -139,7 +139,7 @@ impl LiteralValueP {
                     }
                     // `?nnn-`.
                     if is_date {
-                        if let Some(token1) = tokens.one_ahead.as_ref() {
+                        if let Some(token1) = characters.one_ahead.as_ref() {
                             if let Some(ch1) = token1.to_string().chars().nth(0) {
                                 match ch1 {
                                     '0'..='9' => {}
@@ -152,7 +152,7 @@ impl LiteralValueP {
                     }
                     // `nnnn-`.
                     if is_date {
-                        if let Some(ch0) = token0.to_string().chars().nth(0) {
+                        if let Some(ch0) = character0.to_string().chars().nth(0) {
                             match ch0 {
                                 '0'..='9' => {
                                     // 日付型なのは確定。
@@ -162,11 +162,11 @@ impl LiteralValueP {
                                         Some(DateTimeP::new(DateTimeState::FirstOfDate));
 
                                     let p = self.date_time_p.as_mut().unwrap();
-                                    match p.parse(&tokens) {
+                                    match p.parse(&characters) {
                                         PResult::End => {
                                             return error(
                                                 &mut self.log(),
-                                                &tokens,
+                                                &characters,
                                                 "literal_value_p.rs.170.",
                                             );
                                         }
@@ -174,7 +174,7 @@ impl LiteralValueP {
                                             return error_via(
                                                 &mut table,
                                                 &mut self.log(),
-                                                &tokens,
+                                                &characters,
                                                 "literal_value_p.rs.178.",
                                             );
                                         }
@@ -190,7 +190,7 @@ impl LiteralValueP {
                 } else if is_time {
                     // `?n:`.
                     if is_time {
-                        if let Some(token1) = tokens.one_ahead.as_ref() {
+                        if let Some(token1) = characters.one_ahead.as_ref() {
                             if let Some(ch1) = token1.to_string().chars().nth(0) {
                                 match ch1 {
                                     '0'..='9' => {}
@@ -203,7 +203,7 @@ impl LiteralValueP {
                     }
                     // `nn:`.
                     if is_time {
-                        if let Some(ch0) = token0.to_string().chars().nth(0) {
+                        if let Some(ch0) = character0.to_string().chars().nth(0) {
                             match ch0 {
                                 '0'..='9' => {
                                     // 時刻型なのは確定。
@@ -213,11 +213,11 @@ impl LiteralValueP {
                                         Some(DateTimeP::new(DateTimeState::FirstOfTime));
 
                                     let p = self.date_time_p.as_mut().unwrap();
-                                    match p.parse(&tokens) {
+                                    match p.parse(&characters) {
                                         PResult::End => {
                                             return error(
                                                 &mut self.log(),
-                                                &tokens,
+                                                &characters,
                                                 "literal_value_p.rs.222.",
                                             );
                                         }
@@ -225,7 +225,7 @@ impl LiteralValueP {
                                             return error_via(
                                                 &mut table,
                                                 &mut self.log(),
-                                                &tokens,
+                                                &characters,
                                                 "literal_value_p.rs.230.",
                                             );
                                         }
@@ -243,28 +243,30 @@ impl LiteralValueP {
                 if is_date || is_time {
                     PResult::Ongoing
                 } else {
-                    let base_number = match token0.type_ {
-                        TokenType::Alpha
-                        | TokenType::Colon
-                        | TokenType::Dot
-                        | TokenType::Hyphen
-                        | TokenType::Plus
-                        | TokenType::Underscore => 10,
-                        TokenType::Digit => {
-                            if let Some(ch0) = token0.to_string().chars().nth(0) {
+                    let base_number = match character0.type_ {
+                        CharacterType::Alpha
+                        | CharacterType::Colon
+                        | CharacterType::Dot
+                        | CharacterType::Hyphen
+                        | CharacterType::Plus
+                        | CharacterType::Underscore => 10,
+                        CharacterType::Digit => {
+                            if let Some(ch0) = character0.to_string().chars().nth(0) {
                                 // println!("[trace82 ch0={}]", ch0);
                                 if ch0 == '0' {
                                     // 0x ?
                                     // Look-ahead.
                                     // 先読み。
-                                    if let Some(token1) = tokens.one_ahead.as_ref() {
+                                    if let Some(token1) = characters.one_ahead.as_ref() {
                                         match token1.type_ {
-                                            TokenType::Alpha => match token1.to_string().as_str() {
-                                                "b" => 2,
-                                                "o" => 8,
-                                                "x" => 16,
-                                                _ => 10,
-                                            },
+                                            CharacterType::Alpha => {
+                                                match token1.to_string().as_str() {
+                                                    "b" => 2,
+                                                    "o" => 8,
+                                                    "x" => 16,
+                                                    _ => 10,
+                                                }
+                                            }
                                             _ => 10,
                                         }
                                     } else {
@@ -277,7 +279,7 @@ impl LiteralValueP {
                                 10
                             }
                         }
-                        _ => return error(&mut self.log(), &tokens, "literal_value_p.rs.38."),
+                        _ => return error(&mut self.log(), &characters, "literal_value_p.rs.38."),
                     };
 
                     match base_number {
@@ -295,7 +297,7 @@ impl LiteralValueP {
                         }
                         16 => {
                             // `0x` は無視します。
-                            // println!("[trace129={}]", token0);
+                            // println!("[trace129={}]", character0);
                             self.positional_numeral_string_p =
                                 Some(PositionalNumeralStringP::new("0x").clone());
                             self.state = State::ZeroXPrefix1st;
@@ -303,18 +305,21 @@ impl LiteralValueP {
                         }
                         10 => {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&token0);
+                            m.push_token(&Token::from_character(
+                                &character0,
+                                TokenType::LiteralValue,
+                            ));
                             // Look-ahead.
                             // 先読み。
-                            if let Some(token1) = &tokens.one_ahead {
+                            if let Some(token1) = &characters.one_ahead {
                                 match token1.type_ {
-                                    TokenType::Alpha
-                                    | TokenType::Colon
-                                    | TokenType::Dot
-                                    | TokenType::Hyphen
-                                    | TokenType::Digit
-                                    | TokenType::Plus
-                                    | TokenType::Underscore => {
+                                    CharacterType::Alpha
+                                    | CharacterType::Colon
+                                    | CharacterType::Dot
+                                    | CharacterType::Hyphen
+                                    | CharacterType::Digit
+                                    | CharacterType::Plus
+                                    | CharacterType::Underscore => {
                                         self.state = State::Second;
                                         PResult::Ongoing
                                     }
@@ -335,18 +340,18 @@ impl LiteralValueP {
             State::Second => {
                 // 10進数のみです。
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&token0);
+                m.push_token(&Token::from_character(&character0, TokenType::LiteralValue));
                 // Look-ahead.
                 // 先読み。
-                if let Some(token1) = &tokens.one_ahead {
+                if let Some(token1) = &characters.one_ahead {
                     match token1.type_ {
-                        TokenType::Alpha
-                        | TokenType::Colon
-                        | TokenType::Dot
-                        | TokenType::Hyphen
-                        | TokenType::Digit
-                        | TokenType::Plus
-                        | TokenType::Underscore => PResult::Ongoing,
+                        CharacterType::Alpha
+                        | CharacterType::Colon
+                        | CharacterType::Dot
+                        | CharacterType::Hyphen
+                        | CharacterType::Digit
+                        | CharacterType::Plus
+                        | CharacterType::Underscore => PResult::Ongoing,
                         _ => {
                             self.state = State::End;
                             PResult::End
@@ -362,14 +367,14 @@ impl LiteralValueP {
                 // 例えば `0xDEADBEEF` の場合、2文字目の `x` を取ろうとすると
                 // `xDEADBEEF` と、まとまりで取ってしまい、溢れる分の後処理が手間取りました。
                 // そこで、アルファベットは１トークンずつ取ることにしました。
-                // println!("[trace160={}]", token0);
+                // println!("[trace160={}]", character0);
                 self.state = State::ZeroXString;
                 PResult::Ongoing
             }
             State::ZeroXString => {
-                // println!("[trace164={}]", token0);
+                // println!("[trace164={}]", character0);
                 let p = self.positional_numeral_string_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&characters) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
@@ -381,7 +386,7 @@ impl LiteralValueP {
 
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
-                            token0.column_number,
+                            character0.column_number,
                             &numeral_string,
                             TokenType::SPPositionalNumeralString,
                         ));
@@ -397,7 +402,7 @@ impl LiteralValueP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &tokens,
+                            &characters,
                             "literal_value_p.rs.173.",
                         );
                     }
