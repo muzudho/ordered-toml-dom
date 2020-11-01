@@ -201,10 +201,10 @@ impl ExpressionP {
             },
             State::Ws1Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                let judge = p.judge(&character0);
+                let judge = p.judge1(&character0);
                 if let Some(judge) = judge {
-                    p.commit(&judge);
-                    match p.forward(&characters) {
+                    p.commit1(&judge);
+                    match p.forward1(&characters) {
                         PResult::End => {
                             self.buffer = Some(Expression::EmptyLine(
                                 if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -315,10 +315,10 @@ impl ExpressionP {
             },
             State::Ws1KeyvalWs2Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                let judge = p.judge(&character0);
+                let judge = p.judge1(&character0);
                 if let Some(judge) = judge {
-                    p.commit(&judge);
-                    match p.forward(&characters) {
+                    p.commit1(&judge);
+                    match p.forward1(&characters) {
                         PResult::End => {
                             self.buffer = Some(Expression::Keyval(
                                 if let Some(ws_p_1) = self.ws_p_1.as_mut() {

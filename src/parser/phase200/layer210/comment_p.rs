@@ -47,14 +47,14 @@ impl CommentP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(&self, character: &Character) -> Option<Judge> {
+    pub fn judge1(&self, character: &Character) -> Option<Judge> {
         match self.state {
             State::End => None,
             State::First => match character.type_ {
                 CharacterType::CommentStartSymbol => {
                     Some(Judge::CommentStartSymbol(character.clone()))
                 }
-                _ => None,
+                _ => panic!("comment_p.rs.57. type={:?}", character.type_),
             },
             State::NonEol => {
                 if let Some(judge) = NonEolP::judge(character) {
@@ -69,7 +69,7 @@ impl CommentP {
             }
         }
     }
-    pub fn commit(&mut self, judge: &Judge) {
+    pub fn commit1(&mut self, judge: &Judge) {
         match self.state {
             State::End => {
                 panic!("comment_p.rs.61.");
@@ -104,39 +104,41 @@ impl CommentP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn forward(&mut self, characters: &LookAheadCharacters) -> PResult {
+    pub fn forward1(&mut self, characters: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 panic!("comment_p.rs.61.");
             }
             State::First => {
-                let character0 = characters.current.as_ref().unwrap();
-
-                if let Some(judge) = self.judge(character0) {
-                    // 次の１文字。
-                    let character1 = characters.current.as_ref().unwrap();
-                    if let Some(_judge) = self.judge(character1) {
-                        self.state = State::NonEol;
-                    } else {
-                        self.state = State::End;
-                        return PResult::End;
+                // 次の１文字。
+                let character1 = characters.current.as_ref().unwrap();
+                if let Some(judge) = self.judge1(character1) {
+                    match judge {
+                        Judge::CommentStartSymbol(_) => {
+                            panic!("comment_p.rs.118.");
+                        }
+                        Judge::CommentCharacter(_) => {}
                     }
+                    self.state = State::NonEol;
                 } else {
-                    panic!("comment_p.rs.99.");
+                    self.state = State::End;
+                    return PResult::End;
                 }
             }
             State::NonEol => {
-                let character0 = characters.current.as_ref().unwrap();
-
-                if let Some(judge) = self.judge(character0) {
-                    // 次の１文字。
-                    let character1 = characters.current.as_ref().unwrap();
-                    if let None = self.judge(character1) {
-                        self.state = State::End;
-                        return PResult::End;
+                // 次の１文字。
+                let character1 = characters.current.as_ref().unwrap();
+                if let Some(judge) = self.judge1(character1) {
+                    match judge {
+                        Judge::CommentStartSymbol(_) => {
+                            panic!("comment_p.rs.118.");
+                        }
+                        Judge::CommentCharacter(_) => {}
                     }
+                    self.state = State::NonEol;
                 } else {
-                    panic!("comment_p.rs.124.");
+                    self.state = State::End;
+                    return PResult::End;
                 }
             }
         }
