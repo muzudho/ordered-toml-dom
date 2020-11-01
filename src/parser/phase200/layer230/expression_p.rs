@@ -133,7 +133,7 @@ impl ExpressionP {
                             Ws::default()
                         },
                         if let Some(comment_p) = self.comment_p.as_mut() {
-                            comment_p.flush()
+                            Some(comment_p.get_product())
                         } else {
                             None
                         },
@@ -210,7 +210,7 @@ impl ExpressionP {
                                 Ws::default()
                             },
                             if let Some(comment_p) = self.comment_p.as_mut() {
-                                comment_p.flush()
+                                Some(comment_p.get_product())
                             } else {
                                 None
                             },
@@ -324,7 +324,7 @@ impl ExpressionP {
                                 Ws::default()
                             },
                             if let Some(comment_p) = self.comment_p.as_mut() {
-                                comment_p.flush()
+                                Some(comment_p.get_product())
                             } else {
                                 None
                             },

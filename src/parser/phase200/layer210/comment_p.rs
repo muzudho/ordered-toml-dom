@@ -24,7 +24,7 @@ pub enum State {
 }
 
 pub enum Judge {
-    CommentStartSymbol,
+    CommentStartSymbol(Character),
     CommentCharacter(Character),
 }
 
@@ -50,7 +50,9 @@ impl CommentP {
         match self.state {
             State::End => None,
             State::First => match character.type_ {
-                CharacterType::CommentStartSymbol => Some(Judge::CommentStartSymbol),
+                CharacterType::CommentStartSymbol => {
+                    Some(Judge::CommentStartSymbol(character.clone()))
+                }
                 _ => None,
             },
             State::NonEol => {
@@ -83,22 +85,50 @@ impl CommentP {
                 let character0 = characters.current.as_ref().unwrap();
 
                 if let Some(judge) = self.judge(character0) {
-                    self.product
-                        .push_token(&Token::from_character(&character0, TokenType::Comment));
-                    self.state = State::NonEol;
+                    match judge {
+                        Judge::CommentStartSymbol(ch) => {
+                            self.product
+                                .push_token(&Token::from_character(&ch, TokenType::Comment));
+                        }
+                        Judge::CommentCharacter(_ch) => {
+                            return error(&mut self.log(), &characters, "comment_p.rs.95.");
+                        }
+                    }
+
+                    // 次の１文字。
+                    let character1 = characters.current.as_ref().unwrap();
+                    if let Some(_judge) = self.judge(character1) {
+                        self.state = State::NonEol;
+                    } else {
+                        self.state = State::End;
+                        return PResult::End;
+                    }
                 } else {
-                    return error(&mut self.log(), &characters, "comment_p.rs.61.");
+                    return error(&mut self.log(), &characters, "comment_p.rs.99.");
                 }
             }
             State::NonEol => {
                 let character0 = characters.current.as_ref().unwrap();
 
-                if let Some(_judge) = self.judge(character0) {
-                    self.product
-                        .push_token(&Token::from_character(&character0, TokenType::Comment));
+                if let Some(judge) = self.judge(character0) {
+                    match judge {
+                        Judge::CommentStartSymbol(_ch) => {
+                            return error(&mut self.log(), &characters, "comment_p.rs.108.");
+                        }
+                        Judge::CommentCharacter(ch) => {
+                            self.product
+                                .push_token(&Token::from_character(&ch, TokenType::Comment));
+                        }
+                    }
+
+                    // 次の１文字。
+                    let character1 = characters.current.as_ref().unwrap();
+                    if let None = self.judge(character1) {
+                        self.state = State::End;
+                        return PResult::End;
+                    }
                 } else {
-                    self.state = State::End;
-                    return PResult::End;
+                    return error(&mut self.log(), &characters, "comment_p.rs.124.");
                 }
             }
         }
