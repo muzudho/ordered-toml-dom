@@ -52,7 +52,7 @@ impl InlineTableP {
             // After `{`.
             State::First => {
                 match character0.type_ {
-                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                     // `apple.banana`
                     CharacterType::Alpha
                     | CharacterType::Digit
@@ -109,7 +109,7 @@ impl InlineTableP {
             }
             // After `banana = 3`.
             State::AfterKeyval => match character0.type_ {
-                CharacterType::Wschar => {} // Ignore it.
+                CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                 // `,`
                 CharacterType::Comma => {
                     self.state = State::First;

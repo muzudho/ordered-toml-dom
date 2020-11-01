@@ -156,6 +156,11 @@ impl LexicalParser {
                         self.buffer_character_type = Some(CharacterType::Equals);
                         self.flush();
                     }
+                    // Horizontal tab.
+                    '\t' => {
+                        self.buffer_character_type = Some(CharacterType::HorizontalTab);
+                        self.flush();
+                    }
                     // -
                     '-' => {
                         self.buffer_character_type = Some(CharacterType::Hyphen);
@@ -191,14 +196,14 @@ impl LexicalParser {
                         self.buffer_character_type = Some(CharacterType::SingleQuotation);
                         self.flush();
                     }
+                    // Space.
+                    ' ' => {
+                        self.buffer_character_type = Some(CharacterType::Space);
+                        self.flush();
+                    }
                     // _
                     '_' => {
                         self.buffer_character_type = Some(CharacterType::Underscore);
-                        self.flush();
-                    }
-                    // Whitespace char.
-                    '\t' | ' ' => {
-                        self.buffer_character_type = Some(CharacterType::Wschar);
                         self.flush();
                     }
                     _ => {

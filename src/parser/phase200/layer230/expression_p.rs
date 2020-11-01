@@ -176,7 +176,7 @@ impl ExpressionP {
                     self.comment_p = Some(CommentP::new());
                     self.state = State::Ws1Comment;
                 }
-                CharacterType::Wschar => {
+                CharacterType::HorizontalTab | CharacterType::Space => {
                     if let None = self.ws_p_1 {
                         self.ws_p_1 = Some(WSP::default());
                     }
@@ -264,7 +264,7 @@ impl ExpressionP {
                                 self.comment_p = Some(CommentP::new());
                                 self.state = State::Ws1KeyvalWs2Comment;
                             }
-                            CharacterType::Wschar => {
+                            CharacterType::HorizontalTab | CharacterType::Space => {
                                 self.ws_p_2 = Some(WSP::default());
                                 self.state = State::Ws1KeyvalWs2;
                             }
@@ -285,7 +285,7 @@ impl ExpressionP {
                 }
             }
             State::Ws1KeyvalWs2 => match character0.type_ {
-                CharacterType::Wschar => {
+                CharacterType::HorizontalTab | CharacterType::Space => {
                     let token1 = characters.one_ahead.as_ref().unwrap();
 
                     match token1.type_ {

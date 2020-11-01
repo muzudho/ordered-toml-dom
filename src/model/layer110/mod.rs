@@ -25,6 +25,8 @@ pub enum CharacterType {
     DoubleQuotation,
     /// =  
     Equals,
+    /// \t
+    HorizontalTab,
     /// -  
     Hyphen,
     /// {  
@@ -41,11 +43,10 @@ pub enum CharacterType {
     RightSquareBracket,
     /// '  
     SingleQuotation,
+    /// 半角スペース。  
+    Space,
     /// _  
     Underscore,
-    /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
-    /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
-    Wschar,
     NonAscii,
 }
 

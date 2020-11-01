@@ -140,7 +140,7 @@ impl ValP {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                     }
-                    CharacterType::Wschar => {} //Ignored it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} //Ignored it.
                     CharacterType::Alpha
                     | CharacterType::Digit
                     | CharacterType::Hyphen

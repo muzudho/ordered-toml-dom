@@ -224,7 +224,7 @@ impl BasicStringP {
                     CharacterType::Newline => {
                         // println!("[trace312 Newline]");
                     } // Ignore it.
-                    CharacterType::Wschar => {
+                    CharacterType::HorizontalTab | CharacterType::Space => {
                         // println!("[trace308 WS]");
                     } // Ignore it.
                     // "

@@ -75,7 +75,7 @@ impl ArrayP {
             // After `]`.
             State::AfterArray => {
                 match character0.type_ {
-                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                     // ,
                     CharacterType::Comma => {
                         self.state = State::AfterCommaBehindArray;
@@ -96,7 +96,7 @@ impl ArrayP {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
-                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                     // ]
                     CharacterType::RightSquareBracket => {
                         self.state = State::End;
@@ -118,7 +118,7 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                     // ]
                     CharacterType::RightSquareBracket => {
                         self.state = State::End;
@@ -142,7 +142,7 @@ impl ArrayP {
                         m.push_literal_string(&LiteralValue::from_character(character0));
                         self.state = State::LiteralValue;
                     }
-                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                     // `]`.
                     CharacterType::RightSquareBracket => {
                         self.state = State::End;
@@ -154,7 +154,7 @@ impl ArrayP {
             // After " or '.
             State::AfterString => {
                 match character0.type_ {
-                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                     CharacterType::Comma => {
                         self.state = State::AfterCommaBefindString;
                     }
@@ -223,7 +223,7 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
                     _ => return error(&mut self.log(), &tokens, "array.rs.358."),
                 }
             }

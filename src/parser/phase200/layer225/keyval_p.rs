@@ -75,7 +75,7 @@ impl KeyvalP {
             // After key.
             State::BeforeEqual => {
                 match character0.type_ {
-                    CharacterType::Wschar => {} //Ignored it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} //Ignored it.
                     // `=`.
                     CharacterType::Equals => {
                         self.state = State::AfterEquals;
@@ -85,7 +85,7 @@ impl KeyvalP {
             }
             State::First => {
                 match character0.type_ {
-                    CharacterType::Wschar => {} //Ignored it.
+                    CharacterType::HorizontalTab | CharacterType::Space => {} //Ignored it.
                     CharacterType::Alpha
                     | CharacterType::Digit
                     | CharacterType::Hyphen
