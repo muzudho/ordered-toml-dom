@@ -29,7 +29,7 @@ mod util;
 
 use crate::model::layer310::TomlDocument;
 use crate::parser::{
-    phase100::lexical_parser::LexicalParser,
+    phase100::LexicalParser,
     phase200::{layer210::PResult, layer310::DocumentP},
 };
 use casual_logger::{ArrayOfTable, Log, Table};

@@ -61,11 +61,6 @@ impl LexicalParser {
         match self.state {
             State::First => {
                 self.buffer_character_column_number = i;
-                self.product.characters.push(Character::new(
-                    self.buffer_character_column_number,
-                    *ch0,
-                    self.buffer_character_type.unwrap(),
-                ));
                 self.buffer_character_type = match ch0 {
                     // A ～ Z, a ～ z.
                     'A'..='Z' | 'a'..='z' => Some(CharacterType::Alpha),
@@ -106,6 +101,11 @@ impl LexicalParser {
                     '_' => Some(CharacterType::Underscore),
                     _ => Some(CharacterType::NonAscii),
                 };
+                self.product.characters.push(Character::new(
+                    self.buffer_character_column_number,
+                    *ch0,
+                    self.buffer_character_type.unwrap(),
+                ));
             }
         }
     }

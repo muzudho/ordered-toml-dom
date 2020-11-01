@@ -42,7 +42,7 @@ impl NonAsciiP {
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
     pub fn judge(character: &Character) -> Option<Judge> {
-        let unicode = character.to_string_chars_nth(0).unwrap() as u32;
+        let unicode = character.to_char() as u32;
         match unicode {
             // non-ascii
             0x80..=0xD7FF | 0xE000..=0x10FFFF => Some(Judge::NonAscii),

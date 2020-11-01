@@ -53,7 +53,7 @@ impl WsP {
         if let Some(_judge) = WscharP::judge(character) {
             return Some(Judge::Wschar);
         }
-        let unicode = character.to_string_chars_nth(0).unwrap() as u32;
+        let unicode = character.to_char() as u32;
         match unicode {
             0x09 | 0x20..=0x7F => Some(Judge::HorizontalTabAndAscii),
             _ => None,

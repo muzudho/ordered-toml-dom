@@ -42,7 +42,7 @@ impl WscharP {
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
     pub fn judge(character: &Character) -> Option<Judge> {
-        let unicode = character.to_string_chars_nth(0).unwrap() as u32;
+        let unicode = character.to_char() as u32;
         match unicode {
             // Space, Horizon tab.
             0x20 | 0x09 => Some(Judge::Wschar),
