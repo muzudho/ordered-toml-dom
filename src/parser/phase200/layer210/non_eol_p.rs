@@ -139,7 +139,7 @@ impl NonEolP {
         match p.parse(characters) {
             PResult::End => {
                 if let None = self.buffer {
-                    self.buffer = Some(NonEol::default());
+                    self.buffer = Some(NonEol::new(p.character));
                 }
                 let m = self.buffer.as_mut().unwrap();
                 m.extend_tokens(&p.flush().unwrap().tokens);

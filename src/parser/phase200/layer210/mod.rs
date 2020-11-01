@@ -95,10 +95,7 @@ pub struct HeaderPOfTable {
 /// Non ascii parser.  
 /// 非ASCIIパーサー。  
 #[derive(Clone)]
-pub struct NonAsciiP {
-    buffer: Option<NonAscii>,
-    state: NonAsciiState,
-}
+pub struct NonAsciiP {}
 
 /// Non end-of-line parser.  
 /// 非行末パーサー。  

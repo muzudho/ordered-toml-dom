@@ -65,7 +65,7 @@ pub struct NonAscii {
 /// 非行末。  
 #[derive(Clone)]
 pub struct NonEol {
-    pub tokens: Vec<Token>,
+    pub character: Character,
 }
 
 /// Whitespace.  
