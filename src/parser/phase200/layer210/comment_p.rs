@@ -109,34 +109,10 @@ impl CommentP {
             State::End => {
                 panic!("comment_p.rs.61.");
             }
-            State::First => {
+            State::First | State::NonEol => {
                 // 次の１文字。
                 let character1 = characters.current.as_ref().unwrap();
-                if let Some(judge) = self.judge1(character1) {
-                    match judge {
-                        Judge::CommentStartSymbol(_) => {
-                            panic!("comment_p.rs.118.");
-                        }
-                        Judge::CommentCharacter(_) => {}
-                    }
-                    self.state = State::NonEol;
-                } else {
-                    self.state = State::End;
-                    return PResult::End;
-                }
-            }
-            State::NonEol => {
-                // 次の１文字。
-                let character1 = characters.current.as_ref().unwrap();
-                if let Some(judge) = self.judge1(character1) {
-                    match judge {
-                        Judge::CommentStartSymbol(_) => {
-                            panic!("comment_p.rs.118.");
-                        }
-                        Judge::CommentCharacter(_) => {}
-                    }
-                    self.state = State::NonEol;
-                } else {
+                if let None = NonEolP::judge(character1) {
                     self.state = State::End;
                     return PResult::End;
                 }

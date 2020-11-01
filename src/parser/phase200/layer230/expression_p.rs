@@ -28,6 +28,7 @@ pub enum State {
     Finished,
     /// `[name]`
     Table,
+    First,
     /// Whitespace 1.
     Ws1,
     /// Whitespace 1 and comment.
@@ -46,7 +47,7 @@ impl Default for ExpressionP {
             header_p_of_array_of_table: None,
             header_p_of_table: None,
             keyval_p: None,
-            state: State::Ws1,
+            state: State::First,
             ws_p_1: None,
             ws_p_2: None,
         }
@@ -124,7 +125,7 @@ impl ExpressionP {
             State::Table => {
                 return self.parse_header_of_table(characters);
             }
-            State::Ws1 => match character0.type_ {
+            State::First | State::Ws1 => match character0.type_ {
                 CharacterType::Newline => {
                     self.buffer = Some(Expression::EmptyLine(
                         if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -174,6 +175,39 @@ impl ExpressionP {
                 // `#`
                 CharacterType::CommentStartSymbol => {
                     self.comment_p = Some(CommentP::new());
+
+                    let p = self.comment_p.as_mut().unwrap();
+                    let judge = p.judge1(&character0);
+                    if let Some(judge) = judge {
+                        p.commit1(&judge);
+                        match p.forward1(&characters) {
+                            PResult::End => {
+                                self.buffer = Some(Expression::EmptyLine(
+                                    Ws::default(),
+                                    if let Some(comment_p) = self.comment_p.as_mut() {
+                                        Some(comment_p.get_product())
+                                    } else {
+                                        None
+                                    },
+                                ));
+                                self.ws_p_1 = None;
+                                self.comment_p = None;
+                                self.state = State::End;
+                                return PResult::End;
+                            }
+                            PResult::Err(mut table) => {
+                                return error_via(
+                                    &mut table,
+                                    &mut self.log(),
+                                    &characters,
+                                    "expression.rs.162.",
+                                );
+                            }
+                            PResult::Ongoing => {}
+                        }
+                    } else {
+                        return error(&mut self.log(), &characters, "expression.rs.236.");
+                    }
                     self.state = State::Ws1Comment;
                 }
                 CharacterType::HorizontalTab | CharacterType::Space => {
