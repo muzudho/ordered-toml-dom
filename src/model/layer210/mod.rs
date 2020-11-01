@@ -9,6 +9,7 @@ pub mod non_eol;
 pub mod ws;
 pub mod wschar;
 
+use crate::model::layer110::Character;
 use crate::model::layer110::Token;
 
 /// Comment.  
@@ -57,7 +58,7 @@ pub struct LiteralValue {
 /// 非ASCII。  
 #[derive(Clone)]
 pub struct NonAscii {
-    pub tokens: Vec<Token>,
+    pub character: Character,
 }
 
 /// Non end-of-line.  

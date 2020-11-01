@@ -5,9 +5,11 @@ use crate::model::{
     layer110::{Character, TokenType},
     layer210::NonAscii,
 };
+use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{NonAsciiP, PResult};
 use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
+use casual_logger::Table;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -64,21 +66,24 @@ impl NonAsciiP {
                 return PResult::End;
             }
             State::First => {
-                if let None = self.buffer {
-                    self.buffer = Some(NonAscii::default());
-                }
+                if let None = self.buffer {}
                 let m = self.buffer.as_mut().unwrap();
                 let character0 = characters.current.as_ref().unwrap();
-                m.push_token(&Token::from_character(character0, TokenType::NonAscii));
-                let character1 = characters.current.as_ref().unwrap();
-                if let None = Self::judge(&character1) {
-                    return PResult::End;
+                if let Some(judge) = Self::judge(&character0) {
+                    match judge {
+                        Judge::NonAscii => {
+                            self.buffer = Some(NonAscii::new(character0));
+                            // Forward.
+                            return PResult::End;
+                        }
+                    }
+                } else {
+                    return error(&mut self.log(), &characters, "non_eol_p.rs.90.");
                 }
             }
         }
-        PResult::Ongoing
     }
-    /*
+
     /// Log.
     /// ログ。
     pub fn log(&self) -> Table {
@@ -88,5 +93,4 @@ impl NonAsciiP {
         }
         t
     }
-    */
 }
