@@ -1,7 +1,10 @@
 //! Key parser.  
 //! キー・パーサー。  
 
-use crate::model::{layer110::TokenType, layer210::Key};
+use crate::model::{
+    layer110::{CharacterType, Token, TokenType},
+    layer210::Key,
+};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{KeyP, PResult};
 use crate::parser::phase200::LookAheadCharacters;
@@ -25,34 +28,37 @@ impl KeyP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
-        match token0.type_ {
-            TokenType::Alpha | TokenType::Digit | TokenType::Hyphen | TokenType::Underscore => {
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let character0 = characters.current.as_ref().unwrap();
+        match character0.type_ {
+            CharacterType::Alpha
+            | CharacterType::Digit
+            | CharacterType::Hyphen
+            | CharacterType::Underscore => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&token0);
+                m.push_token(&Token::from_character(&character0, TokenType::Key));
 
                 // Look-ahead.
                 // 先読み。
-                if let Some(token1) = tokens.one_ahead.as_ref() {
+                if let Some(token1) = characters.one_ahead.as_ref() {
                     match token1.type_ {
-                        TokenType::Alpha
-                        | TokenType::Digit
-                        | TokenType::Hyphen
-                        | TokenType::Underscore => PResult::Ongoing,
+                        CharacterType::Alpha
+                        | CharacterType::Digit
+                        | CharacterType::Hyphen
+                        | CharacterType::Underscore => PResult::Ongoing,
                         _ => PResult::End,
                     }
                 } else {
                     PResult::End
                 }
             }
-            _ => return error(&mut self.log(), &tokens, "key.rs.38."),
+            _ => return error(&mut self.log(), &characters, "key.rs.38."),
         }
     }
 

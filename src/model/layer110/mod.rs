@@ -73,6 +73,8 @@ pub enum TokenType {
     Unknown,
     LiteralValue,
     LiteralString,
+    Key,
+    BasicString,
     /// White space.
     WS,
 }
