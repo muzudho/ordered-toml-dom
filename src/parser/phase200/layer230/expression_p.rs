@@ -203,12 +203,13 @@ impl ExpressionP {
                                     "expression.rs.162.",
                                 );
                             }
-                            PResult::Ongoing => {}
+                            PResult::Ongoing => {
+                                self.state = State::Ws1Comment;
+                            }
                         }
                     } else {
                         return error(&mut self.log(), &characters, "expression.rs.236.");
                     }
-                    self.state = State::Ws1Comment;
                 }
                 CharacterType::HorizontalTab | CharacterType::Space => {
                     if let None = self.ws_p_1 {
