@@ -11,9 +11,10 @@ pub mod non_ascii_p;
 pub mod non_eol_p;
 pub mod positional_numeral_string_p;
 pub mod ws_p;
+pub mod wschar_p;
 
-use crate::model::layer210::NonAscii;
 use crate::model::layer210::NonEol;
+use crate::model::layer210::{NonAscii, Wschar};
 use crate::model::{
     layer210::{BasicString, Comment, Key, LiteralString, LiteralValue, WS},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
@@ -23,6 +24,7 @@ use crate::parser::phase200::layer210::{
     date_time_p::State as DateTimeState, escape_sequence_p::State as EscapeSequenceState,
     literal_string_p::State as LiteralStringState, literal_value_p::State as LiteralValueState,
     non_ascii_p::State as NonAsciiState, non_eol_p::State as NonEolState,
+    wschar_p::State as WscharState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -169,4 +171,12 @@ pub struct LiteralValueP {
 #[derive(Clone)]
 pub struct WSP {
     buffer: WS,
+}
+
+/// White space character parser.  
+/// 空白文字パーサー。  
+#[derive(Clone)]
+pub struct WscharP {
+    buffer: Option<Wschar>,
+    state: WscharState,
 }
