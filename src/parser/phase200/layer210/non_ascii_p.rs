@@ -3,7 +3,6 @@
 
 use crate::model::{layer110::Character, layer210::NonAscii};
 use crate::parser::phase200::layer210::NonAsciiP;
-use casual_logger::Table;
 
 #[derive(Debug, Clone)]
 pub enum Judge {
@@ -42,12 +41,5 @@ impl NonAsciiP {
                 return NonAscii::new(character);
             }
         }
-    }
-
-    /// Log.
-    /// ログ。
-    pub fn log(&self) -> Table {
-        let mut t = Table::default().clone();
-        t
     }
 }

@@ -1,47 +1,17 @@
 //! Non end-of-line parser.  
 //! 非行末パーサー。  
 
-use crate::model::{
-    layer110::{Character, TokenType},
-    layer210::NonEol,
-};
-use crate::parser::phase200::error_via;
+use crate::model::{layer110::Character, layer210::NonEol};
 use crate::parser::phase200::layer210::NonAsciiP;
-use crate::parser::phase200::layer210::{NonEolP, PResult};
-use crate::parser::phase200::LookAheadCharacters;
-use crate::parser::phase200::Token;
-use casual_logger::Table;
-
-/// Syntax machine state.  
-/// 構文状態遷移。  
-#[derive(Debug, Clone)]
-pub enum State {
-    End,
-    First,
-    NonAscii,
-    HorizontalTabAndAscii,
-}
+use crate::parser::phase200::layer210::NonEolP;
 
 pub enum Judge {
-    NonAscii,
-    HorizontalTabAndAscii,
+    HorizontalTab(Character),
+    Ascii(Character),
+    NonAscii(Character),
 }
 
-impl Default for NonEolP {
-    fn default() -> Self {
-        NonEolP {
-            buffer: None,
-            state: State::First,
-            non_ascii_p: None,
-        }
-    }
-}
 impl NonEolP {
-    pub fn flush(&mut self) -> Option<NonEol> {
-        let m = self.buffer.clone();
-        self.buffer = None;
-        m
-    }
     /// # Arguments
     ///
     /// * `token` - Token.  
@@ -52,11 +22,12 @@ impl NonEolP {
     ///                             結果。
     pub fn judge(character: &Character) -> Option<Judge> {
         if let Some(_judge) = NonAsciiP::judge(character) {
-            return Some(Judge::NonAscii);
+            return Some(Judge::NonAscii(character.clone()));
         }
         let unicode = character.to_char() as u32;
         match unicode {
-            0x09 | 0x20..=0x7F => Some(Judge::HorizontalTabAndAscii),
+            0x09 => Some(Judge::HorizontalTab(character.clone())),
+            0x20..=0x7F => Some(Judge::Ascii(character.clone())),
             _ => None,
         }
     }
@@ -68,101 +39,17 @@ impl NonEolP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        match self.state {
-            State::End => {
-                return PResult::End;
+    pub fn product(judge: &Judge) -> NonEol {
+        match judge {
+            Judge::HorizontalTab(horizontalTab) => {
+                return NonEol::new(horizontalTab);
             }
-            State::First => {
-                // Horizon tab and Ascii code.
-                if let None = self.buffer {
-                    self.buffer = Some(NonEol::default());
-                }
-                let m = self.buffer.as_mut().unwrap();
-                let character0 = characters.current.as_ref().unwrap();
-                m.push_token(&Token::from_character(character0, TokenType::NonEol));
-
-                let character1 = characters.one_ahead.as_ref().unwrap();
-                if let Some(judge) = Self::judge(&character1) {
-                    match judge {
-                        Judge::HorizontalTabAndAscii => {
-                            self.state = State::HorizontalTabAndAscii;
-                        }
-                        Judge::NonAscii => {
-                            self.non_ascii_p = Some(NonAsciiP::new());
-                            self.state = State::NonAscii;
-                        }
-                    }
-                } else {
-                    return PResult::End;
-                }
+            Judge::Ascii(ascii) => {
+                return NonEol::new(ascii);
             }
-            State::HorizontalTabAndAscii => {
-                return self.parse_horizontal_tab_and_ascii(characters);
-            }
-            State::NonAscii => {
-                return self.parse_non_ascii(characters);
+            Judge::NonAscii(non_ascii) => {
+                return NonEol::new(non_ascii);
             }
         }
-        PResult::Ongoing
-    }
-
-    fn parse_horizontal_tab_and_ascii(&mut self, characters: &LookAheadCharacters) -> PResult {
-        if let None = self.buffer {
-            self.buffer = Some(NonEol::default());
-        }
-        let m = self.buffer.as_mut().unwrap();
-        let character0 = characters.current.as_ref().unwrap();
-        m.push_token(&Token::from_character(character0, TokenType::NonAscii));
-
-        // Forward.
-        let character1 = characters.one_ahead.as_ref().unwrap();
-        if let Some(judge) = Self::judge(&character1) {
-            match judge {
-                Judge::HorizontalTabAndAscii => {
-                    self.state = State::HorizontalTabAndAscii;
-                }
-                Judge::NonAscii => {
-                    self.non_ascii_p = Some(NonAsciiP::new());
-                    self.state = State::NonAscii;
-                }
-            }
-            PResult::Ongoing
-        } else {
-            PResult::End
-        }
-    }
-
-    fn parse_non_ascii(&mut self, characters: &LookAheadCharacters) -> PResult {
-        if let None = self.non_ascii_p {}
-        let p = self.non_ascii_p.as_mut().unwrap();
-        match p.parse(characters) {
-            PResult::End => {
-                if let None = self.buffer {
-                    self.buffer = Some(NonEol::new(p.character));
-                }
-                let m = self.buffer.as_mut().unwrap();
-                m.extend_tokens(&p.flush().unwrap().tokens);
-                self.non_ascii_p = None;
-                self.state = State::End;
-                return PResult::End;
-            }
-            PResult::Err(mut table) => {
-                return error_via(&mut table, &mut self.log(), &characters, "non_eol_p.rs.90.");
-            }
-            PResult::Ongoing => {
-                return PResult::Ongoing;
-            }
-        }
-    }
-
-    /// Log.  
-    /// ログ。  
-    pub fn log(&self) -> Table {
-        let mut t = Table::default().clone();
-        if let Some(m) = &self.buffer {
-            t.str("buffer", &m.to_string());
-        }
-        t
     }
 }

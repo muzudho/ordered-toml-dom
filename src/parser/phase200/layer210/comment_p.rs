@@ -25,21 +25,18 @@ pub enum State {
 
 pub enum Judge {
     CommentStartSymbol,
-    CommentText,
+    CommentCharacter(Character),
 }
 
 impl CommentP {
     pub fn new() -> Self {
         CommentP {
-            buffer: None,
+            product: Comment::default(),
             state: State::First,
-            non_eol_p: None,
         }
     }
-    pub fn flush(&mut self) -> Option<Comment> {
-        let m = self.buffer.clone();
-        self.buffer = None;
-        m
+    pub fn get_product(&mut self) -> Comment {
+        self.product.clone()
     }
     /// # Arguments
     ///
@@ -49,15 +46,19 @@ impl CommentP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(character: &Character) -> Option<Judge> {
-        match character.type_ {
-            CharacterType::CommentStartSymbol => Some(Judge::CommentStartSymbol),
-            _ => {
+    pub fn judge(&self, character: &Character) -> Option<Judge> {
+        match self.state {
+            State::End => None,
+            State::First => match character.type_ {
+                CharacterType::CommentStartSymbol => Some(Judge::CommentStartSymbol),
+                _ => None,
+            },
+            State::NonEol => {
                 if let Some(judge) = NonEolP::judge(character) {
                     match judge {
-                        NonEolPJudge::HorizontalTabAndAscii | NonEolPJudge::NonAscii => {
-                            Some(Judge::CommentText)
-                        }
+                        NonEolPJudge::Ascii(ch)
+                        | NonEolPJudge::HorizontalTab(ch)
+                        | NonEolPJudge::NonAscii(ch) => Some(Judge::CommentCharacter(ch)),
                     }
                 } else {
                     None
@@ -75,44 +76,29 @@ impl CommentP {
     ///                             結果。
     pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
         match self.state {
-            State::End => {}
+            State::End => {
+                return error(&mut self.log(), &characters, "comment_p.rs.61.");
+            }
             State::First => {
                 let character0 = characters.current.as_ref().unwrap();
 
-                if let Some(_judge) = Self::judge(character0) {
-                    if let None = self.buffer {
-                        self.buffer = Some(Comment::default());
-                    }
-                    let m = self.buffer.as_mut().unwrap();
-                    m.push_token(&Token::from_character(&character0, TokenType::Comment));
-                    self.non_eol_p = Some(NonEolP::default());
+                if let Some(judge) = self.judge(character0) {
+                    self.product
+                        .push_token(&Token::from_character(&character0, TokenType::Comment));
                     self.state = State::NonEol;
                 } else {
                     return error(&mut self.log(), &characters, "comment_p.rs.61.");
                 }
             }
             State::NonEol => {
-                let p = self.non_eol_p.as_mut().unwrap();
-                match p.parse(characters) {
-                    PResult::End => {
-                        let m = self.buffer.as_mut().unwrap();
-                        m.extend_tokens(&p.flush().unwrap().tokens);
+                let character0 = characters.current.as_ref().unwrap();
 
-                        self.non_eol_p = None;
-                        self.state = State::End;
-                        return PResult::End;
-                    }
-                    PResult::Err(mut table) => {
-                        return error_via(
-                            &mut table,
-                            &mut self.log(),
-                            &characters,
-                            "comment_p.rs.87.",
-                        );
-                    }
-                    PResult::Ongoing => {
-                        return PResult::Ongoing;
-                    }
+                if let Some(_judge) = self.judge(character0) {
+                    self.product
+                        .push_token(&Token::from_character(&character0, TokenType::Comment));
+                } else {
+                    self.state = State::End;
+                    return PResult::End;
                 }
             }
         }
@@ -123,9 +109,7 @@ impl CommentP {
     /// ログ。  
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
-        if let Some(m) = &self.buffer {
-            t.str("buffer", &m.to_string());
-        }
+        t.str("product", &self.product.to_string());
         t
     }
 }

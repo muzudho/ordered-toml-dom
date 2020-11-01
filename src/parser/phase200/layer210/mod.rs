@@ -15,17 +15,15 @@ pub mod ws_p;
 pub mod wschar_p;
 
 use crate::model::{
-    layer210::{
-        BasicString, Comment, Key, LiteralString, LiteralValue, NonAscii, NonEol, Ws, Wschar,
-    },
+    layer210::{BasicString, Comment, Key, LiteralString, LiteralValue, Ws, Wschar},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, comment_p::State as CommentState,
     date_time_p::State as DateTimeState, escape_sequence_p::State as EscapeSequenceState,
     keyval_sep_p::State as KeyvalSepPState, literal_string_p::State as LiteralStringState,
-    literal_value_p::State as LiteralValueState, non_ascii_p::State as NonAsciiState,
-    non_eol_p::State as NonEolState, ws_p::State as WsPState, wschar_p::State as WscharState,
+    literal_value_p::State as LiteralValueState, ws_p::State as WsPState,
+    wschar_p::State as WscharState,
 };
 use crate::parser::phase200::Token;
 use casual_logger::Table as LogTable;
@@ -47,9 +45,8 @@ pub struct BasicStringP {
 /// Example: `# comment`.  
 #[derive(Clone)]
 pub struct CommentP {
-    buffer: Option<Comment>,
+    product: Comment,
     state: CommentState,
-    non_eol_p: Option<NonEolP>,
 }
 
 /// Date time parser.  
@@ -100,11 +97,7 @@ pub struct NonAsciiP {}
 /// Non end-of-line parser.  
 /// 非行末パーサー。  
 #[derive(Clone)]
-pub struct NonEolP {
-    buffer: Option<NonEol>,
-    state: NonEolState,
-    non_ascii_p: Option<NonAsciiP>,
-}
+pub struct NonEolP {}
 
 /// Hex string parser.  
 /// 16進文字列パーサー。  
