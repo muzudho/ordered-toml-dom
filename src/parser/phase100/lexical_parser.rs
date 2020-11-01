@@ -192,9 +192,9 @@ impl LexicalParser {
                         self.buffer_string_token_type = TokenType::Underscore;
                         self.flush();
                     }
-                    // Whitespace.
+                    // Whitespace char.
                     '\t' | ' ' => {
-                        self.buffer_string_token_type = TokenType::WS;
+                        self.buffer_string_token_type = TokenType::Wschar;
                         self.flush();
                     }
                     _ => {

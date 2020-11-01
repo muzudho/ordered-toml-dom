@@ -173,7 +173,7 @@ impl ExpressionP {
                     self.comment_p = Some(CommentP::new());
                     self.state = State::Ws1Comment;
                 }
-                TokenType::WS => {
+                TokenType::Wschar => {
                     if let None = self.ws_p_1 {
                         self.ws_p_1 = Some(WSP::default());
                     }
@@ -257,7 +257,7 @@ impl ExpressionP {
                                 self.comment_p = Some(CommentP::new());
                                 self.state = State::Ws1KeyvalWs2Comment;
                             }
-                            TokenType::WS => {
+                            TokenType::Wschar => {
                                 self.ws_p_2 = Some(WSP::default());
                                 self.state = State::Ws1KeyvalWs2;
                             }
@@ -278,7 +278,7 @@ impl ExpressionP {
                 }
             }
             State::Ws1KeyvalWs2 => match token0.type_ {
-                TokenType::WS => {
+                TokenType::Wschar => {
                     let token1 = tokens.one_ahead.as_ref().unwrap();
 
                     match token1.type_ {

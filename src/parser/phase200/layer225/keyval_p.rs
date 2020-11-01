@@ -75,7 +75,7 @@ impl KeyvalP {
             // After key.
             State::BeforeEqual => {
                 match token0.type_ {
-                    TokenType::WS => {} //Ignored it.
+                    TokenType::Wschar => {} //Ignored it.
                     // `=`.
                     TokenType::Equals => {
                         self.state = State::AfterEquals;
@@ -85,7 +85,7 @@ impl KeyvalP {
             }
             State::First => {
                 match token0.type_ {
-                    TokenType::WS => {} //Ignored it.
+                    TokenType::Wschar => {} //Ignored it.
                     TokenType::Alpha
                     | TokenType::Digit
                     | TokenType::Hyphen

@@ -214,7 +214,7 @@ impl BasicStringP {
                     TokenType::Newline => {
                         // println!("[trace312 Newline]");
                     } // Ignore it.
-                    TokenType::WS => {
+                    TokenType::Wschar => {
                         // println!("[trace308 WS]");
                     } // Ignore it.
                     // "
