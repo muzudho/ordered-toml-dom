@@ -8,7 +8,6 @@ pub mod non_ascii;
 pub mod non_eol;
 pub mod ws;
 pub mod wschar;
-pub mod wsold;
 
 use crate::model::layer110::Token;
 
@@ -65,13 +64,6 @@ pub struct NonAscii {
 /// 非行末。  
 #[derive(Clone)]
 pub struct NonEol {
-    pub tokens: Vec<Token>,
-}
-
-/// White space.  
-/// ホワイト・スペース。  
-#[derive(Clone)]
-pub struct WSOld {
     pub tokens: Vec<Token>,
 }
 

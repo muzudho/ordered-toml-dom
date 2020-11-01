@@ -2,11 +2,11 @@
 //! `縦幅のある行` 構文パーサー。  
 
 use crate::model::layer210::Comment;
-use crate::model::layer210::WSOld;
+use crate::model::layer210::Ws;
 use crate::model::{layer110::CharacterType, layer230::Expression};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::layer230::WSPOld;
+use crate::parser::phase200::layer230::WsP;
 use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
@@ -128,9 +128,9 @@ impl ExpressionP {
                 CharacterType::Newline => {
                     self.buffer = Some(Expression::EmptyLine(
                         if let Some(ws_p_1) = self.ws_p_1.as_mut() {
-                            ws_p_1.flush()
+                            ws_p_1.get_ws()
                         } else {
-                            WSOld::default()
+                            Ws::default()
                         },
                         if let Some(comment_p) = self.comment_p.as_mut() {
                             comment_p.flush()
@@ -178,7 +178,7 @@ impl ExpressionP {
                 }
                 CharacterType::HorizontalTab | CharacterType::Space => {
                     if let None = self.ws_p_1 {
-                        self.ws_p_1 = Some(WSPOld::default());
+                        self.ws_p_1 = Some(WsP::default());
                     }
                     match self.ws_p_1.as_mut().unwrap().parse(&characters) {
                         PResult::End => {
@@ -205,9 +205,9 @@ impl ExpressionP {
                     PResult::End => {
                         self.buffer = Some(Expression::EmptyLine(
                             if let Some(ws_p_1) = self.ws_p_1.as_mut() {
-                                ws_p_1.flush()
+                                ws_p_1.get_ws()
                             } else {
-                                WSOld::default()
+                                Ws::default()
                             },
                             if let Some(comment_p) = self.comment_p.as_mut() {
                                 comment_p.flush()
@@ -242,12 +242,12 @@ impl ExpressionP {
                                 if let Some(keyval) = p.flush() {
                                     self.buffer = Some(Expression::from_keyval(
                                         &if let Some(ws_p_1) = self.ws_p_1.as_mut() {
-                                            ws_p_1.flush()
+                                            ws_p_1.get_ws()
                                         } else {
-                                            WSOld::default()
+                                            Ws::default()
                                         },
                                         &keyval,
-                                        &WSOld::default(),
+                                        &Ws::default(),
                                         &Comment::default(),
                                     ));
                                     self.keyval_p = None;
@@ -265,7 +265,7 @@ impl ExpressionP {
                                 self.state = State::Ws1KeyvalWs2Comment;
                             }
                             CharacterType::HorizontalTab | CharacterType::Space => {
-                                self.ws_p_2 = Some(WSPOld::default());
+                                self.ws_p_2 = Some(WsP::default());
                                 self.state = State::Ws1KeyvalWs2;
                             }
                             _ => {
@@ -313,15 +313,15 @@ impl ExpressionP {
                     PResult::End => {
                         self.buffer = Some(Expression::Keyval(
                             if let Some(ws_p_1) = self.ws_p_1.as_mut() {
-                                ws_p_1.flush()
+                                ws_p_1.get_ws()
                             } else {
-                                WSOld::default()
+                                Ws::default()
                             },
                             self.keyval_p.as_mut().unwrap().flush().unwrap(), // TODO
                             if let Some(ws_p_2) = self.ws_p_2.as_mut() {
-                                ws_p_2.flush()
+                                ws_p_2.get_ws()
                             } else {
-                                WSOld::default()
+                                Ws::default()
                             },
                             if let Some(comment_p) = self.comment_p.as_mut() {
                                 comment_p.flush()

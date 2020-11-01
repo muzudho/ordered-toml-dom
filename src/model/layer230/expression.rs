@@ -1,7 +1,7 @@
 //! Expression model.  
 //! 縦幅のある行 モデル。  
 
-use crate::model::layer230::WSOld;
+use crate::model::layer230::Ws;
 use crate::model::{
     layer210::Comment,
     layer225::Keyval,
@@ -13,10 +13,10 @@ impl Expression {
     pub fn from_header_of_array_of_table(m: &HeaderOfArrayOfTable) -> Self {
         Expression::HeaderOfArrayOfTable(m.clone())
     }
-    pub fn from_empty_line(ws: &WSOld, comment: &Comment) -> Self {
+    pub fn from_empty_line(ws: &Ws, comment: &Comment) -> Self {
         Expression::EmptyLine(ws.clone(), Some(comment.clone()))
     }
-    pub fn from_keyval(ws1: &WSOld, keyval: &Keyval, ws2: &WSOld, comment: &Comment) -> Self {
+    pub fn from_keyval(ws1: &Ws, keyval: &Keyval, ws2: &Ws, comment: &Comment) -> Self {
         Expression::Keyval(
             ws1.clone(),
             keyval.clone(),

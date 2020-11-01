@@ -11,13 +11,12 @@ pub mod non_ascii_p;
 pub mod non_eol_p;
 pub mod positional_numeral_string_p;
 pub mod ws_p;
-pub mod ws_p_old;
 pub mod wschar_p;
 
-use crate::model::layer210::NonEol;
-use crate::model::layer210::{NonAscii, Ws, Wschar};
 use crate::model::{
-    layer210::{BasicString, Comment, Key, LiteralString, LiteralValue, WSOld},
+    layer210::{
+        BasicString, Comment, Key, LiteralString, LiteralValue, NonAscii, NonEol, Ws, Wschar,
+    },
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
 };
 use crate::parser::phase200::layer210::{
@@ -170,15 +169,8 @@ pub struct LiteralValueP {
 ///
 /// Example: `# comment`.  
 #[derive(Clone)]
-pub struct WSPOld {
-    buffer: WSOld,
-}
-
-/// Non end-of-line parser.  
-/// 非行末パーサー。  
-#[derive(Clone)]
 pub struct WsP {
-    buffer: Option<Ws>,
+    ws: Ws,
     state: WsPState,
     wschar_p: Option<WscharP>,
 }

@@ -29,17 +29,15 @@ pub enum Judge {
 impl Default for WsP {
     fn default() -> Self {
         WsP {
-            buffer: None,
+            ws: Ws::default(),
             state: State::First,
             wschar_p: None,
         }
     }
 }
 impl WsP {
-    pub fn flush(&mut self) -> Option<Ws> {
-        let m = self.buffer.clone();
-        self.buffer = None;
-        m
+    pub fn get_ws(&mut self) -> Ws {
+        self.ws.clone()
     }
     /// # Arguments
     ///
@@ -74,12 +72,9 @@ impl WsP {
             }
             State::First => {
                 // Horizon tab and Ascii code.
-                if let None = self.buffer {
-                    self.buffer = Some(Ws::default());
-                }
-                let m = self.buffer.as_mut().unwrap();
                 let character0 = characters.current.as_ref().unwrap();
-                m.push_token(&Token::from_character(character0, TokenType::Ws));
+                self.ws
+                    .push_token(&Token::from_character(character0, TokenType::Ws));
 
                 // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
                 let character1 = characters.current.as_ref().unwrap();
@@ -101,11 +96,7 @@ impl WsP {
         let p = self.wschar_p.as_mut().unwrap();
         match p.parse(characters) {
             PResult::End => {
-                if let None = self.buffer {
-                    self.buffer = Some(Ws::default());
-                }
-                let m = self.buffer.as_mut().unwrap();
-                m.extend_tokens(&p.flush().unwrap().tokens);
+                self.ws.extend_tokens(&p.flush().unwrap().tokens);
                 self.wschar_p = None;
                 self.state = State::End;
                 return PResult::End;
@@ -128,9 +119,7 @@ impl WsP {
     /// ログ。  
     pub fn log(&self) -> Table {
         let mut t = Table::default().clone();
-        if let Some(m) = &self.buffer {
-            t.str("buffer", &m.to_string());
-        }
+        t.str("ws", &self.ws.to_string());
         t
     }
 }
