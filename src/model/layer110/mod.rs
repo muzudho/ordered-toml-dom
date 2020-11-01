@@ -82,6 +82,7 @@ pub enum TokenType {
     Table,
     /// White space.
     WSOld,
+    Ws,
     Wschar,
 }
 

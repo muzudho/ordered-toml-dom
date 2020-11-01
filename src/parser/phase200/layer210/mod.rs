@@ -10,11 +10,12 @@ pub mod literal_value_p;
 pub mod non_ascii_p;
 pub mod non_eol_p;
 pub mod positional_numeral_string_p;
+pub mod ws_p;
 pub mod ws_p_old;
 pub mod wschar_p;
 
 use crate::model::layer210::NonEol;
-use crate::model::layer210::{NonAscii, Wschar};
+use crate::model::layer210::{NonAscii, Ws, Wschar};
 use crate::model::{
     layer210::{BasicString, Comment, Key, LiteralString, LiteralValue, WSOld},
     layer230::{HeaderOfArrayOfTable, HeaderOfTable},
@@ -23,7 +24,7 @@ use crate::parser::phase200::layer210::{
     basic_string_p::State as BasicStringState, comment_p::State as CommentState,
     date_time_p::State as DateTimeState, escape_sequence_p::State as EscapeSequenceState,
     literal_string_p::State as LiteralStringState, literal_value_p::State as LiteralValueState,
-    non_ascii_p::State as NonAsciiState, non_eol_p::State as NonEolState,
+    non_ascii_p::State as NonAsciiState, non_eol_p::State as NonEolState, ws_p::State as WsPState,
     wschar_p::State as WscharState,
 };
 use crate::parser::phase200::Token;
@@ -171,6 +172,15 @@ pub struct LiteralValueP {
 #[derive(Clone)]
 pub struct WSPOld {
     buffer: WSOld,
+}
+
+/// Non end-of-line parser.  
+/// 非行末パーサー。  
+#[derive(Clone)]
+pub struct WsP {
+    buffer: Option<Ws>,
+    state: WsPState,
+    wschar_p: Option<WscharP>,
 }
 
 /// White space character parser.  
