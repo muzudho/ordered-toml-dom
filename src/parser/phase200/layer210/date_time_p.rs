@@ -1,7 +1,7 @@
 //! Comment syntax parser.  
 //! コメント構文パーサー。  
 
-use crate::model::layer110::TokenType;
+use crate::model::layer110::{CharacterType, TokenType};
 use crate::parser::phase200::Token;
 use crate::parser::phase200::{
     error,
@@ -37,46 +37,52 @@ impl DateTimeP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
-                return error(&mut self.log(), &tokens, "date_time_p.rs.50.");
+                return error(&mut self.log(), &characters, "date_time_p.rs.50.");
             }
             State::FirstOfDate => {
-                let token0 = tokens.current.as_ref().unwrap();
-                let token1 = tokens.one_ahead.as_ref().unwrap();
-                match token0.type_ {
-                    TokenType::Newline => {
+                let character0 = characters.current.as_ref().unwrap();
+                let character1 = characters.one_ahead.as_ref().unwrap();
+                match character0.type_ {
+                    CharacterType::Newline => {
                         // println!("[trace59.]");
                         return PResult::End;
                     }
-                    TokenType::Alpha => match token0.to_string().as_str() {
+                    CharacterType::Alpha => match character0.to_string().as_str() {
                         "T" => {
                             // println!("[trace64.]");
-                            self.buffer.push(token0.clone());
+                            self.buffer.push(Token::from_character(
+                                &character0.clone(),
+                                TokenType::DateTime,
+                            ));
                             self.state = State::End;
                         }
                         _ => {
                             // println!("[trace69.]");
-                            return error(&mut self.log(), &tokens, "date_time_p.rs.63.");
+                            return error(&mut self.log(), &characters, "date_time_p.rs.63.");
                         }
                     },
-                    TokenType::Hyphen | TokenType::Digit => {
-                        self.buffer.push(token0.clone());
-                        match token1.type_ {
-                            TokenType::Alpha => match token1.to_string().as_str() {
+                    CharacterType::Hyphen | CharacterType::Digit => {
+                        self.buffer.push(Token::from_character(
+                            &character0.clone(),
+                            TokenType::DateTime,
+                        ));
+                        match character1.type_ {
+                            CharacterType::Alpha => match character1.to_string().as_str() {
                                 "T" => {
                                     /*
                                     println!(
                                         // "[trace78={}|{}]",
-                                        token0.to_string().as_str(),
-                                        token1.to_string().as_str()
+                                        character0.to_string().as_str(),
+                                        character1.to_string().as_str()
                                     );
                                     */
                                     self.state = State::FirstOfTime;
@@ -85,47 +91,54 @@ impl DateTimeP {
                                     /*
                                     println!(
                                         // "[trace81={}|{}]",
-                                        token0.to_string().as_str(),
-                                        token1.to_string().as_str()
+                                        character0.to_string().as_str(),
+                                        character1.to_string().as_str()
                                     );
                                     */
-                                    return error(&mut self.log(), &tokens, "date_time_p.rs.72.");
+                                    return error(
+                                        &mut self.log(),
+                                        &characters,
+                                        "date_time_p.rs.72.",
+                                    );
                                 }
                             },
-                            TokenType::Hyphen | TokenType::Digit => {
-                                // println!("[trace86={}]", token0.to_string().as_str());
+                            CharacterType::Hyphen | CharacterType::Digit => {
+                                // println!("[trace86={}]", character0.to_string().as_str());
                             }
                             _ => {
-                                // println!("[trace89={}]", token0.to_string().as_str());
+                                // println!("[trace89={}]", character0.to_string().as_str());
                                 return PResult::End;
                             }
                         }
                     }
                     _ => {
                         // println!("[trace95.]");
-                        return error(&mut self.log(), &tokens, "date_time_p.rs.82.");
+                        return error(&mut self.log(), &characters, "date_time_p.rs.82.");
                     }
                 }
                 PResult::Ongoing
             }
             State::FirstOfTime => {
-                let token0 = tokens.current.as_ref().unwrap();
-                let token1 = tokens.one_ahead.as_ref().unwrap();
-                match token0.type_ {
-                    TokenType::Newline => {
+                let character0 = characters.current.as_ref().unwrap();
+                let character1 = characters.one_ahead.as_ref().unwrap();
+                match character0.type_ {
+                    CharacterType::Newline => {
                         // println!("[trace114.]");
                         return PResult::End;
                     }
-                    TokenType::Colon | TokenType::Digit => {
-                        self.buffer.push(token0.clone());
-                        match token1.type_ {
-                            TokenType::Alpha => match token1.to_string().as_str() {
+                    CharacterType::Colon | CharacterType::Digit => {
+                        self.buffer.push(Token::from_character(
+                            &character0.clone(),
+                            TokenType::DateTime,
+                        ));
+                        match character1.type_ {
+                            CharacterType::Alpha => match character1.to_string().as_str() {
                                 "Z" => {
                                     /*
                                     println!(
                                         // "[trace124={}|{}]",
-                                        token0.to_string().as_str(),
-                                        token1.to_string().as_str()
+                                        character0.to_string().as_str(),
+                                        character1.to_string().as_str()
                                     );
                                     */
                                     self.state = State::LongitudeZero;
@@ -134,39 +147,43 @@ impl DateTimeP {
                                     /*
                                     println!(
                                         // "[trace132={}|{}]",
-                                        token0.to_string().as_str(),
-                                        token1.to_string().as_str()
+                                        character0.to_string().as_str(),
+                                        character1.to_string().as_str()
                                     );
                                     */
-                                    return error(&mut self.log(), &tokens, "date_time_p.rs.72.");
+                                    return error(
+                                        &mut self.log(),
+                                        &characters,
+                                        "date_time_p.rs.72.",
+                                    );
                                 }
                             },
-                            TokenType::Dot => {
+                            CharacterType::Dot => {
                                 /*
                                 println!(
                                     // "[trace141={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                                 self.state = State::FractionalSeconds;
                             }
-                            TokenType::Plus | TokenType::Hyphen => {
+                            CharacterType::Plus | CharacterType::Hyphen => {
                                 /*
                                 println!(
                                     // "[trace149={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            TokenType::Colon | TokenType::Digit => {
+                            CharacterType::Colon | CharacterType::Digit => {
                                 /*
                                 println!(
                                     // "[trace156={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                             }
@@ -174,8 +191,8 @@ impl DateTimeP {
                                 /*
                                 println!(
                                     // "[trace164={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                                 return PResult::End;
@@ -183,30 +200,42 @@ impl DateTimeP {
                         }
                     }
                     _ => {
-                        self.buffer.push(token0.clone());
+                        self.buffer.push(Token::from_character(
+                            &character0.clone(),
+                            TokenType::DateTime,
+                        ));
                     }
                 }
                 PResult::Ongoing
             }
             State::LongitudeZero => {
-                let token0 = tokens.current.as_ref().unwrap();
-                self.buffer.push(token0.clone());
+                let character0 = characters.current.as_ref().unwrap();
+                self.buffer.push(Token::from_character(
+                    &character0.clone(),
+                    TokenType::DateTime,
+                ));
                 self.state = State::End;
                 PResult::End
             }
             State::OffsetSign => {
-                let token0 = tokens.current.as_ref().unwrap();
-                let token1 = tokens.one_ahead.as_ref().unwrap();
-                match token0.type_ {
-                    TokenType::Colon | TokenType::Hyphen | TokenType::Digit | TokenType::Plus => {
-                        self.buffer.push(token0.clone());
-                        match token1.type_ {
-                            TokenType::Colon | TokenType::Digit => {
+                let character0 = characters.current.as_ref().unwrap();
+                let character1 = characters.one_ahead.as_ref().unwrap();
+                match character0.type_ {
+                    CharacterType::Colon
+                    | CharacterType::Hyphen
+                    | CharacterType::Digit
+                    | CharacterType::Plus => {
+                        self.buffer.push(Token::from_character(
+                            &character0.clone(),
+                            TokenType::DateTime,
+                        ));
+                        match character1.type_ {
+                            CharacterType::Colon | CharacterType::Digit => {
                                 /*
                                 println!(
                                     // "[trace193={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                             }
@@ -214,8 +243,8 @@ impl DateTimeP {
                                 /*
                                 println!(
                                     // "[trace200={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                                 return PResult::End;
@@ -226,39 +255,42 @@ impl DateTimeP {
                         /*
                         println!(
                             // "[trace210={}|{}]",
-                            token0.to_string().as_str(),
-                            token1.to_string().as_str()
+                            character0.to_string().as_str(),
+                            character1.to_string().as_str()
                         );
                         */
-                        return error(&mut self.log(), &tokens, "date_time_p.rs.244.");
+                        return error(&mut self.log(), &characters, "date_time_p.rs.244.");
                     }
                 }
                 PResult::Ongoing
             }
             State::FractionalSeconds => {
-                let token0 = tokens.current.as_ref().unwrap();
-                let token1 = tokens.one_ahead.as_ref().unwrap();
-                match token0.type_ {
-                    TokenType::Dot | TokenType::Digit => {
-                        self.buffer.push(token0.clone());
-                        match token1.type_ {
-                            TokenType::Hyphen | TokenType::Plus => {
+                let character0 = characters.current.as_ref().unwrap();
+                let character1 = characters.one_ahead.as_ref().unwrap();
+                match character0.type_ {
+                    CharacterType::Dot | CharacterType::Digit => {
+                        self.buffer.push(Token::from_character(
+                            &character0.clone(),
+                            TokenType::DateTime,
+                        ));
+                        match character1.type_ {
+                            CharacterType::Hyphen | CharacterType::Plus => {
                                 // - or +.
                                 /*
                                 println!(
                                     // "[trace229={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            TokenType::Dot | TokenType::Digit => {
+                            CharacterType::Dot | CharacterType::Digit => {
                                 /*
                                 println!(
                                     // "[trace237={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                             }
@@ -266,8 +298,8 @@ impl DateTimeP {
                                 /*
                                 println!(
                                     // "[trace244={}|{}]",
-                                    token0.to_string().as_str(),
-                                    token1.to_string().as_str()
+                                    character0.to_string().as_str(),
+                                    character1.to_string().as_str()
                                 );
                                 */
                                 return PResult::End;
@@ -278,11 +310,11 @@ impl DateTimeP {
                         /*
                         println!(
                             // "[trace219={}|{}]",
-                            token0.to_string().as_str(),
-                            token1.to_string().as_str()
+                            character0.to_string().as_str(),
+                            character1.to_string().as_str()
                         );
                         */
-                        return error(&mut self.log(), &tokens, "date_time_p.rs.244.");
+                        return error(&mut self.log(), &characters, "date_time_p.rs.244.");
                     }
                 }
                 PResult::Ongoing

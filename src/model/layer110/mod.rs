@@ -76,6 +76,7 @@ pub enum TokenType {
     Key,
     BasicString,
     Comment,
+    DateTime,
     /// White space.
     WS,
 }
