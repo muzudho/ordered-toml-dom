@@ -1,6 +1,6 @@
 //! Combines only consecutive whitespace into one.  
 //! 連続する空白のみを1つに結合します。  
-use crate::model::layer110::{Token, TokenLine, TokenType};
+use crate::model::layer110::{Character, CharacterLine, CharacterType};
 use std::fmt;
 
 #[derive(Debug)]
@@ -13,38 +13,38 @@ enum State {
 /// 字句解析器。  
 pub struct LexicalParser {
     state: State,
-    product: TokenLine,
-    buffer_string_token_column_number: usize,
-    buffer_string_token_type: TokenType,
+    product: CharacterLine,
+    buffer_character_column_number: usize,
+    buffer_character_type: Option<CharacterType>,
     buffer_string: String,
 }
 impl LexicalParser {
     pub fn new(row_number: usize) -> Self {
         LexicalParser {
             state: State::First,
-            product: TokenLine::new(row_number),
-            buffer_string_token_column_number: 0,
-            buffer_string_token_type: TokenType::Unknown,
+            product: CharacterLine::new(row_number),
+            buffer_character_column_number: 0,
+            buffer_character_type: None,
             buffer_string: String::new(),
         }
     }
     /// Flush.
     fn flush(&mut self) {
         if !self.buffer_string.is_empty() {
-            self.product.tokens.push(Token::new(
-                self.buffer_string_token_column_number,
+            self.product.characters.push(Character::new(
+                self.buffer_character_column_number,
                 &self.buffer_string,
-                self.buffer_string_token_type,
+                self.buffer_character_type.unwrap(),
             ));
             self.buffer_string.clear();
         }
     }
-    pub fn product(&self) -> &TokenLine {
+    pub fn product(&self) -> &CharacterLine {
         &self.product
     }
     pub fn parse_line(&mut self, line: &str) {
         let ch_vec: Vec<char> = line.chars().collect();
-        self.buffer_string_token_column_number = 0;
+        self.buffer_character_column_number = 0;
         let mut j = 0;
         let mut chars: (Option<&char>, Option<&char>) = (None, None);
         for (i, ch) in ch_vec.iter().enumerate() {
@@ -72,11 +72,11 @@ impl LexicalParser {
         self.flush();
         // Append an end of line.
         // 行末を追加します。
-        self.product.tokens.push(Token::new(
+        self.product.characters.push(Character::new(
             ch_vec.len(),
             "
 ",
-            TokenType::Newline,
+            CharacterType::Newline,
         ));
     }
     fn one_delay_loop(&mut self, i: usize, chars: (Option<&char>, Option<&char>)) {
@@ -86,27 +86,27 @@ impl LexicalParser {
             // `\` の次に連なる文字列は、先頭1文字でトークンを切ります。
             State::EscapeSequenceCharacter => {
                 // print!("[trace101 AlbetChar={:?}]", ch0);
-                self.buffer_string_token_column_number = i;
-                self.buffer_string_token_type = TokenType::Alpha;
+                self.buffer_character_column_number = i;
+                self.buffer_character_type = TokenType::Alpha;
                 self.buffer_string.push(*ch0);
                 self.flush();
                 self.state = State::First;
             }
             */
             State::First => {
-                self.buffer_string_token_column_number = i;
+                self.buffer_character_column_number = i;
                 self.buffer_string.push(*ch0);
                 match ch0 {
                     // A ～ Z, a ～ z.
                     'A'..='Z' | 'a'..='z' => {
                         // print!("[trace105 albet={:?}]", ch0);
-                        self.buffer_string_token_type = TokenType::Alpha;
+                        self.buffer_character_type = Some(CharacterType::Alpha);
                         self.flush();
                     }
                     // \
                     '\\' => {
                         // print!("[trace104 bs={:?}]", ch0);
-                        self.buffer_string_token_type = TokenType::Backslash;
+                        self.buffer_character_type = Some(CharacterType::Backslash);
                         self.flush();
                         /*
                         if let Some(ch1) = chars.1 {
@@ -124,85 +124,85 @@ impl LexicalParser {
                     }
                     // :
                     ':' => {
-                        self.buffer_string_token_type = TokenType::Colon;
+                        self.buffer_character_type = Some(CharacterType::Colon);
                         self.flush();
                     }
                     // ,
                     ',' => {
-                        self.buffer_string_token_type = TokenType::Comma;
-                        self.flush();
-                    }
-                    // .
-                    '.' => {
-                        self.buffer_string_token_type = TokenType::Dot;
-                        self.flush();
-                    }
-                    // "
-                    '"' => {
-                        self.buffer_string_token_type = TokenType::DoubleQuotation;
-                        self.flush();
-                    }
-                    // =
-                    '=' => {
-                        self.buffer_string_token_type = TokenType::Equals;
-                        self.flush();
-                    }
-                    // -
-                    '-' => {
-                        self.buffer_string_token_type = TokenType::Hyphen;
-                        self.flush();
-                    }
-                    // {
-                    '{' => {
-                        self.buffer_string_token_type = TokenType::LeftCurlyBracket;
-                        self.flush();
-                    }
-                    // [
-                    '[' => {
-                        self.buffer_string_token_type = TokenType::LeftSquareBracket;
-                        self.flush();
-                    }
-                    '0'..='9' => {
-                        self.buffer_string_token_type = TokenType::Digit;
-                        self.flush();
-                    }
-                    // +
-                    '+' => {
-                        self.buffer_string_token_type = TokenType::Plus;
-                        self.flush();
-                    }
-                    // }
-                    '}' => {
-                        self.buffer_string_token_type = TokenType::RightCurlyBracket;
-                        self.flush();
-                    }
-                    // ]
-                    ']' => {
-                        self.buffer_string_token_type = TokenType::RightSquareBracket;
+                        self.buffer_character_type = Some(CharacterType::Comma);
                         self.flush();
                     }
                     // #
                     '#' => {
-                        self.buffer_string_token_type = TokenType::CommentStartSymbol;
+                        self.buffer_character_type = Some(CharacterType::CommentStartSymbol);
+                        self.flush();
+                    }
+                    '0'..='9' => {
+                        self.buffer_character_type = Some(CharacterType::Digit);
+                        self.flush();
+                    }
+                    // .
+                    '.' => {
+                        self.buffer_character_type = Some(CharacterType::Dot);
+                        self.flush();
+                    }
+                    // "
+                    '"' => {
+                        self.buffer_character_type = Some(CharacterType::DoubleQuotation);
+                        self.flush();
+                    }
+                    // =
+                    '=' => {
+                        self.buffer_character_type = Some(CharacterType::Equals);
+                        self.flush();
+                    }
+                    // -
+                    '-' => {
+                        self.buffer_character_type = Some(CharacterType::Hyphen);
+                        self.flush();
+                    }
+                    // {
+                    '{' => {
+                        self.buffer_character_type = Some(CharacterType::LeftCurlyBracket);
+                        self.flush();
+                    }
+                    // [
+                    '[' => {
+                        self.buffer_character_type = Some(CharacterType::LeftSquareBracket);
+                        self.flush();
+                    }
+                    // +
+                    '+' => {
+                        self.buffer_character_type = Some(CharacterType::Plus);
+                        self.flush();
+                    }
+                    // }
+                    '}' => {
+                        self.buffer_character_type = Some(CharacterType::RightCurlyBracket);
+                        self.flush();
+                    }
+                    // ]
+                    ']' => {
+                        self.buffer_character_type = Some(CharacterType::RightSquareBracket);
                         self.flush();
                     }
                     // '
                     '\'' => {
-                        self.buffer_string_token_type = TokenType::SingleQuotation;
+                        self.buffer_character_type = Some(CharacterType::SingleQuotation);
                         self.flush();
                     }
                     // _
                     '_' => {
-                        self.buffer_string_token_type = TokenType::Underscore;
+                        self.buffer_character_type = Some(CharacterType::Underscore);
                         self.flush();
                     }
                     // Whitespace char.
                     '\t' | ' ' => {
-                        self.buffer_string_token_type = TokenType::Wschar;
+                        self.buffer_character_type = Some(CharacterType::Wschar);
                         self.flush();
                     }
                     _ => {
-                        self.buffer_string_token_type = TokenType::Unknown;
+                        self.buffer_character_type = Some(CharacterType::NonAscii);
                         self.flush();
                     }
                 }

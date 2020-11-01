@@ -7,7 +7,7 @@ use crate::model::{layer110::TokenType, layer230::Expression};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer230::WSP;
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
     layer225::KeyvalP,
@@ -67,7 +67,7 @@ impl ExpressionP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
 
         match self.state {
@@ -349,7 +349,7 @@ impl ExpressionP {
     ///
     /// * `tokens` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
-    fn parse_header_of_table(&mut self, tokens: &LookAheadTokens) -> PResult {
+    fn parse_header_of_table(&mut self, tokens: &LookAheadCharacters) -> PResult {
         let p = self.header_p_of_table.as_mut().unwrap();
         match p.parse(&tokens) {
             PResult::End => {

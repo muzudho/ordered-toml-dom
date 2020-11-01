@@ -4,7 +4,7 @@
 use crate::model::{layer110::TokenType, layer225::InlineTable};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::PResult,
     layer225::{InlineTableP, KeyvalP},
@@ -46,7 +46,7 @@ impl InlineTableP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `{`.

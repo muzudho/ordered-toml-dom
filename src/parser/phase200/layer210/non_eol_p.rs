@@ -5,7 +5,7 @@ use crate::model::{layer110::TokenType, layer210::NonEol};
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{non_ascii_p::Judge as NonAsciiPJudge, NonAsciiP};
 use crate::parser::phase200::layer210::{NonEolP, PResult};
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
 
@@ -64,7 +64,7 @@ impl NonEolP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;
@@ -91,7 +91,7 @@ impl NonEolP {
         PResult::Ongoing
     }
 
-    fn parse_non_ascii(&mut self, tokens: &LookAheadTokens) -> PResult {
+    fn parse_non_ascii(&mut self, tokens: &LookAheadCharacters) -> PResult {
         if let None = self.non_ascii_p {
             self.non_ascii_p = Some(NonAsciiP::new());
         }

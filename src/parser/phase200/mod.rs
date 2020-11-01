@@ -6,21 +6,21 @@ pub mod layer220;
 pub mod layer225;
 pub mod layer230;
 pub mod layer310;
-pub mod look_ahead_tokens;
+pub mod look_ahead_characters;
 
-use crate::model::layer110::Token;
+use crate::model::layer110::{Character, Token};
 use crate::parser::phase200::layer210::PResult;
 use crate::parser::phase200::layer220::usize_to_i128;
 use crate::util::random_name;
 use casual_logger::Table as LogTable;
 
-pub struct LookAheadTokens {
-    pub current: Option<Token>,
-    pub one_ahead: Option<Token>,
-    pub two_ahead: Option<Token>,
-    pub three_ahead: Option<Token>,
+pub struct LookAheadCharacters {
+    pub current: Option<Character>,
+    pub one_ahead: Option<Character>,
+    pub two_ahead: Option<Character>,
+    pub three_ahead: Option<Character>,
     /// `2020-10-21` を `2020-` のハイフンまで先読みするのに使います。
-    pub four_ahead: Option<Token>,
+    pub four_ahead: Option<Character>,
 }
 
 /// Error message.  
@@ -30,7 +30,7 @@ pub struct LookAheadTokens {
 ///
 /// * `tokens` - Tokens contains look ahead.  
 ///             先読みを含むトークン。  
-fn error(table: &mut LogTable, tokens: &LookAheadTokens, place_of_occurrence: &str) -> PResult {
+fn error(table: &mut LogTable, tokens: &LookAheadCharacters, place_of_occurrence: &str) -> PResult {
     table.str("place_of_occurrence", place_of_occurrence);
 
     if let Some(token) = &tokens.current {
@@ -64,7 +64,7 @@ fn error(table: &mut LogTable, tokens: &LookAheadTokens, place_of_occurrence: &s
 fn error_via(
     escalated_table1: &mut LogTable,
     this_table: &mut LogTable,
-    tokens: &LookAheadTokens,
+    tokens: &LookAheadCharacters,
     place_of_occurrence: &str,
 ) -> PResult {
     this_table.str("via", place_of_occurrence);

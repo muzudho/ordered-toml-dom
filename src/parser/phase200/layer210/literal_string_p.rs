@@ -4,7 +4,7 @@
 use crate::model::{layer110::TokenType, layer210::LiteralString};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{LiteralStringP, PResult};
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use casual_logger::Table;
 
 /// Syntax machine state.  
@@ -43,7 +43,7 @@ impl LiteralStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::BeforeMultiLine1 => {
@@ -181,7 +181,7 @@ impl LiteralStringP {
 ///
 /// It's triple single quotation.  
 /// ３連一重引用符。  
-fn check_triple_single_quotation(tokens: &LookAheadTokens) -> bool {
+fn check_triple_single_quotation(tokens: &LookAheadCharacters) -> bool {
     if let Some(token_2_ahead) = &tokens.two_ahead {
         match token_2_ahead.type_ {
             TokenType::SingleQuotation => {

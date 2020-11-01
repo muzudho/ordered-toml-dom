@@ -6,7 +6,7 @@ use crate::parser::phase200::Token;
 use crate::parser::phase200::{
     error,
     layer210::{DateTimeP, PResult},
-    LookAheadTokens,
+    LookAheadCharacters,
 };
 use casual_logger::Table;
 
@@ -43,7 +43,7 @@ impl DateTimeP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 return error(&mut self.log(), &tokens, "date_time_p.rs.50.");

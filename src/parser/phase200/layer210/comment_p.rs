@@ -6,7 +6,7 @@ use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{non_eol_p::Judge as NonEolPJudge, NonEolP};
 use crate::parser::phase200::layer210::{CommentP, PResult};
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
 
@@ -69,7 +69,7 @@ impl CommentP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {}
             State::First => {

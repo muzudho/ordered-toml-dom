@@ -1,22 +1,22 @@
+pub mod character;
+pub mod character_line;
 pub mod token;
 pub mod token_line;
 
-/// Token type.  
-/// トークンの種類。  
+/// Character type.  
+/// 文字の種類。  
 #[derive(Clone, Copy, Debug)]
-pub enum TokenType {
+pub enum CharacterType {
     /// Alphabet character. A ～ Z, a ～ z.  1 disit.  
     Alpha,
     /// \  
     Backslash,
-    /// }  
-    CloseCurlyBracket,
     /// :  
     Colon,
-    /// #  
-    CommentStartSymbol,
     /// ,  
     Comma,
+    /// #  
+    CommentStartSymbol,
     /// Numeral character. 0 ～ 9. 1 disit.  
     Digit,
     /// .  
@@ -25,26 +25,38 @@ pub enum TokenType {
     DoubleQuotation,
     /// =  
     Equals,
-    /// \r, \n, or combine.
-    Newline,
     /// -  
     Hyphen,
     /// {  
     LeftCurlyBracket,
     /// [  
     LeftSquareBracket,
+    /// \r, \n, or combine.
+    Newline,
     /// +  
     Plus,
     /// }  
     RightCurlyBracket,
     /// ]  
     RightSquareBracket,
+    /// '  
+    SingleQuotation,
+    /// _  
+    Underscore,
+    /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
+    /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
+    Wschar,
+    NonAscii,
+}
+
+/// Token type.  
+/// トークンの種類。  
+#[derive(Clone, Copy, Debug)]
+pub enum TokenType {
     /// 0x80 - 0xD7FF.
     NonAscii,
     /// Non end-of-line. 0x09, 0x20 - 0x7F, non-ascii.
     NonEol,
-    /// '  
-    SingleQuotation,
     /// A ～ Z, a ～ z.  Multiple disits.   
     /// 構文解析の結果。文字列トークン。  
     SPAlphabetString,
@@ -56,14 +68,16 @@ pub enum TokenType {
     /// 進数文字列。  
     /// `0x01aB23Cd` なら、 `01aB23Cd` の部分。  
     SPPositionalNumeralString,
-    /// _  
-    Underscore,
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
     Unknown,
-    /// Whitespace means tab ('\t' 0x09) or space (' ' 0x20).  
-    /// ホワイトスペースは タブ ('\t', 0x09) と 半角スペース (' ' 0x20) です。  
-    Wschar,
+}
+
+/// A row of characters.  
+/// 一列の字。  
+pub struct CharacterLine {
+    pub row_number: usize,
+    pub characters: Vec<Character>,
 }
 
 /// A row of tokens.  
@@ -71,6 +85,15 @@ pub enum TokenType {
 pub struct TokenLine {
     pub row_number: usize,
     pub tokens: Vec<Token>,
+}
+
+/// Character.  
+/// 字。  
+#[derive(Clone)]
+pub struct Character {
+    pub column_number: usize,
+    pub value: String,
+    pub type_: CharacterType,
 }
 
 /// Token.  

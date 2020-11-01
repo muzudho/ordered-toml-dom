@@ -14,7 +14,7 @@ use crate::model::{layer110::TokenType, layer210::BasicString};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{BasicStringP, EscapeSequenceP, PResult};
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use casual_logger::Table;
 
 /// Syntax machine state.  
@@ -62,7 +62,7 @@ impl BasicStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::BeforeMultiLine => {
@@ -315,7 +315,7 @@ impl BasicStringP {
 ///
 /// It's triple double quotation.  
 /// ３連一重引用符。  
-fn check_triple_double_quotation(tokens: &LookAheadTokens) -> bool {
+fn check_triple_double_quotation(tokens: &LookAheadCharacters) -> bool {
     if let Some(token_2_ahead) = &tokens.two_ahead {
         match token_2_ahead.type_ {
             TokenType::DoubleQuotation => {

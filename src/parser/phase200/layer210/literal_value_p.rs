@@ -13,7 +13,7 @@ use crate::parser::phase200::layer210::PositionalNumeralStringP;
 use crate::parser::phase200::layer210::{
     date_time_p::State as DateTimeState, LiteralValueP, PResult,
 };
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use casual_logger::Table as LogTable;
 
 /// Syntax machine state.  
@@ -56,7 +56,7 @@ impl LiteralValueP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match self.state {
             State::DateTime => {

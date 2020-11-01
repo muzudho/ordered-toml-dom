@@ -3,7 +3,7 @@
 
 use crate::model::{layer110::TokenType, layer210::NonAscii};
 use crate::parser::phase200::layer210::{NonAsciiP, PResult};
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
 
 /// Syntax machine state.  
@@ -55,7 +55,7 @@ impl NonAsciiP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;

@@ -3,7 +3,7 @@
 
 use crate::model::{layer110::TokenType, layer210::WS};
 use crate::parser::phase200::layer210::{PResult, WSP};
-use crate::parser::phase200::LookAheadTokens;
+use crate::parser::phase200::LookAheadCharacters;
 
 impl Default for WSP {
     fn default() -> Self {
@@ -26,7 +26,7 @@ impl WSP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadTokens) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
         let token0 = tokens.current.as_ref().unwrap();
         match token0.type_ {
             TokenType::Newline => return PResult::End,
