@@ -2,7 +2,7 @@
 //! エスケープ・シーケンス・パーサー。  
 
 use crate::model::layer110::token::tokens_stringify;
-use crate::model::layer110::{Token, TokenType};
+use crate::model::layer110::{CharacterType, Token, TokenType};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::PositionalNumeralStringP;
@@ -43,51 +43,57 @@ impl EscapeSequenceP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let character0 = characters.current.as_ref().unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), &tokens, "escape_sequence_p.rs.66.");
+                return error(&mut self.log(), &characters, "escape_sequence_p.rs.66.");
             }
             State::First => {
                 // Look-ahead.
                 // 先読み。
-                if let Some(token_1_ahead) = tokens.one_ahead.as_ref() {
+                if let Some(token_1_ahead) = characters.one_ahead.as_ref() {
                     match token_1_ahead.type_ {
-                        TokenType::Alpha | TokenType::Backslash | TokenType::DoubleQuotation => {
+                        CharacterType::Alpha
+                        | CharacterType::Backslash
+                        | CharacterType::DoubleQuotation => {
                             // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
                             self.state = State::EscapedCharacter;
                         }
-                        TokenType::Newline => {
+                        CharacterType::Newline => {
                             // 行末に \ があったケース。
                             // println!("[trace3 行末にEOLがあったケース]");
                             self.state = State::End;
                             return PResult::End;
                         }
                         _ => {
-                            return error(&mut self.log(), &tokens, "escape_sequence_p.rs.136.");
+                            return error(
+                                &mut self.log(),
+                                &characters,
+                                "escape_sequence_p.rs.136.",
+                            );
                         }
                     }
                 } else {
-                    return error(&mut self.log(), &tokens, "escape_sequence_p.rs.112.");
+                    return error(&mut self.log(), &characters, "escape_sequence_p.rs.112.");
                 }
             }
             State::EscapedCharacter => {
-                // println!("[trace196={:?}]", token0);
+                // println!("[trace196={:?}]", character0);
                 // Escaped.
-                match token0.type_ {
+                match character0.type_ {
                     // `"`
-                    TokenType::Alpha => {
+                    CharacterType::Alpha => {
                         // TODO 汎用的に書けないか？
-                        // https://doc.rust-lang.org/reference/tokens.html
+                        // https://doc.rust-lang.org/reference/characters.html
                         let mut code = None;
-                        match token0.to_string().as_str() {
+                        match character0.to_string().as_str() {
                             "n" => code = Some("\n"),
                             "r" => code = Some("\r"),
                             "t" => code = Some("\t"),
@@ -110,46 +116,50 @@ impl EscapeSequenceP {
                                 );
                             }
                             _ => {
-                                return error(&mut self.log(), &tokens, "escape_sequence_p.rs.206.")
+                                return error(
+                                    &mut self.log(),
+                                    &characters,
+                                    "escape_sequence_p.rs.206.",
+                                )
                             }
                         }
                         if let Some(code) = code {
                             self.buffer.push(Token::new(
-                                token0.column_number,
+                                character0.column_number,
                                 code,
-                                TokenType::Alpha, // TODO EscapeSequence
+                                TokenType::EscapeSequence, // TODO EscapeSequence
                             ));
                             self.state = State::End;
                             return PResult::End;
                         }
                     }
-                    TokenType::Backslash => {
+                    CharacterType::Backslash => {
                         self.buffer.push(Token::new(
-                            token0.column_number,
+                            character0.column_number,
                             "\\",
-                            TokenType::Alpha, // TODO EscapeSequence
+                            TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
                         self.state = State::End;
                         return PResult::End;
                     }
                     // "
-                    TokenType::DoubleQuotation => {
+                    CharacterType::DoubleQuotation => {
                         self.buffer.push(Token::new(
-                            token0.column_number,
+                            character0.column_number,
                             "\"",
-                            TokenType::Alpha, // TODO EscapeSequence
+                            TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
                         self.state = State::End;
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), &tokens, "escape_sequence_p.rs.212.");
+                        return error(&mut self.log(), &characters, "escape_sequence_p.rs.212.");
                     }
                 }
             }
             State::UnicodeDigits => {
                 let p = self.positional_numeral_string_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(characters) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
@@ -160,9 +170,9 @@ impl EscapeSequenceP {
                             Err(why) => panic!("{}", why),
                         };
                         self.buffer.push(Token::new(
-                            token0.column_number,
+                            character0.column_number,
                             &from_u32(hex).unwrap().to_string(),
-                            TokenType::Alpha, // TODO EscapeSequence
+                            TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
                         self.state = State::End;
                         self.positional_numeral_string_p = None;
@@ -172,7 +182,7 @@ impl EscapeSequenceP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &tokens,
+                            &characters,
                             "escape_sequence_p.rs.165.",
                         );
                     }

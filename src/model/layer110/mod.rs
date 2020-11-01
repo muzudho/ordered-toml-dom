@@ -77,6 +77,7 @@ pub enum TokenType {
     BasicString,
     Comment,
     DateTime,
+    EscapeSequence,
     /// White space.
     WS,
 }
