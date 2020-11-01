@@ -1,7 +1,7 @@
 //! Hex string parser.  
 //! 16進文字列パーサー。  
 
-use crate::model::layer110::{Token, TokenType};
+use crate::model::layer110::{CharacterType, Token, TokenType};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{PResult, PositionalNumeralStringP};
 use crate::parser::phase200::LookAheadCharacters;
@@ -27,17 +27,17 @@ impl PositionalNumeralStringP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let token0 = characters.current.as_ref().unwrap();
 
         match token0.type_ {
-            TokenType::Alpha | TokenType::Digit | TokenType::Underscore => {
+            CharacterType::Alpha | CharacterType::Digit | CharacterType::Underscore => {
                 let s = token0.to_string();
                 let expected_len = 1;
                 if s.len() != expected_len {
@@ -48,9 +48,9 @@ impl PositionalNumeralStringP {
                 self.string_buffer.push_str(&s);
 
                 // 次がHexの文字以外か？
-                let finished = if let Some(token1) = tokens.one_ahead.as_ref() {
+                let finished = if let Some(token1) = characters.one_ahead.as_ref() {
                     match token1.type_ {
-                        TokenType::Alpha | TokenType::Digit | TokenType::Underscore => {
+                        CharacterType::Alpha | CharacterType::Digit | CharacterType::Underscore => {
                             // 続行。
                             false
                         }
@@ -68,11 +68,11 @@ impl PositionalNumeralStringP {
                 {
                     /*
                     println!(
-                        // "[trace56={} self.expected_digits={} self.string_buffer.len()={} tokens.one_ahead={}]",
+                        // "[trace56={} self.expected_digits={} self.string_buffer.len()={} characters.one_ahead={}]",
                         self.string_buffer,
                         self.expected_digits,
                         self.string_buffer.len(),
-                        if let Some(token1) = tokens.one_ahead.as_ref() {token1.to_string()}else{"".to_string()}
+                        if let Some(token1) = characters.one_ahead.as_ref() {token1.to_string()}else{"".to_string()}
                     );
                     // */
                     self.buffer.push(Token::new(
@@ -86,7 +86,7 @@ impl PositionalNumeralStringP {
                 // １文字ずつだから、オーバーフローしないはず。
             }
             _ => {
-                return error(&mut self.log(), &tokens, "hex_string_p.rs.179.");
+                return error(&mut self.log(), &characters, "hex_string_p.rs.179.");
             }
         }
 

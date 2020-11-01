@@ -1,7 +1,10 @@
 //! Non end-of-line parser.  
 //! 非行末パーサー。  
 
-use crate::model::{layer110::TokenType, layer210::NonEol};
+use crate::model::{
+    layer110::{Character, TokenType},
+    layer210::NonEol,
+};
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{non_ascii_p::Judge as NonAsciiPJudge, NonAsciiP};
 use crate::parser::phase200::layer210::{NonEolP, PResult};
@@ -46,11 +49,11 @@ impl NonEolP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(token: &Token) -> Option<Judge> {
-        if let Some(_judge) = NonAsciiP::judge(token) {
+    pub fn judge(character: &Character) -> Option<Judge> {
+        if let Some(_judge) = NonAsciiP::judge(character) {
             return Some(Judge::NonAscii);
         }
-        let unicode = token.to_string_chars_nth(0).unwrap() as u32;
+        let unicode = character.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
             0x09 | 0x20..=0x7F => Some(Judge::HorizontalTabAndAscii),
             _ => None,
@@ -58,13 +61,13 @@ impl NonEolP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;
@@ -75,28 +78,28 @@ impl NonEolP {
                     self.buffer = Some(NonEol::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
-                let token0 = tokens.current.as_ref().unwrap();
-                m.push_token(&Token::from_base(token0, TokenType::NonEol));
+                let character0 = characters.current.as_ref().unwrap();
+                m.push_token(&Token::from_character(character0, TokenType::NonEol));
 
                 // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
-                let token1 = tokens.current.as_ref().unwrap();
-                if let None = Self::judge(&token1) {
+                let character1 = characters.current.as_ref().unwrap();
+                if let None = Self::judge(&character1) {
                     return PResult::End;
                 }
             }
             State::NonAscii => {
-                return self.parse_non_ascii(tokens);
+                return self.parse_non_ascii(characters);
             }
         }
         PResult::Ongoing
     }
 
-    fn parse_non_ascii(&mut self, tokens: &LookAheadCharacters) -> PResult {
+    fn parse_non_ascii(&mut self, characters: &LookAheadCharacters) -> PResult {
         if let None = self.non_ascii_p {
             self.non_ascii_p = Some(NonAsciiP::new());
         }
         let p = self.non_ascii_p.as_mut().unwrap();
-        match p.parse(tokens) {
+        match p.parse(characters) {
             PResult::End => {
                 if let None = self.buffer {
                     self.buffer = Some(NonEol::default());
@@ -111,7 +114,7 @@ impl NonEolP {
                 return error_via(
                     &mut table,
                     &mut self.log(),
-                    &tokens,
+                    &characters,
                     "literal_value_p.rs.90.",
                 );
             }

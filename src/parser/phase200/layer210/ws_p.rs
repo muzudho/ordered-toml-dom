@@ -1,7 +1,10 @@
 //! White space syntax parser.  
 //! ホワイト・スペース構文パーサー。  
 
-use crate::model::{layer110::TokenType, layer210::WS};
+use crate::model::{
+    layer110::{CharacterType, Token, TokenType},
+    layer210::WS,
+};
 use crate::parser::phase200::layer210::{PResult, WSP};
 use crate::parser::phase200::LookAheadCharacters;
 
@@ -20,18 +23,19 @@ impl WSP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
-        match token0.type_ {
-            TokenType::Newline => return PResult::End,
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let character0 = characters.current.as_ref().unwrap();
+        match character0.type_ {
+            CharacterType::Newline => return PResult::End,
             _ => {
-                self.buffer.push_token(&token0);
+                self.buffer
+                    .push_token(&Token::from_character(character0, TokenType::WS));
             }
         }
         PResult::Ongoing

@@ -72,6 +72,8 @@ pub enum TokenType {
     /// 全角文字などいろいろ。  
     Unknown,
     LiteralValue,
+    /// White space.
+    WS,
 }
 
 /// A row of characters.  

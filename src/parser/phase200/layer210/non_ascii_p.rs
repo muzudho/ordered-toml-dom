@@ -1,7 +1,10 @@
 //! Non ascii parser.  
 //! 非ASCIIパーサー。  
 
-use crate::model::{layer110::TokenType, layer210::NonAscii};
+use crate::model::{
+    layer110::{Character, TokenType},
+    layer210::NonAscii,
+};
 use crate::parser::phase200::layer210::{NonAsciiP, PResult};
 use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
@@ -32,14 +35,14 @@ impl NonAsciiP {
     }
     /// # Arguments
     ///
-    /// * `token` - Token.  
+    /// * `character` - Token.  
     ///             トークン。  
     /// # Returns
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(token: &Token) -> Option<Judge> {
-        let unicode = token.to_string_chars_nth(0).unwrap() as u32;
+    pub fn judge(character: &Character) -> Option<Judge> {
+        let unicode = character.to_string_chars_nth(0).unwrap() as u32;
         match unicode {
             // non-ascii
             0x80..=0xD7FF | 0xE000..=0x10FFFF => Some(Judge::NonAscii),
@@ -65,10 +68,10 @@ impl NonAsciiP {
                     self.buffer = Some(NonAscii::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
-                let token0 = tokens.current.as_ref().unwrap();
-                m.push_token(&Token::from_base(token0, TokenType::NonAscii));
-                let token1 = tokens.current.as_ref().unwrap();
-                if let None = Self::judge(&token1) {
+                let character0 = tokens.current.as_ref().unwrap();
+                m.push_token(&Token::from_character(character0, TokenType::NonAscii));
+                let character1 = tokens.current.as_ref().unwrap();
+                if let None = Self::judge(&character1) {
                     return PResult::End;
                 }
             }

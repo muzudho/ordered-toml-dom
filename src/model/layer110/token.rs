@@ -1,7 +1,7 @@
 //! Token.  
 //! 字句。  
 
-use crate::model::layer110::{Token, TokenType};
+use crate::model::layer110::{Character, Token, TokenType};
 use std::fmt;
 
 impl Token {
@@ -16,6 +16,13 @@ impl Token {
         Token {
             column_number: token.column_number,
             value: token.value.to_string(),
+            type_: type_,
+        }
+    }
+    pub fn from_character(character: &Character, type_: TokenType) -> Self {
+        Token {
+            column_number: character.column_number,
+            value: character.value.to_string(),
             type_: type_,
         }
     }
