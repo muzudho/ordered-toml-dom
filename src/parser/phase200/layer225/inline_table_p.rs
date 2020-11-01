@@ -1,7 +1,7 @@
 //! Inline table syntax parser.  
 //! インライン・テーブル構文パーサー。  
 
-use crate::model::{layer110::TokenType, layer225::InlineTable};
+use crate::model::{layer110::CharacterType, layer225::InlineTable};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadCharacters;
@@ -47,17 +47,17 @@ impl InlineTableP {
     /// * `PResult` - Result.  
     ///               結果。
     pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+        let character0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `{`.
             State::First => {
-                match token0.type_ {
-                    TokenType::Wschar => {} // Ignore it.
+                match character0.type_ {
+                    CharacterType::Wschar => {} // Ignore it.
                     // `apple.banana`
-                    TokenType::Alpha
-                    | TokenType::Digit
-                    | TokenType::Hyphen
-                    | TokenType::Underscore => {
+                    CharacterType::Alpha
+                    | CharacterType::Digit
+                    | CharacterType::Hyphen
+                    | CharacterType::Underscore => {
                         self.keyval_p = Some(Box::new(KeyvalP::new()));
                         self.state = State::Keyval;
                         match self.keyval_p.as_mut().unwrap().parse(tokens) {
@@ -76,7 +76,7 @@ impl InlineTableP {
                             PResult::Ongoing => {}
                         }
                     }
-                    TokenType::RightCurlyBracket => {
+                    CharacterType::RightCurlyBracket => {
                         // Empty inline-table.
                         return PResult::End;
                     }
@@ -108,14 +108,14 @@ impl InlineTableP {
                 }
             }
             // After `banana = 3`.
-            State::AfterKeyval => match token0.type_ {
-                TokenType::Wschar => {} // Ignore it.
+            State::AfterKeyval => match character0.type_ {
+                CharacterType::Wschar => {} // Ignore it.
                 // `,`
-                TokenType::Comma => {
+                CharacterType::Comma => {
                     self.state = State::First;
                 }
                 // `}`
-                TokenType::RightCurlyBracket => {
+                CharacterType::RightCurlyBracket => {
                     return PResult::End;
                 }
                 _ => return error(&mut self.log(), &tokens, "inline_table.rs.96."),

@@ -1,7 +1,7 @@
 //! Key value syntax parser.  
 //! キー値構文パーサー。  
 
-use crate::model::{layer110::TokenType, layer225::Val};
+use crate::model::{layer110::CharacterType, layer225::Val};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadCharacters;
@@ -49,19 +49,19 @@ impl ValP {
 
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let character0 = characters.current.as_ref().unwrap();
         match self.state {
             // After {.
             State::AfterLeftCurlyBracket => {
                 let p = self.inline_table_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&characters) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::InlineTable(child_m));
@@ -69,11 +69,11 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "val.rs.68.");
+                            return error(&mut self.log(), &characters, "val.rs.68.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.72.")
+                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.72.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -81,7 +81,7 @@ impl ValP {
             // After [.
             State::AfterLeftSquareBracket => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&characters) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::Array(child_m));
@@ -89,11 +89,11 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "val.rs.88.");
+                            return error(&mut self.log(), &characters, "val.rs.88.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.92.")
+                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.92.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -101,7 +101,7 @@ impl ValP {
             // "abc"
             State::BasicString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&characters) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::BasicString(child_m));
@@ -109,47 +109,47 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "val.rs.108.");
+                            return error(&mut self.log(), &characters, "val.rs.108.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.112.")
+                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.112.")
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::First => {
-                match token0.type_ {
+                match character0.type_ {
                     // "
-                    TokenType::DoubleQuotation => {
+                    CharacterType::DoubleQuotation => {
                         self.basic_string_p = Some(BasicStringP::new());
                         self.state = State::BasicString;
                     }
                     // `{`.
-                    TokenType::LeftCurlyBracket => {
+                    CharacterType::LeftCurlyBracket => {
                         self.inline_table_p = Some(InlineTableP::default());
                         self.state = State::AfterLeftCurlyBracket;
                     }
                     // `[`.
-                    TokenType::LeftSquareBracket => {
+                    CharacterType::LeftSquareBracket => {
                         self.array_p = Some(ArrayP::default());
                         self.state = State::AfterLeftSquareBracket;
                     }
                     // `'`.
-                    TokenType::SingleQuotation => {
+                    CharacterType::SingleQuotation => {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                     }
-                    TokenType::Wschar => {} //Ignored it.
-                    TokenType::Alpha
-                    | TokenType::Digit
-                    | TokenType::Hyphen
-                    | TokenType::Underscore
+                    CharacterType::Wschar => {} //Ignored it.
+                    CharacterType::Alpha
+                    | CharacterType::Digit
+                    | CharacterType::Hyphen
+                    | CharacterType::Underscore
                     | _ => {
                         self.literal_value_p = Some(LiteralValueP::default());
                         self.state = State::LiteralValue;
                         let p = self.literal_value_p.as_mut().unwrap();
-                        match p.parse(&tokens) {
+                        match p.parse(&characters) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.buffer = Some(Val::LiteralValue(child_m));
@@ -157,14 +157,14 @@ impl ValP {
                                     self.state = State::End;
                                     return PResult::End;
                                 } else {
-                                    return error(&mut self.log(), &tokens, "val.rs.152.");
+                                    return error(&mut self.log(), &characters, "val.rs.152.");
                                 }
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &tokens,
+                                    &characters,
                                     "val.rs.156.",
                                 )
                             }
@@ -176,7 +176,7 @@ impl ValP {
             // `abc`.
             State::LiteralValue => {
                 let p = self.literal_value_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&characters) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::LiteralValue(child_m));
@@ -184,11 +184,11 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "val.rs.174.");
+                            return error(&mut self.log(), &characters, "val.rs.174.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.178.")
+                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.178.")
                     }
                     PResult::Ongoing => {}
                 }
@@ -196,7 +196,7 @@ impl ValP {
             // `'abc'`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&characters) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::LiteralString(child_m));
@@ -204,17 +204,17 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "val.rs.194.");
+                            return error(&mut self.log(), &characters, "val.rs.194.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "val.rs.198.")
+                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.198.")
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return error(&mut self.log(), &tokens, "val.rs.204.");
+                return error(&mut self.log(), &characters, "val.rs.204.");
             }
         }
         PResult::Ongoing

@@ -71,6 +71,7 @@ pub enum TokenType {
     /// Multi-byte character or more.  
     /// 全角文字などいろいろ。  
     Unknown,
+    LiteralValue,
 }
 
 /// A row of characters.  

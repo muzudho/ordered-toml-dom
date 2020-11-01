@@ -7,7 +7,7 @@
 //! // [ 1, 2, 3 ]
 //! ```
 
-use crate::model::{layer110::TokenType, layer210::LiteralValue, layer220::Array};
+use crate::model::{layer110::CharacterType, layer210::LiteralValue, layer220::Array};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadCharacters;
@@ -70,18 +70,18 @@ impl ArrayP {
     /// * `PResult` - Result.  
     ///               結果。
     pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+        let character0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `]`.
             State::AfterArray => {
-                match token0.type_ {
-                    TokenType::Wschar => {} // Ignore it.
+                match character0.type_ {
+                    CharacterType::Wschar => {} // Ignore it.
                     // ,
-                    TokenType::Comma => {
+                    CharacterType::Comma => {
                         self.state = State::AfterCommaBehindArray;
                     }
                     // ]
-                    TokenType::RightSquareBracket => {
+                    CharacterType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -90,15 +90,15 @@ impl ArrayP {
             }
             // After `[],`.
             State::AfterCommaBehindArray => {
-                match token0.type_ {
+                match character0.type_ {
                     // [
-                    TokenType::LeftSquareBracket => {
+                    CharacterType::LeftSquareBracket => {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
-                    TokenType::Wschar => {} // Ignore it.
+                    CharacterType::Wschar => {} // Ignore it.
                     // ]
-                    TokenType::RightSquareBracket => {
+                    CharacterType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -107,20 +107,20 @@ impl ArrayP {
             }
             // ", ` の次。
             State::AfterCommaBefindString => {
-                match token0.type_ {
+                match character0.type_ {
                     // "
-                    TokenType::DoubleQuotation => {
+                    CharacterType::DoubleQuotation => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
                     // '
-                    TokenType::SingleQuotation => {
+                    CharacterType::SingleQuotation => {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    TokenType::Wschar => {} // Ignore it.
+                    CharacterType::Wschar => {} // Ignore it.
                     // ]
-                    TokenType::RightSquareBracket => {
+                    CharacterType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -129,22 +129,22 @@ impl ArrayP {
             }
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
-                match token0.type_ {
-                    TokenType::Alpha
-                    | TokenType::Digit
-                    | TokenType::Hyphen
-                    | TokenType::Underscore => {
+                match character0.type_ {
+                    CharacterType::Alpha
+                    | CharacterType::Digit
+                    | CharacterType::Hyphen
+                    | CharacterType::Underscore => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralValue::from_token(token0));
+                        m.push_literal_string(&LiteralValue::from_character(character0));
                         self.state = State::LiteralValue;
                     }
-                    TokenType::Wschar => {} // Ignore it.
+                    CharacterType::Wschar => {} // Ignore it.
                     // `]`.
-                    TokenType::RightSquareBracket => {
+                    CharacterType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -153,12 +153,12 @@ impl ArrayP {
             }
             // After " or '.
             State::AfterString => {
-                match token0.type_ {
-                    TokenType::Wschar => {} // Ignore it.
-                    TokenType::Comma => {
+                match character0.type_ {
+                    CharacterType::Wschar => {} // Ignore it.
+                    CharacterType::Comma => {
                         self.state = State::AfterCommaBefindString;
                     }
-                    TokenType::RightSquareBracket => {
+                    CharacterType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -190,48 +190,48 @@ impl ArrayP {
             }
             // After `[`.
             State::First => {
-                match token0.type_ {
+                match character0.type_ {
                     // "
-                    TokenType::DoubleQuotation => {
+                    CharacterType::DoubleQuotation => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
-                    TokenType::Alpha
-                    | TokenType::Digit
-                    | TokenType::Hyphen
-                    | TokenType::Underscore => {
+                    CharacterType::Alpha
+                    | CharacterType::Digit
+                    | CharacterType::Hyphen
+                    | CharacterType::Underscore => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralValue::from_token(token0));
+                        m.push_literal_string(&LiteralValue::from_character(character0));
                         self.state = State::LiteralValue;
                     }
                     // `[`. Recursive.
-                    TokenType::LeftSquareBracket => {
+                    CharacterType::LeftSquareBracket => {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
                     // `]`. Empty array.
-                    TokenType::RightSquareBracket => {
+                    CharacterType::RightSquareBracket => {
                         self.state = State::End;
                         return PResult::End;
                     }
                     // '
-                    TokenType::SingleQuotation => {
+                    CharacterType::SingleQuotation => {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    TokenType::Wschar => {} // Ignore it.
+                    CharacterType::Wschar => {} // Ignore it.
                     _ => return error(&mut self.log(), &tokens, "array.rs.358."),
                 }
             }
-            State::LiteralValue => match token0.type_ {
-                TokenType::Comma => {
+            State::LiteralValue => match character0.type_ {
+                CharacterType::Comma => {
                     self.state = State::AfterCommaBehindLiteralValue;
                 }
-                TokenType::RightSquareBracket => {
+                CharacterType::RightSquareBracket => {
                     self.state = State::End;
                     return PResult::End;
                 }

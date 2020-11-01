@@ -7,7 +7,7 @@
 //! // key = val
 //! ```
 
-use crate::model::{layer110::TokenType, layer225::Keyval};
+use crate::model::{layer110::CharacterType, layer225::Keyval};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::LookAheadCharacters;
@@ -58,14 +58,14 @@ impl KeyvalP {
 
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `characters` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let token0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+        let character0 = characters.current.as_ref().unwrap();
         match self.state {
             // After `=`.
             State::AfterEquals => {
@@ -74,51 +74,51 @@ impl KeyvalP {
             }
             // After key.
             State::BeforeEqual => {
-                match token0.type_ {
-                    TokenType::Wschar => {} //Ignored it.
+                match character0.type_ {
+                    CharacterType::Wschar => {} //Ignored it.
                     // `=`.
-                    TokenType::Equals => {
+                    CharacterType::Equals => {
                         self.state = State::AfterEquals;
                     }
-                    _ => return error(&mut self.log(), &tokens, "keyval.rs.65."),
+                    _ => return error(&mut self.log(), &characters, "keyval.rs.65."),
                 }
             }
             State::First => {
-                match token0.type_ {
-                    TokenType::Wschar => {} //Ignored it.
-                    TokenType::Alpha
-                    | TokenType::Digit
-                    | TokenType::Hyphen
-                    | TokenType::Underscore => {
+                match character0.type_ {
+                    CharacterType::Wschar => {} //Ignored it.
+                    CharacterType::Alpha
+                    | CharacterType::Digit
+                    | CharacterType::Hyphen
+                    | CharacterType::Underscore => {
                         let p = self.key_p.as_mut().unwrap();
-                        match p.parse(&tokens) {
+                        match p.parse(&characters) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.key_buffer = Some(child_m);
                                     self.key_p = None;
                                     self.state = State::BeforeEqual;
                                 } else {
-                                    return error(&mut self.log(), &tokens, "keyval.rs.84.");
+                                    return error(&mut self.log(), &characters, "keyval.rs.84.");
                                 }
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &tokens,
+                                    &characters,
                                     "keyval.rs.84.",
                                 );
                             }
                             PResult::Ongoing => {}
                         }
                     }
-                    _ => return error(&mut self.log(), &tokens, "keyval.rs.65."),
+                    _ => return error(&mut self.log(), &characters, "keyval.rs.65."),
                 }
             }
             // After `=`.
             State::Val => {
                 let p = self.val_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(characters) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.val_buffer = Some(child_m);
@@ -126,16 +126,21 @@ impl KeyvalP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &tokens, "keyval.rs.84.");
+                            return error(&mut self.log(), &characters, "keyval.rs.84.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "keyval.rs.88.");
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &characters,
+                            "keyval.rs.88.",
+                        );
                     }
                     PResult::Ongoing => {}
                 }
             }
-            State::End => return error(&mut self.log(), &tokens, "keyval.rs.93."),
+            State::End => return error(&mut self.log(), &characters, "keyval.rs.93."),
         }
         PResult::Ongoing
     }

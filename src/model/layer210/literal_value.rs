@@ -7,7 +7,10 @@
 //! // work_number
 //! ```
 
-use crate::model::{layer110::Token, layer210::LiteralValue};
+use crate::model::{
+    layer110::{Character, Token, TokenType},
+    layer210::LiteralValue,
+};
 use std::fmt;
 
 impl Default for LiteralValue {
@@ -16,6 +19,15 @@ impl Default for LiteralValue {
     }
 }
 impl LiteralValue {
+    pub fn from_character(character: &Character) -> Self {
+        let mut m = LiteralValue::default();
+        m.tokens.push(Token::new(
+            character.column_number,
+            &character.value,
+            TokenType::LiteralValue,
+        ));
+        m
+    }
     pub fn from_token(token: &Token) -> Self {
         let mut m = LiteralValue::default();
         m.tokens.push(token.clone());
