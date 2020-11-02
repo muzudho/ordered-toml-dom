@@ -8,7 +8,7 @@
 //! ```
 
 use crate::model::{
-    layer110::{Character, Token, TokenType},
+    layer110::{Token, TokenType},
     layer210::LiteralValue,
 };
 use std::fmt;
@@ -19,10 +19,10 @@ impl Default for LiteralValue {
     }
 }
 impl LiteralValue {
-    pub fn from_character(character: &Character) -> Self {
+    pub fn from_character(chr: char) -> Self {
         let mut m = LiteralValue::default();
         m.tokens
-            .push(Token::from_character(&character, TokenType::LiteralValue));
+            .push(Token::from_character(chr, TokenType::LiteralValue));
         m
     }
     pub fn from_token(token: &Token) -> Self {

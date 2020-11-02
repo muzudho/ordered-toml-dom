@@ -1,13 +1,14 @@
 //! Comment syntax parser.  
 //! コメント構文パーサー。  
 
-use crate::model::layer110::{CharacterType, TokenType};
+use crate::model::layer110::TokenType;
 use crate::parser::phase200::Token;
 use crate::parser::phase200::{
     error,
     layer210::{DateTimeP, PResult},
 };
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -36,42 +37,42 @@ impl DateTimeP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::End => {
-                return error(&mut self.log(), &characters, "date_time_p.rs.50.");
+                return error(&mut self.log(), &look_ahead_items, "date_time_p.rs.50.");
             }
             State::FirstOfDate => {
-                let chr0 = characters.current.as_ref().unwrap();
-                let chr1 = characters.one_ahead.as_ref().unwrap();
-                match chr0.type_ {
+                let chr0 = look_ahead_items.get(0).unwrap();
+                let chr1 = look_ahead_items.get(1).unwrap();
+                match chr0 {
                     '\r' | '\t' => {
                         // println!("[trace59.]");
                         return PResult::End;
                     }
-                    CharacterType::Alpha => match chr0.to_string().as_str() {
+                    'A'..='Z' | 'a'..='z' => match chr0.to_string().as_str() {
                         "T" => {
                             // println!("[trace64.]");
                             self.buffer
-                                .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
+                                .push(Token::from_character(chr0, TokenType::DateTime));
                             self.state = State::End;
                         }
                         _ => {
                             // println!("[trace69.]");
-                            return error(&mut self.log(), &characters, "date_time_p.rs.63.");
+                            return error(&mut self.log(), &look_ahead_items, "date_time_p.rs.63.");
                         }
                     },
-                    '-' | CharacterType::Digit => {
+                    '-' | '0'..='9' => {
                         self.buffer
-                            .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
-                        match chr1.type_ {
-                            CharacterType::Alpha => match chr1.to_string().as_str() {
+                            .push(Token::from_character(chr0, TokenType::DateTime));
+                        match chr1 {
+                            'A'..='Z' | 'a'..='z' => match chr1.to_string().as_str() {
                                 "T" => {
                                     /*
                                     println!(
@@ -92,12 +93,12 @@ impl DateTimeP {
                                     */
                                     return error(
                                         &mut self.log(),
-                                        &characters,
+                                        &look_ahead_items,
                                         "date_time_p.rs.72.",
                                     );
                                 }
                             },
-                            '-' | CharacterType::Digit => {
+                            '-' | '0'..='9' => {
                                 // println!("[trace86={}]", chr0.to_string().as_str());
                             }
                             _ => {
@@ -108,24 +109,24 @@ impl DateTimeP {
                     }
                     _ => {
                         // println!("[trace95.]");
-                        return error(&mut self.log(), &characters, "date_time_p.rs.82.");
+                        return error(&mut self.log(), &look_ahead_items, "date_time_p.rs.82.");
                     }
                 }
                 PResult::Ongoing
             }
             State::FirstOfTime => {
-                let chr0 = characters.current.as_ref().unwrap();
-                let chr1 = characters.one_ahead.as_ref().unwrap();
-                match chr0.type_ {
+                let chr0 = look_ahead_items.get(0).unwrap();
+                let chr1 = look_ahead_items.get(1).unwrap();
+                match chr0 {
                     '\r' | '\t' => {
                         // println!("[trace114.]");
                         return PResult::End;
                     }
-                    ':' | CharacterType::Digit => {
+                    ':' | '0'..='9' => {
                         self.buffer
-                            .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
-                        match chr1.type_ {
-                            CharacterType::Alpha => match chr1.to_string().as_str() {
+                            .push(Token::from_character(chr0, TokenType::DateTime));
+                        match chr1 {
+                            'A'..='Z' | 'a'..='z' => match chr1.to_string().as_str() {
                                 "Z" => {
                                     /*
                                     println!(
@@ -146,7 +147,7 @@ impl DateTimeP {
                                     */
                                     return error(
                                         &mut self.log(),
-                                        &characters,
+                                        &look_ahead_items,
                                         "date_time_p.rs.72.",
                                     );
                                 }
@@ -171,7 +172,7 @@ impl DateTimeP {
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            ':' | CharacterType::Digit => {
+                            ':' | '0'..='9' => {
                                 /*
                                 println!(
                                     // "[trace156={}|{}]",
@@ -194,27 +195,27 @@ impl DateTimeP {
                     }
                     _ => {
                         self.buffer
-                            .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
+                            .push(Token::from_character(chr0, TokenType::DateTime));
                     }
                 }
                 PResult::Ongoing
             }
             State::LongitudeZero => {
-                let chr0 = characters.current.as_ref().unwrap();
+                let chr0 = look_ahead_items.get(0).unwrap();
                 self.buffer
-                    .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
+                    .push(Token::from_character(chr0, TokenType::DateTime));
                 self.state = State::End;
                 PResult::End
             }
             State::OffsetSign => {
-                let chr0 = characters.current.as_ref().unwrap();
-                let chr1 = characters.one_ahead.as_ref().unwrap();
-                match chr0.type_ {
-                    ':' | '-' | CharacterType::Digit | '+' => {
+                let chr0 = look_ahead_items.get(0).unwrap();
+                let chr1 = look_ahead_items.get(1).unwrap();
+                match chr0 {
+                    ':' | '-' | '0'..='9' | '+' => {
                         self.buffer
-                            .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
-                        match chr1.type_ {
-                            ':' | CharacterType::Digit => {
+                            .push(Token::from_character(chr0, TokenType::DateTime));
+                        match chr1 {
+                            ':' | '0'..='9' => {
                                 /*
                                 println!(
                                     // "[trace193={}|{}]",
@@ -243,19 +244,19 @@ impl DateTimeP {
                             chr1.to_string().as_str()
                         );
                         */
-                        return error(&mut self.log(), &characters, "date_time_p.rs.244.");
+                        return error(&mut self.log(), &look_ahead_items, "date_time_p.rs.244.");
                     }
                 }
                 PResult::Ongoing
             }
             State::FractionalSeconds => {
-                let chr0 = characters.current.as_ref().unwrap();
-                let chr1 = characters.one_ahead.as_ref().unwrap();
-                match chr0.type_ {
-                    '.' | CharacterType::Digit => {
+                let chr0 = look_ahead_items.get(0).unwrap();
+                let chr1 = look_ahead_items.get(1).unwrap();
+                match chr0 {
+                    '.' | '0'..='9' => {
                         self.buffer
-                            .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
-                        match chr1.type_ {
+                            .push(Token::from_character(chr0, TokenType::DateTime));
+                        match chr1 {
                             '-' | '+' => {
                                 // - or +.
                                 /*
@@ -267,7 +268,7 @@ impl DateTimeP {
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            '.' | CharacterType::Digit => {
+                            '.' | '0'..='9' => {
                                 /*
                                 println!(
                                     // "[trace237={}|{}]",
@@ -296,7 +297,7 @@ impl DateTimeP {
                             chr1.to_string().as_str()
                         );
                         */
-                        return error(&mut self.log(), &characters, "date_time_p.rs.244.");
+                        return error(&mut self.log(), &look_ahead_items, "date_time_p.rs.244.");
                     }
                 }
                 PResult::Ongoing

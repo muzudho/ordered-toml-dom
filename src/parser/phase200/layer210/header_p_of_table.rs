@@ -22,15 +22,15 @@ impl HeaderPOfTable {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
-        match chr0.type_ {
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
+        match chr0 {
             // `"`
             '"' => {
                 // End of syntax.

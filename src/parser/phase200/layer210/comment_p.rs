@@ -11,7 +11,6 @@ use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{non_eol_p::Judge as NonEolPJudge, NonEolP};
 use crate::parser::phase200::layer210::{CommentP, PResult};
 use crate::parser::phase200::Character;
-use crate::parser::phase200::LookAheadItems<char>;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
 
@@ -47,17 +46,15 @@ impl CommentP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge1(&self, character: &Character) -> Option<Judge> {
+    pub fn judge1(&self, chr: char) -> Option<Judge> {
         match self.state {
             State::End => None,
-            State::First => match character.type_ {
-                '#' => {
-                    Some(Judge::CommentStartSymbol(character.clone()))
-                }
-                _ => panic!("comment_p.rs.57. type={:?}", character.type_),
+            State::First => match chr {
+                '#' => Some(Judge::CommentStartSymbol(chr.clone())),
+                _ => panic!("comment_p.rs.57. chr={:?}", chr),
             },
             State::NonEol => {
-                if let Some(judge) = NonEolP::judge(character) {
+                if let Some(judge) = NonEolP::judge(chr) {
                     match judge {
                         NonEolPJudge::Ascii(ch)
                         | NonEolPJudge::HorizontalTab(ch)

@@ -26,17 +26,17 @@ impl PositionalNumeralStringP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let token0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let token0 = look_ahead_items.get(0).unwrap();
 
         match token0.type_ {
-            CharacterType::Alpha | CharacterType::Digit | '_' => {
+            'A'..='Z' | 'a'..='z' | '0'..='9' | '_' => {
                 let s = token0.to_string();
                 let expected_len = 1;
                 if s.len() != expected_len {
@@ -47,9 +47,9 @@ impl PositionalNumeralStringP {
                 self.string_buffer.push_str(&s);
 
                 // 次がHexの文字以外か？
-                let finished = if let Some(token1) = characters.one_ahead.as_ref() {
+                let finished = if let Some(token1) = look_ahead_items.one_ahead.as_ref() {
                     match token1.type_ {
-                        CharacterType::Alpha | CharacterType::Digit | '_' => {
+                        'A'..='Z' | 'a'..='z' | '0'..='9' | '_' => {
                             // 続行。
                             false
                         }
@@ -67,15 +67,14 @@ impl PositionalNumeralStringP {
                 {
                     /*
                     println!(
-                        // "[trace56={} self.expected_digits={} self.string_buffer.len()={} characters.one_ahead={}]",
+                        // "[trace56={} self.expected_digits={} self.string_buffer.len()={} look_ahead_items.one_ahead={}]",
                         self.string_buffer,
                         self.expected_digits,
                         self.string_buffer.len(),
-                        if let Some(token1) = characters.one_ahead.as_ref() {token1.to_string()}else{"".to_string()}
+                        if let Some(token1) = look_ahead_items.one_ahead.as_ref() {token1.to_string()}else{"".to_string()}
                     );
                     // */
                     self.buffer.push(Token::new(
-                        token0.column_number,
                         &self.string_buffer,
                         TokenType::SPPositionalNumeralString,
                     ));
@@ -85,7 +84,7 @@ impl PositionalNumeralStringP {
                 // １文字ずつだから、オーバーフローしないはず。
             }
             _ => {
-                return error(&mut self.log(), &characters, "hex_string_p.rs.179.");
+                return error(&mut self.log(), &look_ahead_items, "hex_string_p.rs.179.");
             }
         }
 

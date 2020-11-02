@@ -66,37 +66,37 @@ impl KeyvalSepP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::First => {
-                let chr0 = characters.current.as_ref().unwrap();
+                let chr0 = look_ahead_items.current.as_ref().unwrap();
                 if let Some(judge) = Self::judge(&chr0) {
                     match judge {
                         Judge::Ws => {
-                            return self.parse_ws1(characters);
+                            return self.parse_ws1(look_ahead_items);
                         }
                         Judge::Equals => {
                             self.state = State::Ws2;
                         }
                     }
                 } else {
-                    return error(&mut self.log(), &characters, "keyval_sep_p.rs.108.");
+                    return error(&mut self.log(), &look_ahead_items, "keyval_sep_p.rs.108.");
                 }
             }
             State::Ws1 => {
-                return self.parse_ws1(characters);
+                return self.parse_ws1(look_ahead_items);
             }
             State::Equals => {
-                return self.parse_equals(characters);
+                return self.parse_equals(look_ahead_items);
             }
             State::Ws2 => {
-                return self.parse_ws2(characters);
+                return self.parse_ws2(look_ahead_items);
             }
             State::End => {
                 return PResult::End;
@@ -105,53 +105,53 @@ impl KeyvalSepP {
         PResult::Ongoing
     }
 
-    fn parse_ws1(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    fn parse_ws1(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         self.ws1
             .push_token(&Token::from_character(chr0, TokenType::Ws));
 
         // 次のトークンを調べます。
-        let chr1 = characters.one_ahead.as_ref().unwrap();
+        let chr1 = look_ahead_items.one_ahead.as_ref().unwrap();
         if let Some(judge) = Self::judge(&chr1) {
             match judge {
                 Judge::Ws => self.state = State::Ws1,
                 Judge::Equals => self.state = State::Equals,
             }
         } else {
-            return error(&mut self.log(), &characters, "keyval_sep_p.rs.87.");
+            return error(&mut self.log(), &look_ahead_items, "keyval_sep_p.rs.87.");
         }
         PResult::Ongoing
     }
 
-    fn parse_equals(&mut self, characters: &LookAheadItems<char>) -> PResult {
+    fn parse_equals(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         // 次の文字を調べます。
-        let chr1 = characters.one_ahead.as_ref().unwrap();
+        let chr1 = look_ahead_items.get(1).unwrap();
         if let Some(judge) = Self::judge(&chr1) {
             match judge {
                 Judge::Ws => {
-                    return self.parse_ws2(characters);
+                    return self.parse_ws2(look_ahead_items);
                 }
                 Judge::Equals => {
-                    return error(&mut self.log(), &characters, "keyval_sep_p.rs.87.");
+                    return error(&mut self.log(), &look_ahead_items, "keyval_sep_p.rs.87.");
                 }
             }
         } else {
-            return error(&mut self.log(), &characters, "keyval_sep_p.rs.93.");
+            return error(&mut self.log(), &look_ahead_items, "keyval_sep_p.rs.93.");
         }
     }
 
-    fn parse_ws2(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    fn parse_ws2(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         self.ws2
             .push_token(&Token::from_character(chr0, TokenType::Ws));
 
         // 次のトークンを調べます。
-        let chr1 = characters.one_ahead.as_ref().unwrap();
+        let chr1 = look_ahead_items.one_ahead.as_ref().unwrap();
         if let Some(judge) = Self::judge(&chr1) {
             match judge {
                 Judge::Ws => self.state = State::Ws2,
                 Judge::Equals => {
-                    return error(&mut self.log(), &characters, "keyval_sep_p.rs.147.");
+                    return error(&mut self.log(), &look_ahead_items, "keyval_sep_p.rs.147.");
                 }
             }
             PResult::Ongoing

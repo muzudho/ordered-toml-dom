@@ -7,6 +7,7 @@ use crate::parser::phase200::layer210::WscharP;
 use crate::parser::phase200::layer210::{PResult, WsP};
 use crate::parser::phase200::Token;
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -43,11 +44,11 @@ impl WsP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(character: &Character) -> Option<Judge> {
-        if let Some(_judge) = WscharP::judge(character) {
+    pub fn judge(chr: char) -> Option<Judge> {
+        if let Some(_judge) = WscharP::judge(chr) {
             return Some(Judge::Wschar);
         }
-        let unicode = character.to_char() as u32;
+        let unicode = chr as u32;
         match unicode {
             0x09 | 0x20..=0x7F => Some(Judge::HorizontalTabAndAscii),
             _ => None,
@@ -55,42 +56,42 @@ impl WsP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;
             }
             State::First => {
                 // Horizon tab and Ascii code.
-                let chr0 = characters.current.as_ref().unwrap();
+                let chr0 = look_ahead_items.get(0).unwrap();
                 self.ws
                     .push_token(&Token::from_character(chr0, TokenType::Ws));
 
                 // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
-                let chr1 = characters.current.as_ref().unwrap();
-                if let None = Self::judge(&chr1) {
+                let chr1 = look_ahead_items.get(1).unwrap();
+                if let None = Self::judge(chr1) {
                     return PResult::End;
                 }
             }
             State::Wschar => {
-                return self.parse_wschar(characters);
+                return self.parse_wschar(look_ahead_items);
             }
         }
         PResult::Ongoing
     }
 
-    fn parse_wschar(&mut self, characters: &LookAheadItems<char>) -> PResult {
+    fn parse_wschar(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         if let None = self.wschar_p {
             self.wschar_p = Some(WscharP::new());
         }
         let p = self.wschar_p.as_mut().unwrap();
-        match p.parse(characters) {
+        match p.parse(look_ahead_items) {
             PResult::End => {
                 self.ws.extend_tokens(&p.flush().unwrap().tokens);
                 self.wschar_p = None;
@@ -101,7 +102,7 @@ impl WsP {
                 return error_via(
                     &mut table,
                     &mut self.log(),
-                    &characters,
+                    &look_ahead_items,
                     "literal_value_p.rs.90.",
                 );
             }

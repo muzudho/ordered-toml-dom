@@ -1,7 +1,7 @@
 //! Non ascii parser.  
 //! 非ASCIIパーサー。  
 
-use crate::model::{layer110::Character, layer210::NonAscii};
+use crate::model::layer210::NonAscii;
 use crate::parser::phase200::layer210::NonAsciiP;
 
 #[derive(Debug, Clone)]

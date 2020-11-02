@@ -1,54 +1,54 @@
-pub mod character;
-pub mod character_line;
 pub mod token;
 pub mod token_line;
 
-/// Character type.  
-/// 文字の種類。  
+/*
+/// Character type.
+/// 文字の種類。
 #[derive(Clone, Copy, Debug)]
 pub enum CharacterType {
-    /// Alphabet character. A ～ Z, a ～ z.  1 disit.  
+    /// Alphabet character. A ～ Z, a ～ z.  1 disit.
     Alpha,
-    /// \  
+    /// \
     Backslash,
-    /// :  
+    /// :
     Colon,
-    /// ,  
+    /// ,
     Comma,
-    /// #  
+    /// #
     CommentStartSymbol,
-    /// Numeral character. 0 ～ 9. 1 disit.  
+    /// Numeral character. 0 ～ 9. 1 disit.
     Digit,
-    /// .  
+    /// .
     Dot,
-    /// "  
+    /// "
     DoubleQuotation,
-    /// =  
+    /// =
     Equals,
     /// \t
     HorizontalTab,
-    /// -  
+    /// -
     Hyphen,
-    /// {  
+    /// {
     LeftCurlyBracket,
-    /// [  
+    /// [
     LeftSquareBracket,
     /// \r, \n, or combine.
     Newline,
-    /// +  
+    /// +
     Plus,
-    /// }  
+    /// }
     RightCurlyBracket,
-    /// ]  
+    /// ]
     RightSquareBracket,
-    /// '  
+    /// '
     SingleQuotation,
-    /// 半角スペース。  
+    /// 半角スペース。
     Space,
-    /// _  
+    /// _
     Underscore,
     NonAscii,
 }
+*/
 
 /// Token type.  
 /// トークンの種類。  
@@ -86,13 +86,6 @@ pub enum TokenType {
     Wschar,
 }
 
-/// A row of characters.  
-/// 一列の字。  
-pub struct CharacterLine {
-    pub row_number: usize,
-    pub characters: Vec<char>,
-}
-
 /// A row of tokens.  
 /// 一列のトークン。  
 pub struct TokenLine {
@@ -104,7 +97,6 @@ pub struct TokenLine {
 /// 字句。  
 #[derive(Clone)]
 pub struct Token {
-    pub column_number: usize,
     pub value: String,
     pub type_: TokenType,
 }

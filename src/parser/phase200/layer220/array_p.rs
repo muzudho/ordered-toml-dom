@@ -15,6 +15,7 @@ use crate::parser::phase200::{
     layer220::ArrayP,
 };
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 /// Array syntax machine state.  
 /// 配列構文状態遷移。  
@@ -62,14 +63,14 @@ impl ArrayP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadItems<char>) -> PResult {
-        let chr0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             // After `]`.
             State::AfterArray => {
@@ -84,12 +85,12 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), &tokens, "array.rs.93."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "array.rs.93."),
                 }
             }
             // After `[],`.
             State::AfterCommaBehindArray => {
-                match chr0.type_ {
+                match chr0 {
                     // [
                     '[' => {
                         self.array_p = Some(Box::new(ArrayP::default()));
@@ -101,12 +102,12 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), &tokens, "array.rs.130."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "array.rs.130."),
                 }
             }
             // ", ` の次。
             State::AfterCommaBefindString => {
-                match chr0.type_ {
+                match chr0 {
                     // "
                     '"' => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
@@ -123,13 +124,13 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), &tokens, "array.rs.176."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "array.rs.176."),
                 }
             }
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
-                match chr0.type_ {
-                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
+                match chr0 {
+                    'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
@@ -144,12 +145,12 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), &tokens, "array.rs.218."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "array.rs.218."),
                 }
             }
             // After " or '.
             State::AfterString => {
-                match chr0.type_ {
+                match chr0 {
                     '\t' | ' ' => {} // Ignore it.
                     ',' => {
                         self.state = State::AfterCommaBefindString;
@@ -158,13 +159,13 @@ impl ArrayP {
                         self.state = State::End;
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), &tokens, "array.rs.245."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "array.rs.245."),
                 }
             }
             // `[array]`.
             State::Array => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -179,20 +180,25 @@ impl ArrayP {
                         self.state = State::AfterArray;
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "array.rs.283.");
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "array.rs.283.",
+                        );
                     }
                     PResult::Ongoing => {}
                 }
             }
             // After `[`.
             State::First => {
-                match chr0.type_ {
+                match chr0 {
                     // "
                     '"' => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
-                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
+                    'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
@@ -217,10 +223,10 @@ impl ArrayP {
                         self.state = State::LiteralString;
                     }
                     '\t' | ' ' => {} // Ignore it.
-                    _ => return error(&mut self.log(), &tokens, "array.rs.358."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "array.rs.358."),
                 }
             }
-            State::LiteralValue => match chr0.type_ {
+            State::LiteralValue => match chr0 {
                 ',' => {
                     self.state = State::AfterCommaBehindLiteralValue;
                 }
@@ -228,12 +234,12 @@ impl ArrayP {
                     self.state = State::End;
                     return PResult::End;
                 }
-                _ => return error(&mut self.log(), &tokens, "array.rs.383."),
+                _ => return error(&mut self.log(), &look_ahead_items, "array.rs.383."),
             },
             // "dog".
             State::DoubleQuotedString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -244,22 +250,27 @@ impl ArrayP {
                             self.basic_string_p = None;
                             self.state = State::AfterString;
                         } else {
-                            return error(&mut self.log(), &tokens, "array.rs.439.");
+                            return error(&mut self.log(), &look_ahead_items, "array.rs.439.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "array.rs.448.");
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "array.rs.448.",
+                        );
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return error(&mut self.log(), &tokens, "array.rs.466.");
+                return error(&mut self.log(), &look_ahead_items, "array.rs.466.");
             }
             // `'C:\temp'`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(&tokens) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             if let None = self.buffer {
@@ -270,11 +281,16 @@ impl ArrayP {
                             self.literal_string_p = None;
                             self.state = State::AfterString;
                         } else {
-                            return error(&mut self.log(), &tokens, "array.rs.493.");
+                            return error(&mut self.log(), &look_ahead_items, "array.rs.493.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &tokens, "array.rs.502.");
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "array.rs.502.",
+                        );
                     }
                     PResult::Ongoing => {}
                 }

@@ -1,7 +1,7 @@
 //! Inline table syntax parser.  
 //! インライン・テーブル構文パーサー。  
 
-use crate::model::{layer110::CharacterType, layer225::InlineTable};
+use crate::model::layer225::InlineTable;
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::{
@@ -9,6 +9,7 @@ use crate::parser::phase200::{
     layer225::{InlineTableP, KeyvalP},
 };
 use casual_logger::Table as LogTable;
+use look_ahead_items::LookAheadItems;
 
 /// Inline table syntax machine state.  
 /// インライン・テーブル構文状態遷移。  
@@ -39,33 +40,37 @@ impl InlineTableP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadItems<char>) -> PResult {
-        let chr0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             // After `{`.
             State::First => {
                 match chr0.type_ {
                     '\t' | ' ' => {} // Ignore it.
                     // `apple.banana`
-                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
+                    'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => {
                         self.keyval_p = Some(Box::new(KeyvalP::new()));
                         self.state = State::Keyval;
-                        match self.keyval_p.as_mut().unwrap().parse(tokens) {
+                        match self.keyval_p.as_mut().unwrap().parse(look_ahead_items) {
                             PResult::End => {
                                 // 1トークンでは終わらないから。
-                                return error(&mut self.log(), &tokens, "inline_table.rs.64.");
+                                return error(
+                                    &mut self.log(),
+                                    &look_ahead_items,
+                                    "inline_table.rs.64.",
+                                );
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &tokens,
+                                    &look_ahead_items,
                                     "inline_table.rs.71.",
                                 )
                             }
@@ -76,27 +81,31 @@ impl InlineTableP {
                         // Empty inline-table.
                         return PResult::End;
                     }
-                    _ => return error(&mut self.log(), &tokens, "inline_table.rs.63."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "inline_table.rs.63."),
                 }
             }
             // `apple.banana`.
             State::Keyval => {
                 let p = self.keyval_p.as_mut().unwrap();
-                match p.parse(tokens) {
+                match p.parse(look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer.as_mut().unwrap().push_keyval(&child_m);
                             self.keyval_p = None;
                             self.state = State::AfterKeyval;
                         } else {
-                            return error(&mut self.log(), &tokens, "inline_table.rs.76.");
+                            return error(
+                                &mut self.log(),
+                                &look_ahead_items,
+                                "inline_table.rs.76.",
+                            );
                         }
                     }
                     PResult::Err(mut table) => {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &tokens,
+                            &look_ahead_items,
                             "inline_table.rs.80.",
                         )
                     }
@@ -114,7 +123,7 @@ impl InlineTableP {
                 '}' => {
                     return PResult::End;
                 }
-                _ => return error(&mut self.log(), &tokens, "inline_table.rs.96."),
+                _ => return error(&mut self.log(), &look_ahead_items, "inline_table.rs.96."),
             },
         }
         PResult::Ongoing

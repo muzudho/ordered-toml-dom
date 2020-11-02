@@ -3,7 +3,7 @@
 
 use crate::model::layer110::token::tokens_stringify;
 use crate::model::{
-    layer110::{CharacterType, Token, TokenType},
+    layer110::{Token, TokenType},
     layer210::LiteralValue,
 };
 use crate::parser::phase200::error;
@@ -49,26 +49,22 @@ impl LiteralValueP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             State::DateTime => {
                 let p = self.date_time_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         let string_buffer = tokens_stringify(&p.flush());
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::new(
-                            chr0.column_number,
-                            &string_buffer,
-                            TokenType::SPDateTimeString,
-                        ));
+                        m.push_token(&Token::new(&string_buffer, TokenType::SPDateTimeString));
                         self.date_time_p = None;
                         self.state = State::End;
                         return PResult::End;
@@ -77,7 +73,7 @@ impl LiteralValueP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "literal_value_p.rs.90.",
                         );
                     }
@@ -85,7 +81,7 @@ impl LiteralValueP {
                 }
             }
             State::End => {
-                return error(&mut self.log(), &characters, "literal_value.rs.57.");
+                return error(&mut self.log(), &look_ahead_items, "literal_value.rs.57.");
             }
             State::First => {
                 // println!("[trace61 chr0.type_={:?}]", &chr0.type_);
@@ -95,8 +91,8 @@ impl LiteralValueP {
                 let mut is_date = true;
                 let mut is_time = true;
                 // `??n??`.
-                if let Some(token2) = characters.two_ahead.as_ref() {
-                    if let Some(ch2) = token2.to_string().chars().nth(0) {
+                if let Some(chr2_ahead) = look_ahead_items.get(2).as_ref() {
+                    if let Some(ch2) = chr2_ahead.to_string().chars().nth(0) {
                         match ch2 {
                             '0'..='9' => {
                                 is_time = false;
@@ -116,8 +112,8 @@ impl LiteralValueP {
                 }
                 if is_date {
                     // `??n?-`.
-                    if let Some(token4) = characters.four_ahead.as_ref() {
-                        if let Some(ch4) = token4.to_string().chars().nth(0) {
+                    if let Some(chr4_ahead) = look_ahead_items.get(4).as_ref() {
+                        if let Some(ch4) = chr4_ahead.to_string().chars().nth(0) {
                             if ch4 != '-' {
                                 is_date = false;
                             }
@@ -125,8 +121,8 @@ impl LiteralValueP {
                     }
                     // `??nn-`.
                     if is_date {
-                        if let Some(token3) = characters.three_ahead.as_ref() {
-                            if let Some(ch3) = token3.to_string().chars().nth(0) {
+                        if let Some(chr3_ahead) = look_ahead_items.get(3).as_ref() {
+                            if let Some(ch3) = chr3_ahead.to_string().chars().nth(0) {
                                 match ch3 {
                                     '0'..='9' => {}
                                     _ => {
@@ -138,8 +134,8 @@ impl LiteralValueP {
                     }
                     // `?nnn-`.
                     if is_date {
-                        if let Some(token1) = characters.one_ahead.as_ref() {
-                            if let Some(ch1) = token1.to_string().chars().nth(0) {
+                        if let Some(chr1_ahead) = look_ahead_items.get(1).as_ref() {
+                            if let Some(ch1) = chr1_ahead.to_string().chars().nth(0) {
                                 match ch1 {
                                     '0'..='9' => {}
                                     _ => {
@@ -161,11 +157,11 @@ impl LiteralValueP {
                                         Some(DateTimeP::new(DateTimeState::FirstOfDate));
 
                                     let p = self.date_time_p.as_mut().unwrap();
-                                    match p.parse(&characters) {
+                                    match p.parse(&look_ahead_items) {
                                         PResult::End => {
                                             return error(
                                                 &mut self.log(),
-                                                &characters,
+                                                &look_ahead_items,
                                                 "literal_value_p.rs.170.",
                                             );
                                         }
@@ -173,7 +169,7 @@ impl LiteralValueP {
                                             return error_via(
                                                 &mut table,
                                                 &mut self.log(),
-                                                &characters,
+                                                &look_ahead_items,
                                                 "literal_value_p.rs.178.",
                                             );
                                         }
@@ -189,8 +185,8 @@ impl LiteralValueP {
                 } else if is_time {
                     // `?n:`.
                     if is_time {
-                        if let Some(token1) = characters.one_ahead.as_ref() {
-                            if let Some(ch1) = token1.to_string().chars().nth(0) {
+                        if let Some(chr1_ahead) = look_ahead_items.get(1).as_ref() {
+                            if let Some(ch1) = chr1_ahead.to_string().chars().nth(0) {
                                 match ch1 {
                                     '0'..='9' => {}
                                     _ => {
@@ -212,11 +208,11 @@ impl LiteralValueP {
                                         Some(DateTimeP::new(DateTimeState::FirstOfTime));
 
                                     let p = self.date_time_p.as_mut().unwrap();
-                                    match p.parse(&characters) {
+                                    match p.parse(&look_ahead_items) {
                                         PResult::End => {
                                             return error(
                                                 &mut self.log(),
-                                                &characters,
+                                                &look_ahead_items,
                                                 "literal_value_p.rs.222.",
                                             );
                                         }
@@ -224,7 +220,7 @@ impl LiteralValueP {
                                             return error_via(
                                                 &mut table,
                                                 &mut self.log(),
-                                                &characters,
+                                                &look_ahead_items,
                                                 "literal_value_p.rs.230.",
                                             );
                                         }
@@ -243,18 +239,18 @@ impl LiteralValueP {
                     PResult::Ongoing
                 } else {
                     let base_number = match chr0.type_ {
-                        CharacterType::Alpha | ':' | '.' | '-' | '+' | '_' => 10,
-                        CharacterType::Digit => {
+                        'A'..='Z' | 'a'..='z' | ':' | '.' | '-' | '+' | '_' => 10,
+                        '0'..='9' => {
                             if let Some(ch0) = chr0.to_string().chars().nth(0) {
                                 // println!("[trace82 ch0={}]", ch0);
                                 if ch0 == '0' {
                                     // 0x ?
                                     // Look-ahead.
                                     // 先読み。
-                                    if let Some(token1) = characters.one_ahead.as_ref() {
-                                        match token1.type_ {
-                                            CharacterType::Alpha => {
-                                                match token1.to_string().as_str() {
+                                    if let Some(chr1_ahead) = look_ahead_items.get(1).as_ref() {
+                                        match chr1_ahead.type_ {
+                                            'A'..='Z' | 'a'..='z' => {
+                                                match chr1_ahead.to_string().as_str() {
                                                     "b" => 2,
                                                     "o" => 8,
                                                     "x" => 16,
@@ -273,7 +269,13 @@ impl LiteralValueP {
                                 10
                             }
                         }
-                        _ => return error(&mut self.log(), &characters, "literal_value_p.rs.38."),
+                        _ => {
+                            return error(
+                                &mut self.log(),
+                                &look_ahead_items,
+                                "literal_value_p.rs.38.",
+                            )
+                        }
                     };
 
                     match base_number {
@@ -302,13 +304,14 @@ impl LiteralValueP {
                             m.push_token(&Token::from_character(&chr0, TokenType::LiteralValue));
                             // Look-ahead.
                             // 先読み。
-                            if let Some(token1) = &characters.one_ahead {
-                                match token1.type_ {
-                                    CharacterType::Alpha
+                            if let Some(chr1_ahead) = &look_ahead_items.get(1) {
+                                match chr1_ahead {
+                                    'A'..='Z'
+                                    | 'a'..='z'
                                     | ':'
                                     | '.'
                                     | '-'
-                                    | CharacterType::Digit
+                                    | '0'..='9'
                                     | '+'
                                     | '_' => {
                                         self.state = State::Second;
@@ -334,15 +337,11 @@ impl LiteralValueP {
                 m.push_token(&Token::from_character(&chr0, TokenType::LiteralValue));
                 // Look-ahead.
                 // 先読み。
-                if let Some(token1) = &characters.one_ahead {
-                    match token1.type_ {
-                        CharacterType::Alpha
-                        | ':'
-                        | '.'
-                        | '-'
-                        | CharacterType::Digit
-                        | '+'
-                        | '_' => PResult::Ongoing,
+                if let Some(chr1_ahead) = &look_ahead_items.get(1) {
+                    match chr1_ahead {
+                        'A'..='Z' | 'a'..='z' | ':' | '.' | '-' | '0'..='9' | '+' | '_' => {
+                            PResult::Ongoing
+                        }
                         _ => {
                             self.state = State::End;
                             PResult::End
@@ -365,7 +364,7 @@ impl LiteralValueP {
             State::ZeroXString => {
                 // println!("[trace164={}]", chr0);
                 let p = self.positional_numeral_string_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
@@ -377,7 +376,6 @@ impl LiteralValueP {
 
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
-                            chr0.column_number,
                             &numeral_string,
                             TokenType::SPPositionalNumeralString,
                         ));
@@ -393,7 +391,7 @@ impl LiteralValueP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "literal_value_p.rs.173.",
                         );
                     }

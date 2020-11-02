@@ -1,7 +1,7 @@
 //! Key value syntax parser.  
 //! キー値構文パーサー。  
 
-use crate::model::{layer110::CharacterType, layer225::Val};
+use crate::model::layer225::Val;
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::{
@@ -49,19 +49,19 @@ impl ValP {
 
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             // After {.
             State::AfterLeftCurlyBracket => {
                 let p = self.inline_table_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::InlineTable(child_m));
@@ -69,11 +69,16 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &characters, "val.rs.68.");
+                            return error(&mut self.log(), &look_ahead_items, "val.rs.68.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.72.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "val.rs.72.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
@@ -81,7 +86,7 @@ impl ValP {
             // After [.
             State::AfterLeftSquareBracket => {
                 let p = self.array_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::Array(child_m));
@@ -89,11 +94,16 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &characters, "val.rs.88.");
+                            return error(&mut self.log(), &look_ahead_items, "val.rs.88.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.92.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "val.rs.92.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
@@ -101,7 +111,7 @@ impl ValP {
             // "abc"
             State::BasicString => {
                 let p = self.basic_string_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::BasicString(child_m));
@@ -109,11 +119,16 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &characters, "val.rs.108.");
+                            return error(&mut self.log(), &look_ahead_items, "val.rs.108.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.112.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "val.rs.112.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
@@ -141,11 +156,11 @@ impl ValP {
                         self.state = State::LiteralString;
                     }
                     '\t' | ' ' => {} //Ignored it.
-                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' | _ => {
+                    'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | _ => {
                         self.literal_value_p = Some(LiteralValueP::default());
                         self.state = State::LiteralValue;
                         let p = self.literal_value_p.as_mut().unwrap();
-                        match p.parse(&characters) {
+                        match p.parse(&look_ahead_items) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.buffer = Some(Val::LiteralValue(child_m));
@@ -153,14 +168,18 @@ impl ValP {
                                     self.state = State::End;
                                     return PResult::End;
                                 } else {
-                                    return error(&mut self.log(), &characters, "val.rs.152.");
+                                    return error(
+                                        &mut self.log(),
+                                        &look_ahead_items,
+                                        "val.rs.152.",
+                                    );
                                 }
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "val.rs.156.",
                                 )
                             }
@@ -172,7 +191,7 @@ impl ValP {
             // `abc`.
             State::LiteralValue => {
                 let p = self.literal_value_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::LiteralValue(child_m));
@@ -180,11 +199,16 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &characters, "val.rs.174.");
+                            return error(&mut self.log(), &look_ahead_items, "val.rs.174.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.178.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "val.rs.178.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
@@ -192,7 +216,7 @@ impl ValP {
             // `'abc'`.
             State::LiteralString => {
                 let p = self.literal_string_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.buffer = Some(Val::LiteralString(child_m));
@@ -200,17 +224,22 @@ impl ValP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &characters, "val.rs.194.");
+                            return error(&mut self.log(), &look_ahead_items, "val.rs.194.");
                         }
                     }
                     PResult::Err(mut table) => {
-                        return error_via(&mut table, &mut self.log(), &characters, "val.rs.198.")
+                        return error_via(
+                            &mut table,
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "val.rs.198.",
+                        )
                     }
                     PResult::Ongoing => {}
                 }
             }
             State::End => {
-                return error(&mut self.log(), &characters, "val.rs.204.");
+                return error(&mut self.log(), &look_ahead_items, "val.rs.204.");
             }
         }
         PResult::Ongoing

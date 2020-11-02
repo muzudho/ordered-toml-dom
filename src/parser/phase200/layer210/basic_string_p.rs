@@ -11,7 +11,7 @@
 //! ```
 
 use crate::model::{
-    layer110::{CharacterType, Token, TokenType},
+    layer110::{Token, TokenType},
     layer210::BasicString,
 };
 use crate::parser::phase200::error;
@@ -59,30 +59,30 @@ impl BasicStringP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             State::BeforeMultiLine => {
                 // print!("trace.8.");
                 self.state = State::MultiLine;
             }
             State::End => {
-                return error(&mut self.log(), characters, "basic_string_p.rs.66.");
+                return error(&mut self.log(), look_ahead_items, "basic_string_p.rs.66.");
             }
             State::First => {
                 // print!("trace.4.");
-                match chr0.type_ {
+                match chr0 {
                     // `"`
                     '"' => {
                         // print!("trace.5.");
-                        if let Some(token_1_ahead) = &characters.one_ahead {
-                            match token_1_ahead.type_ {
+                        if let Some(chr1_ahead) = &look_ahead_items.get(1) {
+                            match chr1_ahead {
                                 '"' => {
                                     //print!("trace.7.");
                                     // Before triple double quoted string.
@@ -96,17 +96,26 @@ impl BasicStringP {
                                 }
                             }
                         } else {
-                            return error(&mut self.log(), &characters, "basic_string_p.rs.112.");
+                            return error(
+                                &mut self.log(),
+                                &look_ahead_items,
+                                "basic_string_p.rs.112.",
+                            );
                         }
                     }
                     // \
                     '\\' => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
-                        match self.escape_sequence_p.as_mut().unwrap().parse(characters) {
+                        match self
+                            .escape_sequence_p
+                            .as_mut()
+                            .unwrap()
+                            .parse(look_ahead_items)
+                        {
                             PResult::End => {
                                 return error(
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "basic_string_p.rs.108.",
                                 );
                             }
@@ -114,7 +123,7 @@ impl BasicStringP {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "basic_string_p.rs.115.",
                                 );
                             }
@@ -125,27 +134,32 @@ impl BasicStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(chr0, TokenType::BasicString));
                         self.state = State::SingleLine;
                     }
                 }
             }
             State::MultiLine => {
-                match chr0.type_ {
+                match chr0 {
                     // "
                     '"' => {
                         // print!("trace.10.");
-                        if check_triple_double_quotation(characters) {
+                        if check_triple_double_quotation(look_ahead_items) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
+                            m.push_token(&Token::from_character(chr, TokenType::BasicString));
                         }
                     }
                     // \
                     '\\' => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
-                        match self.escape_sequence_p.as_mut().unwrap().parse(characters) {
+                        match self
+                            .escape_sequence_p
+                            .as_mut()
+                            .unwrap()
+                            .parse(look_ahead_items)
+                        {
                             PResult::End => {
                                 // 行末の \ だったなら。
                                 // println!("[trace200 行末の \\ だったなら。]");
@@ -155,7 +169,7 @@ impl BasicStringP {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "basic_string_p.rs.139.",
                                 );
                             }
@@ -167,23 +181,23 @@ impl BasicStringP {
                     _ => {
                         // print!("trace.12.");
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(chr, TokenType::BasicString));
                     }
                 }
             }
             State::MultiLineEnd1 => {
-                match chr0.type_ {
+                match chr0 {
                     // `"`
                     '"' => {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
-                        return error(&mut self.log(), &characters, "basic_string_p.rs.124.");
+                        return error(&mut self.log(), &look_ahead_items, "basic_string_p.rs.124.");
                     }
                 }
             }
             State::MultiLineEnd2 => {
-                match chr0.type_ {
+                match chr0 {
                     // `"`
                     '"' => {
                         // End of syntax.
@@ -192,13 +206,13 @@ impl BasicStringP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), &characters, "basic_string_p.rs.136.");
+                        return error(&mut self.log(), &look_ahead_items, "basic_string_p.rs.136.");
                     }
                 }
             }
             State::MultiLineEscapeSequence => {
                 let p = self.escape_sequence_p.as_mut().unwrap();
-                match p.parse(characters) {
+                match p.parse(look_ahead_items) {
                     PResult::End => {
                         self.buffer.as_mut().unwrap().extend_tokens(&p.flush());
                         self.escape_sequence_p = None;
@@ -208,7 +222,7 @@ impl BasicStringP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "basic_string_p.rs.190.",
                         );
                     }
@@ -217,7 +231,7 @@ impl BasicStringP {
             }
             State::MultiLineTrimStart => {
                 // println!("[trace307 MultiLineTrimStart]");
-                match chr0.type_ {
+                match chr0 {
                     '\r' | '\t' => {
                         // println!("[trace312 Newline]");
                     } // Ignore it.
@@ -226,26 +240,26 @@ impl BasicStringP {
                     } // Ignore it.
                     // "
                     '"' => {
-                        if check_triple_double_quotation(characters) {
+                        if check_triple_double_quotation(look_ahead_items) {
                             // println!("[trace309 check_triple_double_quotation]");
                             self.state = State::MultiLineEnd1;
                         } else {
                             // println!("[trace310 DoubleQuotation]");
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
+                            m.push_token(&Token::from_character(chr, TokenType::BasicString));
                             self.state = State::MultiLine; // (2020-10-18追加)
                         }
                     }
                     _ => {
                         // println!("[trace311 Otherwise={:?}]", chr0);
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(chr, TokenType::BasicString));
                         self.state = State::MultiLine;
                     }
                 }
             }
             State::SingleLine => {
-                match chr0.type_ {
+                match chr0 {
                     // `"`
                     '"' => {
                         // End of syntax.
@@ -256,11 +270,16 @@ impl BasicStringP {
                     // \
                     '\\' => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
-                        match self.escape_sequence_p.as_mut().unwrap().parse(characters) {
+                        match self
+                            .escape_sequence_p
+                            .as_mut()
+                            .unwrap()
+                            .parse(look_ahead_items)
+                        {
                             PResult::End => {
                                 return error(
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "basic_string_p.rs.252.",
                                 );
                             }
@@ -268,7 +287,7 @@ impl BasicStringP {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "basic_string_p.rs.139.",
                                 );
                             }
@@ -279,13 +298,13 @@ impl BasicStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(chr, TokenType::BasicString));
                     }
                 }
             }
             State::SingleLineEscapeSequence => {
                 let p = self.escape_sequence_p.as_mut().unwrap();
-                match p.parse(characters) {
+                match p.parse(look_ahead_items) {
                     PResult::End => {
                         self.buffer.as_mut().unwrap().extend_tokens(&p.flush());
                         self.escape_sequence_p = None;
@@ -295,7 +314,7 @@ impl BasicStringP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "basic_string_p.rs.190.",
                         );
                     }
@@ -320,18 +339,18 @@ impl BasicStringP {
 
 /// # Arguments
 ///
-/// * `characters` - Tokens contains look ahead.  
+/// * `look_ahead_items` - Tokens contains look ahead.  
 ///             先読みを含むトークン。  
 /// # Returns
 ///
 /// It's triple double quotation.  
 /// ３連一重引用符。  
-fn check_triple_double_quotation(characters: &LookAheadItems<char>) -> bool {
-    if let Some(token_2_ahead) = &characters.two_ahead {
-        match token_2_ahead.type_ {
+fn check_triple_double_quotation(look_ahead_items: &LookAheadItems<char>) -> bool {
+    if let Some(chr2_ahead) = &look_ahead_items.get(2) {
+        match chr2_ahead {
             '"' => {
-                if let Some(token_1_ahead) = &characters.one_ahead {
-                    match token_1_ahead.type_ {
+                if let Some(chr1_ahead) = &look_ahead_items.get(1) {
+                    match chr1_ahead {
                         '"' => {
                             // Triple double quote.
                             true

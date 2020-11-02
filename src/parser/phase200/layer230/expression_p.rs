@@ -3,7 +3,7 @@
 
 use crate::model::layer210::Comment;
 use crate::model::layer210::Ws;
-use crate::model::{layer110::CharacterType, layer230::Expression};
+use crate::model::layer230::Expression;
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer230::WsP;
@@ -145,7 +145,7 @@ impl ExpressionP {
                     return PResult::End;
                 }
                 // `abc`
-                CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
+                'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => {
                     self.keyval_p = Some(KeyvalP::new());
                     match self.keyval_p.as_mut().unwrap().parse(&look_ahead_items) {
                         PResult::End => {
@@ -173,7 +173,7 @@ impl ExpressionP {
                     self.comment_p = Some(CommentP::new());
 
                     let p = self.comment_p.as_mut().unwrap();
-                    let judge = p.judge1(&chr0);
+                    let judge = p.judge1(chr0);
                     if let Some(judge) = judge {
                         p.commit1(&judge);
                         match p.forward1(&look_ahead_items) {
@@ -232,7 +232,7 @@ impl ExpressionP {
             },
             State::Ws1Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                let judge = p.judge1(&chr0);
+                let judge = p.judge1(chr0);
                 if let Some(judge) = judge {
                     p.commit1(&judge);
                     match p.forward1(&look_ahead_items) {

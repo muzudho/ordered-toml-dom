@@ -1,7 +1,6 @@
 //! Document syntax parser.  
 //! ドキュメント構文解析器。  
 
-use crate::model::layer110::CharacterLine;
 use crate::model::{layer110::TokenLine, layer310::TomlDocument};
 use crate::parser::phase200::{
     error_via,

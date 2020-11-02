@@ -1,17 +1,14 @@
 //! Non ascii model.  
 //! 非アスキー・モデル。  
 
-use crate::model::layer110::Character;
 use crate::model::layer210::NonAscii;
 use std::fmt;
 
 impl NonAscii {
-    pub fn new(character: &Character) -> Self {
-        NonAscii {
-            character: character.clone(),
-        }
+    pub fn new(chr: char) -> Self {
+        NonAscii { character: chr }
     }
-    pub fn get_character(&self) -> Character {
+    pub fn get_character(&self) -> char {
         self.character.clone()
     }
     pub fn to_debug_string(&self) -> String {

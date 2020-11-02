@@ -7,7 +7,7 @@
 //! // key = val
 //! ```
 
-use crate::model::{layer110::CharacterType, layer225::Keyval};
+use crate::model::layer225::Keyval;
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::{
@@ -15,6 +15,7 @@ use crate::parser::phase200::{
     layer225::{KeyvalP, ValP},
 };
 use casual_logger::Table as LogTable;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -57,14 +58,14 @@ impl KeyvalP {
 
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             // After `=`.
             State::AfterEquals => {
@@ -73,48 +74,52 @@ impl KeyvalP {
             }
             // After key.
             State::BeforeEqual => {
-                match chr0.type_ {
+                match chr0 {
                     '\t' | ' ' => {} //Ignored it.
                     // `=`.
                     '=' => {
                         self.state = State::AfterEquals;
                     }
-                    _ => return error(&mut self.log(), &characters, "keyval.rs.65."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "keyval.rs.65."),
                 }
             }
             State::First => {
-                match chr0.type_ {
+                match chr0 {
                     '\t' | ' ' => {} //Ignored it.
-                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
+                    'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => {
                         let p = self.key_p.as_mut().unwrap();
-                        match p.parse(&characters) {
+                        match p.parse(&look_ahead_items) {
                             PResult::End => {
                                 if let Some(child_m) = p.flush() {
                                     self.key_buffer = Some(child_m);
                                     self.key_p = None;
                                     self.state = State::BeforeEqual;
                                 } else {
-                                    return error(&mut self.log(), &characters, "keyval.rs.84.");
+                                    return error(
+                                        &mut self.log(),
+                                        &look_ahead_items,
+                                        "keyval.rs.84.",
+                                    );
                                 }
                             }
                             PResult::Err(mut table) => {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "keyval.rs.84.",
                                 );
                             }
                             PResult::Ongoing => {}
                         }
                     }
-                    _ => return error(&mut self.log(), &characters, "keyval.rs.65."),
+                    _ => return error(&mut self.log(), &look_ahead_items, "keyval.rs.65."),
                 }
             }
             // After `=`.
             State::Val => {
                 let p = self.val_p.as_mut().unwrap();
-                match p.parse(characters) {
+                match p.parse(look_ahead_items) {
                     PResult::End => {
                         if let Some(child_m) = p.flush() {
                             self.val_buffer = Some(child_m);
@@ -122,21 +127,21 @@ impl KeyvalP {
                             self.state = State::End;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &characters, "keyval.rs.84.");
+                            return error(&mut self.log(), &look_ahead_items, "keyval.rs.84.");
                         }
                     }
                     PResult::Err(mut table) => {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "keyval.rs.88.",
                         );
                     }
                     PResult::Ongoing => {}
                 }
             }
-            State::End => return error(&mut self.log(), &characters, "keyval.rs.93."),
+            State::End => return error(&mut self.log(), &look_ahead_items, "keyval.rs.93."),
         }
         PResult::Ongoing
     }

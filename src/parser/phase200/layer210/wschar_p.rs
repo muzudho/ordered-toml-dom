@@ -32,7 +32,7 @@ impl WscharP {
     }
     /// # Arguments
     ///
-    /// * `character` - Token.  
+    /// * `chr` - Token.  
     ///             トークン。  
     /// # Returns
     ///
@@ -48,13 +48,13 @@ impl WscharP {
     }
     /// # Arguments
     ///
-    /// * `tokens` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadItems<char>) -> PResult {
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;
@@ -64,10 +64,10 @@ impl WscharP {
                     self.buffer = Some(Wschar::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
-                let chr0 = tokens.current.as_ref().unwrap();
+                let chr0 = look_ahead_items.get(0).unwrap();
                 m.push_token(&Token::from_character(chr0, TokenType::Wschar));
-                let chr1 = tokens.current.as_ref().unwrap();
-                if let None = Self::judge(&chr1) {
+                let chr1 = look_ahead_items.get(1).unwrap();
+                if let None = Self::judge(chr1) {
                     return PResult::End;
                 }
             }

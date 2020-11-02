@@ -43,24 +43,24 @@ impl EscapeSequenceP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), &characters, "escape_sequence_p.rs.66.");
+                return error(&mut self.log(), &look_ahead_items, "escape_sequence_p.rs.66.");
             }
             State::First => {
                 // Look-ahead.
                 // 先読み。
-                if let Some(token_1_ahead) = characters.one_ahead.as_ref() {
+                if let Some(token_1_ahead) = look_ahead_items.one_ahead.as_ref() {
                     match token_1_ahead.type_ {
-                        CharacterType::Alpha
+                        'A'..='Z' | 'a'..='z'
                         | '\\'
                         | '"' => {
                             // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
@@ -75,13 +75,13 @@ impl EscapeSequenceP {
                         _ => {
                             return error(
                                 &mut self.log(),
-                                &characters,
+                                &look_ahead_items,
                                 "escape_sequence_p.rs.136.",
                             );
                         }
                     }
                 } else {
-                    return error(&mut self.log(), &characters, "escape_sequence_p.rs.112.");
+                    return error(&mut self.log(), &look_ahead_items, "escape_sequence_p.rs.112.");
                 }
             }
             State::EscapedCharacter => {
@@ -89,9 +89,9 @@ impl EscapeSequenceP {
                 // Escaped.
                 match chr0.type_ {
                     // `"`
-                    CharacterType::Alpha => {
+                    'A'..='Z' | 'a'..='z' => {
                         // TODO 汎用的に書けないか？
-                        // https://doc.rust-lang.org/reference/characters.html
+                        // https://doc.rust-lang.org/reference/look_ahead_items.html
                         let mut code = None;
                         match chr0.to_string().as_str() {
                             "n" => code = Some("\n"),
@@ -118,7 +118,7 @@ impl EscapeSequenceP {
                             _ => {
                                 return error(
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "escape_sequence_p.rs.206.",
                                 )
                             }
@@ -153,13 +153,13 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), &characters, "escape_sequence_p.rs.212.");
+                        return error(&mut self.log(), &look_ahead_items, "escape_sequence_p.rs.212.");
                     }
                 }
             }
             State::UnicodeDigits => {
                 let p = self.positional_numeral_string_p.as_mut().unwrap();
-                match p.parse(characters) {
+                match p.parse(look_ahead_items) {
                     PResult::End => {
                         // Filled.
                         // 満ちたなら。
@@ -182,7 +182,7 @@ impl EscapeSequenceP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "escape_sequence_p.rs.165.",
                         );
                     }

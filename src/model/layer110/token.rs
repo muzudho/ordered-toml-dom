@@ -1,28 +1,25 @@
 //! Token.  
 //! 字句。  
 
-use crate::model::layer110::{Character, Token, TokenType};
+use crate::model::layer110::{Token, TokenType};
 use std::fmt;
 
 impl Token {
-    pub fn new(column_number: usize, value: &str, type_: TokenType) -> Self {
+    pub fn new(value: &str, type_: TokenType) -> Self {
         Token {
-            column_number: column_number,
             value: value.to_string(),
             type_: type_,
         }
     }
     pub fn from_base(token: &Token, type_: TokenType) -> Self {
         Token {
-            column_number: token.column_number,
             value: token.value.to_string(),
             type_: type_,
         }
     }
-    pub fn from_character(character: &Character, type_: TokenType) -> Self {
+    pub fn from_character(chr: char, type_: TokenType) -> Self {
         Token {
-            column_number: character.column_number,
-            value: character.value.to_string(),
+            value: chr.to_string(),
             type_: type_,
         }
     }
@@ -43,11 +40,7 @@ impl fmt::Display for Token {
 }
 impl fmt::Debug for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "[{} {} {:?}]",
-            self.column_number, self.value, self.type_
-        )
+        write!(f, "[{} {:?}]", self.value, self.type_)
     }
 }
 

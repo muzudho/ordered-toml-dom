@@ -28,28 +28,28 @@ impl KeyP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
-        let chr0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
         match chr0.type_ {
-            CharacterType::Alpha
-            | CharacterType::Digit
+            'A'..='Z' | 'a'..='z'
+            | '0'..='9'
             | '-'
             | '_' => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(&chr0, TokenType::Key));
+                m.push_token(&Token::from_character(chr, TokenType::Key));
 
                 // Look-ahead.
                 // 先読み。
-                if let Some(token1) = characters.one_ahead.as_ref() {
+                if let Some(token1) = look_ahead_items.one_ahead.as_ref() {
                     match token1.type_ {
-                        CharacterType::Alpha
-                        | CharacterType::Digit
+                        'A'..='Z' | 'a'..='z'
+                        | '0'..='9'
                         | '-'
                         | '_' => PResult::Ongoing,
                         _ => PResult::End,
@@ -58,7 +58,7 @@ impl KeyP {
                     PResult::End
                 }
             }
-            _ => return error(&mut self.log(), &characters, "key.rs.38."),
+            _ => return error(&mut self.log(), &look_ahead_items, "key.rs.38."),
         }
     }
 
