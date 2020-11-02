@@ -165,7 +165,7 @@ impl ExpressionP {
                     self.state = State::Ws1Keyval;
                 }
                 // `[`
-                CharacterType::LeftSquareBracket => {
+                '[' => {
                     self.state = State::AfterLeftSquareBracket;
                 }
                 // `#`

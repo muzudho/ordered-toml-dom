@@ -75,12 +75,12 @@ impl LiteralStringP {
             State::First => {
                 match chr0.type_ {
                     // `'`
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         // Look-ahead.
                         // 先読み。
                         if let Some(token_1_ahead) = &characters.one_ahead {
                             match token_1_ahead.type_ {
-                                CharacterType::SingleQuotation => {
+                                '\'' => {
                                     // Before triple sinble quoted string.
                                     self.state = State::BeforeMultiLine1;
                                 }
@@ -105,7 +105,7 @@ impl LiteralStringP {
             State::MultiLine => {
                 match chr0.type_ {
                     // `'`
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         if check_triple_single_quotation(characters) {
                             self.state = State::MultiLineEnd1;
                         } else {
@@ -122,7 +122,7 @@ impl LiteralStringP {
             State::MultiLineEnd1 => {
                 match chr0.type_ {
                     // `'`
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
@@ -133,7 +133,7 @@ impl LiteralStringP {
             State::MultiLineEnd2 => {
                 match chr0.type_ {
                     // `'`
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         // End of syntax.
                         // 構文の終わり。
                         self.state = State::End;
@@ -147,7 +147,7 @@ impl LiteralStringP {
             State::SingleLine => {
                 match chr0.type_ {
                     // `'`
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         // End of syntax.
                         // 構文の終わり。
                         self.state = State::End;
@@ -186,10 +186,10 @@ impl LiteralStringP {
 fn check_triple_single_quotation(characters: &LookAheadItems<char>) -> bool {
     if let Some(token_2_ahead) = &characters.two_ahead {
         match token_2_ahead.type_ {
-            CharacterType::SingleQuotation => {
+            '\'' => {
                 if let Some(token_1_ahead) = &characters.one_ahead {
                     match token_1_ahead.type_ {
-                        CharacterType::SingleQuotation => {
+                        '\'' => {
                             // Triple single quote.
                             true
                         }

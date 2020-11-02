@@ -61,7 +61,7 @@ impl EscapeSequenceP {
                 if let Some(token_1_ahead) = characters.one_ahead.as_ref() {
                     match token_1_ahead.type_ {
                         CharacterType::Alpha
-                        | CharacterType::Backslash
+                        | '\\'
                         | '"' => {
                             // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
                             self.state = State::EscapedCharacter;
@@ -133,7 +133,7 @@ impl EscapeSequenceP {
                             return PResult::End;
                         }
                     }
-                    CharacterType::Backslash => {
+                    '\\' => {
                         self.buffer.push(Token::new(
                             chr0.column_number,
                             "\\",

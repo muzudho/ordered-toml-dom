@@ -53,10 +53,7 @@ impl InlineTableP {
                 match chr0.type_ {
                     '\t' | ' ' => {} // Ignore it.
                     // `apple.banana`
-                    CharacterType::Alpha
-                    | CharacterType::Digit
-                    | CharacterType::Hyphen
-                    | CharacterType::Underscore => {
+                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
                         self.keyval_p = Some(Box::new(KeyvalP::new()));
                         self.state = State::Keyval;
                         match self.keyval_p.as_mut().unwrap().parse(tokens) {
@@ -75,7 +72,7 @@ impl InlineTableP {
                             PResult::Ongoing => {}
                         }
                     }
-                    CharacterType::RightCurlyBracket => {
+                    '}' => {
                         // Empty inline-table.
                         return PResult::End;
                     }
@@ -110,11 +107,11 @@ impl InlineTableP {
             State::AfterKeyval => match chr0.type_ {
                 '\t' | ' ' => {} // Ignore it.
                 // `,`
-                CharacterType::Comma => {
+                ',' => {
                     self.state = State::First;
                 }
                 // `}`
-                CharacterType::RightCurlyBracket => {
+                '}' => {
                     return PResult::End;
                 }
                 _ => return error(&mut self.log(), &tokens, "inline_table.rs.96."),

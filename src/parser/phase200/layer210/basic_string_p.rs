@@ -100,7 +100,7 @@ impl BasicStringP {
                         }
                     }
                     // \
-                    CharacterType::Backslash => {
+                    '\\' => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
                         match self.escape_sequence_p.as_mut().unwrap().parse(characters) {
                             PResult::End => {
@@ -143,7 +143,7 @@ impl BasicStringP {
                         }
                     }
                     // \
-                    CharacterType::Backslash => {
+                    '\\' => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
                         match self.escape_sequence_p.as_mut().unwrap().parse(characters) {
                             PResult::End => {
@@ -254,7 +254,7 @@ impl BasicStringP {
                         return PResult::End;
                     }
                     // \
-                    CharacterType::Backslash => {
+                    '\\' => {
                         self.escape_sequence_p = Some(EscapeSequenceP::default());
                         match self.escape_sequence_p.as_mut().unwrap().parse(characters) {
                             PResult::End => {

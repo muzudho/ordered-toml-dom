@@ -76,11 +76,11 @@ impl ArrayP {
                 match chr0.type_ {
                     '\t' | ' ' => {} // Ignore it.
                     // ,
-                    CharacterType::Comma => {
+                    ',' => {
                         self.state = State::AfterCommaBehindArray;
                     }
                     // ]
-                    CharacterType::RightSquareBracket => {
+                    ']' => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -91,13 +91,13 @@ impl ArrayP {
             State::AfterCommaBehindArray => {
                 match chr0.type_ {
                     // [
-                    CharacterType::LeftSquareBracket => {
+                    '[' => {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
                     '\t' | ' ' => {} // Ignore it.
                     // ]
-                    CharacterType::RightSquareBracket => {
+                    ']' => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -113,13 +113,13 @@ impl ArrayP {
                         self.state = State::DoubleQuotedString;
                     }
                     // '
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
                     '\t' | ' ' => {} // Ignore it.
                     // ]
-                    CharacterType::RightSquareBracket => {
+                    ']' => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -129,10 +129,7 @@ impl ArrayP {
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
                 match chr0.type_ {
-                    CharacterType::Alpha
-                    | CharacterType::Digit
-                    | CharacterType::Hyphen
-                    | CharacterType::Underscore => {
+                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
@@ -143,7 +140,7 @@ impl ArrayP {
                     }
                     '\t' | ' ' => {} // Ignore it.
                     // `]`.
-                    CharacterType::RightSquareBracket => {
+                    ']' => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -154,10 +151,10 @@ impl ArrayP {
             State::AfterString => {
                 match chr0.type_ {
                     '\t' | ' ' => {} // Ignore it.
-                    CharacterType::Comma => {
+                    ',' => {
                         self.state = State::AfterCommaBefindString;
                     }
-                    CharacterType::RightSquareBracket => {
+                    ']' => {
                         self.state = State::End;
                         return PResult::End;
                     }
@@ -195,10 +192,7 @@ impl ArrayP {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
-                    CharacterType::Alpha
-                    | CharacterType::Digit
-                    | CharacterType::Hyphen
-                    | CharacterType::Underscore => {
+                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
                         // TODO 数字なら正しいが、リテラル文字列だと間違い。キー・バリューかもしれない。
                         if let None = self.buffer {
                             self.buffer = Some(Array::default());
@@ -208,17 +202,17 @@ impl ArrayP {
                         self.state = State::LiteralValue;
                     }
                     // `[`. Recursive.
-                    CharacterType::LeftSquareBracket => {
+                    '[' => {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
                     // `]`. Empty array.
-                    CharacterType::RightSquareBracket => {
+                    ']' => {
                         self.state = State::End;
                         return PResult::End;
                     }
                     // '
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
@@ -227,10 +221,10 @@ impl ArrayP {
                 }
             }
             State::LiteralValue => match chr0.type_ {
-                CharacterType::Comma => {
+                ',' => {
                     self.state = State::AfterCommaBehindLiteralValue;
                 }
-                CharacterType::RightSquareBracket => {
+                ']' => {
                     self.state = State::End;
                     return PResult::End;
                 }

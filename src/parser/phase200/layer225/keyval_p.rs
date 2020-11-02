@@ -76,7 +76,7 @@ impl KeyvalP {
                 match chr0.type_ {
                     '\t' | ' ' => {} //Ignored it.
                     // `=`.
-                    CharacterType::Equals => {
+                    '=' => {
                         self.state = State::AfterEquals;
                     }
                     _ => return error(&mut self.log(), &characters, "keyval.rs.65."),
@@ -85,10 +85,7 @@ impl KeyvalP {
             State::First => {
                 match chr0.type_ {
                     '\t' | ' ' => {} //Ignored it.
-                    CharacterType::Alpha
-                    | CharacterType::Digit
-                    | CharacterType::Hyphen
-                    | CharacterType::Underscore => {
+                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
                         let p = self.key_p.as_mut().unwrap();
                         match p.parse(&characters) {
                             PResult::End => {

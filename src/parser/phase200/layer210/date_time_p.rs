@@ -67,7 +67,7 @@ impl DateTimeP {
                             return error(&mut self.log(), &characters, "date_time_p.rs.63.");
                         }
                     },
-                    CharacterType::Hyphen | CharacterType::Digit => {
+                    '-' | CharacterType::Digit => {
                         self.buffer
                             .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
                         match chr1.type_ {
@@ -97,7 +97,7 @@ impl DateTimeP {
                                     );
                                 }
                             },
-                            CharacterType::Hyphen | CharacterType::Digit => {
+                            '-' | CharacterType::Digit => {
                                 // println!("[trace86={}]", chr0.to_string().as_str());
                             }
                             _ => {
@@ -121,7 +121,7 @@ impl DateTimeP {
                         // println!("[trace114.]");
                         return PResult::End;
                     }
-                    CharacterType::Colon | CharacterType::Digit => {
+                    ':' | CharacterType::Digit => {
                         self.buffer
                             .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
                         match chr1.type_ {
@@ -151,7 +151,7 @@ impl DateTimeP {
                                     );
                                 }
                             },
-                            CharacterType::Dot => {
+                            '.' => {
                                 /*
                                 println!(
                                     // "[trace141={}|{}]",
@@ -161,7 +161,7 @@ impl DateTimeP {
                                 */
                                 self.state = State::FractionalSeconds;
                             }
-                            CharacterType::Plus | CharacterType::Hyphen => {
+                            '+' | '-' => {
                                 /*
                                 println!(
                                     // "[trace149={}|{}]",
@@ -171,7 +171,7 @@ impl DateTimeP {
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            CharacterType::Colon | CharacterType::Digit => {
+                            ':' | CharacterType::Digit => {
                                 /*
                                 println!(
                                     // "[trace156={}|{}]",
@@ -210,14 +210,11 @@ impl DateTimeP {
                 let chr0 = characters.current.as_ref().unwrap();
                 let chr1 = characters.one_ahead.as_ref().unwrap();
                 match chr0.type_ {
-                    CharacterType::Colon
-                    | CharacterType::Hyphen
-                    | CharacterType::Digit
-                    | CharacterType::Plus => {
+                    ':' | '-' | CharacterType::Digit | '+' => {
                         self.buffer
                             .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
                         match chr1.type_ {
-                            CharacterType::Colon | CharacterType::Digit => {
+                            ':' | CharacterType::Digit => {
                                 /*
                                 println!(
                                     // "[trace193={}|{}]",
@@ -255,11 +252,11 @@ impl DateTimeP {
                 let chr0 = characters.current.as_ref().unwrap();
                 let chr1 = characters.one_ahead.as_ref().unwrap();
                 match chr0.type_ {
-                    CharacterType::Dot | CharacterType::Digit => {
+                    '.' | CharacterType::Digit => {
                         self.buffer
                             .push(Token::from_character(&chr0.clone(), TokenType::DateTime));
                         match chr1.type_ {
-                            CharacterType::Hyphen | CharacterType::Plus => {
+                            '-' | '+' => {
                                 // - or +.
                                 /*
                                 println!(
@@ -270,7 +267,7 @@ impl DateTimeP {
                                 */
                                 self.state = State::OffsetSign;
                             }
-                            CharacterType::Dot | CharacterType::Digit => {
+                            '.' | CharacterType::Digit => {
                                 /*
                                 println!(
                                     // "[trace237={}|{}]",

@@ -126,26 +126,22 @@ impl ValP {
                         self.state = State::BasicString;
                     }
                     // `{`.
-                    CharacterType::LeftCurlyBracket => {
+                    '{' => {
                         self.inline_table_p = Some(InlineTableP::default());
                         self.state = State::AfterLeftCurlyBracket;
                     }
                     // `[`.
-                    CharacterType::LeftSquareBracket => {
+                    '[' => {
                         self.array_p = Some(ArrayP::default());
                         self.state = State::AfterLeftSquareBracket;
                     }
                     // `'`.
-                    CharacterType::SingleQuotation => {
+                    '\'' => {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                     }
                     '\t' | ' ' => {} //Ignored it.
-                    CharacterType::Alpha
-                    | CharacterType::Digit
-                    | CharacterType::Hyphen
-                    | CharacterType::Underscore
-                    | _ => {
+                    CharacterType::Alpha | CharacterType::Digit | '-' | '_' | _ => {
                         self.literal_value_p = Some(LiteralValueP::default());
                         self.state = State::LiteralValue;
                         let p = self.literal_value_p.as_mut().unwrap();

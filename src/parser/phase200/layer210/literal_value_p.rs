@@ -243,12 +243,7 @@ impl LiteralValueP {
                     PResult::Ongoing
                 } else {
                     let base_number = match chr0.type_ {
-                        CharacterType::Alpha
-                        | CharacterType::Colon
-                        | CharacterType::Dot
-                        | CharacterType::Hyphen
-                        | CharacterType::Plus
-                        | CharacterType::Underscore => 10,
+                        CharacterType::Alpha | ':' | '.' | '-' | '+' | '_' => 10,
                         CharacterType::Digit => {
                             if let Some(ch0) = chr0.to_string().chars().nth(0) {
                                 // println!("[trace82 ch0={}]", ch0);
@@ -310,12 +305,12 @@ impl LiteralValueP {
                             if let Some(token1) = &characters.one_ahead {
                                 match token1.type_ {
                                     CharacterType::Alpha
-                                    | CharacterType::Colon
-                                    | CharacterType::Dot
-                                    | CharacterType::Hyphen
+                                    | ':'
+                                    | '.'
+                                    | '-'
                                     | CharacterType::Digit
-                                    | CharacterType::Plus
-                                    | CharacterType::Underscore => {
+                                    | '+'
+                                    | '_' => {
                                         self.state = State::Second;
                                         PResult::Ongoing
                                     }
@@ -342,12 +337,12 @@ impl LiteralValueP {
                 if let Some(token1) = &characters.one_ahead {
                     match token1.type_ {
                         CharacterType::Alpha
-                        | CharacterType::Colon
-                        | CharacterType::Dot
-                        | CharacterType::Hyphen
+                        | ':'
+                        | '.'
+                        | '-'
                         | CharacterType::Digit
-                        | CharacterType::Plus
-                        | CharacterType::Underscore => PResult::Ongoing,
+                        | '+'
+                        | '_' => PResult::Ongoing,
                         _ => {
                             self.state = State::End;
                             PResult::End

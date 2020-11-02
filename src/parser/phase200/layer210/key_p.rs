@@ -39,8 +39,8 @@ impl KeyP {
         match chr0.type_ {
             CharacterType::Alpha
             | CharacterType::Digit
-            | CharacterType::Hyphen
-            | CharacterType::Underscore => {
+            | '-'
+            | '_' => {
                 let m = self.buffer.as_mut().unwrap();
                 m.push_token(&Token::from_character(&chr0, TokenType::Key));
 
@@ -50,8 +50,8 @@ impl KeyP {
                     match token1.type_ {
                         CharacterType::Alpha
                         | CharacterType::Digit
-                        | CharacterType::Hyphen
-                        | CharacterType::Underscore => PResult::Ongoing,
+                        | '-'
+                        | '_' => PResult::Ongoing,
                         _ => PResult::End,
                     }
                 } else {
