@@ -1,18 +1,15 @@
 //! Non end-of-line parser.  
 //! 非行末パーサー。  
 
-use crate::model::{
-    layer110::{Character, TokenType},
-    layer210::Ws,
-};
+use crate::model::{layer110::TokenType, layer210::Ws};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::WsP;
 use crate::parser::phase200::layer210::WscharP;
 use crate::parser::phase200::layer210::{KeyvalSepP, PResult};
-use crate::parser::phase200::LookAheadItems<char>;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -54,11 +51,11 @@ impl KeyvalSepP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(character: &Character) -> Option<Judge> {
-        if let Some(_judge) = WsP::judge(character) {
+    pub fn judge(chr: char) -> Option<Judge> {
+        if let Some(_judge) = WsP::judge(chr) {
             return Some(Judge::Ws);
         }
-        let unicode = character.to_char() as u32;
+        let unicode = chr as u32;
         match unicode {
             0x3D => Some(Judge::Equals),
             _ => None,
@@ -75,8 +72,8 @@ impl KeyvalSepP {
     pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::First => {
-                let chr0 = look_ahead_items.current.as_ref().unwrap();
-                if let Some(judge) = Self::judge(&chr0) {
+                let chr0 = look_ahead_items.get(0).unwrap();
+                if let Some(judge) = Self::judge(*chr0) {
                     match judge {
                         Judge::Ws => {
                             return self.parse_ws1(look_ahead_items);
@@ -108,11 +105,11 @@ impl KeyvalSepP {
     fn parse_ws1(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         let chr0 = look_ahead_items.get(0).unwrap();
         self.ws1
-            .push_token(&Token::from_character(chr0, TokenType::Ws));
+            .push_token(&Token::from_character(*chr0, TokenType::Ws));
 
         // 次のトークンを調べます。
-        let chr1 = look_ahead_items.one_ahead.as_ref().unwrap();
-        if let Some(judge) = Self::judge(&chr1) {
+        let chr1 = look_ahead_items.get(1).unwrap();
+        if let Some(judge) = Self::judge(*chr1) {
             match judge {
                 Judge::Ws => self.state = State::Ws1,
                 Judge::Equals => self.state = State::Equals,
@@ -126,7 +123,7 @@ impl KeyvalSepP {
     fn parse_equals(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         // 次の文字を調べます。
         let chr1 = look_ahead_items.get(1).unwrap();
-        if let Some(judge) = Self::judge(&chr1) {
+        if let Some(judge) = Self::judge(*chr1) {
             match judge {
                 Judge::Ws => {
                     return self.parse_ws2(look_ahead_items);
@@ -143,11 +140,11 @@ impl KeyvalSepP {
     fn parse_ws2(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         let chr0 = look_ahead_items.get(0).unwrap();
         self.ws2
-            .push_token(&Token::from_character(chr0, TokenType::Ws));
+            .push_token(&Token::from_character(*chr0, TokenType::Ws));
 
         // 次のトークンを調べます。
-        let chr1 = look_ahead_items.one_ahead.as_ref().unwrap();
-        if let Some(judge) = Self::judge(&chr1) {
+        let chr1 = look_ahead_items.get(1).unwrap();
+        if let Some(judge) = Self::judge(*chr1) {
             match judge {
                 Judge::Ws => self.state = State::Ws2,
                 Judge::Equals => {

@@ -12,17 +12,17 @@ pub enum Judge {
 impl NonAsciiP {
     /// # Arguments
     ///
-    /// * `character` - Token.  
+    /// * `chr` - Token.  
     ///             トークン。  
     /// # Returns
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(character: &Character) -> Option<Judge> {
-        let unicode = character.to_char() as u32;
+    pub fn judge(chr: char) -> Option<Judge> {
+        let unicode = chr as u32;
         match unicode {
             // non-ascii
-            0x80..=0xD7FF | 0xE000..=0x10FFFF => Some(Judge::NonAscii(NonAscii::new(character))),
+            0x80..=0xD7FF | 0xE000..=0x10FFFF => Some(Judge::NonAscii(NonAscii::new(chr))),
             // 0x80..=0xD7FF | 0xE000..=u32::MAX => Judge::NonAscii,
             _ => None,
         }

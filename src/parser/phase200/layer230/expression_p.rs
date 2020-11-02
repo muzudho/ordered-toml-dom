@@ -173,7 +173,7 @@ impl ExpressionP {
                     self.comment_p = Some(CommentP::new());
 
                     let p = self.comment_p.as_mut().unwrap();
-                    let judge = p.judge1(chr0);
+                    let judge = p.judge1(*chr0);
                     if let Some(judge) = judge {
                         p.commit1(&judge);
                         match p.forward1(&look_ahead_items) {
@@ -232,7 +232,7 @@ impl ExpressionP {
             },
             State::Ws1Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                let judge = p.judge1(chr0);
+                let judge = p.judge1(*chr0);
                 if let Some(judge) = judge {
                     p.commit1(&judge);
                     match p.forward1(&look_ahead_items) {
@@ -272,9 +272,9 @@ impl ExpressionP {
                 let p = self.keyval_p.as_mut().unwrap();
                 match p.parse(&look_ahead_items) {
                     PResult::End => {
-                        let token1 = look_ahead_items.one_ahead.as_ref().unwrap();
+                        let chr1_ahead = look_ahead_items.get(1).as_ref().unwrap();
 
-                        match token1.type_ {
+                        match chr1_ahead {
                             '\r' | '\t' => {
                                 if let Some(keyval) = p.flush() {
                                     self.buffer = Some(Expression::from_keyval(
@@ -327,9 +327,9 @@ impl ExpressionP {
             }
             State::Ws1KeyvalWs2 => match chr0 {
                 '\t' | ' ' => {
-                    let token1 = look_ahead_items.one_ahead.as_ref().unwrap();
+                    let chr1_ahead = look_ahead_items.get(1).as_ref().unwrap();
 
-                    match token1.type_ {
+                    match chr1_ahead {
                         '\r' | '\t' => {
                             return PResult::End;
                         }
@@ -350,7 +350,7 @@ impl ExpressionP {
             },
             State::Ws1KeyvalWs2Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                let judge = p.judge1(&chr0);
+                let judge = p.judge1(*chr0);
                 if let Some(judge) = judge {
                     p.commit1(&judge);
                     match p.forward1(&look_ahead_items) {

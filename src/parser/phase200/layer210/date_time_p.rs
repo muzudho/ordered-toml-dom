@@ -60,7 +60,7 @@ impl DateTimeP {
                         "T" => {
                             // println!("[trace64.]");
                             self.buffer
-                                .push(Token::from_character(chr0, TokenType::DateTime));
+                                .push(Token::from_character(*chr0, TokenType::DateTime));
                             self.state = State::End;
                         }
                         _ => {
@@ -70,7 +70,7 @@ impl DateTimeP {
                     },
                     '-' | '0'..='9' => {
                         self.buffer
-                            .push(Token::from_character(chr0, TokenType::DateTime));
+                            .push(Token::from_character(*chr0, TokenType::DateTime));
                         match chr1 {
                             'A'..='Z' | 'a'..='z' => match chr1.to_string().as_str() {
                                 "T" => {
@@ -195,7 +195,7 @@ impl DateTimeP {
                     }
                     _ => {
                         self.buffer
-                            .push(Token::from_character(chr0, TokenType::DateTime));
+                            .push(Token::from_character(*chr0, TokenType::DateTime));
                     }
                 }
                 PResult::Ongoing
@@ -203,7 +203,7 @@ impl DateTimeP {
             State::LongitudeZero => {
                 let chr0 = look_ahead_items.get(0).unwrap();
                 self.buffer
-                    .push(Token::from_character(chr0, TokenType::DateTime));
+                    .push(Token::from_character(*chr0, TokenType::DateTime));
                 self.state = State::End;
                 PResult::End
             }
@@ -213,7 +213,7 @@ impl DateTimeP {
                 match chr0 {
                     ':' | '-' | '0'..='9' | '+' => {
                         self.buffer
-                            .push(Token::from_character(chr0, TokenType::DateTime));
+                            .push(Token::from_character(*chr0, TokenType::DateTime));
                         match chr1 {
                             ':' | '0'..='9' => {
                                 /*
@@ -255,7 +255,7 @@ impl DateTimeP {
                 match chr0 {
                     '.' | '0'..='9' => {
                         self.buffer
-                            .push(Token::from_character(chr0, TokenType::DateTime));
+                            .push(Token::from_character(*chr0, TokenType::DateTime));
                         match chr1 {
                             '-' | '+' => {
                                 // - or +.

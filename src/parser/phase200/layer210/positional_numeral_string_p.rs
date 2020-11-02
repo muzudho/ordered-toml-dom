@@ -1,10 +1,11 @@
 //! Hex string parser.  
 //! 16進文字列パーサー。  
 
-use crate::model::layer110::{CharacterType, Token, TokenType};
+use crate::model::layer110::{Token, TokenType};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{PResult, PositionalNumeralStringP};
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 impl PositionalNumeralStringP {
     pub fn new(prefix: &str) -> Self {
@@ -35,7 +36,7 @@ impl PositionalNumeralStringP {
     pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         let token0 = look_ahead_items.get(0).unwrap();
 
-        match token0.type_ {
+        match token0 {
             'A'..='Z' | 'a'..='z' | '0'..='9' | '_' => {
                 let s = token0.to_string();
                 let expected_len = 1;
@@ -47,8 +48,8 @@ impl PositionalNumeralStringP {
                 self.string_buffer.push_str(&s);
 
                 // 次がHexの文字以外か？
-                let finished = if let Some(token1) = look_ahead_items.one_ahead.as_ref() {
-                    match token1.type_ {
+                let finished = if let Some(chr1_ahead) = look_ahead_items.get(1).as_ref() {
+                    match chr1_ahead {
                         'A'..='Z' | 'a'..='z' | '0'..='9' | '_' => {
                             // 続行。
                             false
@@ -71,7 +72,7 @@ impl PositionalNumeralStringP {
                         self.string_buffer,
                         self.expected_digits,
                         self.string_buffer.len(),
-                        if let Some(token1) = look_ahead_items.one_ahead.as_ref() {token1.to_string()}else{"".to_string()}
+                        if let Some(chr1_ahead) = look_ahead_items.one_ahead.as_ref() {chr1_ahead.to_string()}else{"".to_string()}
                     );
                     // */
                     self.buffer.push(Token::new(

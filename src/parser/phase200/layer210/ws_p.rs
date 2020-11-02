@@ -71,11 +71,11 @@ impl WsP {
                 // Horizon tab and Ascii code.
                 let chr0 = look_ahead_items.get(0).unwrap();
                 self.ws
-                    .push_token(&Token::from_character(chr0, TokenType::Ws));
+                    .push_token(&Token::from_character(*chr0, TokenType::Ws));
 
                 // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
                 let chr1 = look_ahead_items.get(1).unwrap();
-                if let None = Self::judge(chr1) {
+                if let None = Self::judge(*chr1) {
                     return PResult::End;
                 }
             }

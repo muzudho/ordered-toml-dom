@@ -1,13 +1,10 @@
 //! Array of HeaderOfArrayOfTable syntax parser.  
 //! テーブルの配列構文パーサー。  
 
-use crate::model::{
-    layer110::{CharacterType, TokenType},
-    layer230::HeaderOfArrayOfTable,
-};
+use crate::model::{layer110::TokenType, layer230::HeaderOfArrayOfTable};
 use crate::parser::phase200::layer210::{HeaderPOfArrayOfTable, PResult};
-use crate::parser::phase200::LookAheadItems<char>;
 use crate::parser::phase200::Token;
+use look_ahead_items::LookAheadItems;
 // use casual_logger::Table;
 
 impl HeaderPOfArrayOfTable {
@@ -39,7 +36,7 @@ impl HeaderPOfArrayOfTable {
             }
             _ => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(&chr0, TokenType::Table));
+                m.push_token(&Token::from_character(*chr0, TokenType::Table));
             }
         }
         PResult::Ongoing

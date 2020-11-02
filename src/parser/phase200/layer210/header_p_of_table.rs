@@ -2,11 +2,11 @@
 //! テーブル構文パーサー。  
 
 use crate::model::{
-    layer110::{CharacterType, Token, TokenType},
+    layer110::{Token, TokenType},
     layer230::HeaderOfTable,
 };
 use crate::parser::phase200::layer210::{HeaderPOfTable, PResult};
-use crate::parser::phase200::LookAheadItems<char>;
+use look_ahead_items::LookAheadItems;
 // use casual_logger::Table;
 
 impl HeaderPOfTable {
@@ -39,7 +39,7 @@ impl HeaderPOfTable {
             }
             _ => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(&chr0, TokenType::Table));
+                m.push_token(&Token::from_character(chr0, TokenType::Table));
             }
         }
         PResult::Ongoing

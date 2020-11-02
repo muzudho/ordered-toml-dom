@@ -7,7 +7,7 @@
 //! // [ 1, 2, 3 ]
 //! ```
 
-use crate::model::{layer110::CharacterType, layer210::LiteralValue, layer220::Array};
+use crate::model::{layer210::LiteralValue, layer220::Array};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::{
@@ -74,7 +74,7 @@ impl ArrayP {
         match self.state {
             // After `]`.
             State::AfterArray => {
-                match chr0.type_ {
+                match chr0 {
                     '\t' | ' ' => {} // Ignore it.
                     // ,
                     ',' => {
@@ -136,7 +136,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralValue::from_character(chr0));
+                        m.push_literal_string(&LiteralValue::from_character(*chr0));
                         self.state = State::LiteralValue;
                     }
                     '\t' | ' ' => {} // Ignore it.
@@ -204,7 +204,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralValue::from_character(chr0));
+                        m.push_literal_string(&LiteralValue::from_character(*chr0));
                         self.state = State::LiteralValue;
                     }
                     // `[`. Recursive.

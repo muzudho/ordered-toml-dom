@@ -2,13 +2,13 @@
 //! キー・パーサー。  
 
 use crate::model::{
-    layer110::{CharacterType, Token, TokenType},
+    layer110::{Token, TokenType},
     layer210::Key,
 };
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{KeyP, PResult};
-use crate::parser::phase200::LookAheadItems<char>;
 use casual_logger::Table as LogTable;
+use look_ahead_items::LookAheadItems;
 
 impl Default for KeyP {
     fn default() -> Self {
@@ -36,22 +36,16 @@ impl KeyP {
     ///                             結果。
     pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         let chr0 = look_ahead_items.get(0).unwrap();
-        match chr0.type_ {
-            'A'..='Z' | 'a'..='z'
-            | '0'..='9'
-            | '-'
-            | '_' => {
+        match chr0 {
+            'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(chr, TokenType::Key));
+                m.push_token(&Token::from_character(*chr0, TokenType::Key));
 
                 // Look-ahead.
                 // 先読み。
-                if let Some(token1) = look_ahead_items.one_ahead.as_ref() {
-                    match token1.type_ {
-                        'A'..='Z' | 'a'..='z'
-                        | '0'..='9'
-                        | '-'
-                        | '_' => PResult::Ongoing,
+                if let Some(chr1_ahead) = look_ahead_items.get(1).as_ref() {
+                    match chr1_ahead {
+                        'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => PResult::Ongoing,
                         _ => PResult::End,
                     }
                 } else {

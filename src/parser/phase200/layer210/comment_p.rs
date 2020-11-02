@@ -2,15 +2,11 @@
 //! コメント構文パーサー。  
 
 use crate::model::layer210::NonEol;
-use crate::model::{
-    layer110::{CharacterType, TokenType},
-    layer210::Comment,
-};
+use crate::model::{layer110::TokenType, layer210::Comment};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{non_eol_p::Judge as NonEolPJudge, NonEolP};
 use crate::parser::phase200::layer210::{CommentP, PResult};
-use crate::parser::phase200::Character;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
 
@@ -86,7 +82,7 @@ impl CommentP {
                 }
                 Judge::CommentCharacter(non_eol) => {
                     self.product.push_token(&Token::from_character(
-                        &non_eol.get_character(),
+                        non_eol.get_character(),
                         TokenType::Comment,
                     ));
                 }

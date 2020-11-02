@@ -134,7 +134,7 @@ impl BasicStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(chr0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(*chr0, TokenType::BasicString));
                         self.state = State::SingleLine;
                     }
                 }
@@ -148,7 +148,7 @@ impl BasicStringP {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(chr, TokenType::BasicString));
+                            m.push_token(&Token::from_character(*chr0, TokenType::BasicString));
                         }
                     }
                     // \
@@ -246,14 +246,14 @@ impl BasicStringP {
                         } else {
                             // println!("[trace310 DoubleQuotation]");
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(chr, TokenType::BasicString));
+                            m.push_token(&Token::from_character(*chr0, TokenType::BasicString));
                             self.state = State::MultiLine; // (2020-10-18追加)
                         }
                     }
                     _ => {
                         // println!("[trace311 Otherwise={:?}]", chr0);
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(chr, TokenType::BasicString));
+                        m.push_token(&Token::from_character(*chr0, TokenType::BasicString));
                         self.state = State::MultiLine;
                     }
                 }

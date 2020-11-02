@@ -110,25 +110,25 @@ impl LiteralStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(chr0, TokenType::LiteralString));
+                        m.push_token(&Token::from_character(*chr0, TokenType::LiteralString));
                         self.state = State::SingleLine;
                     }
                 }
             }
             State::MultiLine => {
-                match chr0.type_ {
+                match chr0 {
                     // `'`
                     '\'' => {
                         if check_triple_single_quotation(look_ahead_items) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(chr0, TokenType::LiteralString));
+                            m.push_token(&Token::from_character(*chr0, TokenType::LiteralString));
                         }
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(chr0, TokenType::LiteralString));
+                        m.push_token(&Token::from_character(*chr0, TokenType::LiteralString));
                     }
                 }
             }
@@ -176,7 +176,7 @@ impl LiteralStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(chr, TokenType::LiteralString));
+                        m.push_token(&Token::from_character(*chr0, TokenType::LiteralString));
                     }
                 }
             }

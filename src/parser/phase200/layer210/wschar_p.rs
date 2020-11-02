@@ -65,9 +65,9 @@ impl WscharP {
                 }
                 let m = self.buffer.as_mut().unwrap();
                 let chr0 = look_ahead_items.get(0).unwrap();
-                m.push_token(&Token::from_character(chr0, TokenType::Wschar));
+                m.push_token(&Token::from_character(*chr0, TokenType::Wschar));
                 let chr1 = look_ahead_items.get(1).unwrap();
-                if let None = Self::judge(chr1) {
+                if let None = Self::judge(*chr1) {
                     return PResult::End;
                 }
             }

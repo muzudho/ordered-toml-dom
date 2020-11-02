@@ -51,7 +51,7 @@ impl InlineTableP {
         match self.state {
             // After `{`.
             State::First => {
-                match chr0.type_ {
+                match chr0 {
                     '\t' | ' ' => {} // Ignore it.
                     // `apple.banana`
                     'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' => {
@@ -113,7 +113,7 @@ impl InlineTableP {
                 }
             }
             // After `banana = 3`.
-            State::AfterKeyval => match chr0.type_ {
+            State::AfterKeyval => match chr0 {
                 '\t' | ' ' => {} // Ignore it.
                 // `,`
                 ',' => {

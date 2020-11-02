@@ -2,13 +2,13 @@
 //! エスケープ・シーケンス・パーサー。  
 
 use crate::model::layer110::token::tokens_stringify;
-use crate::model::layer110::{CharacterType, Token, TokenType};
+use crate::model::layer110::{Token, TokenType};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::PositionalNumeralStringP;
 use crate::parser::phase200::layer210::{EscapeSequenceP, PResult};
-use crate::parser::phase200::LookAheadItems<char>;
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 use std::char::from_u32;
 
 /// Syntax machine state.  
@@ -53,16 +53,18 @@ impl EscapeSequenceP {
         let chr0 = look_ahead_items.get(0).unwrap();
         match self.state {
             State::End => {
-                return error(&mut self.log(), &look_ahead_items, "escape_sequence_p.rs.66.");
+                return error(
+                    &mut self.log(),
+                    &look_ahead_items,
+                    "escape_sequence_p.rs.66.",
+                );
             }
             State::First => {
                 // Look-ahead.
                 // 先読み。
                 if let Some(token_1_ahead) = look_ahead_items.one_ahead.as_ref() {
                     match token_1_ahead.type_ {
-                        'A'..='Z' | 'a'..='z'
-                        | '\\'
-                        | '"' => {
+                        'A'..='Z' | 'a'..='z' | '\\' | '"' => {
                             // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
                             self.state = State::EscapedCharacter;
                         }
@@ -81,7 +83,11 @@ impl EscapeSequenceP {
                         }
                     }
                 } else {
-                    return error(&mut self.log(), &look_ahead_items, "escape_sequence_p.rs.112.");
+                    return error(
+                        &mut self.log(),
+                        &look_ahead_items,
+                        "escape_sequence_p.rs.112.",
+                    );
                 }
             }
             State::EscapedCharacter => {
@@ -125,7 +131,6 @@ impl EscapeSequenceP {
                         }
                         if let Some(code) = code {
                             self.buffer.push(Token::new(
-                                chr0.column_number,
                                 code,
                                 TokenType::EscapeSequence, // TODO EscapeSequence
                             ));
@@ -135,7 +140,6 @@ impl EscapeSequenceP {
                     }
                     '\\' => {
                         self.buffer.push(Token::new(
-                            chr0.column_number,
                             "\\",
                             TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
@@ -145,7 +149,6 @@ impl EscapeSequenceP {
                     // "
                     '"' => {
                         self.buffer.push(Token::new(
-                            chr0.column_number,
                             "\"",
                             TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
@@ -153,7 +156,11 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     _ => {
-                        return error(&mut self.log(), &look_ahead_items, "escape_sequence_p.rs.212.");
+                        return error(
+                            &mut self.log(),
+                            &look_ahead_items,
+                            "escape_sequence_p.rs.212.",
+                        );
                     }
                 }
             }
@@ -170,7 +177,6 @@ impl EscapeSequenceP {
                             Err(why) => panic!("{}", why),
                         };
                         self.buffer.push(Token::new(
-                            chr0.column_number,
                             &from_u32(hex).unwrap().to_string(),
                             TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
