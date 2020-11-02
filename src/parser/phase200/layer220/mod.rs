@@ -5,8 +5,9 @@ use crate::parser::phase200::{
     layer210::{BasicStringP, LiteralStringP},
     layer220::array_p::State as ArrayState,
 };
-use std::convert::TryInto;
 
+/*
+use std::convert::TryInto;
 pub fn usize_to_i128(num: usize) -> i128 {
     if let Ok(n) = num.try_into() {
         n
@@ -14,6 +15,7 @@ pub fn usize_to_i128(num: usize) -> i128 {
         -1
     }
 }
+*/
 
 /// Array parser.  
 /// 配列パーサー。  

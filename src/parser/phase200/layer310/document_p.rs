@@ -1,15 +1,13 @@
 //! Document syntax parser.  
 //! ドキュメント構文解析器。  
 
-use crate::model::{layer110::TokenLine, layer310::TomlDocument};
+use crate::model::layer310::TomlDocument;
 use crate::parser::phase200::{
     error_via,
     {layer210::PResult, layer230::ExpressionP, layer310::DocumentP},
 };
 use casual_logger::Table;
-use look_ahead_items::Items;
 use look_ahead_items::ItemsBuilder;
-use look_ahead_items::LookAheadItems;
 
 impl Default for DocumentP {
     fn default() -> Self {
