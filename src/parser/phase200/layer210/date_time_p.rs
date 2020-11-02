@@ -52,7 +52,7 @@ impl DateTimeP {
                 let chr0 = look_ahead_items.get(0).unwrap();
                 let chr1 = look_ahead_items.get(1).unwrap();
                 match chr0 {
-                    '\r' | '\t' => {
+                    '\r' | '\n' => {
                         // println!("[trace59.]");
                         return PResult::End;
                     }
@@ -118,13 +118,13 @@ impl DateTimeP {
                 let chr0 = look_ahead_items.get(0).unwrap();
                 let chr1 = look_ahead_items.get(1).unwrap();
                 match chr0 {
-                    '\r' | '\t' => {
+                    '\r' | '\n' => {
                         // println!("[trace114.]");
                         return PResult::End;
                     }
                     ':' | '0'..='9' => {
                         self.buffer
-                            .push(Token::from_character(chr0, TokenType::DateTime));
+                            .push(Token::from_character(*chr0, TokenType::DateTime));
                         match chr1 {
                             'A'..='Z' | 'a'..='z' => match chr1.to_string().as_str() {
                                 "Z" => {

@@ -39,7 +39,7 @@ impl HeaderPOfTable {
             }
             _ => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(chr0, TokenType::Table));
+                m.push_token(&Token::from_character(*chr0, TokenType::Table));
             }
         }
         PResult::Ongoing

@@ -55,12 +55,8 @@ impl Toml {
                         Err(why) => panic!(Log::fatal(&format!("{}", why))),
                     };
                     // Log::trace(&format!("from_file/line=|{}|", line));
-                    let mut product = ItemsBuilder::default()
-                        .set_look_ahead_size(4)
-                        .read(&line.chars().collect())
-                        .build();
 
-                    match document_p.scan_line(&product, &mut output_document) {
+                    match document_p.scan_line(&line.chars().collect(), &mut output_document) {
                         PResult::End => {} // Ignored it.
                         PResult::Err(table) => {
                             error_tables.push(

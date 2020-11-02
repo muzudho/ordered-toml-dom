@@ -181,7 +181,7 @@ impl BasicStringP {
                     _ => {
                         // print!("trace.12.");
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(chr, TokenType::BasicString));
+                        m.push_token(&Token::from_character(*chr0, TokenType::BasicString));
                     }
                 }
             }
@@ -232,7 +232,7 @@ impl BasicStringP {
             State::MultiLineTrimStart => {
                 // println!("[trace307 MultiLineTrimStart]");
                 match chr0 {
-                    '\r' | '\t' => {
+                    '\r' | '\n' => {
                         // println!("[trace312 Newline]");
                     } // Ignore it.
                     '\t' | ' ' => {
@@ -298,7 +298,7 @@ impl BasicStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(chr, TokenType::BasicString));
+                        m.push_token(&Token::from_character(*chr0, TokenType::BasicString));
                     }
                 }
             }

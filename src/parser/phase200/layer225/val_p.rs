@@ -134,7 +134,7 @@ impl ValP {
                 }
             }
             State::First => {
-                match chr0.type_ {
+                match chr0 {
                     // "
                     '"' => {
                         self.basic_string_p = Some(BasicStringP::new());

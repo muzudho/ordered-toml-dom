@@ -14,6 +14,7 @@ use crate::parser::phase200::layer210::{
     date_time_p::State as DateTimeState, LiteralValueP, PResult,
 };
 use casual_logger::Table as LogTable;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -238,7 +239,7 @@ impl LiteralValueP {
                 if is_date || is_time {
                     PResult::Ongoing
                 } else {
-                    let base_number = match chr0.type_ {
+                    let base_number = match chr0 {
                         'A'..='Z' | 'a'..='z' | ':' | '.' | '-' | '+' | '_' => 10,
                         '0'..='9' => {
                             if let Some(ch0) = chr0.to_string().chars().nth(0) {
@@ -248,7 +249,7 @@ impl LiteralValueP {
                                     // Look-ahead.
                                     // 先読み。
                                     if let Some(chr1_ahead) = look_ahead_items.get(1).as_ref() {
-                                        match chr1_ahead.type_ {
+                                        match chr1_ahead {
                                             'A'..='Z' | 'a'..='z' => {
                                                 match chr1_ahead.to_string().as_str() {
                                                     "b" => 2,
@@ -301,7 +302,7 @@ impl LiteralValueP {
                         }
                         10 => {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(&chr0, TokenType::LiteralValue));
+                            m.push_token(&Token::from_character(*chr0, TokenType::LiteralValue));
                             // Look-ahead.
                             // 先読み。
                             if let Some(chr1_ahead) = &look_ahead_items.get(1) {
@@ -334,7 +335,7 @@ impl LiteralValueP {
             State::Second => {
                 // 10進数のみです。
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(&chr0, TokenType::LiteralValue));
+                m.push_token(&Token::from_character(*chr0, TokenType::LiteralValue));
                 // Look-ahead.
                 // 先読み。
                 if let Some(chr1_ahead) = &look_ahead_items.get(1) {

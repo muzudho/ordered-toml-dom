@@ -8,6 +8,7 @@ use crate::parser::phase200::{
 };
 use casual_logger::Table;
 use look_ahead_items::Items;
+use look_ahead_items::ItemsBuilder;
 use look_ahead_items::LookAheadItems;
 
 impl Default for DocumentP {
@@ -20,12 +21,17 @@ impl DocumentP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn scan_line(&mut self, character_line: &Items<char>, doc: &mut TomlDocument) -> PResult {
+    pub fn scan_line(&mut self, char_vec: &Vec<char>, doc: &mut TomlDocument) -> PResult {
+        let items = ItemsBuilder::default()
+            .set_look_ahead_size(4)
+            .read(char_vec)
+            .build();
+
         // * `tokens` - Tokens contains look ahead.
         //             先読みを含むトークン。
         // (Current character, 1 ahead character, 2 ahead character)
         // （現在のトークン, １つ先のトークン，２つ先のトークン）
-        for look_ahead_characters in *character_line {
+        for look_ahead_characters in items {
             if let None = self.expression_p {
                 self.expression_p = Some(ExpressionP::default());
             }

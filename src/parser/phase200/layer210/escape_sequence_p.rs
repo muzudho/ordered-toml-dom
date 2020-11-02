@@ -62,13 +62,13 @@ impl EscapeSequenceP {
             State::First => {
                 // Look-ahead.
                 // 先読み。
-                if let Some(token_1_ahead) = look_ahead_items.one_ahead.as_ref() {
-                    match token_1_ahead.type_ {
+                if let Some(chr1_ahead) = look_ahead_items.get(1).as_ref() {
+                    match chr1_ahead {
                         'A'..='Z' | 'a'..='z' | '\\' | '"' => {
-                            // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
+                            // print!("[trace1 (IgnoreBackslash) ahead={:?}]", chr1_ahead);
                             self.state = State::EscapedCharacter;
                         }
-                        '\r' | '\t' => {
+                        '\r' | '\n' => {
                             // 行末に \ があったケース。
                             // println!("[trace3 行末にEOLがあったケース]");
                             self.state = State::End;
@@ -93,7 +93,7 @@ impl EscapeSequenceP {
             State::EscapedCharacter => {
                 // println!("[trace196={:?}]", chr0);
                 // Escaped.
-                match chr0.type_ {
+                match chr0 {
                     // `"`
                     'A'..='Z' | 'a'..='z' => {
                         // TODO 汎用的に書けないか？

@@ -55,7 +55,7 @@ impl LiteralStringP {
                 // 先読み。
                 if let Some(chr1_ahead) = &look_ahead_items.get(1) {
                     match chr1_ahead {
-                        '\r' | '\t' => {
+                        '\r' | '\n' => {
                             self.state = State::BeforeMultiLine2;
                         }
                         _ => {

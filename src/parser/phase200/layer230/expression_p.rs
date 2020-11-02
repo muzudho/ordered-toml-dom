@@ -272,10 +272,10 @@ impl ExpressionP {
                 let p = self.keyval_p.as_mut().unwrap();
                 match p.parse(&look_ahead_items) {
                     PResult::End => {
-                        let chr1_ahead = look_ahead_items.get(1).as_ref().unwrap();
+                        let chr1_ahead = look_ahead_items.get(1).unwrap();
 
                         match chr1_ahead {
-                            '\r' | '\t' => {
+                            '\r' | '\n' => {
                                 if let Some(keyval) = p.flush() {
                                     self.buffer = Some(Expression::from_keyval(
                                         &if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -327,10 +327,10 @@ impl ExpressionP {
             }
             State::Ws1KeyvalWs2 => match chr0 {
                 '\t' | ' ' => {
-                    let chr1_ahead = look_ahead_items.get(1).as_ref().unwrap();
+                    let chr1_ahead = look_ahead_items.get(1).unwrap();
 
                     match chr1_ahead {
-                        '\r' | '\t' => {
+                        '\r' | '\n' => {
                             return PResult::End;
                         }
                         '#' => {
@@ -343,7 +343,7 @@ impl ExpressionP {
                     }
                 } // Ignore it.
                 // `,`
-                '\r' | '\t' => return PResult::End,
+                '\r' | '\n' => return PResult::End,
                 _ => {
                     return error(&mut self.log(), &look_ahead_items, "expression.rs.84.");
                 }

@@ -9,6 +9,7 @@ use crate::parser::phase200::layer210::{non_eol_p::Judge as NonEolPJudge, NonEol
 use crate::parser::phase200::layer210::{CommentP, PResult};
 use crate::parser::phase200::Token;
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -20,7 +21,7 @@ pub enum State {
 }
 
 pub enum Judge {
-    CommentStartSymbol(Character),
+    CommentStartSymbol(char),
     CommentCharacter(NonEol),
 }
 
@@ -70,7 +71,7 @@ impl CommentP {
             State::First => match judge {
                 Judge::CommentStartSymbol(ch) => {
                     self.product
-                        .push_token(&Token::from_character(&ch, TokenType::Comment));
+                        .push_token(&Token::from_character(*ch, TokenType::Comment));
                 }
                 Judge::CommentCharacter(ch) => {
                     panic!("comment_p.rs.82.");
@@ -91,21 +92,21 @@ impl CommentP {
     }
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn forward1(&mut self, characters: &LookAheadItems<char>) -> PResult {
+    pub fn forward1(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::End => {
                 panic!("comment_p.rs.61.");
             }
             State::First | State::NonEol => {
                 // 次の１文字。
-                let chr1 = characters.current.as_ref().unwrap();
-                if let None = NonEolP::judge(chr1) {
+                let chr1 = look_ahead_items.get(1).unwrap();
+                if let None = NonEolP::judge(*chr1) {
                     self.state = State::End;
                     return PResult::End;
                 }
