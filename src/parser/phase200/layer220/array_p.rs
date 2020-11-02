@@ -10,7 +10,6 @@
 use crate::model::{layer110::CharacterType, layer210::LiteralValue, layer220::Array};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::{BasicStringP, LiteralStringP, PResult},
     layer220::ArrayP,
@@ -69,13 +68,13 @@ impl ArrayP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let character0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, tokens: &LookAheadItems<char>) -> PResult {
+        let chr0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `]`.
             State::AfterArray => {
-                match character0.type_ {
-                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+                match chr0.type_ {
+                    '\t' | ' ' => {} // Ignore it.
                     // ,
                     CharacterType::Comma => {
                         self.state = State::AfterCommaBehindArray;
@@ -90,13 +89,13 @@ impl ArrayP {
             }
             // After `[],`.
             State::AfterCommaBehindArray => {
-                match character0.type_ {
+                match chr0.type_ {
                     // [
                     CharacterType::LeftSquareBracket => {
                         self.array_p = Some(Box::new(ArrayP::default()));
                         self.state = State::Array;
                     }
-                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+                    '\t' | ' ' => {} // Ignore it.
                     // ]
                     CharacterType::RightSquareBracket => {
                         self.state = State::End;
@@ -107,9 +106,9 @@ impl ArrayP {
             }
             // ", ` の次。
             State::AfterCommaBefindString => {
-                match character0.type_ {
+                match chr0.type_ {
                     // "
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
@@ -118,7 +117,7 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+                    '\t' | ' ' => {} // Ignore it.
                     // ]
                     CharacterType::RightSquareBracket => {
                         self.state = State::End;
@@ -129,7 +128,7 @@ impl ArrayP {
             }
             // After `literal,`.
             State::AfterCommaBehindLiteralValue => {
-                match character0.type_ {
+                match chr0.type_ {
                     CharacterType::Alpha
                     | CharacterType::Digit
                     | CharacterType::Hyphen
@@ -139,10 +138,10 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralValue::from_character(character0));
+                        m.push_literal_string(&LiteralValue::from_character(chr0));
                         self.state = State::LiteralValue;
                     }
-                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+                    '\t' | ' ' => {} // Ignore it.
                     // `]`.
                     CharacterType::RightSquareBracket => {
                         self.state = State::End;
@@ -153,8 +152,8 @@ impl ArrayP {
             }
             // After " or '.
             State::AfterString => {
-                match character0.type_ {
-                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+                match chr0.type_ {
+                    '\t' | ' ' => {} // Ignore it.
                     CharacterType::Comma => {
                         self.state = State::AfterCommaBefindString;
                     }
@@ -190,9 +189,9 @@ impl ArrayP {
             }
             // After `[`.
             State::First => {
-                match character0.type_ {
+                match chr0.type_ {
                     // "
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         self.basic_string_p = Some(Box::new(BasicStringP::new()));
                         self.state = State::DoubleQuotedString;
                     }
@@ -205,7 +204,7 @@ impl ArrayP {
                             self.buffer = Some(Array::default());
                         }
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_literal_string(&LiteralValue::from_character(character0));
+                        m.push_literal_string(&LiteralValue::from_character(chr0));
                         self.state = State::LiteralValue;
                     }
                     // `[`. Recursive.
@@ -223,11 +222,11 @@ impl ArrayP {
                         self.literal_string_p = Some(Box::new(LiteralStringP::new()));
                         self.state = State::LiteralString;
                     }
-                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+                    '\t' | ' ' => {} // Ignore it.
                     _ => return error(&mut self.log(), &tokens, "array.rs.358."),
                 }
             }
-            State::LiteralValue => match character0.type_ {
+            State::LiteralValue => match chr0.type_ {
                 CharacterType::Comma => {
                     self.state = State::AfterCommaBehindLiteralValue;
                 }

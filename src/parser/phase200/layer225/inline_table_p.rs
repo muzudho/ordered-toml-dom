@@ -4,7 +4,6 @@
 use crate::model::{layer110::CharacterType, layer225::InlineTable};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::PResult,
     layer225::{InlineTableP, KeyvalP},
@@ -46,13 +45,13 @@ impl InlineTableP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
-        let character0 = tokens.current.as_ref().unwrap();
+    pub fn parse(&mut self, tokens: &LookAheadItems<char>) -> PResult {
+        let chr0 = tokens.current.as_ref().unwrap();
         match self.state {
             // After `{`.
             State::First => {
-                match character0.type_ {
-                    CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+                match chr0.type_ {
+                    '\t' | ' ' => {} // Ignore it.
                     // `apple.banana`
                     CharacterType::Alpha
                     | CharacterType::Digit
@@ -108,8 +107,8 @@ impl InlineTableP {
                 }
             }
             // After `banana = 3`.
-            State::AfterKeyval => match character0.type_ {
-                CharacterType::HorizontalTab | CharacterType::Space => {} // Ignore it.
+            State::AfterKeyval => match chr0.type_ {
+                '\t' | ' ' => {} // Ignore it.
                 // `,`
                 CharacterType::Comma => {
                     self.state = State::First;

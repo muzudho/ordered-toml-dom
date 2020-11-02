@@ -4,13 +4,13 @@
 use crate::model::{layer110::CharacterType, layer225::Val};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::{BasicStringP, LiteralStringP, LiteralValueP, PResult},
     layer220::ArrayP,
     layer225::{InlineTableP, ValP},
 };
 use casual_logger::Table as LogTable;
+use look_ahead_items::LookAheadItems;
 
 /// Key value syntax machine state.  
 /// キー値構文状態遷移。  
@@ -55,8 +55,8 @@ impl ValP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
         match self.state {
             // After {.
             State::AfterLeftCurlyBracket => {
@@ -119,9 +119,9 @@ impl ValP {
                 }
             }
             State::First => {
-                match character0.type_ {
+                match chr0.type_ {
                     // "
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         self.basic_string_p = Some(BasicStringP::new());
                         self.state = State::BasicString;
                     }
@@ -140,7 +140,7 @@ impl ValP {
                         self.literal_string_p = Some(LiteralStringP::new());
                         self.state = State::LiteralString;
                     }
-                    CharacterType::HorizontalTab | CharacterType::Space => {} //Ignored it.
+                    '\t' | ' ' => {} //Ignored it.
                     CharacterType::Alpha
                     | CharacterType::Digit
                     | CharacterType::Hyphen

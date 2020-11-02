@@ -4,7 +4,6 @@
 use crate::model::layer110::{CharacterType, Token, TokenType};
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{PResult, PositionalNumeralStringP};
-use crate::parser::phase200::LookAheadCharacters;
 use casual_logger::Table;
 
 impl PositionalNumeralStringP {
@@ -33,7 +32,7 @@ impl PositionalNumeralStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
         let token0 = characters.current.as_ref().unwrap();
 
         match token0.type_ {

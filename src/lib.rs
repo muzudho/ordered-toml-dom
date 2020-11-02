@@ -20,6 +20,7 @@
 // #[macro_use]
 // extern crate lazy_static;
 extern crate chrono;
+extern crate look_ahead_items;
 extern crate num_traits;
 extern crate rand;
 
@@ -28,11 +29,9 @@ mod parser;
 mod util;
 
 use crate::model::layer310::TomlDocument;
-use crate::parser::{
-    phase100::LexicalParser,
-    phase200::{layer210::PResult, layer310::DocumentP},
-};
+use crate::parser::phase200::{layer210::PResult, layer310::DocumentP};
 use casual_logger::{ArrayOfTable, Log, Table};
+use look_ahead_items::ItemsBuilder;
 use std::convert::TryInto;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -56,10 +55,12 @@ impl Toml {
                         Err(why) => panic!(Log::fatal(&format!("{}", why))),
                     };
                     // Log::trace(&format!("from_file/line=|{}|", line));
-                    let mut lexical_p = LexicalParser::new(row_number);
-                    lexical_p.parse_line(&line);
+                    let mut product = ItemsBuilder::default()
+                        .set_look_ahead_size(4)
+                        .read(&line.chars().collect())
+                        .build();
 
-                    match document_p.scan_line(&lexical_p.product(), &mut output_document) {
+                    match document_p.scan_line(&product, &mut output_document) {
                         PResult::End => {} // Ignored it.
                         PResult::Err(table) => {
                             error_tables.push(
@@ -74,7 +75,6 @@ impl Toml {
                                         },
                                     )
                                     .str("line", &format!("{}", line))
-                                    .str("token_line", &format!("{}", lexical_p))
                                     .sub_t("table", &table)
                                     .sub_t("document_p", &document_p.log())
                                     .clone(),

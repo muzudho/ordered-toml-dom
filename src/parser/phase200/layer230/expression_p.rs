@@ -7,13 +7,13 @@ use crate::model::{layer110::CharacterType, layer230::Expression};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer230::WsP;
-use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::{CommentP, HeaderPOfArrayOfTable, HeaderPOfTable, PResult},
     layer225::KeyvalP,
     layer230::ExpressionP,
 };
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 /// Line syntax machine state.  
 /// 行構文状態遷移。  
@@ -62,42 +62,41 @@ impl ExpressionP {
 
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
     /// # Returns
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
+        let chr0 = look_ahead_items.get(0).unwrap();
 
         match self.state {
             State::AfterArrayOfTable => {
                 // TODO 後ろにコメントがあるかも。
-                return error(&mut self.log(), &characters, "expression.rs.66.");
+                return error(&mut self.log(), &look_ahead_items, "expression.rs.66.");
             }
-            State::AfterLeftSquareBracket => match character0.type_ {
-                // `[`
-                CharacterType::LeftSquareBracket => {
+            State::AfterLeftSquareBracket => match chr0 {
+                '[' => {
                     self.header_p_of_array_of_table = Some(HeaderPOfArrayOfTable::new());
                     self.state = State::HeaderOfArrayOfTable;
                 }
                 _ => {
                     self.header_p_of_table = Some(HeaderPOfTable::new());
                     self.state = State::Table;
-                    return self.parse_header_of_table(characters);
+                    return self.parse_header_of_table(look_ahead_items);
                 }
             },
             State::AfterTable => {
                 // TODO 後ろにコメントがあるかも。
-                return error(&mut self.log(), &characters, "expression.rs.106.");
+                return error(&mut self.log(), &look_ahead_items, "expression.rs.106.");
             }
             State::End => {
-                return error(&mut self.log(), &characters, "expression.rs.98.");
+                return error(&mut self.log(), &look_ahead_items, "expression.rs.98.");
             }
             State::HeaderOfArrayOfTable => {
                 let p = self.header_p_of_array_of_table.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
                         if let Some(m) = p.flush() {
                             self.buffer = Some(Expression::from_header_of_array_of_table(&m));
@@ -105,14 +104,14 @@ impl ExpressionP {
                             self.state = State::AfterArrayOfTable;
                             return PResult::End;
                         } else {
-                            return error(&mut self.log(), &characters, "expression.rs.123.");
+                            return error(&mut self.log(), &look_ahead_items, "expression.rs.123.");
                         }
                     } // Ignored it.
                     PResult::Err(mut table) => {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "expression.rs.132.",
                         );
                     }
@@ -120,13 +119,13 @@ impl ExpressionP {
                 }
             }
             State::Finished => {
-                return error(&mut self.log(), &characters, "expression.rs.205.");
+                return error(&mut self.log(), &look_ahead_items, "expression.rs.205.");
             }
             State::Table => {
-                return self.parse_header_of_table(characters);
+                return self.parse_header_of_table(look_ahead_items);
             }
-            State::First | State::Ws1 => match character0.type_ {
-                CharacterType::Newline => {
+            State::First | State::Ws1 => match chr0 {
+                '\r' | '\n' => {
                     self.buffer = Some(Expression::EmptyLine(
                         if let Some(ws_p_1) = self.ws_p_1.as_mut() {
                             ws_p_1.get_ws()
@@ -146,21 +145,18 @@ impl ExpressionP {
                     return PResult::End;
                 }
                 // `abc`
-                CharacterType::Alpha
-                | CharacterType::Digit
-                | CharacterType::Hyphen
-                | CharacterType::Underscore => {
+                CharacterType::Alpha | CharacterType::Digit | '-' | '_' => {
                     self.keyval_p = Some(KeyvalP::new());
-                    match self.keyval_p.as_mut().unwrap().parse(&characters) {
+                    match self.keyval_p.as_mut().unwrap().parse(&look_ahead_items) {
                         PResult::End => {
                             // 1トークンでは終わらないから。
-                            return error(&mut self.log(), &characters, "expression.rs.164.");
+                            return error(&mut self.log(), &look_ahead_items, "expression.rs.164.");
                         }
                         PResult::Err(mut table) => {
                             return error_via(
                                 &mut table,
                                 &mut self.log(),
-                                &characters,
+                                &look_ahead_items,
                                 "expression.rs.171.",
                             )
                         }
@@ -173,14 +169,14 @@ impl ExpressionP {
                     self.state = State::AfterLeftSquareBracket;
                 }
                 // `#`
-                CharacterType::CommentStartSymbol => {
+                '#' => {
                     self.comment_p = Some(CommentP::new());
 
                     let p = self.comment_p.as_mut().unwrap();
-                    let judge = p.judge1(&character0);
+                    let judge = p.judge1(&chr0);
                     if let Some(judge) = judge {
                         p.commit1(&judge);
-                        match p.forward1(&characters) {
+                        match p.forward1(&look_ahead_items) {
                             PResult::End => {
                                 self.buffer = Some(Expression::EmptyLine(
                                     Ws::default(),
@@ -199,7 +195,7 @@ impl ExpressionP {
                                 return error_via(
                                     &mut table,
                                     &mut self.log(),
-                                    &characters,
+                                    &look_ahead_items,
                                     "expression.rs.162.",
                                 );
                             }
@@ -208,22 +204,22 @@ impl ExpressionP {
                             }
                         }
                     } else {
-                        return error(&mut self.log(), &characters, "expression.rs.236.");
+                        return error(&mut self.log(), &look_ahead_items, "expression.rs.236.");
                     }
                 }
-                CharacterType::HorizontalTab | CharacterType::Space => {
+                '\t' | ' ' => {
                     if let None = self.ws_p_1 {
                         self.ws_p_1 = Some(WsP::default());
                     }
-                    match self.ws_p_1.as_mut().unwrap().parse(&characters) {
+                    match self.ws_p_1.as_mut().unwrap().parse(&look_ahead_items) {
                         PResult::End => {
-                            return error(&mut self.log(), &characters, "expression.rs.197.");
+                            return error(&mut self.log(), &look_ahead_items, "expression.rs.197.");
                         }
                         PResult::Err(mut table) => {
                             return error_via(
                                 &mut table,
                                 &mut self.log(),
-                                &characters,
+                                &look_ahead_items,
                                 "expression.rs.200.",
                             );
                         }
@@ -231,15 +227,15 @@ impl ExpressionP {
                     }
                 } // Ignored it.
                 _ => {
-                    return error(&mut self.log(), &characters, "expression.rs.246.");
+                    return error(&mut self.log(), &look_ahead_items, "expression.rs.246.");
                 }
             },
             State::Ws1Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                let judge = p.judge1(&character0);
+                let judge = p.judge1(&chr0);
                 if let Some(judge) = judge {
                     p.commit1(&judge);
-                    match p.forward1(&characters) {
+                    match p.forward1(&look_ahead_items) {
                         PResult::End => {
                             self.buffer = Some(Expression::EmptyLine(
                                 if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -262,24 +258,24 @@ impl ExpressionP {
                             return error_via(
                                 &mut table,
                                 &mut self.log(),
-                                &characters,
+                                &look_ahead_items,
                                 "expression.rs.162.",
                             );
                         }
                         PResult::Ongoing => {}
                     }
                 } else {
-                    return error(&mut self.log(), &characters, "expression.rs.236.");
+                    return error(&mut self.log(), &look_ahead_items, "expression.rs.236.");
                 }
             }
             State::Ws1Keyval => {
                 let p = self.keyval_p.as_mut().unwrap();
-                match p.parse(&characters) {
+                match p.parse(&look_ahead_items) {
                     PResult::End => {
-                        let token1 = characters.one_ahead.as_ref().unwrap();
+                        let token1 = look_ahead_items.one_ahead.as_ref().unwrap();
 
                         match token1.type_ {
-                            CharacterType::Newline => {
+                            '\r' | '\t' => {
                                 if let Some(keyval) = p.flush() {
                                     self.buffer = Some(Expression::from_keyval(
                                         &if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -295,22 +291,26 @@ impl ExpressionP {
                                 } else {
                                     return error(
                                         &mut self.log(),
-                                        &characters,
+                                        &look_ahead_items,
                                         "expression.rs.222.",
                                     );
                                 }
                                 return PResult::End;
                             }
-                            CharacterType::CommentStartSymbol => {
+                            '#' => {
                                 self.comment_p = Some(CommentP::new());
                                 self.state = State::Ws1KeyvalWs2Comment;
                             }
-                            CharacterType::HorizontalTab | CharacterType::Space => {
+                            '\t' | ' ' => {
                                 self.ws_p_2 = Some(WsP::default());
                                 self.state = State::Ws1KeyvalWs2;
                             }
                             _ => {
-                                return error(&mut self.log(), &characters, "expression.rs.222.");
+                                return error(
+                                    &mut self.log(),
+                                    &look_ahead_items,
+                                    "expression.rs.222.",
+                                );
                             }
                         }
                     } // Ignored it.
@@ -318,42 +318,42 @@ impl ExpressionP {
                         return error_via(
                             &mut table,
                             &mut self.log(),
-                            &characters,
+                            &look_ahead_items,
                             "expression.rs.231.",
                         );
                     }
                     PResult::Ongoing => {}
                 }
             }
-            State::Ws1KeyvalWs2 => match character0.type_ {
-                CharacterType::HorizontalTab | CharacterType::Space => {
-                    let token1 = characters.one_ahead.as_ref().unwrap();
+            State::Ws1KeyvalWs2 => match chr0 {
+                '\t' | ' ' => {
+                    let token1 = look_ahead_items.one_ahead.as_ref().unwrap();
 
                     match token1.type_ {
-                        CharacterType::Newline => {
+                        '\r' | '\t' => {
                             return PResult::End;
                         }
-                        CharacterType::CommentStartSymbol => {
+                        '#' => {
                             self.comment_p = Some(CommentP::new());
                             self.state = State::Ws1KeyvalWs2Comment;
                         }
                         _ => {
-                            return error(&mut self.log(), &characters, "expression.rs.222.");
+                            return error(&mut self.log(), &look_ahead_items, "expression.rs.222.");
                         }
                     }
                 } // Ignore it.
                 // `,`
-                CharacterType::Newline => return PResult::End,
+                '\r' | '\t' => return PResult::End,
                 _ => {
-                    return error(&mut self.log(), &characters, "expression.rs.84.");
+                    return error(&mut self.log(), &look_ahead_items, "expression.rs.84.");
                 }
             },
             State::Ws1KeyvalWs2Comment => {
                 let p = self.comment_p.as_mut().unwrap();
-                let judge = p.judge1(&character0);
+                let judge = p.judge1(&chr0);
                 if let Some(judge) = judge {
                     p.commit1(&judge);
-                    match p.forward1(&characters) {
+                    match p.forward1(&look_ahead_items) {
                         PResult::End => {
                             self.buffer = Some(Expression::Keyval(
                                 if let Some(ws_p_1) = self.ws_p_1.as_mut() {
@@ -382,14 +382,14 @@ impl ExpressionP {
                             return error_via(
                                 &mut table,
                                 &mut self.log(),
-                                &characters,
+                                &look_ahead_items,
                                 "expression.rs.162.",
                             );
                         }
                         PResult::Ongoing => {}
                     }
                 } else {
-                    return error(&mut self.log(), &characters, "expression.rs.315.");
+                    return error(&mut self.log(), &look_ahead_items, "expression.rs.315.");
                 }
             }
         }
@@ -401,11 +401,11 @@ impl ExpressionP {
     ///
     /// # Arguments
     ///
-    /// * `characters` - Tokens contains look ahead.  
+    /// * `look_ahead_items` - Tokens contains look ahead.  
     ///             先読みを含むトークン。  
-    fn parse_header_of_table(&mut self, characters: &LookAheadCharacters) -> PResult {
+    fn parse_header_of_table(&mut self, look_ahead_items: &LookAheadItems<char>) -> PResult {
         let p = self.header_p_of_table.as_mut().unwrap();
-        match p.parse(&characters) {
+        match p.parse(&look_ahead_items) {
             PResult::End => {
                 if let Some(m) = p.flush() {
                     self.buffer = Some(Expression::from_header_of_table(&m));
@@ -413,14 +413,14 @@ impl ExpressionP {
                     self.state = State::AfterTable;
                     return PResult::End;
                 } else {
-                    return error(&mut self.log(), &characters, "expression.rs.269.");
+                    return error(&mut self.log(), &look_ahead_items, "expression.rs.269.");
                 }
             } // Ignored it.
             PResult::Err(mut table) => {
                 return error_via(
                     &mut table,
                     &mut self.log(),
-                    &characters,
+                    &look_ahead_items,
                     "expression.rs.278.",
                 );
             }

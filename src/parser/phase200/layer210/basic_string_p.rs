@@ -17,8 +17,8 @@ use crate::model::{
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{BasicStringP, EscapeSequenceP, PResult};
-use crate::parser::phase200::LookAheadCharacters;
 use casual_logger::Table;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -65,8 +65,8 @@ impl BasicStringP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
         match self.state {
             State::BeforeMultiLine => {
                 // print!("trace.8.");
@@ -77,13 +77,13 @@ impl BasicStringP {
             }
             State::First => {
                 // print!("trace.4.");
-                match character0.type_ {
+                match chr0.type_ {
                     // `"`
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         // print!("trace.5.");
                         if let Some(token_1_ahead) = &characters.one_ahead {
                             match token_1_ahead.type_ {
-                                CharacterType::DoubleQuotation => {
+                                '"' => {
                                     //print!("trace.7.");
                                     // Before triple double quoted string.
                                     self.state = State::BeforeMultiLine;
@@ -125,24 +125,21 @@ impl BasicStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&character0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
                         self.state = State::SingleLine;
                     }
                 }
             }
             State::MultiLine => {
-                match character0.type_ {
+                match chr0.type_ {
                     // "
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         // print!("trace.10.");
                         if check_triple_double_quotation(characters) {
                             self.state = State::MultiLineEnd1;
                         } else {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(
-                                &character0,
-                                TokenType::BasicString,
-                            ));
+                            m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
                         }
                     }
                     // \
@@ -170,14 +167,14 @@ impl BasicStringP {
                     _ => {
                         // print!("trace.12.");
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&character0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
                     }
                 }
             }
             State::MultiLineEnd1 => {
-                match character0.type_ {
+                match chr0.type_ {
                     // `"`
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         self.state = State::MultiLineEnd2;
                     }
                     _ => {
@@ -186,9 +183,9 @@ impl BasicStringP {
                 }
             }
             State::MultiLineEnd2 => {
-                match character0.type_ {
+                match chr0.type_ {
                     // `"`
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         // End of syntax.
                         // 構文の終わり。
                         self.state = State::End;
@@ -220,40 +217,37 @@ impl BasicStringP {
             }
             State::MultiLineTrimStart => {
                 // println!("[trace307 MultiLineTrimStart]");
-                match character0.type_ {
-                    CharacterType::Newline => {
+                match chr0.type_ {
+                    '\r' | '\t' => {
                         // println!("[trace312 Newline]");
                     } // Ignore it.
-                    CharacterType::HorizontalTab | CharacterType::Space => {
+                    '\t' | ' ' => {
                         // println!("[trace308 WS]");
                     } // Ignore it.
                     // "
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         if check_triple_double_quotation(characters) {
                             // println!("[trace309 check_triple_double_quotation]");
                             self.state = State::MultiLineEnd1;
                         } else {
                             // println!("[trace310 DoubleQuotation]");
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(
-                                &character0,
-                                TokenType::BasicString,
-                            ));
+                            m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
                             self.state = State::MultiLine; // (2020-10-18追加)
                         }
                     }
                     _ => {
-                        // println!("[trace311 Otherwise={:?}]", character0);
+                        // println!("[trace311 Otherwise={:?}]", chr0);
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&character0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
                         self.state = State::MultiLine;
                     }
                 }
             }
             State::SingleLine => {
-                match character0.type_ {
+                match chr0.type_ {
                     // `"`
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         // End of syntax.
                         // 構文の終わり。
                         self.state = State::End;
@@ -285,7 +279,7 @@ impl BasicStringP {
                     }
                     _ => {
                         let m = self.buffer.as_mut().unwrap();
-                        m.push_token(&Token::from_character(&character0, TokenType::BasicString));
+                        m.push_token(&Token::from_character(&chr0, TokenType::BasicString));
                     }
                 }
             }
@@ -332,13 +326,13 @@ impl BasicStringP {
 ///
 /// It's triple double quotation.  
 /// ３連一重引用符。  
-fn check_triple_double_quotation(characters: &LookAheadCharacters) -> bool {
+fn check_triple_double_quotation(characters: &LookAheadItems<char>) -> bool {
     if let Some(token_2_ahead) = &characters.two_ahead {
         match token_2_ahead.type_ {
-            CharacterType::DoubleQuotation => {
+            '"' => {
                 if let Some(token_1_ahead) = &characters.one_ahead {
                     match token_1_ahead.type_ {
-                        CharacterType::DoubleQuotation => {
+                        '"' => {
                             // Triple double quote.
                             true
                         }

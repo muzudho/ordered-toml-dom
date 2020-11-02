@@ -6,7 +6,7 @@ use crate::model::{
     layer230::HeaderOfArrayOfTable,
 };
 use crate::parser::phase200::layer210::{HeaderPOfArrayOfTable, PResult};
-use crate::parser::phase200::LookAheadCharacters;
+use crate::parser::phase200::LookAheadItems<char>;
 use crate::parser::phase200::Token;
 // use casual_logger::Table;
 
@@ -29,17 +29,17 @@ impl HeaderPOfArrayOfTable {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
-        match character0.type_ {
-            CharacterType::DoubleQuotation => {
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
+        match chr0.type_ {
+            '"' => {
                 // End of syntax.
                 // 構文の終わり。
                 return PResult::End;
             }
             _ => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(&character0, TokenType::Table));
+                m.push_token(&Token::from_character(&chr0, TokenType::Table));
             }
         }
         PResult::Ongoing

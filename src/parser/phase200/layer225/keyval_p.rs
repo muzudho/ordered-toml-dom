@@ -10,7 +10,6 @@
 use crate::model::{layer110::CharacterType, layer225::Keyval};
 use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
-use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::{
     layer210::{KeyP, PResult},
     layer225::{KeyvalP, ValP},
@@ -64,8 +63,8 @@ impl KeyvalP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
         match self.state {
             // After `=`.
             State::AfterEquals => {
@@ -74,8 +73,8 @@ impl KeyvalP {
             }
             // After key.
             State::BeforeEqual => {
-                match character0.type_ {
-                    CharacterType::HorizontalTab | CharacterType::Space => {} //Ignored it.
+                match chr0.type_ {
+                    '\t' | ' ' => {} //Ignored it.
                     // `=`.
                     CharacterType::Equals => {
                         self.state = State::AfterEquals;
@@ -84,8 +83,8 @@ impl KeyvalP {
                 }
             }
             State::First => {
-                match character0.type_ {
-                    CharacterType::HorizontalTab | CharacterType::Space => {} //Ignored it.
+                match chr0.type_ {
+                    '\t' | ' ' => {} //Ignored it.
                     CharacterType::Alpha
                     | CharacterType::Digit
                     | CharacterType::Hyphen

@@ -11,7 +11,7 @@ use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::{non_eol_p::Judge as NonEolPJudge, NonEolP};
 use crate::parser::phase200::layer210::{CommentP, PResult};
 use crate::parser::phase200::Character;
-use crate::parser::phase200::LookAheadCharacters;
+use crate::parser::phase200::LookAheadItems<char>;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
 
@@ -51,7 +51,7 @@ impl CommentP {
         match self.state {
             State::End => None,
             State::First => match character.type_ {
-                CharacterType::CommentStartSymbol => {
+                '#' => {
                     Some(Judge::CommentStartSymbol(character.clone()))
                 }
                 _ => panic!("comment_p.rs.57. type={:?}", character.type_),
@@ -104,15 +104,15 @@ impl CommentP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn forward1(&mut self, characters: &LookAheadCharacters) -> PResult {
+    pub fn forward1(&mut self, characters: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::End => {
                 panic!("comment_p.rs.61.");
             }
             State::First | State::NonEol => {
                 // 次の１文字。
-                let character1 = characters.current.as_ref().unwrap();
-                if let None = NonEolP::judge(character1) {
+                let chr1 = characters.current.as_ref().unwrap();
+                if let None = NonEolP::judge(chr1) {
                     self.state = State::End;
                     return PResult::End;
                 }

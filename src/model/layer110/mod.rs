@@ -90,7 +90,7 @@ pub enum TokenType {
 /// 一列の字。  
 pub struct CharacterLine {
     pub row_number: usize,
-    pub characters: Vec<Character>,
+    pub characters: Vec<char>,
 }
 
 /// A row of tokens.  
@@ -98,15 +98,6 @@ pub struct CharacterLine {
 pub struct TokenLine {
     pub row_number: usize,
     pub tokens: Vec<Token>,
-}
-
-/// Character.  
-/// 字。  
-#[derive(Clone)]
-pub struct Character {
-    pub column_number: usize,
-    pub value: char,
-    pub type_: CharacterType,
 }
 
 /// Token.  

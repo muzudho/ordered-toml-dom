@@ -7,7 +7,7 @@ use crate::model::{
 };
 use crate::parser::phase200::error;
 use crate::parser::phase200::layer210::{KeyP, PResult};
-use crate::parser::phase200::LookAheadCharacters;
+use crate::parser::phase200::LookAheadItems<char>;
 use casual_logger::Table as LogTable;
 
 impl Default for KeyP {
@@ -34,15 +34,15 @@ impl KeyP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
-        match character0.type_ {
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
+        match chr0.type_ {
             CharacterType::Alpha
             | CharacterType::Digit
             | CharacterType::Hyphen
             | CharacterType::Underscore => {
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(&character0, TokenType::Key));
+                m.push_token(&Token::from_character(&chr0, TokenType::Key));
 
                 // Look-ahead.
                 // 先読み。

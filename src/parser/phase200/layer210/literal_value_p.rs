@@ -13,7 +13,6 @@ use crate::parser::phase200::layer210::PositionalNumeralStringP;
 use crate::parser::phase200::layer210::{
     date_time_p::State as DateTimeState, LiteralValueP, PResult,
 };
-use crate::parser::phase200::LookAheadCharacters;
 use casual_logger::Table as LogTable;
 
 /// Syntax machine state.  
@@ -56,8 +55,8 @@ impl LiteralValueP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
         match self.state {
             State::DateTime => {
                 let p = self.date_time_p.as_mut().unwrap();
@@ -66,7 +65,7 @@ impl LiteralValueP {
                         let string_buffer = tokens_stringify(&p.flush());
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
-                            character0.column_number,
+                            chr0.column_number,
                             &string_buffer,
                             TokenType::SPDateTimeString,
                         ));
@@ -89,7 +88,7 @@ impl LiteralValueP {
                 return error(&mut self.log(), &characters, "literal_value.rs.57.");
             }
             State::First => {
-                // println!("[trace61 character0.type_={:?}]", &character0.type_);
+                // println!("[trace61 chr0.type_={:?}]", &chr0.type_);
 
                 // TODO まず日付型かどうか調べると楽そう。
                 // ２文字先を最初に調べるのがコツ。
@@ -152,7 +151,7 @@ impl LiteralValueP {
                     }
                     // `nnnn-`.
                     if is_date {
-                        if let Some(ch0) = character0.to_string().chars().nth(0) {
+                        if let Some(ch0) = chr0.to_string().chars().nth(0) {
                             match ch0 {
                                 '0'..='9' => {
                                     // 日付型なのは確定。
@@ -203,7 +202,7 @@ impl LiteralValueP {
                     }
                     // `nn:`.
                     if is_time {
-                        if let Some(ch0) = character0.to_string().chars().nth(0) {
+                        if let Some(ch0) = chr0.to_string().chars().nth(0) {
                             match ch0 {
                                 '0'..='9' => {
                                     // 時刻型なのは確定。
@@ -243,7 +242,7 @@ impl LiteralValueP {
                 if is_date || is_time {
                     PResult::Ongoing
                 } else {
-                    let base_number = match character0.type_ {
+                    let base_number = match chr0.type_ {
                         CharacterType::Alpha
                         | CharacterType::Colon
                         | CharacterType::Dot
@@ -251,7 +250,7 @@ impl LiteralValueP {
                         | CharacterType::Plus
                         | CharacterType::Underscore => 10,
                         CharacterType::Digit => {
-                            if let Some(ch0) = character0.to_string().chars().nth(0) {
+                            if let Some(ch0) = chr0.to_string().chars().nth(0) {
                                 // println!("[trace82 ch0={}]", ch0);
                                 if ch0 == '0' {
                                     // 0x ?
@@ -297,7 +296,7 @@ impl LiteralValueP {
                         }
                         16 => {
                             // `0x` は無視します。
-                            // println!("[trace129={}]", character0);
+                            // println!("[trace129={}]", chr0);
                             self.positional_numeral_string_p =
                                 Some(PositionalNumeralStringP::new("0x").clone());
                             self.state = State::ZeroXPrefix1st;
@@ -305,10 +304,7 @@ impl LiteralValueP {
                         }
                         10 => {
                             let m = self.buffer.as_mut().unwrap();
-                            m.push_token(&Token::from_character(
-                                &character0,
-                                TokenType::LiteralValue,
-                            ));
+                            m.push_token(&Token::from_character(&chr0, TokenType::LiteralValue));
                             // Look-ahead.
                             // 先読み。
                             if let Some(token1) = &characters.one_ahead {
@@ -340,7 +336,7 @@ impl LiteralValueP {
             State::Second => {
                 // 10進数のみです。
                 let m = self.buffer.as_mut().unwrap();
-                m.push_token(&Token::from_character(&character0, TokenType::LiteralValue));
+                m.push_token(&Token::from_character(&chr0, TokenType::LiteralValue));
                 // Look-ahead.
                 // 先読み。
                 if let Some(token1) = &characters.one_ahead {
@@ -367,12 +363,12 @@ impl LiteralValueP {
                 // 例えば `0xDEADBEEF` の場合、2文字目の `x` を取ろうとすると
                 // `xDEADBEEF` と、まとまりで取ってしまい、溢れる分の後処理が手間取りました。
                 // そこで、アルファベットは１トークンずつ取ることにしました。
-                // println!("[trace160={}]", character0);
+                // println!("[trace160={}]", chr0);
                 self.state = State::ZeroXString;
                 PResult::Ongoing
             }
             State::ZeroXString => {
-                // println!("[trace164={}]", character0);
+                // println!("[trace164={}]", chr0);
                 let p = self.positional_numeral_string_p.as_mut().unwrap();
                 match p.parse(&characters) {
                     PResult::End => {
@@ -386,7 +382,7 @@ impl LiteralValueP {
 
                         let m = self.buffer.as_mut().unwrap();
                         m.push_token(&Token::new(
-                            character0.column_number,
+                            chr0.column_number,
                             &numeral_string,
                             TokenType::SPPositionalNumeralString,
                         ));

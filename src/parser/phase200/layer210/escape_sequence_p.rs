@@ -7,7 +7,7 @@ use crate::parser::phase200::error;
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::PositionalNumeralStringP;
 use crate::parser::phase200::layer210::{EscapeSequenceP, PResult};
-use crate::parser::phase200::LookAheadCharacters;
+use crate::parser::phase200::LookAheadItems<char>;
 use casual_logger::Table;
 use std::char::from_u32;
 
@@ -49,8 +49,8 @@ impl EscapeSequenceP {
     ///
     /// * `PResult` - Result.  
     ///               結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
         match self.state {
             State::End => {
                 return error(&mut self.log(), &characters, "escape_sequence_p.rs.66.");
@@ -62,11 +62,11 @@ impl EscapeSequenceP {
                     match token_1_ahead.type_ {
                         CharacterType::Alpha
                         | CharacterType::Backslash
-                        | CharacterType::DoubleQuotation => {
+                        | '"' => {
                             // print!("[trace1 (IgnoreBackslash) ahead={:?}]", token_1_ahead);
                             self.state = State::EscapedCharacter;
                         }
-                        CharacterType::Newline => {
+                        '\r' | '\t' => {
                             // 行末に \ があったケース。
                             // println!("[trace3 行末にEOLがあったケース]");
                             self.state = State::End;
@@ -85,15 +85,15 @@ impl EscapeSequenceP {
                 }
             }
             State::EscapedCharacter => {
-                // println!("[trace196={:?}]", character0);
+                // println!("[trace196={:?}]", chr0);
                 // Escaped.
-                match character0.type_ {
+                match chr0.type_ {
                     // `"`
                     CharacterType::Alpha => {
                         // TODO 汎用的に書けないか？
                         // https://doc.rust-lang.org/reference/characters.html
                         let mut code = None;
-                        match character0.to_string().as_str() {
+                        match chr0.to_string().as_str() {
                             "n" => code = Some("\n"),
                             "r" => code = Some("\r"),
                             "t" => code = Some("\t"),
@@ -125,7 +125,7 @@ impl EscapeSequenceP {
                         }
                         if let Some(code) = code {
                             self.buffer.push(Token::new(
-                                character0.column_number,
+                                chr0.column_number,
                                 code,
                                 TokenType::EscapeSequence, // TODO EscapeSequence
                             ));
@@ -135,7 +135,7 @@ impl EscapeSequenceP {
                     }
                     CharacterType::Backslash => {
                         self.buffer.push(Token::new(
-                            character0.column_number,
+                            chr0.column_number,
                             "\\",
                             TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
@@ -143,9 +143,9 @@ impl EscapeSequenceP {
                         return PResult::End;
                     }
                     // "
-                    CharacterType::DoubleQuotation => {
+                    '"' => {
                         self.buffer.push(Token::new(
-                            character0.column_number,
+                            chr0.column_number,
                             "\"",
                             TokenType::EscapeSequence, // TODO EscapeSequence
                         ));
@@ -170,7 +170,7 @@ impl EscapeSequenceP {
                             Err(why) => panic!("{}", why),
                         };
                         self.buffer.push(Token::new(
-                            character0.column_number,
+                            chr0.column_number,
                             &from_u32(hex).unwrap().to_string(),
                             TokenType::EscapeSequence, // TODO EscapeSequence
                         ));

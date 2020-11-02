@@ -10,7 +10,7 @@ use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::WsP;
 use crate::parser::phase200::layer210::WscharP;
 use crate::parser::phase200::layer210::{KeyvalSepP, PResult};
-use crate::parser::phase200::LookAheadCharacters;
+use crate::parser::phase200::LookAheadItems<char>;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
 
@@ -72,11 +72,11 @@ impl KeyvalSepP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::First => {
-                let character0 = characters.current.as_ref().unwrap();
-                if let Some(judge) = Self::judge(&character0) {
+                let chr0 = characters.current.as_ref().unwrap();
+                if let Some(judge) = Self::judge(&chr0) {
                     match judge {
                         Judge::Ws => {
                             return self.parse_ws1(characters);
@@ -105,14 +105,14 @@ impl KeyvalSepP {
         PResult::Ongoing
     }
 
-    fn parse_ws1(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    fn parse_ws1(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
         self.ws1
-            .push_token(&Token::from_character(character0, TokenType::Ws));
+            .push_token(&Token::from_character(chr0, TokenType::Ws));
 
         // 次のトークンを調べます。
-        let character1 = characters.one_ahead.as_ref().unwrap();
-        if let Some(judge) = Self::judge(&character1) {
+        let chr1 = characters.one_ahead.as_ref().unwrap();
+        if let Some(judge) = Self::judge(&chr1) {
             match judge {
                 Judge::Ws => self.state = State::Ws1,
                 Judge::Equals => self.state = State::Equals,
@@ -123,10 +123,10 @@ impl KeyvalSepP {
         PResult::Ongoing
     }
 
-    fn parse_equals(&mut self, characters: &LookAheadCharacters) -> PResult {
+    fn parse_equals(&mut self, characters: &LookAheadItems<char>) -> PResult {
         // 次の文字を調べます。
-        let character1 = characters.one_ahead.as_ref().unwrap();
-        if let Some(judge) = Self::judge(&character1) {
+        let chr1 = characters.one_ahead.as_ref().unwrap();
+        if let Some(judge) = Self::judge(&chr1) {
             match judge {
                 Judge::Ws => {
                     return self.parse_ws2(characters);
@@ -140,14 +140,14 @@ impl KeyvalSepP {
         }
     }
 
-    fn parse_ws2(&mut self, characters: &LookAheadCharacters) -> PResult {
-        let character0 = characters.current.as_ref().unwrap();
+    fn parse_ws2(&mut self, characters: &LookAheadItems<char>) -> PResult {
+        let chr0 = characters.current.as_ref().unwrap();
         self.ws2
-            .push_token(&Token::from_character(character0, TokenType::Ws));
+            .push_token(&Token::from_character(chr0, TokenType::Ws));
 
         // 次のトークンを調べます。
-        let character1 = characters.one_ahead.as_ref().unwrap();
-        if let Some(judge) = Self::judge(&character1) {
+        let chr1 = characters.one_ahead.as_ref().unwrap();
+        if let Some(judge) = Self::judge(&chr1) {
             match judge {
                 Judge::Ws => self.state = State::Ws2,
                 Judge::Equals => {

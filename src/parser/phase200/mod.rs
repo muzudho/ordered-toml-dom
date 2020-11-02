@@ -6,50 +6,28 @@ pub mod layer220;
 pub mod layer225;
 pub mod layer230;
 pub mod layer310;
-pub mod look_ahead_characters;
 
-use crate::model::layer110::{Character, Token};
+use crate::model::layer110::Token;
 use crate::parser::phase200::layer210::PResult;
-use crate::parser::phase200::layer220::usize_to_i128;
 use crate::util::random_name;
 use casual_logger::Table as LogTable;
-
-pub struct LookAheadCharacters {
-    pub current: Option<Character>,
-    pub one_ahead: Option<Character>,
-    pub two_ahead: Option<Character>,
-    pub three_ahead: Option<Character>,
-    /// `2020-10-21` を `2020-` のハイフンまで先読みするのに使います。
-    pub four_ahead: Option<Character>,
-}
+use look_ahead_items::LookAheadItems;
 
 /// Error message.  
 /// エラー・メッセージ。  
 ///
 /// # Arguments
 ///
-/// * `tokens` - Tokens contains look ahead.  
+/// * `characters` - Tokens contains look ahead.  
 ///             先読みを含むトークン。  
-fn error(table: &mut LogTable, tokens: &LookAheadCharacters, place_of_occurrence: &str) -> PResult {
+fn error(
+    table: &mut LogTable,
+    characters: &LookAheadItems<char>,
+    place_of_occurrence: &str,
+) -> PResult {
     table.str("place_of_occurrence", place_of_occurrence);
 
-    if let Some(token) = &tokens.current {
-        table
-            .int("token0_column_number", usize_to_i128(token.column_number))
-            .str("token0", &format!("{}", token));
-    }
-
-    if let Some(token) = &tokens.one_ahead {
-        table
-            .int("token1_column_number", usize_to_i128(token.column_number))
-            .str("token1", &format!("{}", token));
-    }
-
-    if let Some(token) = &tokens.two_ahead {
-        table
-            .int("token2_column_number", usize_to_i128(token.column_number))
-            .str("token2", &format!("{}", token));
-    }
+    table.str("characters", &format!("{}", characters));
 
     PResult::Err(table.clone())
 }
@@ -59,33 +37,17 @@ fn error(table: &mut LogTable, tokens: &LookAheadCharacters, place_of_occurrence
 ///
 /// # Arguments
 ///
-/// * `tokens` - Tokens contains look ahead.  
+/// * `characters` - Tokens contains look ahead.  
 ///             先読みを含むトークン。  
 fn error_via(
     escalated_table1: &mut LogTable,
     this_table: &mut LogTable,
-    tokens: &LookAheadCharacters,
+    characters: &LookAheadItems<char>,
     place_of_occurrence: &str,
 ) -> PResult {
     this_table.str("via", place_of_occurrence);
 
-    if let Some(token) = &tokens.current {
-        this_table
-            .int("token0_column_number", usize_to_i128(token.column_number))
-            .str("token0", &format!("{}", token));
-    }
-
-    if let Some(token) = &tokens.one_ahead {
-        this_table
-            .int("token1_column_number", usize_to_i128(token.column_number))
-            .str("token1", &format!("{}", token));
-    }
-
-    if let Some(token) = &tokens.two_ahead {
-        this_table
-            .int("token2_column_number", usize_to_i128(token.column_number))
-            .str("token2", &format!("{}", token));
-    }
+    this_table.str("characters", &format!("{}", characters));
 
     PResult::Err(escalated_table1.sub_t(&random_name(), this_table).clone())
 }

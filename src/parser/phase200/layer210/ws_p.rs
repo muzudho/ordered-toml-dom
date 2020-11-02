@@ -1,14 +1,10 @@
 //! Non end-of-line parser.  
 //! 非行末パーサー。  
 
-use crate::model::{
-    layer110::{Character, TokenType},
-    layer210::Ws,
-};
+use crate::model::{layer110::TokenType, layer210::Ws};
 use crate::parser::phase200::error_via;
 use crate::parser::phase200::layer210::WscharP;
 use crate::parser::phase200::layer210::{PResult, WsP};
-use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
 use casual_logger::Table;
 
@@ -65,20 +61,20 @@ impl WsP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, characters: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, characters: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;
             }
             State::First => {
                 // Horizon tab and Ascii code.
-                let character0 = characters.current.as_ref().unwrap();
+                let chr0 = characters.current.as_ref().unwrap();
                 self.ws
-                    .push_token(&Token::from_character(character0, TokenType::Ws));
+                    .push_token(&Token::from_character(chr0, TokenType::Ws));
 
                 // TODO 次の文字をチェックすべきか、次のトークンをチェックすべきか？
-                let character1 = characters.current.as_ref().unwrap();
-                if let None = Self::judge(&character1) {
+                let chr1 = characters.current.as_ref().unwrap();
+                if let None = Self::judge(&chr1) {
                     return PResult::End;
                 }
             }
@@ -89,7 +85,7 @@ impl WsP {
         PResult::Ongoing
     }
 
-    fn parse_wschar(&mut self, characters: &LookAheadCharacters) -> PResult {
+    fn parse_wschar(&mut self, characters: &LookAheadItems<char>) -> PResult {
         if let None = self.wschar_p {
             self.wschar_p = Some(WscharP::new());
         }

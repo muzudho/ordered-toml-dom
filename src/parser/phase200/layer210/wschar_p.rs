@@ -1,13 +1,10 @@
 //! Whitespace character parser.  
 //! 空白文字パーサー。  
 
-use crate::model::{
-    layer110::{Character, TokenType},
-    layer210::Wschar,
-};
+use crate::model::{layer110::TokenType, layer210::Wschar};
 use crate::parser::phase200::layer210::{PResult, WscharP};
-use crate::parser::phase200::LookAheadCharacters;
 use crate::parser::phase200::Token;
+use look_ahead_items::LookAheadItems;
 
 /// Syntax machine state.  
 /// 構文状態遷移。  
@@ -41,8 +38,8 @@ impl WscharP {
     ///
     /// * `bool` - このパーサーの対象とするトークンになる.  
     ///                             結果。
-    pub fn judge(character: &Character) -> Option<Judge> {
-        let unicode = character.to_char() as u32;
+    pub fn judge(chr: char) -> Option<Judge> {
+        let unicode = chr as u32;
         match unicode {
             // Space, Horizon tab.
             0x20 | 0x09 => Some(Judge::Wschar),
@@ -57,7 +54,7 @@ impl WscharP {
     ///
     /// * `PResult` - Result.  
     ///                             結果。
-    pub fn parse(&mut self, tokens: &LookAheadCharacters) -> PResult {
+    pub fn parse(&mut self, tokens: &LookAheadItems<char>) -> PResult {
         match self.state {
             State::End => {
                 return PResult::End;
@@ -67,10 +64,10 @@ impl WscharP {
                     self.buffer = Some(Wschar::default());
                 }
                 let m = self.buffer.as_mut().unwrap();
-                let character0 = tokens.current.as_ref().unwrap();
-                m.push_token(&Token::from_character(character0, TokenType::Wschar));
-                let character1 = tokens.current.as_ref().unwrap();
-                if let None = Self::judge(&character1) {
+                let chr0 = tokens.current.as_ref().unwrap();
+                m.push_token(&Token::from_character(chr0, TokenType::Wschar));
+                let chr1 = tokens.current.as_ref().unwrap();
+                if let None = Self::judge(&chr1) {
                     return PResult::End;
                 }
             }
